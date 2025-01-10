@@ -3,7 +3,7 @@
 ## members
 Nicholas Parise - product owner  
 Geoffery Jensen - scrum master  
-Stephen Stefanitis  
+Stephen Stefanidis  
 Justin Bijoy  
 Ethan Brennan  
 Anthony Medico  
