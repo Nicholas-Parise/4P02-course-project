@@ -19,7 +19,7 @@ function App() {
   return (
     <>
       <BrowserRouter>
-      <Navbar></Navbar>
+      <Navbar name=""></Navbar>
         <Routes>
             <Route index element={<HomePage />} />
             <Route path="home" element={<HomePage />} />

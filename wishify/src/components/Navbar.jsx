@@ -1,37 +1,26 @@
 import React from 'react';
-import { NavLink } from "react-router-dom";
-import { Outlet, Link } from "react-router-dom";
+import { Nav, NavMenu, NavLink, Bars, NavNameLabel } from "./NavbarElements"
+import WishifyLogo from "./WishifyLogo"
 
-
-
-const Navbar = () => {
-  return (
-    <div>    
-
-        <nav>
-            <ul>
-                <li>
-                  <NavLink to="/home">Home</NavLink>
-                </li>
-
-                <li>
+const Navbar = (props) => {
+    return (
+      <>
+          <Nav>
+              <NavLink to="/home"><WishifyLogo/></NavLink>
+              <Bars/>
+              <NavMenu>
                   <NavLink to="/wishlists">Wishlist</NavLink>
-                </li>
-                <li>
                   <NavLink to="/events">Events</NavLink>
-                </li>
-                <li>
-                    <NavLink to="/login">login</NavLink>
-                </li>
-                <li>
-                    <NavLink to="/register">Signup</NavLink>
-                </li>
-                
-            </ul>
-        </nav>
-
-    </div>
-  )
+              </NavMenu>
+              {props.name == "" ?               
+              <NavMenu>
+                <NavLink to="/login">Login</NavLink>
+                <NavLink to="/register">Sign Up</NavLink>
+              </NavMenu>
+              : <NavNameLabel>{props.name}</NavNameLabel>}  {/*Show login and sign up only if user is logged in, otherwise show their name (will be a button eventually)*/}
+          </Nav>
+      </>
+    )
 }
 
 export default Navbar
