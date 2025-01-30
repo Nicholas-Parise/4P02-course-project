@@ -10,7 +10,7 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Events from "./pages/Events";
 import Wishlists from "./pages/Wishlists";
-import Navbar from './components/Navbar';
+import Navbar from './components/Navbar.tsx';
 
 function App() {
   const [count, setCount] = useState(0)
