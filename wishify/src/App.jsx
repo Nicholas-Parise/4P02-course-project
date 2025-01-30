@@ -10,7 +10,6 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Events from "./pages/Events";
 import Wishlists from "./pages/Wishlists";
-
 import Navbar from './components/Navbar';
 
 function App() {
