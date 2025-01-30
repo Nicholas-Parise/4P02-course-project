@@ -1,12 +1,3 @@
-#root {
-  /*max-width: 1280px;*/
-  /*margin: 0 auto; */
-  /*padding: 2rem;*//*these were here by default, not sure if we want them or not*/
-  text-align: center;
-  width: 100%;
-  overflow: hidden;
-}
-
 .logo {
   height: 6em;
   padding: 1.5em;
