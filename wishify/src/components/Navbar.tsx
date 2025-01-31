@@ -1,4 +1,4 @@
-import React, { useState, ReactNode } from 'react'
+import { useState, ReactNode } from 'react'
 import { NavLink } from "react-router-dom";
 
 const Navbar = () => {
@@ -10,6 +10,7 @@ const Navbar = () => {
 
   const [listNav] = useState([
     {'label':'Home', 'href':'/'},
+    {'label':'Landing', 'href':'/landing'},
     {'label':'Wishlist', 'href':'/wishlists'},
     {'label':'Events', 'href':'/events'},
     {'label':'Login', 'href':'/login'},
