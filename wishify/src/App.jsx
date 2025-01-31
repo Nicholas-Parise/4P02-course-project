@@ -10,6 +10,7 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Events from "./pages/Events";
 import Wishlists from "./pages/Wishlists";
+import Profile from "./pages/Profile";
 import Navbar from './components/Navbar';
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
             <Route path="wishlists" element={<Wishlists />} />
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
+            <Route path="profile" element={<Profile />} />
             <Route path="*" element={<NoPage />} />
             <Route path="/" element={<Navigate replace to="/home" />} />
         </Routes>
