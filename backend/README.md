@@ -21,11 +21,13 @@ GET /users/:id/categories → Get categories a user is interested in
 POST /users/:id/categories/:categoryId → Assign a category to a user  
 DELETE /users/:id/categories/:categoryId → Remove a category from a user  
 
-## Categories & User Preferences
-GET /categories → Get all categories  
+## Categories
+GET /categories → Get all categories
+
+should these be an admin thing only?  
 POST /categories → Create a new category  
 GET /categories/:id → Get category details  
-PUT /categories/:id → Update category details  
+PUT /categories/:id → Update category details   
 DELETE /categories/:id → Delete a category  
 
 ## Wishlists
@@ -37,7 +39,7 @@ GET /wishlists/events/:id → Get wishlists for an event
 POST /wishlists/events/:id → Create a wishlist under an event  
 POST /wishlists/ → Create a wishlist without an event  
 
-GET /wishlists/:id/items → Get all items in a wishlist  
+GET /wishlists/:id/items → Get all items in a wishlist (and contributions) 
 POST /wishlists/:id/items → Add an item to a wishlist  
 
 ##  Events
