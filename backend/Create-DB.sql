@@ -1,11 +1,11 @@
 DROP TABLE IF EXISTS contributions;
 DROP TABLE IF EXISTS items;
+DROP TABLE IF EXISTS members;
 DROP TABLE IF EXISTS wishlists;
 DROP TABLE IF EXISTS events;
 DROP TABLE IF EXISTS user_cats;
 DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS sessions;
-DROP TABLE IF EXISTS members;
 DROP TABLE IF EXISTS users;
 
 
@@ -17,15 +17,6 @@ email TEXT,
 picture TEXT,
 datecreated TIMESTAMP,
 dateupdated TIMESTAMP
-);
-
-CREATE TABLE members(
-id SERIAL PRIMARY KEY,   
-user_id INTEGER REFERENCES users (id),
-blind BOOLEAN,
-owner BOOLEAN,
-dateUpdated TIMESTAMP,
-dateCreated TIMESTAMP
 );
 
 
@@ -69,10 +60,19 @@ dateCreated TIMESTAMP
 CREATE TABLE wishlists(
 id SERIAL PRIMARY KEY,   
 event_id INTEGER REFERENCES events (id),
-member_id INTEGER REFERENCES members(id),
 name TEXT,
 description TEXT,
 image TEXT,
+dateUpdated TIMESTAMP,
+dateCreated TIMESTAMP
+);
+
+CREATE TABLE members(
+id SERIAL PRIMARY KEY,   
+user_id INTEGER REFERENCES users (id),
+wishlists_id INTEGER REFERENCES wishlists (id),
+blind BOOLEAN,
+owner BOOLEAN,
 dateUpdated TIMESTAMP,
 dateCreated TIMESTAMP
 );
