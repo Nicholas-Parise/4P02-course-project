@@ -10,6 +10,7 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Events from "./pages/Events";
 import Wishlists from "./pages/Wishlists";
+import Wishlist from "./pages/Wishlist";
 import Profile from "./pages/Profile";
 import Navbar from './components/Navbar';
 
@@ -26,6 +27,7 @@ function App() {
             <Route path="home" element={<HomePage />} />
             <Route path="events" element={<Events />} />
             <Route path="wishlists" element={<Wishlists />} />
+            <Route path="wishlists/:id" element={<Wishlist />} />
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
             <Route path="profile" element={<Profile />} />
