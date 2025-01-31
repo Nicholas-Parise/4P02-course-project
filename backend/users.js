@@ -2,13 +2,15 @@ const express = require('express');
 const router = express.Router();
 
 let userEntry = [
-    {id:0, username:'admin',description:'test',visible:true},
-    {id:1, username:'bdmin',description:'test',visible:true},
-    {id:2, username:'cdmin',description:'test',visible:true},
-    {id:3, username:'ddmin',description:'test',visible:true}
+    {id:0, username:'admin', password:'password', email:'admin@test.com', picture:'public/placeholder-avatar.png', datecreated:'2025-1-29', dateupdated:'2025-1-29'},
+    {id:1, username:'bdmin', password:'password', email:'bdmin@test.com', picture:'public/placeholder-avatar.png', datecreated:'2025-1-29', dateupdated:'2025-1-29'},
+    {id:2, username:'cdmin', password:'password', email:'cdmin@test.com', picture:'public/placeholder-avatar.png', datecreated:'2025-1-29', dateupdated:'2025-1-29'},
+    {id:3, username:'ddmin', password:'password', email:'ddmin@test.com', picture:'public/placeholder-avatar.png', datecreated:'2025-1-29', dateupdated:'2025-1-29'}
 ]
 
-// localhost:3000/users?page=1&pageSize=10?username=admin
+
+// localhost:3000/users?page=1&pageSize=10
+// get list of users
 router.get('/',(req,res,next)=>{
     
     const page = parseInt(req.query.page) || 1;
@@ -26,6 +28,7 @@ router.get('/',(req,res,next)=>{
 })
 
 // localhost:3000/users/0
+// get specific user
 router.get('/:userId', (req, res, next) => {
   const userId = parseInt(req.params.userId);
 
@@ -39,10 +42,13 @@ router.get('/:userId', (req, res, next) => {
 
   router.post('/add', (req, res) => {
 
-    reviewEntry.push({id: req.body.id, 
+    reviewEntry.push({
+        id: req.body.id, 
         username: req.body.username,
-        description: req.body.description,
-        visible: req.body.visible});
+        password: req.body.password,
+        email: req.body.email,
+        picture: req.body.picture
+      });
     res.status(200).json({
         message: 'Post submitted'
     });
