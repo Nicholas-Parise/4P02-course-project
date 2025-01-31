@@ -1,0 +1,88 @@
+.login-container {
+  background: white;
+  font-family: Arial, Helvetica, sans-serif;
+  margin-top: 50px;
+  padding: 100px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.15);
+  text-align: center;
+  max-width: 500px;
+}
+
+.login-container h2 {
+  margin-bottom: 20px;
+  margin-top: 0;
+  font-size: 1.4rem;
+  color: #333
+}
+
+.login-container label {
+  display: block;
+  text-align: left;
+  margin-top: 10px;
+  font-size: 1.1rem;
+  color: #333
+}
+
+.login-container input {
+  width: 100%;
+  padding: 15px 10px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.login-container button {
+  margin-top: 35px;
+  padding: 10px;
+  width: 60%;
+  font-weight: 700;
+  font-size: 1.1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.login-container button:hover {
+  background-color: #0056b3;
+}
+
+.login-password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.login-password-input-container input {
+  width: 100%;
+  /* padding-right: 40px; */
+}
+
+.login-password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 43%;
+  cursor: pointer;
+  font-size: 0.7rem;
+  color: #555;
+}
+
+.login-forgot-password {
+  display: block;
+  margin-top: 10px;
+  text-decoration: none;
+  color: #007bff;
+  font-size: 0.8rem;
+}
+
+.login-signup {
+  margin-top: 15px;
+  font-size: 0.9rem;
+}
+
+.login-signup a {
+  text-decoration: none;
+  color: #007bff;
+}

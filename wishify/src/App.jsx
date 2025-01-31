@@ -11,7 +11,9 @@ import Register from "./pages/auth/Register";
 import Events from "./pages/Events";
 import Wishlists from "./pages/Wishlists";
 import Wishlist from "./pages/Wishlist";
+import Profile from "./pages/Profile";
 import Navbar from './components/Navbar';
+
 
 function App() {
   const [count, setCount] = useState(0)
@@ -19,7 +21,7 @@ function App() {
   return (
     <>
       <BrowserRouter>
-      <Navbar></Navbar>
+      <Navbar name=""></Navbar>
         <Routes>
             <Route index element={<HomePage />} />
             <Route path="home" element={<HomePage />} />
@@ -28,6 +30,7 @@ function App() {
             <Route path="wishlists/:id" element={<Wishlist />} />
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
+            <Route path="profile" element={<Profile />} />
             <Route path="*" element={<NoPage />} />
             <Route path="/" element={<Navigate replace to="/home" />} />
         </Routes>
