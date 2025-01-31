@@ -13,13 +13,14 @@ import Wishlists from "./pages/Wishlists";
 import Profile from "./pages/Profile";
 import Navbar from './components/Navbar';
 
+
 function App() {
   const [count, setCount] = useState(0)
 
   return (
     <>
       <BrowserRouter>
-      <Navbar></Navbar>
+      <Navbar name=""></Navbar>
         <Routes>
             <Route index element={<HomePage />} />
             <Route path="home" element={<HomePage />} />
