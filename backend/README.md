@@ -31,13 +31,13 @@ PUT /categories/:id → Update category details
 DELETE /categories/:id → Delete a category  
 
 ## Wishlists
+POST /wishlists/ → Create a wishlist  
 GET /wishlists/:id → Get wishlist details  
 PUT /wishlists/:id → Update wishlist  
 DELETE /wishlists/:id → Delete wishlist  
 
-GET /wishlists/events/:id → Get wishlists for an event  
-POST /wishlists/events/:id → Create a wishlist under an event  
-POST /wishlists/ → Create a wishlist without an event  
+GET /events/:id/wishlists → Get wishlists for an event  
+POST /events/:id/wishlists → Create a wishlist under an event
 
 GET /wishlists/:id/items → Get all items in a wishlist (and contributions) 
 POST /wishlists/:id/items → Add an item to a wishlist  
@@ -50,13 +50,13 @@ GET /events/:id → Get event details
 PUT /events/:id → Update event  
 DELETE /events/:id → Delete event  
 
-GET /events/:id/members → Get members of an event  
-POST /events/:id/members → Add a member to an event  
-
 ## Members
 
 PUT /members/:id → Update a member’s status (blind/owner)  
 DELETE /members/:id → Remove a member  
+GET /members/events/:id → Get members in an event  
+POST /members/events/:id → Add a member to an event  
+
 
 ## Items
 

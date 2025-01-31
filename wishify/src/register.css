@@ -1,0 +1,80 @@
+.register-container {
+  background: white;
+  font-family: Arial, Helvetica, sans-serif;
+  margin-top: 50px;
+  padding: 100px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.15);
+  text-align: center;
+  max-width: 500px;
+}
+
+.register-container h2 {
+  margin-bottom: 20px;
+  margin-top: 0;
+  font-size: 1.4rem;
+  color: #333
+}
+
+.register-container label {
+  display: block;
+  text-align: left;
+  margin-top: 10px;
+  font-size: 1.1rem;
+  color: #333
+}
+
+.register-container input {
+  width: 100%;
+  padding: 15px 10px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.register-container button {
+  margin-top: 35px;
+  padding: 10px;
+  width: 60%;
+  font-weight: 700;
+  font-size: 1.1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.register-container button:hover {
+  background-color: #0056b3;
+}
+
+.register-password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-container input {
+  width: 100%;
+  padding-right: 0;
+}
+
+.register-password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 43%;
+  cursor: pointer;
+  font-size: 0.7rem;
+  color: #555;
+}
+
+.register-signup {
+  margin-top: 15px;
+  font-size: 0.9rem;
+}
+
+.register-signup a {
+  text-decoration: none;
+  color: #007bff;
+}
