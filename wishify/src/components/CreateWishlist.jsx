@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from "styled-components";
 
+
 const CreateWishlistButton = styled.button`
     background: #63d471;
     border-radius: 25px;
@@ -12,9 +13,10 @@ const CreateWishlistButton = styled.button`
         height: 150px;
     }
 `
-const CreateWishlist = () => {
+
+const CreateWishlist = ({addThumbnail}) => {
     return(
-        <CreateWishlistButton>Create a Wishlist</CreateWishlistButton>
+        <CreateWishlistButton onClick={addThumbnail}>Create a Wishlist</CreateWishlistButton>
     )
 }
 

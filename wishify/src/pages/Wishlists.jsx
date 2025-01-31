@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {act, useState} from 'react'
 import styled from 'styled-components'
 import CreateWishlist from '../components/CreateWishlist'
 import WishlistThumbnail from '../components/WishlistThumbnail'
@@ -11,13 +11,35 @@ const WishlistContainer = styled.div`
 `
 
 const Wishlists = () => {
+  const [wishlistCount, setWishlistCount] = useState(0);
+
+  const [activeOverlay, toggleActiveOverlay] = useState(undefined);
+
+  const addThumbnailFunc = (e) => {
+    setWishlistCount(prevCount => prevCount + 1);
+  }
+
+  const changeActiveOverlay = (title) => {
+    if(activeOverlay == title){
+      alert("Opened " + title)
+    } else{
+      toggleActiveOverlay(title);
+    }
+  }
+
   return (
     <>
       <h1>My Wishlists</h1>
+      <WishlistContainer value={activeOverlay}>
+        <CreateWishlist addThumbnail={addThumbnailFunc}></CreateWishlist>
+        {Array.from({ length: wishlistCount }, (_, index) => (
+          <WishlistThumbnail active={activeOverlay} toggleActive={() => changeActiveOverlay("Wishlist " + (parseInt(index)+1))} key={index} title={"Wishlist " + (parseInt(index)+1)}></WishlistThumbnail>
+        ))}
+      </WishlistContainer>
+      <h1>Shared Wishlists</h1>
       <WishlistContainer>
-        <CreateWishlist></CreateWishlist>
-        <WishlistThumbnail title="Wishlist A"></WishlistThumbnail>
-        <WishlistThumbnail title="Wishlist B"></WishlistThumbnail>
+        <WishlistThumbnail title={"Birthday Blam's Birthday Bash (can view only)"} role={"viewer"}></WishlistThumbnail>
+        <WishlistThumbnail title={"Freddy Fazbear's Funtime Festival (can contribute to)"} role={"contributor"}></WishlistThumbnail>
       </WishlistContainer>
     </>
   )
