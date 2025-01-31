@@ -10,7 +10,9 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Events from "./pages/Events";
 import Wishlists from "./pages/Wishlists";
+import Landing from "./pages/Landing";
 import Navbar from './components/Navbar';
+
 
 function App() {
   const [count, setCount] = useState(0)
@@ -23,6 +25,7 @@ function App() {
             <Route index element={<HomePage />} />
             <Route path="home" element={<HomePage />} />
             <Route path="events" element={<Events />} />
+            <Route path="landing" element={<Landing />} />
             <Route path="wishlists" element={<Wishlists />} />
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
