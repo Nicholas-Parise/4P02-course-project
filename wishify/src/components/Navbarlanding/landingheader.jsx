@@ -1,6 +1,6 @@
 import React, {Fragment, useState} from 'react'
 import {AiFillGift} from 'react-icons/ai'
-import '../../components/Navbarlanding/landingheader.css'
+import '../Navbarlanding/landingheader.css'
 
 const Navbar = () => {
 
