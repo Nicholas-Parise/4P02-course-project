@@ -1,5 +1,5 @@
 import React from 'react'
-import '../Herolanding/hero.css'
+import '../HeroLanding/hero.css'
 
 const Hero = () => {
     return (
