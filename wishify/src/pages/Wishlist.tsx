@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+//import React, { useState, useEffect } from 'react';
+import {useState} from 'react';
 import { useParams } from "react-router-dom"
 import { type Wishlist, WishlistItem, Event } from '../types/types';
 import WishlistSummary from '../components/WishlistSummary';
@@ -6,6 +7,8 @@ import ListOfWishes from '../components/ListOfWishes';
 
 const Wishlist = () => {
   const { id } = useParams();
+
+  console.log(id);
 
     // Static test data
     const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([

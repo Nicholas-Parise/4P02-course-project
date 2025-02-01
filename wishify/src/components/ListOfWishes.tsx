@@ -1,4 +1,4 @@
-import React from 'react'
+//import React from 'react'
 import { type WishlistItem } from '../types/types';
 import WishlistItemEntry from './WishlistItemEntry';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';

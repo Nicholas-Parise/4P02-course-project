@@ -1,4 +1,4 @@
-import React from 'react'
+//import React from 'react'
 import { type WishlistItem } from '../types/types';
 import { useSortable } from '@dnd-kit/sortable';
 import {CSS} from '@dnd-kit/utilities';

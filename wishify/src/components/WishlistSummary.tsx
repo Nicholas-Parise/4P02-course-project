@@ -1,6 +1,6 @@
-import React from 'react'
+//import React from 'react'
 import { Wishlist, Event } from '../types/types';
-import styles from '../pages/Wishlist.scss'
+//import styles from '../pages/Wishlist.scss'
 import { Link } from 'react-router-dom';
 
 const WishlistSummary = ({wishlist, event} : {wishlist: Wishlist, event: Event}) => {
