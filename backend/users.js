@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 
 let userEntry = [
-    {id:0, username:'admin', password:'password', email:'admin@test.com', picture:'public/placeholder-avatar.png', datecreated:'2025-1-29', dateupdated:'2025-1-29'},
-    {id:1, username:'bdmin', password:'password', email:'bdmin@test.com', picture:'public/placeholder-avatar.png', datecreated:'2025-1-29', dateupdated:'2025-1-29'},
-    {id:2, username:'cdmin', password:'password', email:'cdmin@test.com', picture:'public/placeholder-avatar.png', datecreated:'2025-1-29', dateupdated:'2025-1-29'},
-    {id:3, username:'ddmin', password:'password', email:'ddmin@test.com', picture:'public/placeholder-avatar.png', datecreated:'2025-1-29', dateupdated:'2025-1-29'}
+    {id:0, displayName:'admin', password:'password', email:'admin@test.com', picture:'public/placeholder-avatar.png', datecreated:'2025-1-29', dateupdated:'2025-1-29'},
+    {id:1, displayName:'bdmin', password:'password', email:'bdmin@test.com', picture:'public/placeholder-avatar.png', datecreated:'2025-1-29', dateupdated:'2025-1-29'},
+    {id:2, displayName:'cdmin', password:'password', email:'cdmin@test.com', picture:'public/placeholder-avatar.png', datecreated:'2025-1-29', dateupdated:'2025-1-29'},
+    {id:3, displayName:'ddmin', password:'password', email:'ddmin@test.com', picture:'public/placeholder-avatar.png', datecreated:'2025-1-29', dateupdated:'2025-1-29'}
 ]
 
 
