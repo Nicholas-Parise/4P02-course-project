@@ -1,7 +1,7 @@
 import React, {act, useState} from 'react'
 import styled from 'styled-components'
-import CreateWishlist from '../components/CreateWishlist'
-import WishlistThumbnail from '../components/WishlistThumbnail'
+import {CreateWishlist} from '../components/CreateButton'
+import {WishlistThumbnail} from '../components/Thumbnail'
 
 const WishlistContainer = styled.div`
   display: flex;
@@ -31,7 +31,7 @@ const Wishlists = () => {
     <>
       <h1>My Wishlists</h1>
       <WishlistContainer value={activeOverlay}>
-        <CreateWishlist addThumbnail={addThumbnailFunc}></CreateWishlist>
+        <CreateWishlist addThumbnail={addThumbnailFunc}>Create a Wishlist</CreateWishlist>
         {Array.from({ length: wishlistCount }, (_, index) => (
           <WishlistThumbnail active={activeOverlay} toggleActive={() => changeActiveOverlay("Wishlist " + (parseInt(index)+1))} key={index} title={"Wishlist " + (parseInt(index)+1)}></WishlistThumbnail>
         ))}
