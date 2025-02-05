@@ -21,9 +21,9 @@ const Wishlists = () => {
 
   const changeActiveOverlay = (title) => {
     if(activeOverlay == title){
-      alert("Opened " + title)
+      toggleActiveOverlay(undefined)
     } else{
-      toggleActiveOverlay(title);
+      toggleActiveOverlay(title)
     }
   }
 

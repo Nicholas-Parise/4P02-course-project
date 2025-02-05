@@ -16,6 +16,23 @@ const WishlistButton = styled.button`
     }
 `
 
+const WishlistMenu = styled.div`
+    background: rgb(91, 241, 252);
+    display: grid;
+    gap: 0px;
+    grid-template-rows: 37.5% 1fr 1fr 1fr;
+    border-radius: 25px;
+    border-color: black;
+    width: 200px;
+    height: 200px;
+    font-size: clamp(0.5em, 0.75em, 1em);
+    position: relative;
+    @media screen and (max-width: 440px){
+        width: 150px;
+        height: 150px;
+    }
+`
+
 const EventButton = styled.button`
     background: rgb(91, 241, 252);
     display: grid;
@@ -59,21 +76,6 @@ const Eye = createStyledIcon(FaEye);
 const Pencil = createStyledIcon(FaPencilAlt);
 const Key = createStyledIcon(FaKey);
 
-const MenuContainer = styled.div`
-position: fixed;
-top: 50%;
-right: 0;
-bottom: 50%;
-left: 0;
-z-index: 9999;
-`
-
-const Menu = styled.div`
-    display: grid;
-    align-content: center;
-    justify-content: center;
-`
-
 const MenuButton = styled.button`
     &:hover{
         border: solid #5fd5dd 1px;
@@ -81,22 +83,17 @@ const MenuButton = styled.button`
     } 
 `
 
-const TitleButton = styled.button`
-`
-
 
 export const WishlistThumbnail = (props) => {
 
     const WishlistOverlayMenu = () => {
         return (
-            <MenuContainer id={"overlayMenu"}>
-                <Menu>
-                    <p>{props.title}</p>
-                    <MenuButton onClick={openWishlist}>Open</MenuButton>
-                    <MenuButton>Edit</MenuButton>
-                    <MenuButton>Share</MenuButton>
-                </Menu>
-            </MenuContainer>
+            <WishlistMenu>
+                <button onClick={props.toggleActive} style={{overflow: 'hidden', fontSize: "initial", textAlign: 'center', borderBottom: '1px solid black'}}>{props.title}</button>
+                <MenuButton onClick={openWishlist}>Open</MenuButton>
+                <MenuButton>Edit</MenuButton>
+                <MenuButton>Share</MenuButton>
+            </WishlistMenu>
         )
     }
 
@@ -116,8 +113,7 @@ export const WishlistThumbnail = (props) => {
     } else{
         return(
             <>
-                <WishlistButton onClick={props.toggleActive}><Key></Key>{props.title}</WishlistButton>
-                {props.active == props.title ? <WishlistOverlayMenu></WishlistOverlayMenu> : ""}
+                {props.active == props.title ? <WishlistOverlayMenu></WishlistOverlayMenu> : <WishlistButton onClick={props.toggleActive}><Key></Key>{props.title}</WishlistButton>}
             </>
         )
     }
