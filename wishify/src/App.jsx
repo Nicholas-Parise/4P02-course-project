@@ -9,6 +9,7 @@ import NoPage from "./pages/NoPage";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Events from "./pages/Events";
+import Event from "./pages/Event";
 import Wishlists from "./pages/Wishlists";
 import Landing from "./pages/Landing";
 import Wishlist from "./pages/Wishlist";
@@ -27,6 +28,7 @@ function App() {
             <Route index element={<HomePage />} />
             <Route path="home" element={<HomePage />} />
             <Route path="events" element={<Events />} />
+            <Route path="events/:id" element={<Event/>}/>
             <Route path="landing" element={<Landing />} />
             <Route path="wishlists" element={<Wishlists />} />
             <Route path="wishlists/:id" element={<Wishlist />} />

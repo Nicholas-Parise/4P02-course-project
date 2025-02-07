@@ -39,6 +39,7 @@ const Events = () => {
       <h1>Shared Events</h1>
       <EventContainer>
         <EventThumbnail title={"Birthday Blam's Birthday Bash (can view only)"} role={"viewer"}></EventThumbnail>
+        <EventThumbnail title={"Geoff's Christmas Wishlist"} id={1234} role={"viewer"}></EventThumbnail>
         <EventThumbnail title={"Freddy Fazbear's Funtime Festival (can contribute to)"} role={"contributor"}></EventThumbnail>
       </EventContainer>
     </>

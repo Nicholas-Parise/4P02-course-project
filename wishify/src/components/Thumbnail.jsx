@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import {FaEye, FaPencilAlt, FaKey} from 'react-icons/fa';
 
@@ -96,9 +97,10 @@ export const WishlistThumbnail = (props) => {
             </WishlistMenu>
         )
     }
-
+    let navigate = useNavigate(); 
     const openWishlist = (e) => {
-        alert("Opened " + props.title);
+        let path = "/wishlists/" + props.id;
+        navigate(path);
     }
 
 

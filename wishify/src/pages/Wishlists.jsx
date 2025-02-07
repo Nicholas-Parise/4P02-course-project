@@ -39,6 +39,7 @@ const Wishlists = () => {
       <h1>Shared Wishlists</h1>
       <WishlistContainer>
         <WishlistThumbnail title={"Birthday Blam's Birthday Bash (can view only)"} role={"viewer"}></WishlistThumbnail>
+        <WishlistThumbnail title={"Geoff's Christmas Wishlist"} id={1234} role={"viewer"}></WishlistThumbnail>
         <WishlistThumbnail title={"Freddy Fazbear's Funtime Festival (can contribute to)"} role={"contributor"}></WishlistThumbnail>
       </WishlistContainer>
     </>
