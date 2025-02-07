@@ -1,3 +1,5 @@
+const jwt = require("jsonwebtoken");
+require("dotenv").config(); // Load environment variables
 
 /**
  * a helper function to handle authentication,
@@ -5,9 +7,6 @@
  * automatically sends back 401 access denied errors
  * use const user_id = req.user.id; to get the id of the user
  */
-
-const jwt = require("jsonwebtoken");
-require("dotenv").config(); // Load environment variables
 
 const authenticate = (req, res, next) => {
     const token = req.header("Authorization");

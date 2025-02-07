@@ -36,7 +36,6 @@ router.post('/register',async (req,res,next)=>{
         res.status(500).json({ message: "Error registering user" });
     }
 
-
 })
 
 // localhost:3000/auth/login

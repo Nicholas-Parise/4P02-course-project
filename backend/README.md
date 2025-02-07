@@ -34,28 +34,29 @@ DELETE /categories/:id → Delete a category
 GET /wishlists/ → Get list of wishlists (where user is a member)   
 GET /wishlists/:id → Get wishlist details (must be member)   
 PUT /wishlists/:id → Update wishlist (provide desired attributes to edit, must be the owner)  
-DELETE /wishlists/:id → Delete wishlist (must be the owner)**    
-
-GET /events/:id/wishlists → Get wishlists for an event  
-POST /events/:id/wishlists → Create a wishlist under an event
+DELETE /wishlists/:id → Delete wishlist (must be the owner)**      
 
 GET /wishlists/:id/items → Get all items in a wishlist (and contributions)    
 POST /wishlists/:id/items → Add an item to a wishlist  
 
+GET /wishlists/:id/members → Get all members in a specific event   
+POST /wishlists/:id/members → Add a member to an event   
+PUT /wishlists/:id/members → Update a member’s status (blind/owner)     
+DELETE /wishlists/:id/members → Remove a member from wishlist  
+
 ##  Events
-GET /events → Get all events  
-POST /events → Create a new event  
+GET /events → Get all events (for member)   
+POST /events → Create a new event (makes you owner)  
 
 GET /events/:id → Get event details  
 PUT /events/:id → Update event  
-DELETE /events/:id → Delete event  
+DELETE /events/:id → Delete event
 
-## Members
+GET /events/:id/wishlists → Get wishlists for an event
 
-PUT /members/:id → Update a member’s status (blind/owner)  
-DELETE /members/:id → Remove a member  
-GET /members/events/:id → Get members in an event  
-POST /members/events/:id → Add a member to an event  
+GET /events/:id/members → Get all members in a specific event   
+POST /events/:id/members → Add a member to an event   
+DELETE /events/:id/members → Remove a member from event  
 
 
 ## Items
@@ -66,8 +67,8 @@ DELETE /items/:id → Remove an item
 
 ## Contributions
 
-GET /contributions/items/:id/ → Get contributions for an item  
-POST /contributions/items/:id/ → Add a contribution to an item  
+GET /items/:id/contributions → Get contributions for an item  
+POST /items/:id/contributions → Add a contribution to an item  
 PUT /contributions/:id → Update a contribution (mark as purchased, etc.)  
 DELETE /contributions/:id → Remove a contribution  
 
