@@ -23,7 +23,7 @@ router.get('/', authenticate, async(req,res,next)=>{
       const result = await db.query(`
           SELECT w.id, w.name, w.description, w.image, w.dateUpdated, w.dateCreated
           FROM wishlists w
-          JOIN members m ON w.id = m.wishlists_id
+          JOIN wishlist_members m ON w.id = m.wishlists_id
           WHERE m.user_id = $1;`, [userId]);
 
       res.json(result.rows);
@@ -64,7 +64,7 @@ router.get('/', authenticate, async(req,res,next)=>{
 
       // Step 2: Add the users membership (owner)
       await db.query(
-          `INSERT INTO members (user_id, wishlists_id, blind, owner, dateCreated, dateUpdated)
+          `INSERT INTO wishlist_members (user_id, wishlists_id, blind, owner, dateCreated, dateUpdated)
           VALUES ($1, $2, FALSE, TRUE, NOW(), NOW())`,
           [user_id, wishlist_id]
       );
@@ -95,9 +95,9 @@ router.get('/:wishlistId', authenticate, async(req,res,next)=>{
     const userId = req.user.userId; // Get user ID from authenticated token
 
     const result = await db.query(`
-        SELECT w.id, w.name, w.description, w.image, w.dateUpdated, w.dateCreated
+        SELECT w.id, w.name, w.description, w.image, w.dateUpdated, w.dateCreated, w.event_id
         FROM wishlists w
-        JOIN members m ON w.id = m.wishlists_id
+        JOIN wishlist_members m ON w.id = m.wishlists_id
         WHERE m.user_id = $1 AND w.id = $2;`, [userId,wishlistId]);
 
 
@@ -126,7 +126,7 @@ router.delete('/:wishlistId', authenticate, async(req,res,next)=>{
   try {
     const ownershipCheck = await db.query(`
       SELECT m.owner
-      FROM members m
+      FROM wishlist_members m
       WHERE m.user_id = $1 AND m.wishlists_id = $2;
       `, [userId, wishlistId]);
 
@@ -163,7 +163,7 @@ router.put('/:wishlistId', authenticate, async(req,res,next)=>{
   try {
     const ownershipCheck = await db.query(`
       SELECT m.owner
-      FROM members m
+      FROM wishlist_members m
       WHERE m.user_id = $1 AND m.wishlists_id = $2;
       `, [userId, wishlistId]);
 

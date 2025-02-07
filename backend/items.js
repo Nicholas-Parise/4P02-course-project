@@ -38,7 +38,7 @@ router.get('/:itemId', (req, res, next) => {
   });
 
   
-  router.post('/add', (req, res) => {
+  router.post('/', (req, res) => {
 
     itemEntry.push({
       id: req.body.id, 
