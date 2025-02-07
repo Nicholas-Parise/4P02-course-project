@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Define paths
+PROJECT_DIR="/var/www/4P02-course-project"
+FRONTEND_DIR="$PROJECT_DIR/wishify"
+BACKEND_DIR="$PROJECT_DIR/backend"
+
+# Step 1: Pull the latest changes from GitHub
+echo "Pulling latest changes from GitHub..."
+cd $PROJECT_DIR || exit
+git pull origin main
+
+# Step 2: Install dependencies & build frontend
+echo "Installing frontend dependencies..."
+cd $FRONTEND_DIR || exit
+npm install
+npm run build
+
+# Step 3: Install backend dependencies
+echo "Installing backend dependencies..."
+cd $BACKEND_DIR || exit
+npm install
+
+# Step 4: Restart the backend API with PM2 (might change to reload instead of restart)
+echo "Restarting wishify-api..."
+pm2 restart wishify-api  
+
+# Step 5: Reload Nginx (since static files are updated)
+echo "Reloading Nginx..."
+sudo systemctl reload nginx
+
+echo "Deployment completed successfully!"

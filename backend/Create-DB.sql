@@ -22,7 +22,7 @@ dateupdated TIMESTAMP
 
 CREATE TABLE sessions(
 id SERIAL PRIMARY KEY,   
-user_id integer REFERENCES users(id),
+user_id integer REFERENCES users(id) ON DELETE CASCADE,
 token TEXT UNIQUE,
 created TIMESTAMP
 );
@@ -37,15 +37,15 @@ created TIMESTAMP
 
 CREATE TABLE user_cats(
 id SERIAL PRIMARY KEY,   
-user_id INTEGER REFERENCES users (id),
-category_id INTEGER REFERENCES categories (id),
+user_id INTEGER REFERENCES users (id) ON DELETE CASCADE,
+category_id INTEGER REFERENCES categories (id) ON DELETE CASCADE,
 created TIMESTAMP
 );
 
 
 CREATE TABLE events(
 id SERIAL PRIMARY KEY, 
-user_id INTEGER REFERENCES users(id),
+user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
 name TEXT,
 description TEXT,
 url TEXT,
@@ -59,7 +59,7 @@ dateCreated TIMESTAMP
 
 CREATE TABLE wishlists(
 id SERIAL PRIMARY KEY,   
-event_id INTEGER REFERENCES events (id),
+event_id INTEGER REFERENCES events (id) ON DELETE SET NULL,
 name TEXT,
 description TEXT,
 image TEXT,
@@ -69,19 +69,20 @@ dateCreated TIMESTAMP
 
 CREATE TABLE members(
 id SERIAL PRIMARY KEY,   
-user_id INTEGER REFERENCES users (id),
-wishlists_id INTEGER REFERENCES wishlists (id),
+user_id INTEGER REFERENCES users (id) ON DELETE CASCADE,
+wishlists_id INTEGER REFERENCES wishlists (id) ON DELETE CASCADE,
 blind BOOLEAN,
 owner BOOLEAN,
 dateUpdated TIMESTAMP,
-dateCreated TIMESTAMP
+dateCreated TIMESTAMP,
+UNIQUE (user_id,wishlists_id) --only want one membership per user per wishlist
 );
 
 
 CREATE TABLE items(
 id SERIAL PRIMARY KEY, 
-member_id INTEGER REFERENCES members (id),
-wishlist_id INTEGER REFERENCES wishlists(id),
+member_id INTEGER REFERENCES members (id) ON DELETE CASCADE,
+wishlist_id INTEGER REFERENCES wishlists(id) ON DELETE CASCADE,
 name TEXT,
 description TEXT,
 url TEXT,
@@ -95,8 +96,8 @@ dateCreated TIMESTAMP
 
 CREATE TABLE contributions(
 id SERIAL PRIMARY KEY, 
-item_id INTEGER REFERENCES items (id),
-member_id INTEGER REFERENCES members (id),
+item_id INTEGER REFERENCES items (id) ON DELETE CASCADE,
+member_id INTEGER REFERENCES members (id) ON DELETE CASCADE,
 quantity INTEGER,
 purchased BOOLEAN,
 dateUpdated TIMESTAMP,

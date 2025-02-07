@@ -61,9 +61,10 @@ router.post('/login', async (req, res, next) => {
             return res.status(401).json({ message: "Invalid password" });
         }
 
-        const token = jwt.sign({ userId: user.rows[0].id, email: user.rows[0].email }, process.env.SECRET_KEY, {
-            expiresIn: "24h",
-        });
+        const token = jwt.sign(
+            { userId: user.rows[0].id, email: user.rows[0].email }, 
+            process.env.SECRET_KEY, 
+            {expiresIn: "24h"});
 
         await db.query("INSERT INTO sessions (user_id, token, created) VALUES ($1, $2, NOW())", [user.rows[0].id, token]);
 
