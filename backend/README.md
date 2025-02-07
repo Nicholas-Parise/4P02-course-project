@@ -3,14 +3,12 @@
 The following is all about the backend of this web app. From the database, to specifics about the API.
 
 # Endpoints
-
-## NOTE 
-Not all these endpoints are active, these are just the enpoints I'm working towards  
+An end point in **BOLD** specifies it's implemented.
 
 ## Authentication
-POST /auth/register → Create a new user  
+**POST /auth/register → Create a new user  
 POST /auth/login → Authenticate a user and generate a session token  
-POST /auth/logout → Invalidate the session token  
+POST /auth/logout → Invalidate the session token**  
 
 ## Users
 GET /users/:id → Get user profile  
@@ -31,15 +29,17 @@ PUT /categories/:id → Update category details
 DELETE /categories/:id → Delete a category  
 
 ## Wishlists
-POST /wishlists/ → Create a wishlist  
-GET /wishlists/:id → Get wishlist details  
-PUT /wishlists/:id → Update wishlist  
-DELETE /wishlists/:id → Delete wishlist  
+
+**POST /wishlists/ → Create a wishlist (also creates a membership)  
+GET /wishlists/ → Get list of wishlists (where user is a member)   
+GET /wishlists/:id → Get wishlist details (must be member)   
+PUT /wishlists/:id → Update wishlist (provide desired attributes to edit, must be the owner)  
+DELETE /wishlists/:id → Delete wishlist (must be the owner)**    
 
 GET /events/:id/wishlists → Get wishlists for an event  
 POST /events/:id/wishlists → Create a wishlist under an event
 
-GET /wishlists/:id/items → Get all items in a wishlist (and contributions) 
+GET /wishlists/:id/items → Get all items in a wishlist (and contributions)    
 POST /wishlists/:id/items → Add an item to a wishlist  
 
 ##  Events
