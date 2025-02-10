@@ -11,13 +11,16 @@ POST /auth/login → Authenticate a user and generate a session token
 POST /auth/logout → Invalidate the session token**  
 
 ## Users
-GET /users/:id → Get user profile  
-PUT /users/:id → Update user profile  
-DELETE /users/:id → Delete a user account  
+GET /users → Get logged in user profile
+PUT /users → Update logged in user profile  
+DELETE /users → Delete logged in user account  
+GET /users/:id → Get specific user profile  
 
-GET /users/:id/categories → Get categories a user is interested in  
-POST /users/:id/categories/:categoryId → Assign a category to a user  
-DELETE /users/:id/categories/:categoryId → Remove a category from a user  
+GET /users/categories → Get categories from logged in user    
+GET /users/:id/categories → Get categories from specific user 
+
+POST /users/categories/:categoryId → Assign a category from logged in user  
+DELETE /users/categories/:categoryId → Remove a category from logged in user  
 
 ## Categories
 GET /categories → Get all categories
@@ -45,12 +48,11 @@ PUT /wishlists/:id/members → Update a member’s status (blind/owner)
 DELETE /wishlists/:id/members → Remove a member from wishlist  
 
 ##  Events
-GET /events → Get all events (for member)   
+**GET /events → Get all events (for member)   
 POST /events → Create a new event (makes you owner)  
-
 GET /events/:id → Get event details  
 PUT /events/:id → Update event  
-DELETE /events/:id → Delete event
+DELETE /events/:id → Delete event**
 
 GET /events/:id/wishlists → Get wishlists for an event
 
@@ -61,9 +63,9 @@ DELETE /events/:id/members → Remove a member from event
 
 ## Items
 
-GET /items/:id → Get item details  
+**GET /items/:id → Get item details  
 PUT /items/:id → Update an item  
-DELETE /items/:id → Remove an item  
+DELETE /items/:id → Remove an item**  
 
 ## Contributions
 
