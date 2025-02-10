@@ -95,7 +95,6 @@ UNIQUE (user_id,event_id) --only want one membership per user per event
 CREATE TABLE items(
 id SERIAL PRIMARY KEY, 
 member_id INTEGER REFERENCES wishlist_members (id) ON DELETE CASCADE,
-wishlist_id INTEGER REFERENCES wishlists(id) ON DELETE CASCADE,
 name TEXT,
 description TEXT,
 url TEXT,

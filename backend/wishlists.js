@@ -4,11 +4,6 @@ const { parseArgs } = require('util');
 const db = require('./db');
 const authenticate = require('./authenticate');
 
-let wishlistEntry = [
-  {id:0, event_id:0, user_id:0, name:'nicks list', description:'video game console', image:'public/placeholder-wishlist.png', datecreated:'2025-1-29', dateupdated:'2025-1-29'},
-  {id:1, event_id:0, user_id:0, name:'lists list', description:'video game console', image:'public/placeholder-wishlist.png', datecreated:'2025-1-29', dateupdated:'2025-1-29'}
-];
-
 
 // localhost:3000/wishlists?page=1&pageSize=10
 // get list of wishlists from a member or is in an event 
