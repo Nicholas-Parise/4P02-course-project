@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
+import styled from "@emotion/styled";
 import {FaEye, FaPencilAlt, FaKey} from 'react-icons/fa';
 
 const WishlistButton = styled.button`
