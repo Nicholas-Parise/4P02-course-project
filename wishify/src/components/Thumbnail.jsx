@@ -36,11 +36,9 @@ const WishlistMenu = styled.div`
 
 const EventButton = styled.button`
     background: rgb(91, 241, 252);
-    display: grid;
-    font-size: clamp(0.5em, 1em, 1em);
     border-radius: 25px;
     border-color: black;
-    padding-top: 30px;
+    padding: 20px;
     width: 200px;
     height: 200px;
     position: relative;
@@ -89,8 +87,8 @@ export const WishlistThumbnail = (props) => {
 
     const WishlistOverlayMenu = () => {
         return (
-            <WishlistMenu>
-                <button onClick={props.toggleActive} style={{overflow: 'hidden', fontSize: "initial", textAlign: 'center', borderBottom: '1px solid black'}}>{props.title}</button>
+            <WishlistMenu onMouseLeave={props.toggleActive}>
+                <button style={{overflow: 'hidden', fontSize: "initial", textAlign: 'center', borderBottom: '1px solid black'}}>{props.title}</button>
                 <MenuButton onClick={openWishlist}>Open</MenuButton>
                 <MenuButton>Edit</MenuButton>
                 <MenuButton>Share</MenuButton>
@@ -104,18 +102,14 @@ export const WishlistThumbnail = (props) => {
     }
 
 
-    if (props.role == "viewer"){
+    if(props.role == "contributor"){
         return(
             <WishlistButton onClick={openWishlist}><Eye></Eye>{props.title}</WishlistButton>
-        )
-    } else if(props.role == "contributor"){
-        return(
-            <WishlistButton onClick={openWishlist}><Pencil></Pencil>{props.title}</WishlistButton>
         )
     } else{
         return(
             <>
-                {props.active == props.title ? <WishlistOverlayMenu></WishlistOverlayMenu> : <WishlistButton onClick={props.toggleActive}><Key></Key>{props.title}</WishlistButton>}
+                {props.active == props.title ? <WishlistOverlayMenu></WishlistOverlayMenu> : <WishlistButton onMouseEnter={props.toggleActive}>{props.title}</WishlistButton>}
             </>
         )
     }
@@ -125,8 +119,8 @@ export const EventThumbnail = (props) => {
 
     const EventOverlayMenu = () => {
         return (
-            <EventMenu>
-                <button onClick={props.toggleActive} style={{overflow: 'hidden', fontSize: "initial", textAlign: 'center', borderBottom: '1px solid black'}}>{props.title}</button>
+            <EventMenu onMouseLeave={props.toggleActive}>
+                <button style={{overflow: 'hidden', fontSize: "initial", textAlign: 'center', borderBottom: '1px solid black'}}>{props.title}</button>
                 <MenuButton onClick={openEvent}>Open</MenuButton>
                 <MenuButton>Edit</MenuButton>
                 <MenuButton>Share</MenuButton>
@@ -139,18 +133,14 @@ export const EventThumbnail = (props) => {
     }
 
 
-    if (props.role == "viewer"){
+    if(props.role == "contributor"){
         return(
             <EventButton onClick={openEvent}><Eye></Eye>{props.title}</EventButton>
-        )
-    } else if(props.role == "contributor"){
-        return(
-            <EventButton onClick={openEvent}><Pencil></Pencil>{props.title}</EventButton>
         )
     } else{
         return(
             <>
-                {props.active == props.title ? <EventOverlayMenu></EventOverlayMenu> : <EventButton onClick={props.toggleActive}><Key></Key>{props.title}</EventButton>}
+                {props.active == props.title ? <EventOverlayMenu></EventOverlayMenu> : <EventButton onMouseEnter={props.toggleActive}>{props.title}</EventButton>}
             </>
         )
     }
