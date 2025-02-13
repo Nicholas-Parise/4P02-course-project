@@ -27,15 +27,16 @@ const Register = () => {
   const validateForm = (data) => {
     const isEmailValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(data.email)
     const isDisplayNameValid = 
-      data.displayName !== "" &&
-      data.displayName.length  <= 64
+      (data.displayName !== "" &&
+      data.displayName.length  <= 64)
     const isPasswordValid = 
-      data.password == data.confirmPassword &&
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,64}$/.test(data.password)
+      (data.password == data.confirmPassword &&
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,64}$/.test(data.password))
 
     const isFormValid = isEmailValid && isDisplayNameValid && isPasswordValid
 
-    setIsValid(isFormValid)
+    //setIsValid(isFormValid)
+    setIsValid(true)
   }
 
   const handleSubmit = async (event) => {
@@ -55,7 +56,8 @@ const Register = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...formData, confirmPassword: undefined })
+        //body: JSON.stringify({ ...formData, confirmPassword: undefined })
+        body: JSON.stringify({ email: formData.email, password: formData.password, displayName: formData.displayName })
       })
       
       data = await response.json()
@@ -97,7 +99,7 @@ const Register = () => {
         <label htmlFor="display-name">Display Name</label>
         <input 
           type="text"
-          id="display-ame"
+          id="display-name"
           name="displayName"
           value={formData.displayName}
           onChange={handleFormChange}

@@ -44,7 +44,7 @@ const Login = () => {
 
     try {
       let data
-      const response = await fetch("http://api.wishify.ca/auth/login", {
+      const response = await fetch("https://api.wishify.ca/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
