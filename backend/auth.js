@@ -5,12 +5,6 @@ const router = express.Router();
 const db = require('./db');
 require("dotenv").config();
 
-let categoriesEntry = [
-  {id:0, user_id:0, name:'things', description:'who doesnt like things', like: true},
-  {id:1, user_id:0, name:'stuff', description:'who deosnt like stuff', like: true}
-];
-
-
 // localhost:3000/auth/register
 // register account
 router.post('/register',async (req,res,next)=>{
@@ -33,6 +27,13 @@ router.post('/register',async (req,res,next)=>{
         res.status(201).json({ message: "User registered successfully", user: result.rows[0] });
     } catch (error) {
         console.error(error);
+
+         // Handle duplicate email error
+         // error code 23505 means unique constraint violated..
+         if (error.code === "23505") { 
+            return res.status(409).json({ message: "Email is already in use" });
+        }
+
         res.status(500).json({ message: "Error registering user" });
     }
 

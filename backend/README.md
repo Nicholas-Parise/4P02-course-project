@@ -11,10 +11,10 @@ POST /auth/login → Authenticate a user and generate a session token
 POST /auth/logout → Invalidate the session token**  
 
 ## Users
-GET /users → Get logged in user profile
+**GET /users → Get logged in user profile
 PUT /users → Update logged in user profile  
 DELETE /users → Delete logged in user account  
-GET /users/:id → Get specific user profile  
+GET /users/:id → Get specific user profile**  
 
 GET /users/categories → Get categories from logged in user    
 GET /users/:id/categories → Get categories from specific user 
