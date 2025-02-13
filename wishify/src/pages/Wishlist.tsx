@@ -71,7 +71,7 @@ const Wishlist = () => {
     const event: Event = {
         name: "Jensen family Christmas",
         desc: 'Description',
-        url: 'url??',
+        url: '../events/1234',
         dateUpdated: 'yesterday',
         address: '100 Polar Express Way',
         city: 'North Pole'
