@@ -1,59 +1,140 @@
 const express = require('express');
 const router = express.Router();
-
-let userEntry = [
-    {id:0, displayName:'admin', password:'password', email:'admin@test.com', picture:'public/placeholder-avatar.png', datecreated:'2025-1-29', dateupdated:'2025-1-29'},
-    {id:1, displayName:'bdmin', password:'password', email:'bdmin@test.com', picture:'public/placeholder-avatar.png', datecreated:'2025-1-29', dateupdated:'2025-1-29'},
-    {id:2, displayName:'cdmin', password:'password', email:'cdmin@test.com', picture:'public/placeholder-avatar.png', datecreated:'2025-1-29', dateupdated:'2025-1-29'},
-    {id:3, displayName:'ddmin', password:'password', email:'ddmin@test.com', picture:'public/placeholder-avatar.png', datecreated:'2025-1-29', dateupdated:'2025-1-29'}
-]
+const db = require('./db');
+const bcrypt = require("bcryptjs");
+const authenticate = require('./authenticate');
 
 
-// localhost:3000/users?page=1&pageSize=10
-// get list of users
-router.get('/',(req,res,next)=>{
-    
-    const page = parseInt(req.query.page) || 1;
-    const pageSize = parseInt(req.query.pageSize) || 10;
-    const username = req.query.username || "admin";
+// localhost:3000/users
+// get logged in users
+router.get('/', authenticate, async (req, res, next) => {
+  try {
+    const userId = req.user.userId; // Get user ID from authenticated token
+      const result = await db.query('SELECT id, email, displayName, picture, datecreated, dateupdated FROM users WHERE id = $1', [userId]);
 
-    const paginatedUsers = userEntry.slice((page - 1) * pageSize, page * pageSize);
+      console.log(userId);
 
-    res.json({
-        page,
-        pageSize,
-        totalUsers: userEntry.length, //allUsers.length,
-        users: paginatedUsers,
-      });
-})
+      if (result.rows.length === 0) {
+          return res.status(404).json({ message: 'User not found' });
+      }
 
-// localhost:3000/users/0
-// get specific user
-router.get('/:userId', (req, res, next) => {
-  const userId = parseInt(req.params.userId);
+      res.json(result.rows[0]);
+  } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: 'Error retrieving user data' });
+  }
+});
 
-  const allusers = userEntry.filter(user => user.id === userId);
-  
-  res.json({
-    users: allusers,
-  });
+// localhost:3000/users
+// Update logged-in user's profile
+router.put('/', authenticate, async (req, res) => {
+  try {
+    const userId = req.user.userId; // Get user ID from authenticated token
+      const { displayName, picture, password, newPassword } = req.body;
+
+      let newhHashedPassword = null;
+
+      if (newPassword) {
+        if (!password) {
+            return res.status(400).json({ message: "Current password is required to change password" });
+        }
+
+        // Get the user's stored hashed password
+        const userResult = await db.query("SELECT password FROM users WHERE id = $1", [userId]);
+
+        if (userResult.rows.length === 0) {
+          return res.status(404).json({ message: "user not found" });
+        }
+
+        const hashedPassword = userResult.rows[0].password;
+
+        // Compare provided password with stored hash
+        const isMatch = await bcrypt.compare(password, hashedPassword);
+        if (!isMatch) {
+          return res.status(403).json({ message: "Incorrect password" });
+        }
+
+        newhHashedPassword = await bcrypt.hash(newPassword, 10);
+      }
+
+      const result = await db.query(`
+          UPDATE users 
+          SET 
+              displayName = COALESCE($1, displayName), 
+              picture = COALESCE($2, picture), 
+              password = COALESCE($3, password), 
+              dateupdated = NOW()
+          WHERE id = $4
+          RETURNING id, email, displayName, picture, datecreated, dateupdated`, [displayName, picture, newhHashedPassword, userId]);
+
+      if (result.rows.length === 0) {
+          return res.status(404).json({ message: "User not found" });
+      }
+
+      res.json({ message: "Profile updated", user: result.rows[0] });
+
+  } catch (error) {
+      console.error("Error updating user:", error);
+      res.status(500).json({ message: "Error updating user profile" });
+  }
 });
 
 
-  router.post('/add', (req, res) => {
+// localhost:3000/users
+// Delete logged-in user's account
+router.delete('/', authenticate, async (req, res) => {
+  try {
+    const userId = req.user.userId; // Get user ID from authenticated token
+      const { password } = req.body;
 
-    reviewEntry.push({
-        id: req.body.id, 
-        username: req.body.username,
-        password: req.body.password,
-        email: req.body.email,
-        picture: req.body.picture
-      });
-    res.status(200).json({
-        message: 'Post submitted'
-    });
+      if (!password) {
+          return res.status(400).json({ message: "Password is required to delete account" });
+      }
 
-  });
+      // Get the user's stored hashed password
+      const userResult = await db.query("SELECT password FROM users WHERE id = $1", [userId]);
 
+      if (userResult.rows.length === 0) {
+          return res.status(404).json({ message: "user not found" });
+      }
+
+      const hashedPassword = userResult.rows[0].password;
+
+      // Compare provided password with stored hash
+      const isMatch = await bcrypt.compare(password, hashedPassword);
+      if (!isMatch) {
+          return res.status(403).json({ message: "Incorrect password" });
+      }
+
+      // Delete user if password is correct
+      await db.query("DELETE FROM users WHERE id = $1", [userId]);
+
+      res.json({ message: "Account deleted successfully" });
+
+  } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ message: "Error deleting account" });
+  }
+});
+
+
+
+// localhost:3000/users/0
+// get specific user
+router.get('/:userId', async (req, res) => {
+  try {
+      const userId = req.params.userId;
+      const result = await db.query('SELECT id, displayName, picture, datecreated FROM users WHERE id = $1', [userId]);
+
+      if (result.rows.length === 0) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+
+      res.json(result.rows[0]);
+  } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: 'Error retrieving user data' });
+  }
+});
 
   module.exports = router;

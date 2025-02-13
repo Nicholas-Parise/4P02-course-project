@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-
 const db = require('./db');
 const authenticate = require('./authenticate');
 
@@ -23,7 +22,7 @@ router.get('/', authenticate, async(req,res,next)=>{
 
     res.json(result.rows);
 } catch (error) {
-    console.error("Error fetching wishlists:", error);
+    console.error("Error fetching events:", error);
     res.status(500).json({ error: "Internal Server Error" });
 }
 
@@ -66,7 +65,7 @@ router.post('/', authenticate, async (req, res, next) => {
 
     await db.query("COMMIT"); // Commit the transaction
     
-    res.status(201).json({ event_id, message: "Wishlist created successfully!" });
+    res.status(201).json({ event_id, message: "Event created successfully!" });
   
   }catch (error) {
     await db.query("ROLLBACK"); // Rollback if an error occurs
@@ -95,7 +94,7 @@ try {
       WHERE m.user_id = $1 AND e.id = $2;`, [userId,eventId]);
 
       if (result.rows.length === 0) {
-        return res.status(404).json({ error: "wishlist not found." });
+        return res.status(404).json({ error: "event not found." });
       }
 
 
@@ -116,7 +115,7 @@ const userId = req.user.userId; // Get user ID from the authenticated token
 const {name, description, url, addr, city, image } = req.body;
 
 
-// make sure user is the owner of the wishlist before allowing editing
+// make sure user is the owner of the event before allowing editing
 try {
   const ownershipCheck = await db.query(`
     SELECT m.owner
@@ -187,7 +186,7 @@ router.delete('/:eventId', authenticate, async(req,res,next)=>{
       return res.status(403).json({ error: "Only the owner can delete this event." });
     }
   
-    // Delete the wishlist
+    // Delete the event
     await db.query(`DELETE FROM events WHERE id = $1;`, [eventId]);
   
     res.json({ message: "event deleted successfully." });
