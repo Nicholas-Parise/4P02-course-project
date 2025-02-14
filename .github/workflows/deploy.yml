@@ -21,5 +21,4 @@ jobs:
         username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          chmod +x /var/www/4P02-course-project/deploy.sh
           /var/www/4P02-course-project/deploy.sh
