@@ -1,4 +1,4 @@
-import React, {act, useState} from 'react'
+import React, {useState} from 'react'
 import styled from '@emotion/styled'
 import ModalBox from '@mui/material/Box';
 import ModalButton from '@mui/material/Button';
@@ -47,6 +47,12 @@ const Wishlists = () => {
       toggleActiveOverlay(title)
     }
   }
+  function handleMyself(){
+    console.log("myself")
+  }
+  function handleBehalf(){
+    console.log("behalf")
+  }
 
   return (
     <>
@@ -72,8 +78,8 @@ const Wishlists = () => {
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Who is this for?
           </Typography>
-          <ModalButton>For Myself</ModalButton>
-          <ModalButton>On Behalf Of A Loved One</ModalButton>
+          <ModalButton onClick={handleMyself}>For Myself</ModalButton>
+          <ModalButton onClick={handleBehalf}>On Behalf Of A Loved One</ModalButton>
         </ModalBox>
       </Modal>
     </>

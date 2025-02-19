@@ -15,6 +15,10 @@ const WishlistButton = styled.button`
         width: 150px;
         height: 150px;
     }
+    &:hover{
+        transform: scale(1.05);
+        cursor: pointer;
+    }
 `
 
 const WishlistMenu = styled.div`
@@ -45,6 +49,10 @@ const EventButton = styled.button`
     @media screen and (max-width: 440px){
         width: 150px;
         height: 150px;
+    }
+    &:hover{
+        transform: scale(1.05);
+        cursor: pointer;
     }
 `
 
@@ -79,6 +87,7 @@ const MenuButton = styled.button`
     &:hover{
         border: solid #5fd5dd 1px;
         border-radius: 20px;
+        cursor: pointer;
     } 
 `
 
@@ -127,9 +136,10 @@ export const EventThumbnail = (props) => {
             </EventMenu>
         )
     }
-
+    let navigate = useNavigate();
     const openEvent = (e) => {
-        alert("Opened " + props.title);
+        let path = "/events/" + props.id;
+        navigate(path);
     }
 
 
