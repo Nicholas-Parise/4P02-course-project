@@ -51,26 +51,36 @@ const Event = () => {
       <EventImage src={banner}></EventImage>
       <Content>
         <EditText
-                name="textbox1"
-                style={{fontWeight: 'bold'}}
-                  
-                defaultValue={event.title}
-              />
+          name="textbox1"
+          style={{ fontWeight: 'bold' }}
+          defaultValue={event.title}
+        />
         <EditTextarea
-              defaultValue={event.description}
-              style={{
-                resize: "none"
-              }}
-              rows={12}
-            />
+          defaultValue={event.description}
+          style={{
+            resize: "none"
+          }}
+          rows={12}
+        />
       </Content>
       <Sidebar>
         <RSVP>RSVP Now</RSVP>
-        <p>Date: {event.date}</p>
-        <p>Location: {event.location}</p>
+        <div>
+          <p style={{ fontWeight: 'bold' }}>Date:</p>
+          <EditText
+            name="date"
+            defaultValue={event.date}
+          />
+        </div>
+        <div>
+          <p style={{ fontWeight: 'bold' }}>Location:</p>
+          <EditText
+            name="location"
+            defaultValue={event.location}
+          />
+        </div>
       </Sidebar>
-
-    </EventSection> 
+    </EventSection>
   );
 };
 export default Event;

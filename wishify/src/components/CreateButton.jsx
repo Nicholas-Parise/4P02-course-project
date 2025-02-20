@@ -13,6 +13,7 @@ const CreateWishlistButton = styled.button`
         height: 150px;
     }
     &:hover {
+        transform: scale(1.05);
         cursor: pointer;
     }
 `

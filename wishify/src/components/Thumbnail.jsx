@@ -1,7 +1,8 @@
-import React from 'react';
+import {React} from 'react';
 import { useNavigate } from "react-router-dom";
 import styled from "@emotion/styled";
 import {FaEye, FaPencilAlt, FaKey} from 'react-icons/fa';
+
 
 const WishlistButton = styled.button`
     background: rgb(91, 241, 252);
@@ -92,28 +93,28 @@ const MenuButton = styled.button`
 `
 
 
-export const WishlistThumbnail = (props) => {
 
+export const WishlistThumbnail = (props) => {
     const WishlistOverlayMenu = () => {
         return (
             <WishlistMenu onMouseLeave={props.toggleActive}>
                 <button style={{overflow: 'hidden', fontSize: "initial", textAlign: 'center', borderBottom: '1px solid black'}}>{props.title}</button>
                 <MenuButton onClick={openWishlist}>Open</MenuButton>
-                <MenuButton>Edit</MenuButton>
+                <MenuButton onClick={props.edit}>Edit</MenuButton>
                 <MenuButton>Share</MenuButton>
             </WishlistMenu>
         )
     }
+
     let navigate = useNavigate(); 
     const openWishlist = (e) => {
         let path = "/wishlists/" + props.id;
         navigate(path);
     }
 
-
     if(props.role == "contributor"){
         return(
-            <WishlistButton onClick={openWishlist}><Eye></Eye>{props.title}</WishlistButton>
+        <WishlistButton onClick={openWishlist}><Eye></Eye>{props.title}</WishlistButton>
         )
     } else{
         return(
