@@ -1,9 +1,16 @@
-//import React, { useState, useEffect } from 'react';
 import {useState} from 'react';
 import { useParams } from "react-router-dom"
 import { type Wishlist, WishlistItem, Event } from '../types/types';
-import WishlistSummary from '../components/WishlistSummary';
-import ListOfWishes from '../components/ListOfWishes';
+import WishlistHeader from '../components/WishlistHeader';
+import WishlistItemEntry from '../components/WishlistItemEntry';
+import { DndContext, DragEndEvent } from '@dnd-kit/core';
+import { arrayMove, SortableContext } from '@dnd-kit/sortable';
+
+import Box from '@mui/material/Box';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 const Wishlist = () => {
   const { id } = useParams();
@@ -22,7 +29,8 @@ const Wishlist = () => {
             dateUpdated: "Wednesday, January 29th 2025",
             id: 1,
             priority: 1,
-            price: 450
+            price: 450,
+            contributions: []
         },
         {
             name: "Nintendo Switch 2",
@@ -34,7 +42,8 @@ const Wishlist = () => {
             dateUpdated: "Wednesday, January 29th 2025",
             id: 2,
             priority: 2,
-            price: 500
+            price: 500,
+            contributions: []
         },
         {
             name: "PS5 Pro",
@@ -46,11 +55,12 @@ const Wishlist = () => {
             dateUpdated: "Wednesday, January 29th 2025",
             id: 3,
             priority: 3,
-            price: 960
+            price: 960,
+            contributions: []
         },
         {
             name: "Hot dogs",
-            desc: "I'm hungry'",
+            desc: "I'm hungry",
             url: "https://www.amazon.ca/PlayStation-CFI-7019B01X-5-Pro-Console/dp/B0DGYL8TDZ",
             imageSrc: "https://i5.walmartimages.ca/images/Enlarge/020/808/627735020808.jpg?odnHeight=612&odnWidth=612&odnBg=FFFFFF",
             quantity: 5,
@@ -58,7 +68,8 @@ const Wishlist = () => {
             dateUpdated: "Wednesday, January 29th 2025",
             id: 4,
             priority: 3,
-            price: 5
+            price: 5,
+            contributions: []
         },
     ]);
 
@@ -69,18 +80,81 @@ const Wishlist = () => {
     };
 
     const event: Event = {
+        id: 0,
         name: "Jensen family Christmas",
         desc: 'Description',
         url: '../events/1234',
         dateUpdated: 'yesterday',
-        address: '100 Polar Express Way',
+        dateCreated: 'yesterday',
+        image: "",
+        addr: '100 Polar Express Way',
         city: 'North Pole'
     };
 
+    type SortOption = "priority" | "price" | "quantity"
+
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event
+    
+        if (over && active.id !== over.id && sortBy === "priority") {
+          setWishlistItems((items) => {
+            const oldIndex = items.findIndex((item) => item.id === active.id)
+            const newIndex = items.findIndex((item) => item.id === over.id)
+    
+            return arrayMove(items, oldIndex, newIndex).map((item, index) => ({
+              ...item,
+              priority: index + 1,
+            }))
+          })
+        }
+    }
+
+  const [sortBy, setSortBy] = useState<SortOption>("priority")
+
+  const sortedItems = [...wishlistItems].sort((a, b) => {
+    if (sortBy === "priority") return a.priority - b.priority
+    if (sortBy === "price") return a.price - b.price
+    if (sortBy === "quantity") return b.quantity - a.quantity
+    return 0
+  })
+
+  const handleReserveItem = (itemId: number, reservation: number, user: string) => {
+    
+  }
+
   return (
     <section>
-        <WishlistSummary wishlist={wishlist} event={event} />
-        <ListOfWishes wishlistItems={wishlistItems} setWishlistItems={setWishlistItems} />
+        <WishlistHeader wishlist={wishlist} event={event} />
+        <div className="mt-8 mb-4">
+
+            <Box sx={{ minWidth: 120, maxWidth: 180 }}>
+                <FormControl fullWidth>
+                    <InputLabel id="sort-select-label">Sort by</InputLabel>
+                    <Select
+                    labelId="sort-select-label"
+                    id="sort-select"
+                    value={sortBy}
+                    label="Sort by"
+                    onChange={(event: SelectChangeEvent) => setSortBy(event.target.value as SortOption)}>
+                        <MenuItem value={'priority'}>Priority</MenuItem>
+                        <MenuItem value={'price'}>Price</MenuItem>
+                        <MenuItem value={'quantity'}>Quantity</MenuItem>
+                    </Select>
+                </FormControl>
+            </Box>
+        </div>
+      
+        <DndContext onDragEnd={handleDragEnd}>
+            <SortableContext items={sortedItems.map((item) => item.id)}>
+                <ul className="space-y-4">
+                {sortedItems.map((item) => (
+                    <WishlistItemEntry key={item.id} item={item} sortBy={sortBy} onReserve={handleReserveItem} />
+                ))}
+                </ul>
+            </SortableContext>
+        </DndContext>
+      
     </section>   
   );
 }

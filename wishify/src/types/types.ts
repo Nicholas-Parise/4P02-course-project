@@ -5,12 +5,15 @@ export interface Wishlist {
 };
 
 export interface Event {
+    id: number,
     name: string,
     desc: string,
     url: string,
+    addr: string,
+    city: string,
+    image: string,
     dateUpdated: string,
-    address: string,
-    city: string
+    dateCreated: string
 };
 
 export interface WishlistItem {
@@ -24,4 +27,10 @@ export interface WishlistItem {
     quantity: number,
     quantitySupplied: number
     dateUpdated: string,
+    contributions: Contribution[]
 };
+
+export interface Contribution{
+    user: string,
+    quantity: number
+}
