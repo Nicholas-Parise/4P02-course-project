@@ -10,6 +10,7 @@ echo "Pulling latest changes from GitHub..."
 cd $PROJECT_DIR || exit
 git reset --hard origin/main
 git pull origin main
+chmod 770 deploy.sh
 
 # Step 2: Install dependencies & build frontend
 echo "Installing frontend dependencies..."
