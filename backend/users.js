@@ -30,7 +30,7 @@ router.get('/', authenticate, async (req, res, next) => {
 router.put('/', authenticate, async (req, res) => {
   try {
     const userId = req.user.userId; // Get user ID from authenticated token
-      const { displayName, picture, password, newPassword } = req.body;
+      const { email, displayName, picture, password, newPassword } = req.body;
 
       let newhHashedPassword = null;
 
@@ -62,10 +62,11 @@ router.put('/', authenticate, async (req, res) => {
           SET 
               displayName = COALESCE($1, displayName), 
               picture = COALESCE($2, picture), 
-              password = COALESCE($3, password), 
+              password = COALESCE($3, password),
+              email =  COALESCE($4, email),
               dateupdated = NOW()
-          WHERE id = $4
-          RETURNING id, email, displayName, picture, datecreated, dateupdated`, [displayName, picture, newhHashedPassword, userId]);
+          WHERE id = $5
+          RETURNING id, email, displayName, picture, datecreated, dateupdated`, [displayName, picture, newhHashedPassword, email, userId]);
 
       if (result.rows.length === 0) {
           return res.status(404).json({ message: "User not found" });

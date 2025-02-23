@@ -15,7 +15,12 @@ router.post('/register',async (req,res,next)=>{
     }
 
     // I don't know how to do images rn so its always gonna be the placeholder
-    const tempPicture = "/assets/placeholder-avatar.png";
+    let tempPicture;
+    if(!picture){
+        tempPicture = "/assets/placeholder-avatar.png";
+    }else{
+        tempPicture = picture;
+    }
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);

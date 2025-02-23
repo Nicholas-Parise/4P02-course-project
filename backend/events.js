@@ -200,5 +200,128 @@ router.delete('/:eventId', authenticate, async(req,res,next)=>{
 
 
 
+// localhost:3000/events/:eventId/wishlists?page=1&pageSize=10
+// get list of wishlists under an event
+router.get('/:eventId/wishlists', authenticate, async(req,res,next)=>{
+   
+const eventId = parseInt(req.params.eventId);
+const page = parseInt(req.query.page) || 1;
+const pageSize = parseInt(req.query.pageSize) || 10;
+
+try {
+  const result = await db.query(`
+      SELECT w.id, w.name, w.description, w.dateCreated
+            FROM wishlists w
+            JOIN events e ON w.event_id = e.id
+            WHERE e.id = $1;`, [eventId]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: "No wishlists found for this event" });
+        }
+
+
+      res.json({ wishlists: result.rows });
+} catch (error) {
+  console.error("Error fetching wishlists for event:", error);
+  res.status(500).json({ error: "Internal Server Error" });
+}
+
+});
+
+
+// localhost:3000/events/:eventId/members?page=1&pageSize=10
+// get list of members under an event
+router.get('/events/:id/members', authenticate, async (req, res) => {
+  const eventId = parseInt(req.params.id);
+
+  try {
+      const result = await db.query(`
+          SELECT u.id, u.displayName, u.email, u.picture
+          FROM users u
+          JOIN event_members em ON u.id = em.user_id
+          WHERE em.event_id = $1;
+      `, [eventId]);
+
+      if (result.rows.length === 0) {
+          return res.status(404).json({ message: "No members found for this event" });
+      }
+
+      res.json({ members: result.rows });
+  } catch (error) {
+      console.error("Error fetching members for event:", error);
+      res.status(500).json({ message: "Error fetching members" });
+  }
+});
+
+
+
+// localhost:3000/events/:id/members?page=1&pageSize=10
+// add a member to an event
+router.post('/events/:id/members', authenticate, async (req, res) => {
+  const eventId = parseInt(req.params.id);
+  const { userId } = req.body;  // the user provides the userId of the member to add
+
+  if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+  }
+
+  try {
+      // Check if the user is already a member of the event
+      const memberCheck = await db.query(`
+          SELECT * FROM event_members WHERE event_id = $1 AND user_id = $2
+      `, [eventId, userId]);
+
+      if (memberCheck.rows.length > 0) {
+          return res.status(400).json({ message: "User is already a member of this event" });
+      }
+      
+      // Add the user to the event
+      await db.query(`
+          INSERT INTO event_members (event_id, user_id, dateCreated)
+          VALUES ($1, $2, NOW());`, [eventId, userId]);
+
+      res.status(201).json({ message: "User added to the event successfully" });
+  } catch (error) {
+      console.error("Error adding member to event:", error);
+      res.status(500).json({ message: "Error adding member to event" });
+  }
+});
+
+
+
+// localhost:3000/events/:id/members?page=1&pageSize=10
+// remove a member from an event
+router.delete('/events/:id/members', authenticate, async (req, res) => {
+  const eventId = parseInt(req.params.id);
+  const { userId } = req.body;  // Expecting the user to provide the userId of the member to remove
+
+  if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+  }
+
+  try {
+      // Check if the user is a member of the event
+      const memberCheck = await db.query(`
+          SELECT * FROM event_members WHERE event_id = $1 AND user_id = $2
+      `, [eventId, userId]);
+
+      if (memberCheck.rows.length === 0) {
+          return res.status(404).json({ message: "User is not a member of this event" });
+      }
+
+      // Remove the user from the event
+      await db.query(`
+          DELETE FROM event_members WHERE event_id = $1 AND user_id = $2
+      `, [eventId, userId]);
+
+      res.json({ message: "User removed from the event successfully" });
+  } catch (error) {
+      console.error("Error removing member from event:", error);
+      res.status(500).json({ message: "Error removing member from event" });
+  }
+});
+
+
+
 
   module.exports = router;
