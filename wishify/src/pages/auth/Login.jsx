@@ -1,17 +1,20 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import '../../login.css'
 
 const Login = () => {
-  let isAuthenticating = false
-  let token = localStorage.getItem('token')
-
+  const [isAuthenticating, setIsAuthenticating] = React.useState(false)
   const [showPassword, setShowPassword] = React.useState(false)
   const [isValid, setIsValid] = React.useState(false)
+  const [responseMessage, setResponseMessage] = React.useState("");
+  const [responseType, setResponseType] = React.useState(""); // "success" or "error"
   const [formData, setFormData] = React.useState({
     email: "",
     password: ""
   });
+
+  const navigate = useNavigate();
 
   const handleFormChange = (event) => {
     const { name, value } = event.target
@@ -25,7 +28,7 @@ const Login = () => {
 
   const validateForm = (data) => {
     const isEmailValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(data.email)
-    const isPasswordValid = data.password !== "" && data.password.length <= 64
+    const isPasswordValid = data.password.length >= 8 && data.password.length <= 64
 
     const isFormValid = isEmailValid && isPasswordValid
 
@@ -35,15 +38,13 @@ const Login = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (
-      !isValid ||
-      isAuthenticating
-    ) { return }
+    if (!isValid || isAuthenticating) { 
+      return 
+    }
     
-    isAuthenticating = true
+    setIsAuthenticating(true)
 
     try {
-      let data
       const response = await fetch("https://api.wishify.ca/auth/login", {
         method: "POST",
         headers: {
@@ -52,22 +53,36 @@ const Login = () => {
         body: JSON.stringify({ email: formData.email, password: formData.password })
       })
 
-      data = await response.json()
+      const data = await response.json()
 
-      if (data.token) {
-        token = data.token
-        localStorage.setItem('token', token)
-        console.log("Authenticated!")
-        // redirect to home page
+      if (response.status === 200 && data.token) {
+        localStorage.setItem('token', data.token)
+        setResponseMessage(
+          <>
+            Successfully authenticated. Redirecting to your <Link to="/home" className="home-link">home page</Link>...
+          </>
+        );
+        setResponseType("success");
+        navigate("../Home")
+      } else if (response.status === 400) {
+        setResponseMessage("Bad request. Please fill in all required fields.");
+        setResponseType("error");
+      } else if (response.status === 401) {
+        setResponseMessage("Incorrect email or password. Please try again.");
+        setResponseType("error");
+      } else if (response.status === 500) {
+        setResponseMessage("Internal error: something went wrong. Please try again later.");
+        setResponseType("error");
       } else {
-        console.log("Failed to authenticate...")
-        // display message to user
+        setResponseMessage("An unexpected error occurred. Please try again.");
+        setResponseType("error");
       }
 
     } catch (err) {
-      console.log(`Uh oh, an error: ${err.message}`)
+      setResponseMessage(`An error occurred: ${err.message}`);
+      setResponseType("error");
     } finally {
-      isAuthenticating = false
+      setIsAuthenticating(false)
     }
   }
   
@@ -109,8 +124,15 @@ const Login = () => {
           </span>
         </div>
 
-        <button type="submit">Login</button>
+        <button type="submit" disabled={!isValid || isAuthenticating}>Login</button>
       </form>
+
+      {responseMessage && (
+        <div className={`response-message ${responseType}`}>
+          {responseMessage}
+        </div>
+      )}
+
       <Link to="/forgot-password" className="login-forgot-password">Forgot password?</Link>
       <div className="login-signup">
         Don't have an account? <Link to="/register">Sign up here</Link>
