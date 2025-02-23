@@ -15,6 +15,7 @@ id SERIAL PRIMARY KEY,
 password TEXT NOT NULL,
 email TEXT UNIQUE NOT NULL,
 displayName TEXT,
+bio TEXT,
 picture TEXT,
 datecreated TIMESTAMP,
 dateupdated TIMESTAMP

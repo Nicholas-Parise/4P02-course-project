@@ -54,7 +54,7 @@ GET /events/:id → Get event details
 PUT /events/:id → Update event  
 DELETE /events/:id → Delete event**
 
-GET /events/:id/wishlists → Get wishlists for an event
+GET /events/:id/wishlists → Get wishlists for an event  
 
 GET /events/:id/members → Get all members in a specific event   
 POST /events/:id/members → Add a member to an event   
