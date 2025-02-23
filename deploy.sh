@@ -8,6 +8,7 @@ BACKEND_DIR="$PROJECT_DIR/backend"
 # Step 1: Pull the latest changes from GitHub
 echo "Pulling latest changes from GitHub..."
 cd $PROJECT_DIR || exit
+git reset --hard origin/main
 git pull origin main
 
 # Step 2: Install dependencies & build frontend
@@ -23,7 +24,7 @@ npm install
 
 # Step 4: Restart the backend API with PM2 (might change to reload instead of restart)
 echo "Restarting wishify-api..."
-pm2 restart wishify-api  
+pm2 reload wishify-api || pm2 restart wishify-api  
 
 # Step 5: Reload Nginx (since static files are updated)
 echo "Reloading Nginx..."
