@@ -11,7 +11,7 @@ router.get('/:itemId', authenticate, async(req,res,next)=>{
     
   const page = parseInt(req.query.page) || 1;
   const pageSize = parseInt(req.query.pageSize) || 10;
-  const itemsId = parseInt(req.params.itemId);
+  const itemId = parseInt(req.params.itemId);
   
   try {
     const userId = req.user.userId; // Get user ID from authenticated token
@@ -36,7 +36,7 @@ router.get('/:itemId', authenticate, async(req,res,next)=>{
 // edit the contents of a single item
 router.put('/:itemId', authenticate, async(req,res,next)=>{
 
-  const itemsId = parseInt(req.params.itemId);
+  const itemId = parseInt(req.params.itemId);
   const { name, description, url, image, quantity, price } = req.body;
   const userId = req.user.userId; // Get user ID from authenticated token
   
@@ -88,7 +88,7 @@ router.put('/:itemId', authenticate, async(req,res,next)=>{
 // delete the contents of a single item
 router.delete('/:itemId', authenticate, async(req,res,next)=>{
 
-  const itemsId = parseInt(req.params.itemId);
+  const itemId = parseInt(req.params.itemId);
   const userId = req.user.userId; // Get user ID from authenticated token
   
   try {
