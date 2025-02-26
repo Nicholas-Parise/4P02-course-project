@@ -37,15 +37,14 @@ DELETE /categories/:id → Delete a category
 GET /wishlists/ → Get list of wishlists (where user is a member)   
 GET /wishlists/:id → Get wishlist details (must be member)   
 PUT /wishlists/:id → Update wishlist (provide desired attributes to edit, must be the owner)  
-DELETE /wishlists/:id → Delete wishlist (must be the owner)**      
+DELETE /wishlists/:id → Delete wishlist (must be the owner)**          
 
-GET /wishlists/:id/items → Get all items in a wishlist (and contributions)    
-POST /wishlists/:id/items → Add an item to a wishlist  
-
-GET /wishlists/:id/members → Get all members in a specific event   
-POST /wishlists/:id/members → Add a member to an event   
-PUT /wishlists/:id/members → Update a member’s status (blind/owner)     
+**GET /wishlists/:id/members → Get all members in a specific wishlist   
+POST /wishlists/:id/members → Add a member to an wishlist    
 DELETE /wishlists/:id/members → Remove a member from wishlist  
+PUT /wishlists/:id/members → Update a member’s status (blind/owner)**    
+
+**GET /wishlists/:id/items → Get all items in a wishlist (and contributions)**
 
 ##  Events
 **GET /events → Get all events (for member)   
@@ -54,19 +53,19 @@ GET /events/:id → Get event details
 PUT /events/:id → Update event  
 DELETE /events/:id → Delete event**
 
-GET /events/:id/wishlists → Get wishlists for an event  
-
+**GET /events/:id/wishlists → Get wishlists for an event  
 GET /events/:id/members → Get all members in a specific event   
 POST /events/:id/members → Add a member to an event   
-DELETE /events/:id/members → Remove a member from event  
-
+DELETE /events/:id/members → Remove a member from event    
+PUT /events/:id/members → Update a member’s status (blind/owner)**
 
 ## Items
 
 **GET /items/:id → Get item details  
 PUT /items/:id → Update an item  
-DELETE /items/:id → Remove an item**  
-
+DELETE /items/:id → Remove an item  
+POST /items -> create an item (given wishlists id)**
+  
 ## Contributions
 
 GET /items/:id/contributions → Get contributions for an item  

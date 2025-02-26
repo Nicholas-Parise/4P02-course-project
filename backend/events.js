@@ -231,7 +231,7 @@ try {
 
 // localhost:3000/events/:eventId/members?page=1&pageSize=10
 // get list of members under an event
-router.get('/events/:id/members', authenticate, async (req, res) => {
+router.get('/:id/members', authenticate, async (req, res) => {
   const eventId = parseInt(req.params.id);
 
   try {
@@ -257,15 +257,32 @@ router.get('/events/:id/members', authenticate, async (req, res) => {
 
 // localhost:3000/events/:id/members?page=1&pageSize=10
 // add a member to an event
-router.post('/events/:id/members', authenticate, async (req, res) => {
+router.post('/:id/members', authenticate, async (req, res) => {
   const eventId = parseInt(req.params.id);
-  const { userId } = req.body;  // the user provides the userId of the member to add
+  const authUserId = req.user.userId; // Get user ID from the authenticated token
+  const { userId, owner } = req.body;  // the user provides the userId of the member to add
 
   if (!userId) {
       return res.status(400).json({ message: "User ID is required" });
   }
 
   try {
+    // make sure user is the owner of the event before allowing editing of others memberships
+        const ownershipCheck = await db.query(`
+          SELECT m.owner
+          FROM event_members m
+          WHERE m.user_id = $1 AND m.event_id = $2;
+          `, [authUserId, wishlistId]);
+  
+        if (ownershipCheck.rows.length === 0) {
+          return res.status(403).json({ error: "Access denied. You are not a member of this event." });
+        }
+  
+        if (!ownershipCheck.rows[0].owner) {
+          return res.status(403).json({ error: "Only the owner can add a member to this event." });
+        }
+
+
       // Check if the user is already a member of the event
       const memberCheck = await db.query(`
           SELECT * FROM event_members WHERE event_id = $1 AND user_id = $2
@@ -277,8 +294,8 @@ router.post('/events/:id/members', authenticate, async (req, res) => {
       
       // Add the user to the event
       await db.query(`
-          INSERT INTO event_members (event_id, user_id, dateCreated)
-          VALUES ($1, $2, NOW());`, [eventId, userId]);
+          INSERT INTO event_members (event_id, user_id, owner, dateCreated)
+          VALUES ($1, $2, COALESCE($3, false), NOW());`, [eventId, userId, owner]);
 
       res.status(201).json({ message: "User added to the event successfully" });
   } catch (error) {
@@ -291,8 +308,9 @@ router.post('/events/:id/members', authenticate, async (req, res) => {
 
 // localhost:3000/events/:id/members?page=1&pageSize=10
 // remove a member from an event
-router.delete('/events/:id/members', authenticate, async (req, res) => {
+router.delete('/:id/members', authenticate, async (req, res) => {
   const eventId = parseInt(req.params.id);
+  const authUserId = req.user.userId; // Get user ID from the authenticated token
   const { userId } = req.body;  // Expecting the user to provide the userId of the member to remove
 
   if (!userId) {
@@ -300,6 +318,22 @@ router.delete('/events/:id/members', authenticate, async (req, res) => {
   }
 
   try {
+      // make sure user is the owner of the event before allowing editing of others memberships
+      const ownershipCheck = await db.query(`
+        SELECT m.owner
+        FROM event_members m
+        WHERE m.user_id = $1 AND m.event_id = $2;
+        `, [authUserId, wishlistId]);
+
+      if (ownershipCheck.rows.length === 0) {
+        return res.status(403).json({ error: "Access denied. You are not a member of this event." });
+      }
+
+      if (!ownershipCheck.rows[0].owner) {
+        return res.status(403).json({ error: "Only the owner can remove a member to this event." });
+      }
+
+
       // Check if the user is a member of the event
       const memberCheck = await db.query(`
           SELECT * FROM event_members WHERE event_id = $1 AND user_id = $2
@@ -318,6 +352,63 @@ router.delete('/events/:id/members', authenticate, async (req, res) => {
   } catch (error) {
       console.error("Error removing member from event:", error);
       res.status(500).json({ message: "Error removing member from event" });
+  }
+});
+
+
+
+// localhost:3000/events/:id/members?page=1&pageSize=10
+// edit a membership to an event
+router.put('/:id/members', authenticate, async (req, res) => {
+  const eventId = parseInt(req.params.id);
+  const authUserId = req.user.userId; // Get user ID from the authenticated token
+  const { userId, owner } = req.body;  // the user provides the userId of the member to add
+
+  if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+  }
+
+  try {
+    // make sure user is the owner of the event before allowing editing of others memberships
+        const ownershipCheck = await db.query(`
+          SELECT m.owner
+          FROM event_members m
+          WHERE m.user_id = $1 AND m.event_id = $2;
+          `, [authUserId, wishlistId]);
+  
+        if (ownershipCheck.rows.length === 0) {
+          return res.status(403).json({ error: "Access denied. You are not a member of this event." });
+        }
+  
+        if (!ownershipCheck.rows[0].owner) {
+          return res.status(403).json({ error: "Only the owner can edit a member to this event." });
+        }
+
+
+      // Check if the user is already a member of the event
+      const memberCheck = await db.query(`
+          SELECT * FROM event_members WHERE event_id = $1 AND user_id = $2
+      `, [eventId, userId]);
+
+      if (memberCheck.rows.length === 0) {
+        return res.status(404).json({ message: "User is not a member of this event" });
+      }
+
+      
+      // edit a users membership
+          const result = await db.query(`
+            UPDATE event_members
+            SET 
+                owner = COALESCE($2, owner),
+                dateUpdated = NOW()
+            WHERE id = $7
+            RETURNING *;
+          `, [owner, memberCheck.rows[0].id]);
+      
+          res.json({ message: "membership updated successfully.", membership: result.rows[0] });
+  } catch (error) {
+      console.error("Error adding member to event:", error);
+      res.status(500).json({ message: "Error adding member to event" });
   }
 });
 
