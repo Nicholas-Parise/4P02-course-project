@@ -198,6 +198,218 @@ router.put('/:wishlistId', authenticate, async(req,res,next)=>{
 });
 
 
+// localhost:3000/wishlists/:id/members
+// get list of members under a wishlist
+router.get('/:wishlistId/members', authenticate, async (req, res) => {
+  const wishlistId = parseInt(req.params.wishlistId);
+
+  try {
+      const result = await db.query(`
+          SELECT u.id, u.displayName, u.email, u.picture
+          FROM users u
+          JOIN wishlist_members wm ON u.id = wm.user_id
+          WHERE wm.wishlists_id = $1;
+      `, [wishlistId]);
+
+      if (result.rows.length === 0) {
+          return res.status(404).json({ message: "No members found for this wishlist" });
+      }
+
+      res.json({ members: result.rows });
+  } catch (error) {
+      console.error("Error fetching members for wishlist:", error);
+      res.status(500).json({ message: "Error fetching members" });
+  }
+});
+
+
+
+// localhost:3000/wishlists/:id/members?page=1&pageSize=10
+// add a member to an wishlist
+router.post('/:id/members', authenticate, async (req, res) => {
+  const wishlistId = parseInt(req.params.id);
+  const authUserId = req.user.userId; // Get user ID from the authenticated token
+  const { userId, blind, owner } = req.body;  // the user provides the userId of the member to add
+  
+  if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+  }
+
+  try {
+      // make sure user is the owner of the wishlist before allowing editing of others memberships
+      const ownershipCheck = await db.query(`
+        SELECT m.owner
+        FROM wishlist_members m
+        WHERE m.user_id = $1 AND m.wishlists_id = $2;
+        `, [authUserId, wishlistId]);
+
+      if (ownershipCheck.rows.length === 0) {
+        return res.status(403).json({ error: "Access denied. You are not a member of this wishlist." });
+      }
+
+      if (!ownershipCheck.rows[0].owner) {
+        return res.status(403).json({ error: "Only the owner can add a member to this wishlist ." });
+      }
+
+
+      // Check if the user is already a member of the wishlist
+      const memberCheck = await db.query(`
+          SELECT * FROM wishlist_members WHERE wishlists_id = $1 AND user_id = $2
+      `, [wishlistId, userId]);
+
+      if (memberCheck.rows.length > 0) {
+          return res.status(400).json({ message: "User is already a member of this wishlist" });
+      }
+      
+      // Add the user to the wishlist
+      await db.query(`
+          INSERT INTO wishlist_members (wishlists_id, user_id, blind, owner, dateCreated)
+          VALUES ($1, $2, COALESCE($3, false), COALESCE($4, false), NOW());`, [wishlistId, userId, blind, owner]);
+
+      res.status(201).json({ message: "User added to the wishlist successfully" });
+  } catch (error) {
+      console.error("Error adding member to wishlist:", error);
+      res.status(500).json({ message: "Error adding member to wishlist" });
+  }
+});
+
+
+
+// localhost:3000/wishlists/:id/members?page=1&pageSize=10
+// remove a member from an wishlist
+router.delete('/:id/members', authenticate, async (req, res) => {
+  const wishlistId = parseInt(req.params.id);
+  const authUserId = req.user.userId; // Get user ID from the authenticated token
+  const { userId } = req.body;  // Expecting the user to provide the userId of the member to remove
+
+  if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+  }
+
+  try {
+    // make sure user is the owner of the wishlist before allowing editing of others memberships
+    const ownershipCheck = await db.query(`
+      SELECT m.owner
+      FROM wishlist_members m
+      WHERE m.user_id = $1 AND m.wishlists_id = $2;
+      `, [authUserId, wishlistId]);
+
+    if (ownershipCheck.rows.length === 0) {
+      return res.status(403).json({ error: "Access denied. You are not a member of this wishlist." });
+    }
+
+    if (!ownershipCheck.rows[0].owner) {
+      return res.status(403).json({ error: "Only the owner can edit this wishlist membership." });
+    }
+
+
+      // Check if the user is a member of the wishlist
+      const memberCheck = await db.query(`
+          SELECT * FROM wishlist_members WHERE wishlists_id = $1 AND user_id = $2
+      `, [wishlistId, userId]);
+
+      if (memberCheck.rows.length === 0) {
+          return res.status(404).json({ message: "User is not a member of this wishlist" });
+      }
+
+      // Remove the user from the wishlist
+      await db.query(`
+          DELETE FROM wishlist_members WHERE wishlists_id = $1 AND user_id = $2
+      `, [wishlistId, userId]);
+
+      res.json({ message: "User removed from the wishlist successfully" });
+  } catch (error) {
+      console.error("Error removing member from wishlist:", error);
+      res.status(500).json({ message: "Error removing member from wishlist" });
+  }
+});
+
+
+
+// localhost:3000/wishlists/:id/members?page=1&pageSize=10
+// edit a member in an wishlist
+router.put('/:id/members', authenticate, async (req, res) => {
+  const wishlistId = parseInt(req.params.id);
+  const authUserId = req.user.userId; // Get user ID from the authenticated token
+  const { userId, blind, owner } = req.body;  // the user provides the userId of the member to add
+  
+  if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+  }
+
+  try {
+      // make sure user is the owner of the wishlist before allowing editing of others memberships
+      const ownershipCheck = await db.query(`
+        SELECT m.owner
+        FROM wishlist_members m
+        WHERE m.user_id = $1 AND m.wishlists_id = $2;
+        `, [authUserId, wishlistId]);
+  
+      if (ownershipCheck.rows.length === 0) {
+        return res.status(403).json({ error: "Access denied. You are not a member of this wishlist." });
+      }
+  
+      if (!ownershipCheck.rows[0].owner) {
+        return res.status(403).json({ error: "Only the owner can edit this wishlist membership." });
+      }
+
+      // Get the membership ID
+      const memberCheck = await db.query(`
+          SELECT * FROM wishlist_members WHERE wishlists_id = $1 AND user_id = $2
+      `, [wishlistId, userId]);
+
+      
+      if (memberCheck.rows.length === 0) {
+        return res.status(404).json({ message: "User is not a member of this wishlist" });
+      }
+
+      // edit a users membership
+      const result = await db.query(`
+        UPDATE wishlist_members
+        SET 
+            blind = COALESCE($1, blind),
+            owner = COALESCE($2, owner),
+            dateUpdated = NOW()
+        WHERE id = $7
+        RETURNING *;
+      `, [blind, owner, memberCheck.rows[0].id]);
+
+      res.json({ message: "membership updated successfully.", membership: result.rows[0] });
+  } catch (error) {
+      console.error("Error editing membership to wishlist:", error);
+      res.status(500).json({ message: "Error editing membership to wishlist" });
+  }
+});
+
+
+
+// localhost:3000/wishlists/:id/items
+// get list of items under a wishlist
+router.get('/:wishlistId/items', authenticate, async (req, res) => {
+  const wishlistId = parseInt(req.params.wishlistId);
+
+  try {
+      const result = await db.query(`
+          SELECT i.* FROM items i
+          JOIN wishlist_members wm ON i.member_id = wm.id
+          WHERE wm.wishlists_id = $1;
+      `, [wishlistId]);
+
+      if (result.rows.length === 0) {
+          return res.status(404).json({ message: "No items found for this wishlist" });
+      }
+
+      res.json({ items: result.rows });
+  } catch (error) {
+      console.error("Error fetching items for wishlist:", error);
+      res.status(500).json({ message: "Error fetching items" });
+  }
+});
+
+
+
+  
+
 
 
 
