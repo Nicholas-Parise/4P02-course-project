@@ -16,7 +16,7 @@ router.get('/', authenticate, async(req,res,next)=>{
       const userId = req.user.userId; // Get user ID from authenticated token
 
       const result = await db.query(`
-          SELECT w.id, w.name, w.description, w.image, w.deadline, w.dateUpdated, w.dateCreated
+          SELECT w.*
           FROM wishlists w
           JOIN wishlist_members m ON w.id = m.wishlists_id
           WHERE m.user_id = $1;`, [userId]);
@@ -90,7 +90,7 @@ router.get('/:wishlistId', authenticate, async(req,res,next)=>{
     const userId = req.user.userId; // Get user ID from authenticated token
 
     const result = await db.query(`
-        SELECT w.id, w.name, w.description, w.image, w.deadline, w.dateUpdated, w.dateCreated, w.event_id
+        SELECT w.*
         FROM wishlists w
         JOIN wishlist_members m ON w.id = m.wishlists_id
         WHERE m.user_id = $1 AND w.id = $2;`, [userId,wishlistId]);

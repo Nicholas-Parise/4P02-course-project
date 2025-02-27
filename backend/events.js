@@ -15,7 +15,7 @@ router.get('/', authenticate, async(req,res,next)=>{
     const userId = req.user.userId; // Get user ID from authenticated token
     
     const result = await db.query(`
-        SELECT e.id, e.name, e.description, e.url, e.addr, e.city, e.image, e.dateUpdated, e.dateCreated
+        SELECT e.*
         FROM events e
         JOIN event_members m ON e.id = m.event_id
         WHERE m.user_id = $1;`, [userId]);
@@ -88,7 +88,7 @@ try {
   const userId = req.user.userId; // Get user ID from authenticated token
 
   const result = await db.query(`
-      SELECT e.id, e.name, e.description, e.url, e.addr, e.city, e.image, e.dateUpdated, e.dateCreated
+      SELECT e.*
       FROM events e
       JOIN event_members m ON e.id = m.event_id
       WHERE m.user_id = $1 AND e.id = $2;`, [userId,eventId]);
