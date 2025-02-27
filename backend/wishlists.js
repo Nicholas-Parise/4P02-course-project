@@ -16,7 +16,7 @@ router.get('/', authenticate, async(req,res,next)=>{
       const userId = req.user.userId; // Get user ID from authenticated token
 
       const result = await db.query(`
-          SELECT w.id, w.name, w.description, w.image, w.dateUpdated, w.dateCreated
+          SELECT w.id, w.name, w.description, w.image, w.deadline, w.dateUpdated, w.dateCreated
           FROM wishlists w
           JOIN wishlist_members m ON w.id = m.wishlists_id
           WHERE m.user_id = $1;`, [userId]);
@@ -40,7 +40,7 @@ router.get('/', authenticate, async(req,res,next)=>{
     try{
       const user_id = req.user.userId; // Get user ID from authenticated request
 
-      const { event_id, name, description, image } = req.body;
+      const { event_id, name, description, image, deadline } = req.body;
 
       if (!name) {
         return res.status(400).json({ error: "name is required" });
@@ -50,9 +50,9 @@ router.get('/', authenticate, async(req,res,next)=>{
 
       // Step 1: Insert wishlist
       const wishlistResult = await db.query(
-          `INSERT INTO wishlists (event_id, name, description, image, dateCreated, dateUpdated) 
-          VALUES ($1, $2, $3, $4, NOW(), NOW()) RETURNING id`,
-          [event_id, name, description, image]
+          `INSERT INTO wishlists (event_id, name, description, image, deadline, dateCreated, dateUpdated) 
+          VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING id`,
+          [event_id, name, description, image, deadline]
       );
 
       const wishlist_id = wishlistResult.rows[0].id;
@@ -90,7 +90,7 @@ router.get('/:wishlistId', authenticate, async(req,res,next)=>{
     const userId = req.user.userId; // Get user ID from authenticated token
 
     const result = await db.query(`
-        SELECT w.id, w.name, w.description, w.image, w.dateUpdated, w.dateCreated, w.event_id
+        SELECT w.id, w.name, w.description, w.image, w.deadline, w.dateUpdated, w.dateCreated, w.event_id
         FROM wishlists w
         JOIN wishlist_members m ON w.id = m.wishlists_id
         WHERE m.user_id = $1 AND w.id = $2;`, [userId,wishlistId]);
@@ -151,7 +151,7 @@ router.put('/:wishlistId', authenticate, async(req,res,next)=>{
     
   const wishlistId = parseInt(req.params.wishlistId);
   const userId = req.user.userId; // Get user ID from the authenticated token
-  const { event_id, name, description, image } = req.body;
+  const { event_id, name, description, image, deadline } = req.body;
 
 
   // make sure user is the owner of the wishlist before allowing editing
@@ -178,10 +178,11 @@ router.put('/:wishlistId', authenticate, async(req,res,next)=>{
           name = COALESCE($2, name),
           description = COALESCE($3, description),
           image = COALESCE($4, image),
+          deadline = COALESCE($5, deadline),
           dateUpdated = NOW()
-      WHERE id = $5
+      WHERE id = $6
       RETURNING *;
-    `, [event_id, name, description, image, wishlistId]);
+    `, [event_id, name, description, image, deadline, wishlistId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Wishlist not found." });

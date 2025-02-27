@@ -65,6 +65,7 @@ event_id INTEGER REFERENCES events (id) ON DELETE SET NULL,
 name TEXT,
 description TEXT,
 image TEXT,
+deadline TIMESTAMP,
 dateUpdated TIMESTAMP,
 dateCreated TIMESTAMP
 );
