@@ -154,7 +154,7 @@ router.delete('/:itemId', authenticate, async(req,res,next)=>{
     }
     
       // Delete the wishlist
-      await db.query(`DELETE FROM items WHERE id = $1;`, [itemsId]);
+      await db.query(`DELETE FROM items WHERE id = $1;`, [itemId]);
 
       res.json({ message: "Wishlist deleted successfully." });
     } catch (error) {
