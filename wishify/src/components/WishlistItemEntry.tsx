@@ -22,8 +22,8 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
 
   const isDraggable = sortBy === "priority"
   const currentUser = "Current User" // In a real app, this would come from authentication
-  const totalReserved = item.quantitySupplied
-  const userReservation = item.contributions.find((r) => r.user === currentUser)
+  const totalReserved = item.quantitySupplied || 0
+  const userReservation = item.contributions?.find((r) => r.user === currentUser)
   const availableQuantity = item.quantity - totalReserved
 
   const reservedBadgeColour = availableQuantity <= 0 ? "bg-green-600" : "bg-yellow-500"
@@ -61,7 +61,7 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
           </div>
         )}
         <div className="flex-shrink-0 w-16 h-16 relative">
-          <img src={item.imageSrc || "/placeholder.svg"} alt={item.name}/>
+          <img src={item.image || "/placeholder.svg"} alt={item.name}/>
         </div>
         <div className="flex-grow">
           <div className="flex items-center space-x-2">
@@ -96,50 +96,50 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
             Item Details
           </DialogContentText>
           <div className="grid gap-4 py-4">
-          <div className="relative">
-            <img src={item.imageSrc || "/placeholder.svg"} alt={item.name}/>
-          </div>
-          <p className="text-gray-700">{item.desc}</p>
-          <p className="font-semibold">Price: ${item.price.toFixed(2)}</p>
-          <p className="text-gray-600">
-            Quantity: {availableQuantity} available / {item.quantity} total
-          </p>
-          {item.contributions.length > 0 && (
-            <div>
-              <p className="font-semibold">Current Reservations:</p>
-              {item.contributions.map((res, index) => (
-                <p key={index} className="text-green-600">
-                  {res.user}: {res.quantity}
-                </p>
-              ))}
+            <div className="relative">
+              <img src={item.image || "/placeholder.svg"} alt={item.name}/>
             </div>
-          )}
-          <div className="space-y-2">
-            <p className="text-md font-medium">Your Reservation</p>
-            <div className="flex items-center space-x-2">
-              <Button onClick={decrementReserve}>
-                <FaMinus className="h-4 w-4" />
+            <p className="text-gray-700">{item.description}</p>
+            <p className="font-semibold">Price: ${item.price.toFixed(2)}</p>
+            <p className="text-gray-600">
+              Quantity: {availableQuantity} available / {item.quantity} total
+            </p>
+            {item.contributions?.length > 0 && (
+              <div>
+                <p className="font-semibold">Current Reservations:</p>
+                {item.contributions?.map((res, index) => (
+                  <p key={index} className="text-green-600">
+                    {res.user}: {res.quantity}
+                  </p>
+                ))}
+              </div>
+            )}
+            <div className="space-y-2">
+              <p className="text-md font-medium">Your Reservation</p>
+              <div className="flex items-center space-x-2">
+                <Button onClick={decrementReserve}>
+                  <FaMinus className="h-4 w-4" />
+                </Button>
+                <TextField
+                  value={reserveQuantity}
+                  className="w-20 text-center"
+                />
+                <Button onClick={incrementReserve}>
+                  <FaPlus className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <div className="flex space-x-2">
+              <Button>
+                <a href={item.url} target="_blank" rel="noopener noreferrer" className="flex items-center">
+                  Purchase <FaExternalLinkAlt className="ml-2 h-4 w-4" />
+                </a>
               </Button>
-              <TextField
-                value={reserveQuantity}
-                className="w-20 text-center"
-              />
-              <Button onClick={incrementReserve}>
-                <FaPlus className="h-4 w-4" />
+              <Button onClick={handleReserve}>
+                {userReservation ? "Update Reservation" : "Reserve"}
               </Button>
             </div>
           </div>
-          <div className="flex space-x-2">
-            <Button>
-              <a href={item.url} target="_blank" rel="noopener noreferrer" className="flex items-center">
-                Purchase <FaExternalLinkAlt className="ml-2 h-4 w-4" />
-              </a>
-            </Button>
-            <Button onClick={handleReserve}>
-              {userReservation ? "Update Reservation" : "Reserve"}
-            </Button>
-          </div>
-        </div>
 
           
       </DialogContent>

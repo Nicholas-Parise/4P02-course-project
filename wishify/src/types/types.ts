@@ -1,4 +1,5 @@
 export interface Wishlist {
+    id: number,
     eventID: number,
     name: string,
     desc: string
@@ -21,12 +22,13 @@ export interface WishlistItem {
     priority: number,
     price: number,
     name: string,
-    desc: string,
+    description: string,
     url: string,
-    imageSrc: string,
+    image: string,
     quantity: number,
     quantitySupplied: number
-    dateUpdated: string,
+    dateupdated: string,
+    datecreated: string,
     contributions: Contribution[]
 };
 
