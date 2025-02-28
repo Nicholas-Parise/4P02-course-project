@@ -156,7 +156,7 @@ router.delete('/:itemId', authenticate, async(req,res,next)=>{
       // Delete the wishlist
       await db.query(`DELETE FROM items WHERE id = $1;`, [itemId]);
 
-      res.json({ message: "Wishlist deleted successfully." });
+      res.json({ message: "Item deleted successfully." });
     } catch (error) {
       console.error("Error editing item:", error);
       res.status(500).json({ error: "Internal Server Error" });
