@@ -64,14 +64,15 @@ PUT /events/:id/members → Update a member’s status (blind/owner)**
 **GET /items/:id → Get item details  
 PUT /items/:id → Update an item  
 DELETE /items/:id → Remove an item  
-POST /items -> create an item (given wishlists id)**
+POST /items -> create an item (given wishlists_id)**
   
 ## Contributions
-
-GET /items/:id/contributions → Get contributions for an item  
-POST /items/:id/contributions → Add a contribution to an item  
+**GET /contributions → Get all contributions from logged in user  
+GET /contributions/wishlists/:id → Get all contributions from wishlist  
+GET /contributions/items/:id → Get contributions for an item  
+POST /contributions → Add a contribution (given item_id)  
 PUT /contributions/:id → Update a contribution (mark as purchased, etc.)  
-DELETE /contributions/:id → Remove a contribution  
+DELETE /contributions/:id → Remove a contribution**  
 
 # Database
 
