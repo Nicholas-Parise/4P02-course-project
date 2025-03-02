@@ -54,6 +54,7 @@ url TEXT,
 addr TEXT,
 city TEXT,
 image TEXT,
+deadline TIMESTAMP,
 dateUpdated TIMESTAMP,
 dateCreated TIMESTAMP
 );
@@ -103,6 +104,7 @@ url TEXT,
 image TEXT,
 quantity INTEGER,
 price real,
+priority INTEGER,
 dateUpdated TIMESTAMP,
 dateCreated TIMESTAMP
 );
@@ -114,7 +116,9 @@ item_id INTEGER REFERENCES items (id) ON DELETE CASCADE,
 member_id INTEGER REFERENCES wishlist_members (id) ON DELETE CASCADE,
 quantity INTEGER,
 purchased BOOLEAN,
+note TEXT,
 dateUpdated TIMESTAMP,
 dateCreated TIMESTAMP
+UNIQUE (item_id,member_id) --only want one contribution per user per item
 );
 
