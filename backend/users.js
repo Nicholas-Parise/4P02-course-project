@@ -10,18 +10,16 @@ const authenticate = require('./authenticate');
 router.get('/', authenticate, async (req, res, next) => {
   try {
     const userId = req.user.userId; // Get user ID from authenticated token
-      const result = await db.query('SELECT id, email, displayName, picture, datecreated, dateupdated FROM users WHERE id = $1', [userId]);
+    const result = await db.query('SELECT id, email, displayName, picture, datecreated, dateupdated FROM users WHERE id = $1', [userId]);
 
-      console.log(userId);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
-      if (result.rows.length === 0) {
-          return res.status(404).json({ message: 'User not found' });
-      }
-
-      res.json(result.rows[0]);
+    res.status(200).json(result.rows[0]);
   } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: 'Error retrieving user data' });
+    console.error("Error fetching user:", error);
+    res.status(500).json({ message: 'Error retrieving user data' });
   }
 });
 
@@ -30,34 +28,34 @@ router.get('/', authenticate, async (req, res, next) => {
 router.put('/', authenticate, async (req, res) => {
   try {
     const userId = req.user.userId; // Get user ID from authenticated token
-      const { email, displayName, picture, password, newPassword } = req.body;
+    const { email, displayName, picture, password, newPassword } = req.body;
 
-      let newhHashedPassword = null;
+    let newhHashedPassword = null;
 
-      if (newPassword) {
-        if (!password) {
-            return res.status(400).json({ message: "Current password is required to change password" });
-        }
-
-        // Get the user's stored hashed password
-        const userResult = await db.query("SELECT password FROM users WHERE id = $1", [userId]);
-
-        if (userResult.rows.length === 0) {
-          return res.status(404).json({ message: "user not found" });
-        }
-
-        const hashedPassword = userResult.rows[0].password;
-
-        // Compare provided password with stored hash
-        const isMatch = await bcrypt.compare(password, hashedPassword);
-        if (!isMatch) {
-          return res.status(403).json({ message: "Incorrect password" });
-        }
-
-        newhHashedPassword = await bcrypt.hash(newPassword, 10);
+    if (newPassword) {
+      if (!password) {
+        return res.status(400).json({ message: "Current password is required to change password" });
       }
 
-      const result = await db.query(`
+      // Get the user's stored hashed password
+      const userResult = await db.query("SELECT password FROM users WHERE id = $1", [userId]);
+
+      if (userResult.rows.length === 0) {
+        return res.status(404).json({ message: "user not found" });
+      }
+
+      const hashedPassword = userResult.rows[0].password;
+
+      // Compare provided password with stored hash
+      const isMatch = await bcrypt.compare(password, hashedPassword);
+      if (!isMatch) {
+        return res.status(403).json({ message: "Incorrect password" });
+      }
+
+      newhHashedPassword = await bcrypt.hash(newPassword, 10);
+    }
+
+    const result = await db.query(`
           UPDATE users 
           SET 
               displayName = COALESCE($1, displayName), 
@@ -68,15 +66,15 @@ router.put('/', authenticate, async (req, res) => {
           WHERE id = $5
           RETURNING id, email, displayName, picture, datecreated, dateupdated`, [displayName, picture, newhHashedPassword, email, userId]);
 
-      if (result.rows.length === 0) {
-          return res.status(404).json({ message: "User not found" });
-      }
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-      res.json({ message: "Profile updated", user: result.rows[0] });
+    res.status(201).json({ message: "Profile updated", user: result.rows[0] });
 
   } catch (error) {
-      console.error("Error updating user:", error);
-      res.status(500).json({ message: "Error updating user profile" });
+    console.error("Error updating user:", error);
+    res.status(500).json({ message: "Error updating user profile" });
   }
 });
 
@@ -86,35 +84,35 @@ router.put('/', authenticate, async (req, res) => {
 router.delete('/', authenticate, async (req, res) => {
   try {
     const userId = req.user.userId; // Get user ID from authenticated token
-      const { password } = req.body;
+    const { password } = req.body;
 
-      if (!password) {
-          return res.status(400).json({ message: "Password is required to delete account" });
-      }
+    if (!password) {
+      return res.status(400).json({ message: "Password is required to delete account" });
+    }
 
-      // Get the user's stored hashed password
-      const userResult = await db.query("SELECT password FROM users WHERE id = $1", [userId]);
+    // Get the user's stored hashed password
+    const userResult = await db.query("SELECT password FROM users WHERE id = $1", [userId]);
 
-      if (userResult.rows.length === 0) {
-          return res.status(404).json({ message: "user not found" });
-      }
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ message: "user not found" });
+    }
 
-      const hashedPassword = userResult.rows[0].password;
+    const hashedPassword = userResult.rows[0].password;
 
-      // Compare provided password with stored hash
-      const isMatch = await bcrypt.compare(password, hashedPassword);
-      if (!isMatch) {
-          return res.status(403).json({ message: "Incorrect password" });
-      }
+    // Compare provided password with stored hash
+    const isMatch = await bcrypt.compare(password, hashedPassword);
+    if (!isMatch) {
+      return res.status(403).json({ message: "Incorrect password" });
+    }
 
-      // Delete user if password is correct
-      await db.query("DELETE FROM users WHERE id = $1", [userId]);
+    // Delete user if password is correct
+    await db.query("DELETE FROM users WHERE id = $1", [userId]);
 
-      res.json({ message: "Account deleted successfully" });
+    res.status(200).json({ message: "Account deleted successfully" });
 
   } catch (error) {
-      console.error("Error deleting user:", error);
-      res.status(500).json({ message: "Error deleting account" });
+    console.error("Error deleting user:", error);
+    res.status(500).json({ message: "Error deleting account" });
   }
 });
 
@@ -124,18 +122,113 @@ router.delete('/', authenticate, async (req, res) => {
 // get specific user
 router.get('/:userId', async (req, res) => {
   try {
-      const userId = req.params.userId;
-      const result = await db.query('SELECT id, displayName, picture, datecreated FROM users WHERE id = $1', [userId]);
+    const userId = req.params.userId;
+    const result = await db.query('SELECT id, displayName, picture, datecreated FROM users WHERE id = $1', [userId]);
 
-      if (result.rows.length === 0) {
-          return res.status(404).json({ message: 'User not found' });
-      }
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
-      res.json(result.rows[0]);
+    res.status(200).json(result.rows[0]);
   } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: 'Error retrieving user data' });
+    console.error("Error fetching user:", error);
+    res.status(500).json({ message: 'Error retrieving user data' });
   }
 });
 
-  module.exports = router;
+
+
+// localhost:3000/users
+// get logged in users categories
+router.get('/categories', authenticate, async (req, res, next) => {
+  try {
+    const userId = req.user.userId; // Get user ID from authenticated token
+
+    const result = await db.query(
+      `SELECT * FROM categories c
+        JOIN user_categories uc ON c.id = category_id
+        WHERE c.user_id = $1`, [userId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'categories not found' });
+    }
+
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    res.status(500).json({ message: 'Error retrieving category data' });
+  }
+});
+
+
+
+// localhost:3000/users/0/categories
+// get specific user categories
+router.get('/:userId/categories', async (req, res) => {
+
+  try {
+    const userId = req.params.userId;
+
+    const result = await db.query(
+      `SELECT * FROM categories c
+        JOIN user_categories uc ON c.id = category_id
+        WHERE c.user_id = $1`, [userId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ message: 'Error retrieving user data' });
+  }
+});
+
+
+// localhost:3000/categories?page=1&pageSize=10
+// Assign a category from logged in user
+router.post('/categories/:categoryId', authenticate, async (req, res, next) => {
+  const categoryId = parseInt(req.params.categoryId);
+  const userId = req.user.userId; // Get user ID from authenticated token
+
+  try {
+    const result = await db.query(`
+        INSERT INTO user_categories 
+        (user_id, category_id, created)
+        VALUES ($1, $2, NOW()) RETURNING *;`, [userId, categoryId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "categories not found." });
+    }
+
+    res.status(200).json(result.rows[0]);
+
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+// localhost:3000/categories?page=1&pageSize=10
+// remove a category from logged in user
+router.delete('/categories/:categoryId', authenticate, async (req, res, next) => {
+  const categoryId = parseInt(req.params.categoryId);
+  const userId = req.user.userId; // Get user ID from authenticated token
+
+  try {
+    // remove the category
+    const result = await db.query(`
+        DELETE FROM user_categories 
+        WHERE user_id = $1 AND category_id = $2;`, [userId, categoryId]);
+
+    res.status(200).json({ message: "category removed successfully." });
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+module.exports = router;

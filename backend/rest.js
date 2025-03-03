@@ -1,12 +1,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
+const authRoutes = require('./auth');
 const userRoutes = require('./users');
 const itemsRoutes = require('./items');
 const eventsRoutes = require('./events');
 const wishlistsRoutes = require('./wishlists');
-const authRoutes = require('./auth');
 const categoriesRoutes = require('./categories');
+const contributionsRoutes = require('./contributions');
 
 const app = express();
 
@@ -23,11 +24,12 @@ app.use((req,res,next)=>{
 })
 
 // Routes
+app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/items', itemsRoutes);
 app.use('/events', eventsRoutes);
 app.use('/wishlists', wishlistsRoutes);
-app.use('/auth', authRoutes);
 app.use('/categories', categoriesRoutes);
+app.use('/contributions', contributionsRoutes);
 
 module.exports = app;

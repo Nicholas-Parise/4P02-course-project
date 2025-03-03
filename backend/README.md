@@ -16,18 +16,17 @@ PUT /users → Update logged in user profile
 DELETE /users → Delete logged in user account  
 GET /users/:id → Get specific user profile**  
 
-GET /users/categories → Get categories from logged in user    
-GET /users/:id/categories → Get categories from specific user 
-
+**GET /users/categories → Get categories from logged in user    
+GET /users/:id/categories → Get categories from specific user  
 POST /users/categories/:categoryId → Assign a category from logged in user  
-DELETE /users/categories/:categoryId → Remove a category from logged in user  
+DELETE /users/categories/:categoryId → Remove a category from logged in user**  
 
 ## Categories
-GET /categories → Get all categories
-
-should these be an admin thing only?  
-POST /categories → Create a new category  
+**GET /categories → Get all categories   
 GET /categories/:id → Get category details  
+POST /categories → Create a new category**  
+
+should these be admin only?  
 PUT /categories/:id → Update category details   
 DELETE /categories/:id → Delete a category  
 
