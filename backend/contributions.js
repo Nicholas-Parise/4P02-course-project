@@ -120,7 +120,7 @@ router.post('/', authenticate, async(req,res,next)=>{
       const result = await db.query(`
         INSERT INTO contributions 
         (item_id, member_id, quantity, purchased, note, dateCreated)
-        VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING *;
+        VALUES ($1, $2, $3, COALESCE($4, false), $5, NOW()) RETURNING *;
       `, [item_id, member_id, quantity, purchased, note]);
   
       res.status(201).json({ message: "contribution created successfully", contribution: result.rows[0] });

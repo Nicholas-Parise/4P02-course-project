@@ -4,19 +4,22 @@ const db = require('./db');
 const bcrypt = require("bcryptjs");
 const authenticate = require('./authenticate');
 
-
 // localhost:3000/users
 // get logged in users
 router.get('/', authenticate, async (req, res, next) => {
   try {
     const userId = req.user.userId; // Get user ID from authenticated token
     const result = await db.query('SELECT id, email, displayName, bio, picture, datecreated, dateupdated FROM users WHERE id = $1', [userId]);
+    const result2 = await db.query(
+       `SELECT c.*, uc.love FROM categories c
+        JOIN user_categories uc ON c.id = uc.category_id
+        WHERE uc.user_id = $1`, [userId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    res.status(200).json(result.rows[0]);
+    res.status(200).json({user: result.rows[0], categories: result2.rows});
   } catch (error) {
     console.error("Error fetching user:", error);
     res.status(500).json({ message: 'Error retrieving user data' });
@@ -125,53 +128,8 @@ router.get('/:userId', async (req, res) => {
   try {
     const userId = req.params.userId;
     const result = await db.query('SELECT id, displayName, bio, picture, datecreated FROM users WHERE id = $1', [userId]);
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    res.status(200).json(result.rows[0]);
-  } catch (error) {
-    console.error("Error fetching user:", error);
-    res.status(500).json({ message: 'Error retrieving user data' });
-  }
-});
-
-
-
-// localhost:3000/users
-// get logged in users categories
-router.get('/categories', authenticate, async (req, res, next) => {
-  try {
-    const userId = req.user.userId; // Get user ID from authenticated token
-
-    const result = await db.query(
-      `SELECT * FROM categories c
-        JOIN user_categories uc ON c.id = uc.category_id
-        WHERE uc.user_id = $1`, [userId]);
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: 'categories not found' });
-    }
-
-    res.status(200).json(result.rows);
-  } catch (error) {
-    console.error("Error fetching categories:", error);
-    res.status(500).json({ message: 'Error retrieving category data' });
-  }
-});
-
-
-
-// localhost:3000/users/0/categories
-// get specific user categories
-router.get('/:userId/categories', async (req, res) => {
-
-  try {
-    const userId = req.params.userId;
-
-    const result = await db.query(
-      `SELECT * FROM categories c
+    const result2 = await db.query(
+      `SELECT c.*, uc.love FROM categories c
         JOIN user_categories uc ON c.id = uc.category_id
         WHERE uc.user_id = $1`, [userId]);
 
@@ -179,7 +137,7 @@ router.get('/:userId/categories', async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    res.status(200).json(result.rows);
+    res.status(200).json({user: result.rows[0], categories: result2.rows});
   } catch (error) {
     console.error("Error fetching user:", error);
     res.status(500).json({ message: 'Error retrieving user data' });
@@ -194,11 +152,12 @@ router.post('/categories/:categoryId', authenticate, async (req, res, next) => {
   try {
     const userId = req.user.userId; // Get user ID from authenticated token
     const categoryId = parseInt(req.params.categoryId);
-
+    const { love } = req.body;
+    
     const result = await db.query(`
         INSERT INTO user_categories 
         (user_id, category_id, created)
-        VALUES ($1, $2, NOW());`, [userId, categoryId]);
+        VALUES ($1, $2, COALESCE($3, false), NOW());`, [userId, categoryId, love]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "categories not found." });
