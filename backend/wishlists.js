@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { parseArgs } = require('util');
 const db = require('./db');
+const { v4: uuidv4 } = require('uuid');
 const authenticate = require('./authenticate');
 
 
@@ -48,11 +48,13 @@ router.post('/', authenticate, async (req, res, next) => {
 
     await db.query("BEGIN"); // Start a transaction since we want to go all or nothing
 
+    const shareToken = uuidv4();
+
     // Step 1: Insert wishlist
     const wishlistResult = await db.query(
-      `INSERT INTO wishlists (event_id, name, description, image, deadline, dateCreated, dateUpdated) 
-          VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING id`,
-      [event_id, name, description, image, deadline]
+      `INSERT INTO wishlists (event_id, name, description, image, deadline, share_token, dateCreated, dateUpdated) 
+          VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW()) RETURNING id`,
+      [event_id, name, description, image, deadline, shareToken]
     );
 
     const wishlist_id = wishlistResult.rows[0].id;
@@ -76,15 +78,11 @@ router.post('/', authenticate, async (req, res, next) => {
 });
 
 
-
-
 // localhost:3000/wishlists/0
 // get the contents of a single wishlist
 router.get('/:wishlistId', authenticate, async (req, res, next) => {
 
   const wishlistId = parseInt(req.params.wishlistId);
-  const page = parseInt(req.query.page) || 1;
-  const pageSize = parseInt(req.query.pageSize) || 10;
 
   try {
     const userId = req.user.userId; // Get user ID from authenticated token
@@ -100,8 +98,15 @@ router.get('/:wishlistId', authenticate, async (req, res, next) => {
       return res.status(404).json({ error: "wishlist not found." });
     }
 
+    const wishlist = result.rows[0]
 
-    res.json(result.rows[0]);
+    // Get all items
+    const itemsResult = await db.query(`
+      SELECT i.* FROM items i
+      JOIN wishlist_members wm ON i.member_id = wm.id
+      WHERE wm.wishlists_id = $1;`, [wishlist.id]);
+
+    res.status(200).json({ wishlist, items: itemsResult.rows });
   } catch (error) {
     console.error("Error fetching wishlists:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -197,6 +202,81 @@ router.put('/:wishlistId', authenticate, async (req, res, next) => {
   }
 
 });
+
+
+// localhost:3000/wishlists/:id/duplicate
+// Duplicate the wishlist
+router.post('/:wishlistId/duplicate', authenticate, async (req, res, next) => {
+  try {
+    const user_id = req.user.userId; // Get user ID from authenticated request
+    const wishlistId = parseInt(req.params.wishlistId);
+
+    await db.query("BEGIN"); // Start a transaction
+
+    //Fetch original wishlist
+    const wishlistResult = await db.query(
+      `SELECT event_id, name, description, image, deadline 
+       FROM wishlists WHERE id = $1`,
+      [wishlistId]
+    );
+
+    if (wishlistResult.rows.length === 0) {
+      await db.query("ROLLBACK"); // Rollback on error
+      return res.status(404).json({ error: "Wishlist not found" });
+    }
+
+    const { event_id, name, description, image, deadline } = wishlistResult.rows[0];
+
+    // Create the duplicated wishlist
+    const newWishlistResult = await db.query(
+      `INSERT INTO wishlists (event_id, name, description, image, deadline, dateCreated, dateUpdated) 
+       VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING id;`,
+      [event_id, `${name} (Copy)`, description, image, deadline]
+    );
+
+    const newWishlistId = newWishlistResult.rows[0].id;
+   
+    // make creator owner
+    const membersResult = await db.query(
+      `INSERT INTO wishlist_members (user_id, wishlists_id, blind, owner, dateCreated)
+       VALUES ($1, $2, false, true, NOW()) RETURNING id;`,
+      [user_id,newWishlistId]
+    );
+
+    const newMemberId = membersResult.rows[0].id;
+    
+    /*
+    //  Copy wishlist members (keeping same roles)
+    const membersResult = await db.query(
+      `INSERT INTO wishlist_members (user_id, wishlists_id, blind, owner, dateCreated, dateUpdated)
+       SELECT user_id, $1, blind, owner, NOW(), NOW()
+       FROM wishlist_members WHERE wishlists_id = $2 RETURNING id, user_id`,
+      [newWishlistId, wishlistId]
+    );
+    */
+
+    // Copy items and assign new member_ids
+    const itemsResult = await db.query(
+      `INSERT INTO items (member_id, name, description, url, image, quantity, price, dateCreated, priority)
+       SELECT $1, name, description, url, image, quantity, price, NOW(), priority
+       FROM items WHERE member_id IN (SELECT id FROM wishlist_members WHERE wishlists_id = $2) RETURNING id`,
+      [newMemberId, wishlistId] // Assign to the new member_id of the current user
+    );
+    
+    await db.query("COMMIT"); // Commit the transaction
+
+    res.status(201).json({
+      wishlist_id: newWishlistId,
+      message: "Wishlist duplicated successfully!"
+    });
+
+  } catch (error) {
+    await db.query("ROLLBACK"); // Rollback on error
+    console.error("Error duplicating wishlist:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 
 
 // localhost:3000/wishlists/:id/members
@@ -414,8 +494,36 @@ router.get('/:wishlistId/items', authenticate, async (req, res) => {
 });
 
 
+// localhost:3000/wishlists/shared/:id
+// get the shared wishlist 
+router.get('/shared/:token', async (req, res) => {
+  const { token } = req.params;
 
+  try {
+    // Fetch the wishlist by its share token
+    const wishlistResult = await db.query(
+      `SELECT id, name, description, image, deadline FROM wishlists WHERE share_token = $1`,
+      [token]
+    );
 
+    if (wishlistResult.rows.length === 0) {
+      return res.status(404).json({ error: "Invalid share link or wishlist not found" });
+    }
+
+    const wishlist = wishlistResult.rows[0];
+
+    // Get all items
+    const itemsResult = await db.query(`
+      SELECT i.* FROM items i
+      JOIN wishlist_members wm ON i.member_id = wm.id
+      WHERE wm.wishlists_id = $1;`, [wishlist.id]);
+
+    res.status(200).json({ wishlist, items: itemsResult.rows });
+  } catch (error) {
+    console.error("Error fetching shared wishlist:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
 
 
