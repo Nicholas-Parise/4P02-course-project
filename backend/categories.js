@@ -78,7 +78,11 @@ router.post('/', authenticate, async (req, res, next) => {
 
     res.status(201).json({ message: "category created successfully", category: result.rows[0] });
   } catch (error) {
-    console.error("Error fetching categories:", error);
+     // Handle duplicate category error
+     if (error.code === "23505") { 
+      return res.status(409).json({ message: "Category already exists" });
+    }
+    console.error("Error creating category:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });

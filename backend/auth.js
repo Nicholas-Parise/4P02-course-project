@@ -34,7 +34,7 @@ router.post('/register',async (req,res,next)=>{
         console.error(error);
 
          // Handle duplicate email error
-         // error code 23505 means unique constraint violated..
+         // error code 23505 means unique constraint violated.
          if (error.code === "23505") { 
             return res.status(409).json({ message: "Email is already in use" });
         }

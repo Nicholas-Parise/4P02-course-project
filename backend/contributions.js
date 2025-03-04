@@ -126,6 +126,12 @@ router.post('/', authenticate, async(req,res,next)=>{
       res.status(201).json({ message: "contribution created successfully", contribution: result.rows[0] });
   
     } catch (error) {
+        
+      // Handle duplicate contribution error
+      if (error.code === "23505") { 
+        return res.status(409).json({ message: "a contribution already exists for this item" });
+      }
+      
       console.error("Error adding item:", error);
       res.status(500).json({ error: "Internal Server Error" });
     }

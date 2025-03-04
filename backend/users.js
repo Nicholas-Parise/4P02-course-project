@@ -157,8 +157,8 @@ router.post('/categories/:categoryId', authenticate, async (req, res, next) => {
     const result = await db.query(`
         INSERT INTO user_categories 
         (user_id, category_id, love, created)
-        VALUES ($1, $2, COALESCE($3, false), NOW());`, [userId, categoryId, love]);
-
+        VALUES ($1, $2, COALESCE($3, false), NOW()) RETURNING id;`, [userId, categoryId, love]);
+        
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "categories not found." });
     }
@@ -166,6 +166,11 @@ router.post('/categories/:categoryId', authenticate, async (req, res, next) => {
     res.status(200).json("success");
 
   } catch (error) {
+    // Handle duplicate category error
+    if (error.code === "23505") { 
+      return res.status(409).json({ message: "Category is already added" });
+    }
+
     console.error("Error fetching categories:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }

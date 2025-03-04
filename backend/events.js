@@ -299,8 +299,14 @@ router.post('/:id/members', authenticate, async (req, res) => {
 
       res.status(201).json({ message: "User added to the event successfully" });
   } catch (error) {
-      console.error("Error adding member to event:", error);
-      res.status(500).json({ message: "Error adding member to event" });
+
+    // Handle duplicate membership error
+    if (error.code === "23505") { 
+      return res.status(409).json({ message: "user is already a member" });
+    }
+
+    console.error("Error adding member to event:", error);
+    res.status(500).json({ message: "Error adding member to event" });
   }
 });
 
