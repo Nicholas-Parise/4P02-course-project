@@ -32,7 +32,7 @@ created TIMESTAMP
 
 CREATE TABLE categories(
 id SERIAL PRIMARY KEY,   
-name TEXT,
+name TEXT UNIQUE,
 description TEXT,
 created TIMESTAMP
 );
@@ -42,6 +42,7 @@ CREATE TABLE user_categories(
 id SERIAL PRIMARY KEY,   
 user_id INTEGER REFERENCES users (id) ON DELETE CASCADE,
 category_id INTEGER REFERENCES categories (id) ON DELETE CASCADE,
+love BOOLEAN,
 created TIMESTAMP
 );
 
