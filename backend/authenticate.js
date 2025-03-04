@@ -10,7 +10,7 @@ require("dotenv").config(); // Load environment variables
  */
 
 const authenticate = async (req, res, next) => {
-    const token = req.headers.authorization?.split(" ")[1];
+    const token = req.header("Authorization").replace("Bearer ", "");
 
     if (!token) {
         return res.status(401).json({ message: "Access denied. No token provided." });
@@ -21,10 +21,10 @@ const authenticate = async (req, res, next) => {
         const session = await db.query("SELECT user_id FROM sessions WHERE token = $1", [token]);
 
         if (session.rows.length === 0) {
-            return res.status(401).json({ message: "User not logged in" });
+            return res.status(401).json({ message: "invalid token" });
         }
         
-        const decoded = jwt.verify(token.replace("Bearer ", ""), process.env.SECRET_KEY); // Remove "Bearer " prefix if present
+        const decoded = jwt.verify(token, process.env.SECRET_KEY); // Remove "Bearer " prefix if present
         req.user = decoded; // Attach user info to the request
         next(); // Continue to the next middleware or route handler
     } catch (error) {
@@ -36,7 +36,7 @@ const authenticate = async (req, res, next) => {
             console.error("Failed to delete invalid session:", dbError.message);
         }
 
-        res.status(403).json({ message: "Invalid token." });
+        res.status(403).json({ message: "expired token" });
     }
 };
 

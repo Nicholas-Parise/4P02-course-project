@@ -8,7 +8,7 @@ require("dotenv").config();
 // localhost:3000/auth/register
 // register account
 router.post('/register',async (req,res,next)=>{
-    const { email, password, displayName, picture } = req.body;
+    const { email, password, displayName, picture, bio } = req.body;
 
     if (!email || !password || !displayName) {
         return res.status(400).json({ message: "email, password and displayName are required" });
@@ -25,8 +25,8 @@ router.post('/register',async (req,res,next)=>{
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         const result = await db.query(
-            "INSERT INTO users (displayName, password, email, picture, dateCreated) VALUES ($1, $2, $3, $4, NOW()) RETURNING id, displayName, email",
-            [displayName, hashedPassword, email, tempPicture]
+            "INSERT INTO users (displayName, password, email, picture, bio, dateCreated) VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING id, displayName, email",
+            [displayName, hashedPassword, email, tempPicture, bio]
         );
 
         res.status(201).json({ message: "User registered successfully", user: result.rows[0] });

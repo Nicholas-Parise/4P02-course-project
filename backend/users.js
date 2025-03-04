@@ -10,7 +10,7 @@ const authenticate = require('./authenticate');
 router.get('/', authenticate, async (req, res, next) => {
   try {
     const userId = req.user.userId; // Get user ID from authenticated token
-    const result = await db.query('SELECT id, email, displayName, picture, datecreated, dateupdated FROM users WHERE id = $1', [userId]);
+    const result = await db.query('SELECT id, email, displayName, bio, picture, datecreated, dateupdated FROM users WHERE id = $1', [userId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'User not found' });
@@ -28,7 +28,7 @@ router.get('/', authenticate, async (req, res, next) => {
 router.put('/', authenticate, async (req, res) => {
   try {
     const userId = req.user.userId; // Get user ID from authenticated token
-    const { email, displayName, picture, password, newPassword } = req.body;
+    const { email, displayName, picture, password, newPassword, bio} = req.body;
 
     let newhHashedPassword = null;
 
@@ -61,10 +61,11 @@ router.put('/', authenticate, async (req, res) => {
               displayName = COALESCE($1, displayName), 
               picture = COALESCE($2, picture), 
               password = COALESCE($3, password),
-              email =  COALESCE($4, email),
+              email = COALESCE($4, email),
+              bio = COALESCE($5, bio),
               dateupdated = NOW()
-          WHERE id = $5
-          RETURNING id, email, displayName, picture, datecreated, dateupdated`, [displayName, picture, newhHashedPassword, email, userId]);
+          WHERE id = $6
+          RETURNING id, email, displayName, picture, datecreated, dateupdated`, [displayName, picture, newhHashedPassword, email, bio, userId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "User not found" });
@@ -123,7 +124,7 @@ router.delete('/', authenticate, async (req, res) => {
 router.get('/:userId', async (req, res) => {
   try {
     const userId = req.params.userId;
-    const result = await db.query('SELECT id, displayName, picture, datecreated FROM users WHERE id = $1', [userId]);
+    const result = await db.query('SELECT id, displayName, bio, picture, datecreated FROM users WHERE id = $1', [userId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'User not found' });
@@ -146,14 +147,14 @@ router.get('/categories', authenticate, async (req, res, next) => {
 
     const result = await db.query(
       `SELECT * FROM categories c
-        JOIN user_categories uc ON c.id = category_id
-        WHERE c.user_id = $1`, [userId]);
+        JOIN user_categories uc ON c.id = uc.category_id
+        WHERE uc.user_id = $1`, [userId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'categories not found' });
     }
 
-    res.status(200).json(result.rows[0]);
+    res.status(200).json(result.rows);
   } catch (error) {
     console.error("Error fetching categories:", error);
     res.status(500).json({ message: 'Error retrieving category data' });
@@ -171,14 +172,14 @@ router.get('/:userId/categories', async (req, res) => {
 
     const result = await db.query(
       `SELECT * FROM categories c
-        JOIN user_categories uc ON c.id = category_id
-        WHERE c.user_id = $1`, [userId]);
+        JOIN user_categories uc ON c.id = uc.category_id
+        WHERE uc.user_id = $1`, [userId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    res.status(200).json(result.rows[0]);
+    res.status(200).json(result.rows);
   } catch (error) {
     console.error("Error fetching user:", error);
     res.status(500).json({ message: 'Error retrieving user data' });
@@ -189,20 +190,21 @@ router.get('/:userId/categories', async (req, res) => {
 // localhost:3000/categories?page=1&pageSize=10
 // Assign a category from logged in user
 router.post('/categories/:categoryId', authenticate, async (req, res, next) => {
-  const categoryId = parseInt(req.params.categoryId);
-  const userId = req.user.userId; // Get user ID from authenticated token
-
+  
   try {
+    const userId = req.user.userId; // Get user ID from authenticated token
+    const categoryId = parseInt(req.params.categoryId);
+
     const result = await db.query(`
         INSERT INTO user_categories 
         (user_id, category_id, created)
-        VALUES ($1, $2, NOW()) RETURNING *;`, [userId, categoryId]);
+        VALUES ($1, $2, NOW());`, [userId, categoryId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "categories not found." });
     }
 
-    res.status(200).json(result.rows[0]);
+    res.status(200).json("success");
 
   } catch (error) {
     console.error("Error fetching categories:", error);
@@ -214,10 +216,10 @@ router.post('/categories/:categoryId', authenticate, async (req, res, next) => {
 // localhost:3000/categories?page=1&pageSize=10
 // remove a category from logged in user
 router.delete('/categories/:categoryId', authenticate, async (req, res, next) => {
-  const categoryId = parseInt(req.params.categoryId);
-  const userId = req.user.userId; // Get user ID from authenticated token
-
+  
   try {
+    const userId = req.user.userId; // Get user ID from authenticated token
+    const categoryId = parseInt(req.params.categoryId);
     // remove the category
     const result = await db.query(`
         DELETE FROM user_categories 

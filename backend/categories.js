@@ -19,7 +19,7 @@ router.get('/', async (req, res, next) => {
       return res.status(404).json({ error: "categories not found." });
     }
 
-    res.json(result.rows[0]);
+    res.json(result.rows);
 
   } catch (error) {
     console.error("Error fetching categories:", error);
