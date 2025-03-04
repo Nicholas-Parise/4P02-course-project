@@ -10,7 +10,7 @@ require("dotenv").config(); // Load environment variables
  */
 
 const authenticate = async (req, res, next) => {
-    const token = req.header("Authorization");
+    const token = req.headers.authorization?.split(" ")[1];
 
     if (!token) {
         return res.status(401).json({ message: "Access denied. No token provided." });
@@ -21,7 +21,7 @@ const authenticate = async (req, res, next) => {
         const session = await db.query("SELECT user_id FROM sessions WHERE token = $1", [token]);
 
         if (session.rows.length === 0) {
-            return res.status(401).json({ message: "Invalid token" });
+            return res.status(401).json({ message: "User not logged in" });
         }
         
         const decoded = jwt.verify(token.replace("Bearer ", ""), process.env.SECRET_KEY); // Remove "Bearer " prefix if present
