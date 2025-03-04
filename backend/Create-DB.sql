@@ -69,6 +69,7 @@ name TEXT,
 description TEXT,
 image TEXT,
 deadline TIMESTAMP,
+share_token TEXT UNIQUE,
 dateUpdated TIMESTAMP,
 dateCreated TIMESTAMP
 );

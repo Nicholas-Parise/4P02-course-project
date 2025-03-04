@@ -16,7 +16,8 @@ PUT /users → Update logged in user profile
 DELETE /users → Delete logged in user account  
 GET /users/:id → Get specific user profile**  
 
-**POST /users/categories/:categoryId → Assign a category from logged in user  
+**POST /users/categories/:categoryId → Assign a category from logged in user
+Put /users/categories/:categoryId → updates a users love or hate value  
 DELETE /users/categories/:categoryId → Remove a category from logged in user**  
 
 ## Categories
@@ -36,7 +37,8 @@ GET /wishlists/:id → Get wishlist details (must be member)
 PUT /wishlists/:id → Update wishlist (provide desired attributes to edit, must be the owner)  
 DELETE /wishlists/:id → Delete wishlist (must be the owner)**          
 
-**GET /wishlists/:id/members → Get all members in a specific wishlist   
+**POST /wishlists/:id/duplicate → Duplicate the wishlist   
+GET /wishlists/:id/members → Get all members in a specific wishlist   
 POST /wishlists/:id/members → Add a member to an wishlist    
 DELETE /wishlists/:id/members → Remove a member from wishlist  
 PUT /wishlists/:id/members → Update a member’s status (blind/owner)**    
