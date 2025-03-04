@@ -156,7 +156,7 @@ router.post('/categories/:categoryId', authenticate, async (req, res, next) => {
     
     const result = await db.query(`
         INSERT INTO user_categories 
-        (user_id, category_id, created)
+        (user_id, category_id, love, created)
         VALUES ($1, $2, COALESCE($3, false), NOW());`, [userId, categoryId, love]);
 
     if (result.rows.length === 0) {

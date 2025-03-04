@@ -44,6 +44,7 @@ user_id INTEGER REFERENCES users (id) ON DELETE CASCADE,
 category_id INTEGER REFERENCES categories (id) ON DELETE CASCADE,
 love BOOLEAN,
 created TIMESTAMP
+UNIQUE (user_id,category_id) -- only need one entry per category per user
 );
 
 
