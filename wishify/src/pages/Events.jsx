@@ -1,5 +1,5 @@
 import React, {act, useState} from 'react'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import {CreateEvent} from '../components/CreateButton'
 import {EventThumbnail} from '../components/Thumbnail'
 
@@ -38,7 +38,7 @@ const Events = () => {
       </EventContainer>
       <h1>Shared Events</h1>
       <EventContainer>
-        <EventThumbnail title={"Freddy Fazbear's Funtime Festival (can contribute to)"} role={"contributor"}></EventThumbnail>
+        <EventThumbnail title={"Stephen's Birthday"} id={1234} role={"contributor"}></EventThumbnail>
       </EventContainer>
     </>
   )

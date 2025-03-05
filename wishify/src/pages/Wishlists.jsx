@@ -1,8 +1,9 @@
-import React, {act, useState} from 'react'
+import React, {useState} from 'react'
 import styled from '@emotion/styled'
 import ModalBox from '@mui/material/Box';
 import ModalButton from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
 import Modal from '@mui/material/Modal';
 import {CreateWishlist} from '../components/CreateButton'
 import {WishlistThumbnail} from '../components/Thumbnail'
@@ -27,17 +28,42 @@ const WishlistContainer = styled.div`
 `
 
 const Wishlists = () => {
-  const [wishlistCount, setWishlistCount] = useState(0);
-
+  const [wishlistTitles, setWishlistTitles] = useState([]);
+  const [newWishlistTitle, setNewWishlistTitle] = useState('');
   const [activeOverlay, toggleActiveOverlay] = useState(undefined);
-
   const [modalOpen, setModalOpen] = React.useState(false);
   const handleModalOpen = () => setModalOpen(true);
-  const handleModalClose = () => setModalOpen(false);
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setErrorMessage('');
+  }
+  const [editOpen, setEditOpen] = React.useState(false);
+  const handleEditOpen = () => {
+    setEditOpen(true);
+    setNewWishlistTitle(activeOverlay);
+  }
+  const handleEditClose = () => {
+    setEditOpen(false);
+    setErrorMessage('');
+  }
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const addThumbnailFunc = (e) => {
-    setWishlistCount(prevCount => prevCount + 1);
-    handleModalOpen()
+  const handleCreateWishlist = () => {
+    if (newWishlistTitle.trim() === '') {
+      setErrorMessage('Title cannot be empty');
+      return;
+    } 
+    
+    let uniqueTitle = newWishlistTitle;
+    let counter = 1;
+
+    while (wishlistTitles.includes(uniqueTitle)) {
+      uniqueTitle = `${newWishlistTitle} (${counter})`;
+      counter++;
+    }
+
+    setWishlistTitles([...wishlistTitles, uniqueTitle]);
+    handleModalClose();
   }
 
   const changeActiveOverlay = (title) => {
@@ -47,14 +73,41 @@ const Wishlists = () => {
       toggleActiveOverlay(title)
     }
   }
+  function handleMyself(){
+    console.log("myself")
+  }
+  function handleBehalf(){
+    console.log("behalf")
+  }
+  function handleRenameWishlist(){
+    if (newWishlistTitle.trim() === '') {
+      setErrorMessage('Title cannot be empty');
+      return;
+    } else if (wishlistTitles.includes(newWishlistTitle)) {
+      setErrorMessage('Title already exists');
+      return;
+    }
+    setWishlistTitles(wishlistTitles.map(title => title === activeOverlay ? newWishlistTitle : title));
+    setNewWishlistTitle('');
+    handleEditClose();
+  }
+  function handleDeleteWishlist(){
+    console.log("behalf")
+  }
 
   return (
     <>
       <h1>My Wishlists</h1>
       <WishlistContainer value={activeOverlay}>
-        <CreateWishlist addThumbnail={addThumbnailFunc}>Create a Wishlist</CreateWishlist>
-        {Array.from({ length: wishlistCount }, (_, index) => (
-          <WishlistThumbnail active={activeOverlay} toggleActive={() => changeActiveOverlay("Wishlist " + (parseInt(index)+1))} key={index} title={"Wishlist " + (parseInt(index)+1)}></WishlistThumbnail>
+        <CreateWishlist addThumbnail={handleModalOpen}>Create a Wishlist</CreateWishlist>
+        {wishlistTitles.map((title, index) => (
+          <WishlistThumbnail 
+            active={activeOverlay} 
+            toggleActive={() => changeActiveOverlay(title)} 
+            key={index} 
+            title={title}
+            edit={handleEditOpen}
+          />
         ))}
       </WishlistContainer>
       <h1>Shared Wishlists</h1>
@@ -62,6 +115,7 @@ const Wishlists = () => {
         <WishlistThumbnail title={"Birthday Blam's Birthday Bash (can view and contribute)"} role={"contributor"}></WishlistThumbnail>
         <WishlistThumbnail title={"Geoff's Christmas Wishlist"} id={1234} role={"contributor"}></WishlistThumbnail>
       </WishlistContainer>
+      {/* Modal for Creating Wishlists */}
       <Modal
         open={modalOpen}
         onClose={handleModalClose}
@@ -72,9 +126,49 @@ const Wishlists = () => {
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Who is this for?
           </Typography>
-          <ModalButton>For Myself</ModalButton>
-          <ModalButton>On Behalf Of A Loved One</ModalButton>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <ModalButton style={{width:"50%"}} onClick={handleMyself}>For Myself</ModalButton>
+            <ModalButton style={{width:"50%"}} onClick={handleBehalf}>On Behalf Of Somebody</ModalButton>
+          </div>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Enter Wishlist Title
+          </Typography>
+          <TextField
+            fullWidth
+            value={newWishlistTitle}
+            onChange={(e) => setNewWishlistTitle(e.target.value)}
+            label="Wishlist Title"
+            variant="outlined"
+            margin="normal"
+            error={!!errorMessage}
+            helperText={errorMessage}
+          />
+          <ModalButton onClick={handleCreateWishlist}>Create</ModalButton>
         </ModalBox>
+      </Modal>
+      <Modal
+          open={editOpen}
+          onClose={handleEditClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+      >
+      <ModalBox sx={boxStyle}>
+      <Typography id="modal-modal-title" variant="h6" component="h2">
+          Edit Wishlist
+      </Typography>
+      <TextField
+          fullWidth
+          value={newWishlistTitle}
+          onChange={(e) => setNewWishlistTitle(e.target.value)}
+          label="New Wishlist Title"
+          variant="outlined"
+          margin="normal"
+          error={!!errorMessage}
+          helperText={errorMessage}
+      />
+      <ModalButton onClick={handleRenameWishlist}>Rename</ModalButton>
+      <ModalButton onClick={handleDeleteWishlist}>Delete</ModalButton>
+      </ModalBox>
       </Modal>
     </>
   )

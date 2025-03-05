@@ -1,7 +1,8 @@
-import React from 'react';
+import {React} from 'react';
 import { useNavigate } from "react-router-dom";
 import styled from "@emotion/styled";
 import {FaEye, FaPencilAlt, FaKey} from 'react-icons/fa';
+
 
 const WishlistButton = styled.button`
     background: rgb(91, 241, 252);
@@ -14,6 +15,10 @@ const WishlistButton = styled.button`
     @media screen and (max-width: 440px){
         width: 150px;
         height: 150px;
+    }
+    &:hover{
+        transform: scale(1.05);
+        cursor: pointer;
     }
 `
 
@@ -45,6 +50,10 @@ const EventButton = styled.button`
     @media screen and (max-width: 440px){
         width: 150px;
         height: 150px;
+    }
+    &:hover{
+        transform: scale(1.05);
+        cursor: pointer;
     }
 `
 
@@ -79,32 +88,33 @@ const MenuButton = styled.button`
     &:hover{
         border: solid #5fd5dd 1px;
         border-radius: 20px;
+        cursor: pointer;
     } 
 `
 
 
-export const WishlistThumbnail = (props) => {
 
+export const WishlistThumbnail = (props) => {
     const WishlistOverlayMenu = () => {
         return (
             <WishlistMenu onMouseLeave={props.toggleActive}>
                 <button style={{overflow: 'hidden', fontSize: "initial", textAlign: 'center', borderBottom: '1px solid black'}}>{props.title}</button>
                 <MenuButton onClick={openWishlist}>Open</MenuButton>
-                <MenuButton>Edit</MenuButton>
+                <MenuButton onClick={props.edit}>Edit</MenuButton>
                 <MenuButton>Share</MenuButton>
             </WishlistMenu>
         )
     }
+
     let navigate = useNavigate(); 
     const openWishlist = (e) => {
         let path = "/wishlists/" + props.id;
         navigate(path);
     }
 
-
     if(props.role == "contributor"){
         return(
-            <WishlistButton onClick={openWishlist}><Eye></Eye>{props.title}</WishlistButton>
+        <WishlistButton onClick={openWishlist}><Eye></Eye>{props.title}</WishlistButton>
         )
     } else{
         return(
@@ -127,9 +137,10 @@ export const EventThumbnail = (props) => {
             </EventMenu>
         )
     }
-
+    let navigate = useNavigate();
     const openEvent = (e) => {
-        alert("Opened " + props.title);
+        let path = "/events/" + props.id;
+        navigate(path);
     }
 
 
