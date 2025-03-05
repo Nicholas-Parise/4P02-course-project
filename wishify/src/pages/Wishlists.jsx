@@ -107,13 +107,14 @@ const Wishlists = () => {
             key={index} 
             title={title}
             edit={handleEditOpen}
+            owner={"Me"}
           />
         ))}
       </WishlistContainer>
       <h1>Shared Wishlists</h1>
       <WishlistContainer>
-        <WishlistThumbnail title={"Birthday Blam's Birthday Bash (can view and contribute)"} role={"contributor"}></WishlistThumbnail>
-        <WishlistThumbnail title={"Geoff's Christmas Wishlist"} id={1234} role={"contributor"}></WishlistThumbnail>
+        <WishlistThumbnail title={"Birthday Blam's Birthday Bash (can view and contribute)"} role={"contributor"} owner={"Birthday Blam"}></WishlistThumbnail>
+        <WishlistThumbnail title={"Geoff's Christmas Wishlist"} id={1234} role={"contributor"} owner={"Geoff"}></WishlistThumbnail>
       </WishlistContainer>
       {/* Modal for Creating Wishlists */}
       <Modal

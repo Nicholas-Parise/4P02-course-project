@@ -43,7 +43,8 @@ const Event = () => {
     title: "Stephen's Birthday",
     description: "Type your description here.",
     date: "2023-10-01",
-    location: "123 Event Street, Event City"
+    address: "123 Event Street",
+    city: "Event City",
   });
 
   return (
@@ -73,10 +74,17 @@ const Event = () => {
           />
         </div>
         <div>
-          <p style={{ fontWeight: 'bold' }}>Location:</p>
+          <p style={{ fontWeight: 'bold' }}>Address:</p>
           <EditText
-            name="location"
-            defaultValue={event.location}
+            name="address"
+            defaultValue={event.address}
+          />
+        </div>
+        <div>
+          <p style={{ fontWeight: 'bold' }}>City:</p>
+          <EditText
+            name="city"
+            defaultValue={event.city}
           />
         </div>
       </Sidebar>
