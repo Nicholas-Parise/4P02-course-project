@@ -10,15 +10,17 @@ require("dotenv").config(); // Load environment variables
  */
 
 const authenticate = async (req, res, next) => {
-    const token = req.header("Authorization").replace("Bearer ", "");
+    const tempToken = req.header("Authorization");
 
-    if (!token) {
+    if (!tempToken) {
         return res.status(401).json({ message: "Access denied. No token provided." });
     }
 
+    const token = tempToken.replace("Bearer ", "");
+
     try {
         // Find the user associated with the token
-        const session = await db.query("SELECT user_id FROM sessions WHERE token = $1", [token]);
+        const session = await db.query("SELECT user_id FROM sessions WHERE token = $1;", [token]);
 
         if (session.rows.length === 0) {
             return res.status(401).json({ message: "invalid token" });
@@ -31,7 +33,7 @@ const authenticate = async (req, res, next) => {
 
         try {
             // delete the invalid session, so when users come back it will be removed over time
-            await db.query("DELETE FROM sessions WHERE token = $1", [token]);
+            await db.query("DELETE FROM sessions WHERE token = $1;", [token]);
         } catch (dbError) {
             console.error("Failed to delete invalid session:", dbError.message);
         }
