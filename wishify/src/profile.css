@@ -66,7 +66,7 @@
   padding: 20px 0;
 }
 
-.profile-setting-value li {
+.likes-list-item {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -81,6 +81,40 @@
   overflow: hidden;
 }
 
+#add-likes-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 150px;
+  height: 27px;
+  border: 1px solid #c2f3d1;
+  border-radius: 7px;
+  cursor: pointer;
+  color: #c2f3d1;
+}
+
+#add-likes-button:hover {
+  text-decoration: none;
+  background-color: rgba(194, 243, 209, 0.2);
+}
+
+#add-dislikes-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 150px;
+  height: 27px;
+  border: 1px solid #f3c2c2;
+  border-radius: 7px;
+  cursor: pointer;
+  color: #f3c2c2;
+}
+
+#add-dislikes-button:hover {
+  text-decoration: none;
+  background-color: rgba(243, 194, 194, 0.2);
+}
+
 .profile-setting-label {
   width: 20%;
 }
@@ -88,6 +122,10 @@
 .profile-setting-value {
   flex: 1;
   padding-right: 25px;
+}
+
+.profile-setting-value ul {
+  margin: 0;
 }
 
 .profile-setting-button {

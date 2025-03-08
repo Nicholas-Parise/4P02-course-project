@@ -12,6 +12,10 @@ const CreateWishlistButton = styled.button`
         width: 150px;
         height: 150px;
     }
+    &:hover {
+        transform: scale(1.05);
+        cursor: pointer;
+    }
 `
 
 const CreateEventButton = styled.button`
@@ -23,6 +27,10 @@ const CreateEventButton = styled.button`
     @media screen and (max-width: 440px){
         width: 150px;
         height: 150px;
+    }
+    &:hover {
+        transform: scale(1.05);
+        cursor: pointer;
     }
 `
 

@@ -43,7 +43,7 @@ id SERIAL PRIMARY KEY,
 user_id INTEGER REFERENCES users (id) ON DELETE CASCADE,
 category_id INTEGER REFERENCES categories (id) ON DELETE CASCADE,
 love BOOLEAN,
-created TIMESTAMP
+created TIMESTAMP,
 UNIQUE (user_id,category_id) -- only need one entry per category per user
 );
 
@@ -121,7 +121,7 @@ quantity INTEGER,
 purchased BOOLEAN,
 note TEXT,
 dateUpdated TIMESTAMP,
-dateCreated TIMESTAMP
+dateCreated TIMESTAMP,
 UNIQUE (item_id,member_id) --only want one contribution per user per item
 );
 

@@ -2,24 +2,69 @@ import React from 'react'
 import '../profile.css'
 import SettingsItem from '../components/SettingsItem.jsx'
 import Navbar from '../components/Navbarmain.jsx'
+import LikesSettingsItem from '../components/LikesSettingsItem.jsx'
+import { EditDisplayNameModal, EditBioModal, EditEmailModal, EditPasswordModal, DeleteAccountModal, AddLikesModal } from '../components/ProfileSettingModals'
 
 const Profile = () => {
   const [user, setUser] = React.useState({
     profilePictureURL: "",
     displayName: "John Doe",
-    biography: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla quam velit, vulputate eu pharetra nec, mattis ac neque.",
+    biography: "I like copilot.",
     email: "johndoe@wishify.com",
-    password: "password1234",
-    likes: ["Books", "Blu-rays", "Video games", "item 4", "item 5", "item 6", "item 7", "item 8adsaadfjk", "item 9", "item 10", "item 11", "item 12"],
-    dislikes: ["Cleaning Supplies"]
+    likes: [],
+    dislikes: ["Books"]
   })
 
-  // TODO: Input validation
-  // max chars per item
-  // maximum of 12 likes and 12 dislikes
-  // password: min 8 chars, at least one of each (uppercase letter, lowercase letter, symbol, number)
-  // strength of password indicator?
+  // Modal setup
+  const [openModals, setOpenModals] = React.useState({
+    displayName: false,
+    biography: false,
+    email: false,
+    password: false,
+    likes: false,
+    dislikes: false,
+    deleteAccount: false
+  })
 
+  const [currentField, setCurrentField] = React.useState('')
+  const [currentValue, setCurrentValue] = React.useState('')
+
+  const handleOpenModal = (field) => {
+    setCurrentField(field)
+    setCurrentValue(user[field])
+    setOpenModals((prev) => ({...prev, [field]: true}))
+  }
+
+  const handleOpenPasswordModal = () => {
+    setCurrentField('password')
+    setOpenModals((prev) => ({...prev, password: true}))
+  }
+
+  const handleOpenDeleteAccountModal = () => {
+    setCurrentField('deleteAccount')
+    setOpenModals((prev) => ({...prev, deleteAccount: true}))
+  }
+
+  const handleClose = () => setOpenModals({
+    displayName: false,
+    biography: false,
+    email: false,
+    password: false,
+    likes: false,
+    deleteAccount: false
+  })
+
+  const handleSave = (value) => {
+    setUser((prevUser) => ({
+      ...prevUser, [currentField]: value 
+    }))
+  }
+
+  const handleSaveLikes = (value, type) => {
+    setUser((prevUser) => ({
+      ...prevUser, [type]: value
+    }))
+  }
 
   return (
     <>
@@ -37,56 +82,106 @@ const Profile = () => {
 
         <hr />
 
-        <SettingsItem
-          label='Display name:'
-          values={user.displayName}
-          onEdit={() => {console.log("Edit display name.")}}
-        />
 
-        <SettingsItem
-          label="Biography:"
-          values={user.biography}
-          onEdit={() => {console.log("Edit bio.")}}
-        />
+      <SettingsItem
+        label='Display name:'
+        values={user.displayName}
+        buttonText={'Edit'}
+        onEdit={() => handleOpenModal("displayName")}
+      />
 
-        <SettingsItem
-          label="Likes:"
-          values={user.likes}
-          buttonText='Add/Remove'
-          onEdit={() => {console.log("Edit likes.")}}
-          isList={true}
-        />
+      <SettingsItem
+        label="Biography:"
+        values={user.biography}
+        buttonText={'Edit'}
+        onEdit={() => handleOpenModal("biography")}
+      />
 
-        <SettingsItem
-          label="Dislikes:"
-          values={user.dislikes}
-          buttonText='Add/Remove'
-          onEdit={() => {console.log("Clicked!")}}
-          isList={true}
-        />
+      <LikesSettingsItem
+        label="Likes:"
+        values={user.likes}
+        onEdit={() => handleOpenModal("likes")}
+        onSave={handleSaveLikes}
+      />
 
-        <SettingsItem
-          label='Email address:'
-          values={[user.email]}
-          buttonText='Edit'
-          onEdit={() => {console.log("Edit email.")}}
-        />
+      <LikesSettingsItem
+        label="Dislikes:"
+        values={user.dislikes}
+        onEdit={() => handleOpenModal("dislikes")}
+        onSave={handleSaveLikes}
+      />
 
-        <SettingsItem
-          label='Password:'
-          values={['Password strength: weak']}
-          buttonText='Change Password'
-          onEdit={() => {console.log("Edit password.")}}
-        />
+      <SettingsItem
+        label='Email address:'
+        values={[user.email]}
+        buttonText='Edit'
+        onEdit={() => handleOpenModal("email")}
+      />
 
-        <button
-          className='delete-account-button'
-          style={{color: 'red'}}
-          onClick={() => {}}
-          >Delete account
-        </button>
-      </section>
-    </>
+      <SettingsItem
+        label='Password:'
+        values={['********']}
+        buttonText='Change Password'
+        onEdit={() => handleOpenPasswordModal()}
+      />
+
+      <button
+        className='delete-account-button'
+        style={{color: 'red'}}
+        onClick={() => handleOpenDeleteAccountModal()}
+        >Delete account
+      </button>
+
+      <EditDisplayNameModal
+        open={openModals.displayName}
+        value={currentValue}
+        onSave={handleSave}
+        handleClose={handleClose}
+      />
+
+      <EditBioModal
+        open={openModals.biography}
+        value={currentValue}
+        onSave={handleSave}
+        handleClose={handleClose}
+      />
+
+      <AddLikesModal
+        open={openModals.likes}
+        values={currentValue}
+        type='Likes'
+        onSave={handleSave}
+        handleClose={handleClose}
+      />
+
+      <AddLikesModal
+        open={openModals.dislikes}
+        values={currentValue}
+        type='Dislikes'
+        onSave={handleSave}
+        handleClose={handleClose}
+      />
+
+      <EditEmailModal
+        open={openModals.email}
+        value={currentValue}
+        onSave={handleSave}
+        handleClose={handleClose}
+      />
+
+      <EditPasswordModal
+        open={openModals.password}
+        onSave={handleSave}
+        handleClose={handleClose}
+      />
+
+      <DeleteAccountModal
+        open={openModals.deleteAccount}
+        onSave={handleSave}
+        handleClose={handleClose}
+      />
+
+    </section>
   )
 }
 
