@@ -120,6 +120,13 @@ const Register = () => {
           password: false,
           confirmPassword: false
         });
+        setIsFieldValid({
+          email: false,
+          displayName: false,
+          password: false,
+          confirmPassword: false
+        });
+        setIsValid(false);
       } else if (response.status === 400) {
         setResponseMessage("Bad request. Please fill in all required fields.");
         setResponseType("error");
