@@ -2,6 +2,7 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import '../../login.css'
+import Navbar from '../../components/Navbarlanding/landingheader'
 
 const Login = () => {
   const [isAuthenticating, setIsAuthenticating] = React.useState(false)
@@ -91,53 +92,56 @@ const Login = () => {
   }
 
   return (
-    <section className="login-container">
-      <h2>Sign in to continue</h2>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="email">Email</label>
-        <input 
-          type="email"
-          id="email"
-          name="email"
-          value={formData.email}
-          onChange={handleFormChange}
-          required
-          placeholder='johndoe@wishify.com'
-        ></input>
-
-        <label htmlFor="password">Password</label>
-        <div className='login-password-input-container'>
+    <>
+      <Navbar></Navbar>
+      <section className="login-container">
+        <h2>Sign in to continue</h2>
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="email">Email</label>
           <input 
-            type={showPassword ? "text" : "password"}
-            id="password"
-            name="password"
-            value={formData.password}
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
             onChange={handleFormChange}
             required
-            placeholder='Password'
+            placeholder='johndoe@wishify.com'
           ></input>
-          <span
-            className='login-password-toggle'
-            onClick={togglePasswordVisibility}
-          >
-            {showPassword ? "Hide" : "Show"}
-          </span>
+
+          <label htmlFor="password">Password</label>
+          <div className='login-password-input-container'>
+            <input 
+              type={showPassword ? "text" : "password"}
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleFormChange}
+              required
+              placeholder='Password'
+            ></input>
+            <span
+              className='login-password-toggle'
+              onClick={togglePasswordVisibility}
+            >
+              {showPassword ? "Hide" : "Show"}
+            </span>
+          </div>
+
+          <button type="submit" disabled={!isValid || isAuthenticating}>Login</button>
+        </form>
+
+        {responseMessage && (
+          <div className={`response-message ${responseType}`}>
+            {responseMessage}
+          </div>
+        )}
+
+        <Link to="/forgot-password" className="login-forgot-password">Forgot password?</Link>
+        <div className="login-signup">
+          Don't have an account? <Link to="/register">Sign up here</Link>
         </div>
-
-        <button type="submit" disabled={!isValid || isAuthenticating}>Login</button>
-      </form>
-
-      {responseMessage && (
-        <div className={`response-message ${responseType}`}>
-          {responseMessage}
-        </div>
-      )}
-
-      <Link to="/forgot-password" className="login-forgot-password">Forgot password?</Link>
-      <div className="login-signup">
-        Don't have an account? <Link to="/register">Sign up here</Link>
-      </div>
-    </section>
+      </section>
+    </>
   )
 }
 

@@ -1,26 +1,31 @@
-.navbar {
+navbar {
     width: 100%;
-    height: 90px;
-    top: 0;
-    left: 0;
+    height: 80px;
     background-color: #fff;
     border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    padding: 1rem 2rem;
 }
 
 .navbar .container1 {
-    height: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding:1rem;
+    background-color: #fff;
+    width: 100%;
+    padding: 0 1rem; 
+    box-sizing: border-box; 
 }
 
 .navbar .container2 {
     height: 100%;
     display: flex;
     justify-content: space-between;
+    background-color: #fff;
     align-items: left;
-    padding:0.5rem;
+    padding: 0.5rem 1rem; 
+    box-sizing: border-box; 
 }
 
 .navbar .container1 h1 {
@@ -46,6 +51,14 @@
 
 .navbar .nav-menu {
     display: flex;
+    gap: 2rem;
+    font-size: 1.2rem;
+}
+
+.navbar .nav-menu a {
+    text-decoration: none;
+    color: black;
+    padding: 0.5rem 1rem;
 }
 
 .navbar li {
@@ -56,4 +69,68 @@
     font-size: 1.5rem;
 }
 
+.navbar .logo {
+    display: flex;
+    align-items: center;
+    font-size: 2rem;
+    font-weight: bold;
+}
 
+.navbar .logo span {
+    color: #5651e5;
+    margin-left: 5px;
+}
+
+.navbar .actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.navbar .btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: linear-gradient(135deg, #8d8aee, #5651e5);
+    color: white;
+    border: none;
+    padding: 0.7rem 1.2rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+    margin: 0.5rem 0; 
+}
+
+.navbar .btn:hover {
+    background: linear-gradient(135deg, #5651e5, #343188);
+}
+
+navbar .nav-menu a {
+    text-decoration: none;
+    color: black;
+    padding: 0.5rem 1rem;
+    transition: 0.3s ease-in-out;
+}
+
+.navbar .nav-menu a:hover {
+    background-color: rgba(86, 81, 229, 0.1); 
+    border-radius: 5px;
+}
+
+.navbar .profile-icon {
+    font-size: 1.8rem;
+    cursor: pointer;
+    background: rgba(86, 81, 229, 0.1);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s ease-in-out;
+}
+
+.navbar .profile-icon:hover {
+    background: rgba(86, 81, 229, 0.2); 
+}

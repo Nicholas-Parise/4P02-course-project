@@ -2,6 +2,7 @@ import React, {act, useState} from 'react'
 import styled from 'styled-components'
 import {CreateEvent} from '../components/CreateButton'
 import {EventThumbnail} from '../components/Thumbnail'
+import Navbar from '../components/Navbarmain'
 
 const EventContainer = styled.div`
   display: flex;
@@ -29,6 +30,7 @@ const Events = () => {
 
   return (
     <>
+      <Navbar></Navbar>
       <h1>My Events</h1>
       <EventContainer value={activeOverlay}>
         <CreateEvent addThumbnail={addThumbnailFunc}>Create an Event</CreateEvent>
