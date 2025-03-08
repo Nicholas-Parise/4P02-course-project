@@ -1,5 +1,4 @@
 const express = require('express');
-const { parseArgs } = require('util');
 const router = express.Router();
 const db = require('./db');
 const authenticate = require('./authenticate');
@@ -24,7 +23,7 @@ router.get('/', authenticate, async(req,res,next)=>{
       return res.status(404).json({ error: "contributions not found." });
     }
   
-    res.json(result.rows[0]);
+    res.json(result.rows);
   } catch (error) {
     console.error("Error fetching contributions:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -53,7 +52,7 @@ router.get('/wishlists/:id', authenticate, async(req,res,next)=>{
       return res.status(404).json({ error: "no contributions found." });
     }
   
-    res.json(result.rows[0]);
+    res.json(result.rows);
   } catch (error) {
     console.error("Error fetching contributions:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -65,8 +64,6 @@ router.get('/wishlists/:id', authenticate, async(req,res,next)=>{
 // get contributions from of a single item
 router.get('/items/:id', authenticate, async(req,res,next)=>{
     
-  const page = parseInt(req.query.page) || 1;
-  const pageSize = parseInt(req.query.pageSize) || 10;
   const itemId = parseInt(req.params.id);
   
   try {  
@@ -77,7 +74,7 @@ router.get('/items/:id', authenticate, async(req,res,next)=>{
       return res.status(404).json({ error: "contributions not found." });
     }
   
-    res.json(result.rows[0]);
+    res.json(result.rows);
   } catch (error) {
     console.error("Error fetching contributions:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -86,7 +83,7 @@ router.get('/items/:id', authenticate, async(req,res,next)=>{
 
 
 
-// localhost:3000/contribution
+// localhost:3000/contributions
 // create a contribution for an item
 router.post('/', authenticate, async(req,res,next)=>{
 
@@ -96,15 +93,29 @@ router.post('/', authenticate, async(req,res,next)=>{
   if (!item_id || !quantity) {
     return res.status(400).json({ message: "item_id and quantity are required" });
   }
+  
+ // Type checking
+  if (quantity !== undefined && (!Number.isInteger(quantity) || quantity < 0)) {
+    return res.status(400).json({ error: "quantity must be a non-negative integer" });
+  }
+  if (purchased !== undefined && typeof purchased !== "boolean") {
+    return res.status(400).json({ error: "purchased must be a boolean (true or false)" });
+  }
+  if (note !== undefined && typeof note !== "string") {
+    return res.status(400).json({ error: "note must be a string" });
+  }
+
 
   try {
        // get user membership from item id
-      const wishlistId = await db.query(
+      const wishlistResult = await db.query(
         `SELECT wm.wishlists_id FROM wishlist_members wm
         JOIN items i ON wm.id = i.member_id
         WHERE i.id = $1;`,
-        [itemId]);
+        [item_id]);
         
+        const wishlistId = wishlistResult.rows[0].wishlists_id;
+
         const member = await db.query(
           `SELECT id FROM wishlist_members WHERE wishlists_id = $1 AND user_id = $2;`,
           [wishlistId,userId]);
@@ -141,13 +152,24 @@ router.post('/', authenticate, async(req,res,next)=>{
 
 
 
-// localhost:3000/items/0
+// localhost:3000/contributions/0
 // edit the contents of a single item
 router.put('/:id', authenticate, async(req,res,next)=>{
 
   const contributionId = parseInt(req.params.id);
   const { quantity, purchased, note } = req.body;
   const userId = req.user.userId; // Get user ID from authenticated token
+  
+  // Type checking
+  if (quantity !== undefined && (!Number.isInteger(quantity) || quantity < 0)) {
+    return res.status(400).json({ error: "quantity must be a non-negative integer" });
+  }
+  if (purchased !== undefined && typeof purchased !== "boolean") {
+    return res.status(400).json({ error: "purchased must be a boolean (true or false)" });
+  }
+  if (note !== undefined && typeof note !== "string") {
+    return res.status(400).json({ error: "note must be a string" });
+  }
   
     try {
       /// make sure that only the user that created the contribution can edit it.
@@ -171,7 +193,7 @@ router.put('/:id', authenticate, async(req,res,next)=>{
             purchased = COALESCE($2, purchased),
             note = COALESCE($3, note),
             dateUpdated = NOW()
-        WHERE id = $7
+        WHERE id = $4
         RETURNING *;
       `, [quantity, purchased, note, contributionId]);
   

@@ -79,7 +79,7 @@ router.post('/', authenticate, async (req, res, next) => {
 
 
 // localhost:3000/wishlists/0
-// get the contents of a single wishlist
+// get the contents of a single wishlist, items and contributions
 router.get('/:wishlistId', authenticate, async (req, res, next) => {
 
   const wishlistId = parseInt(req.params.wishlistId);
@@ -88,7 +88,7 @@ router.get('/:wishlistId', authenticate, async (req, res, next) => {
     const userId = req.user.userId; // Get user ID from authenticated token
 
     const result = await db.query(`
-        SELECT w.*
+        SELECT w.*, m.blind, m.owner
         FROM wishlists w
         JOIN wishlist_members m ON w.id = m.wishlists_id
         WHERE m.user_id = $1 AND w.id = $2;`, [userId, wishlistId]);
@@ -106,7 +106,18 @@ router.get('/:wishlistId', authenticate, async (req, res, next) => {
       JOIN wishlist_members wm ON i.member_id = wm.id
       WHERE wm.wishlists_id = $1;`, [wishlist.id]);
 
-    res.status(200).json({ wishlist, items: itemsResult.rows });
+      let contributionResult = null;
+
+      if(!wishlist.blind){  // return the contributions but only if user is not blind 
+      contributionResult = await db.query(
+        `SELECT c.* FROM contributions c
+        JOIN wishlist_members wm ON c.member_id = wm.id
+        WHERE wm.wishlists_id = $1;`,
+        [wishlistId]
+      );
+    }
+        
+    res.status(200).json({ wishlist, items: itemsResult.rows, contributions: contributionResult.rows });
   } catch (error) {
     console.error("Error fetching wishlists:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -494,9 +505,9 @@ router.get('/:wishlistId/items', authenticate, async (req, res) => {
 });
 
 
-// localhost:3000/wishlists/shared/:id
+// localhost:3000/wishlists/share/:id
 // get the shared wishlist 
-router.get('/shared/:token', async (req, res) => {
+router.get('/share/:token', async (req, res) => {
   const { token } = req.params;
 
   try {

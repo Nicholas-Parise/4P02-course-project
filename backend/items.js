@@ -1,5 +1,4 @@
 const express = require('express');
-const { parseArgs } = require('util');
 const router = express.Router();
 const db = require('./db');
 const authenticate = require('./authenticate');
@@ -9,8 +8,6 @@ const authenticate = require('./authenticate');
 // get the contents of a single item
 router.get('/:itemId', authenticate, async (req, res, next) => {
 
-  const page = parseInt(req.query.page) || 1;
-  const pageSize = parseInt(req.query.pageSize) || 10;
   const itemId = parseInt(req.params.itemId);
 
   try {
@@ -36,13 +33,33 @@ router.get('/:itemId', authenticate, async (req, res, next) => {
 // create an item (given wishlists id)
 router.post('/', authenticate, async (req, res, next) => {
 
-  const itemId = parseInt(req.params.itemId);
   const { name, description, url, image, quantity, price, wishlists_id } = req.body;
   const userId = req.user.userId; // Get user ID from authenticated token
 
   if (!wishlists_id || !name || !quantity) {
     return res.status(400).json({ message: "wishlists_id, name and quantity are required" });
   }
+
+  // Type checking
+  if (name !== undefined && typeof name !== "string") {
+    return res.status(400).json({ error: "name must be a string" });
+  }
+  if (description !== undefined && typeof description !== "string") {
+    return res.status(400).json({ error: "description must be a string" });
+  }
+  if (url !== undefined && typeof url !== "string") {
+    return res.status(400).json({ error: "url must be a string" });
+  }
+  if (image !== undefined && typeof image !== "string") {
+    return res.status(400).json({ error: "image must be a string" });
+  }
+  if (quantity !== undefined && (!Number.isInteger(quantity) || quantity < 0)) {
+    return res.status(400).json({ error: "quantity must be a non-negative integer" });
+  }
+  if (price !== undefined && (typeof price !== "number" || price < 0)) {
+    return res.status(400).json({ error: "price must be a non-negative number" });
+  }
+
 
   try {
     // Check if the user is a member of the given wishlist
@@ -77,7 +94,7 @@ router.post('/', authenticate, async (req, res, next) => {
     // insert the item
     const result = await db.query(`
         INSERT INTO items 
-        (member_id, name, description, url, image, quantity, price, dateCreated, priority)
+        (member_id, name, description, url, image, quantity, price, priority, dateCreated)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW()) RETURNING *;
       `, [member_id, name, description, url, image, quantity, price, priority]);
 
@@ -99,6 +116,30 @@ router.put('/:itemId', authenticate, async (req, res, next) => {
   const itemId = parseInt(req.params.itemId);
   const { name, description, url, image, quantity, price, priority } = req.body;
   const userId = req.user.userId; // Get user ID from authenticated token
+
+  // Type checking
+  if (name !== undefined && typeof name !== "string") {
+    return res.status(400).json({ error: "name must be a string" });
+  }
+  if (description !== undefined && typeof description !== "string") {
+    return res.status(400).json({ error: "description must be a string" });
+  }
+  if (url !== undefined && typeof url !== "string") {
+    return res.status(400).json({ error: "url must be a string" });
+  }
+  if (image !== undefined && typeof image !== "string") {
+    return res.status(400).json({ error: "image must be a string" });
+  }
+  if (quantity !== undefined && (!Number.isInteger(quantity) || quantity < 0)) {
+    return res.status(400).json({ error: "quantity must be a non-negative integer" });
+  }
+  if (price !== undefined && (typeof price !== "number" || price < 0)) {
+    return res.status(400).json({ error: "price must be a non-negative number" });
+  }
+  if (priority !== undefined && (!Number.isInteger(priority) || priority < 0)) {
+    return res.status(400).json({ error: "priority must be a non-negative integer" });
+  }
+
 
   try {
     const ownershipCheck = await db.query(
@@ -123,17 +164,17 @@ router.put('/:itemId', authenticate, async (req, res, next) => {
             image = COALESCE($4, image),
             quantity = COALESCE($5, quantity),
             price = COALESCE($6, price),
-            priority = COALESCE($6, priority),
+            priority = COALESCE($7, priority),
             dateUpdated = NOW()
-        WHERE id = $7
+        WHERE id = $8
         RETURNING *;
-      `, [name, description, url, image, quantity, price, priority, itemsId]);
+      `, [name, description, url, image, quantity, price, priority, itemId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "item not found." });
     }
 
-    res.json({ message: "item updated successfully.", wishlist: result.rows[0] });
+    res.json({ message: "item updated successfully.", item: result.rows[0] });
 
 
   } catch (error) {
