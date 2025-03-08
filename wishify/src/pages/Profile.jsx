@@ -182,6 +182,7 @@ const Profile = () => {
       />
 
     </section>
+    </>
   )
 }
 
