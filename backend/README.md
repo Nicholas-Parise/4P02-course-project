@@ -40,11 +40,11 @@ DELETE /wishlists/:id → Delete wishlist (must be the owner)**
 **GET /wishlists/:id/members → Get all members in a specific wishlist   
 POST /wishlists/:id/members → Add a member to an wishlist    
 DELETE /wishlists/:id/members → Remove a member from wishlist  
-PUT /wishlists/:id/members → Update a member’s status (blind/owner)**    
+PUT /wishlists/:id/members → Update a members status (blind/owner)**    
 
 **POST /wishlists/:id/duplicate → Duplicate the wishlist   
 GET /wishlists/:id/items → Get all items in a wishlist (and contributions)   
-GET /wishlists/shared/:token → get the shared wishlist**
+GET /wishlists/share/:token → get the shared wishlist**
 
 ##  Events
 **GET /events → Get all events (for member)   
@@ -57,7 +57,7 @@ DELETE /events/:id → Delete event**
 GET /events/:id/members → Get all members in a specific event   
 POST /events/:id/members → Add a member to an event   
 DELETE /events/:id/members → Remove a member from event    
-PUT /events/:id/members → Update a member’s status (blind/owner)**
+PUT /events/:id/members → Update a members status (blind/owner)**
 
 ## Items
 
