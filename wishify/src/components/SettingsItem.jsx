@@ -1,7 +1,8 @@
 import React from 'react'
 
-const SettingsItem = ({ label, values, buttonText, onEdit, isList }) => {
-  console.log(label, typeof label)
+
+const SettingsItem = ({ label, values, buttonText, onEdit }) => {
+
   return (
     <>
       <div className="profile-settings-item">
@@ -10,19 +11,11 @@ const SettingsItem = ({ label, values, buttonText, onEdit, isList }) => {
         </div>
 
         <div className='profile-setting-value'>
-          {isList ? (
-            <ul className="max-w-xl mx-auto columns-1 sm:columns-1 md:columns-2 lg:columns-3 space-y-2">
-              {values.map((value, index) => (
-                <li key={index} style={{backgroundColor: label === "Likes:" ? "#c2f3d1" : "#f3c2c2"}}>
-                  {value}
-                </li>
-              ))}
-            </ul>
-          ) : values}
+          {values}
         </div>
 
         <div className='profile-setting-button'>
-          <button onClick={onEdit}>{buttonText ? buttonText : "Edit"}</button>
+          <button onClick={onEdit}>{buttonText}</button>
         </div>
       </div>
 
