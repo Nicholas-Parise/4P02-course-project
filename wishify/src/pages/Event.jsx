@@ -49,6 +49,7 @@ const Event = () => {
   });
 
   return (
+    <>
     <Navbar></Navbar>
     
     <EventSection>
@@ -92,6 +93,7 @@ const Event = () => {
         </div>
       </Sidebar>
     </EventSection>
+    </>
   );
 };
 export default Event;
