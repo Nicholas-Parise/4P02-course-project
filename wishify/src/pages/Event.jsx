@@ -1,5 +1,6 @@
 import React, {useState} from 'react'
 import styled from 'styled-components'
+import Navbar from '../components/Navbarmain'
 import { EditText, EditTextarea } from 'react-edit-text';
 import 'react-edit-text/dist/index.css';
 import banner from "../assets/bday-banner.jpg";
@@ -48,6 +49,8 @@ const Event = () => {
   });
 
   return (
+    <Navbar></Navbar>
+    
     <EventSection>
       <EventImage src={banner}></EventImage>
       <Content>

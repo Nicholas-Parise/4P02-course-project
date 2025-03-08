@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
 
 * {
   box-sizing: border-box;
@@ -11,9 +11,7 @@ html {
 
 body {
   margin: 0;
-  font-family: 'Calibri', 'Raleway', 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Calibri', sans-serif;
   background-color: #f8f5ff;
   color: #0d001f;
   font-size: 1.5rem;
@@ -40,23 +38,6 @@ main{
   width: min(1300px, 100%);
   margin: auto;
 }
-
-
-nav {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 30px;
-  padding: 10px;
-}
-
-
-nav :hover {
-  transition: 0.3s;
-  color:#001691;
-  text-shadow: 0 0 5px #7000a3;
-}
-
 
 section {
   width: min(1300px, 100%);

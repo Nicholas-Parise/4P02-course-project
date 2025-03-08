@@ -6,6 +6,7 @@ import WishlistItemEntry from '../components/WishlistItemEntry';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import { FaArrowUp } from 'react-icons/fa';
+import Navbar from '../components/Navbarmain.jsx';
 
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -159,39 +160,42 @@ const Wishlist = () => {
   }
 
   return (
-    <section>
-        <WishlistHeader wishlist={wishlist} event={event} />
-        <div className="mt-8 mb-4 flex gap-1 items-center">
-            <FormControl fullWidth className='min-w-[120px] max-w-[180px]'>
-                <InputLabel id="sort-select-label">Sort by</InputLabel>
-                <Select
-                    labelId="sort-select-label"
-                    id="sort-select"
-                    value={sortBy}
-                    label="Sort by"
-                    onChange={(event: SelectChangeEvent) => setSortBy(event.target.value as SortOption)}
-                >
-                    <MenuItem value={'priority'}>Priority</MenuItem>
-                    <MenuItem value={'price'}>Price</MenuItem>
-                    <MenuItem value={'quantity'}>Quantity</MenuItem>
-                </Select>
-            </FormControl>
-            <IconButton className='w-12 h-12' onClick={() => setSortDirection(sortDirection === 1 ? -1 : 1)}>
-                <FaArrowUp className={`transition-[1]  ${sortDirection === -1 ? 'rotate-180' : 'rotate-0'}`} />
-            </IconButton>
-        </div>
-      
-        <DndContext onDragEnd={handleDragEnd}>
-            <SortableContext items={sortedItems.map((item) => item.id)}>
-                <ul className="space-y-4">
-                {sortedItems.map((item) => (
-                    <WishlistItemEntry key={item.id} item={item} sortBy={sortBy} onReserve={handleReserveItem} />
-                ))}
-                </ul>
-            </SortableContext>
-        </DndContext>
-      
-    </section>   
+    <>
+      <Navbar></Navbar>
+      <section>
+          <WishlistHeader wishlist={wishlist} event={event} />
+          <div className="mt-8 mb-4 flex gap-1 items-center">
+              <FormControl fullWidth className='min-w-[120px] max-w-[180px]'>
+                  <InputLabel id="sort-select-label">Sort by</InputLabel>
+                  <Select
+                      labelId="sort-select-label"
+                      id="sort-select"
+                      value={sortBy}
+                      label="Sort by"
+                      onChange={(event: SelectChangeEvent) => setSortBy(event.target.value as SortOption)}
+                  >
+                      <MenuItem value={'priority'}>Priority</MenuItem>
+                      <MenuItem value={'price'}>Price</MenuItem>
+                      <MenuItem value={'quantity'}>Quantity</MenuItem>
+                  </Select>
+              </FormControl>
+              <IconButton className='w-12 h-12' onClick={() => setSortDirection(sortDirection === 1 ? -1 : 1)}>
+                  <FaArrowUp className={`transition-[1]  ${sortDirection === -1 ? 'rotate-180' : 'rotate-0'}`} />
+              </IconButton>
+          </div>
+        
+          <DndContext onDragEnd={handleDragEnd}>
+              <SortableContext items={sortedItems.map((item) => item.id)}>
+                  <ul className="space-y-4">
+                  {sortedItems.map((item) => (
+                      <WishlistItemEntry key={item.id} item={item} sortBy={sortBy} onReserve={handleReserveItem} />
+                  ))}
+                  </ul>
+              </SortableContext>
+          </DndContext>
+        
+      </section>   
+    </>
   );
 }
 

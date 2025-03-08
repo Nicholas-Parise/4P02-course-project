@@ -1,6 +1,7 @@
 import React from 'react'
 import '../profile.css'
 import SettingsItem from '../components/SettingsItem.jsx'
+import Navbar from '../components/Navbarmain.jsx'
 import LikesSettingsItem from '../components/LikesSettingsItem.jsx'
 import { EditDisplayNameModal, EditBioModal, EditEmailModal, EditPasswordModal, DeleteAccountModal, AddLikesModal } from '../components/ProfileSettingModals'
 
@@ -66,18 +67,21 @@ const Profile = () => {
   }
 
   return (
-    <section className="profile-container">
-      <h2>Profile settings</h2>
+    <>
+      <Navbar></Navbar>
+      <section className="profile-container">
+        <h2>Profile settings</h2>
 
-      <div className="profile-picture">
-        <img
-          src={user.profilePicture || "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?t=st=1738333167~exp=1738336767~hmac=d1a2645bf22eff4e35bc060e5a7529cb9cbf09696ae232ab6690c137ad06d5e4&w=1060"}
-          alt='User profile picture'
-        />
-        <button>Update Picture</button>
-      </div>
+        <div className="profile-picture">
+          <img
+            src={user.profilePicture || "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?t=st=1738333167~exp=1738336767~hmac=d1a2645bf22eff4e35bc060e5a7529cb9cbf09696ae232ab6690c137ad06d5e4&w=1060"}
+            alt='User profile picture'
+          />
+          <button>Update Picture</button>
+        </div>
 
-      <hr />
+        <hr />
+
 
       <SettingsItem
         label='Display name:'

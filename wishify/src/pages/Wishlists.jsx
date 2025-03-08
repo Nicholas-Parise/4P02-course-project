@@ -7,6 +7,7 @@ import TextField from '@mui/material/TextField';
 import Modal from '@mui/material/Modal';
 import {CreateWishlist} from '../components/CreateButton'
 import {WishlistThumbnail} from '../components/Thumbnail'
+import Navbar from '../components/Navbarmain';
 
 const boxStyle = {
   position: 'absolute',
@@ -97,6 +98,7 @@ const Wishlists = () => {
 
   return (
     <>
+      <Navbar></Navbar>
       <h1>My Wishlists</h1>
       <WishlistContainer value={activeOverlay}>
         <CreateWishlist addThumbnail={handleModalOpen}>Create a Wishlist</CreateWishlist>

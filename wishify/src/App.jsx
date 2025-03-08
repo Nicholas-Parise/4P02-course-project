@@ -14,7 +14,7 @@ import Wishlists from "./pages/Wishlists";
 import Landing from "./pages/Landing";
 import Wishlist from "./pages/Wishlist";
 import Profile from "./pages/Profile";
-import Navbar from './components/Navbar';
+import Navbar from './components/Navbarmain';
 
 
 function App() {
@@ -23,7 +23,6 @@ function App() {
   return (
     <>
       <BrowserRouter>
-      <Navbar name=""></Navbar>
         <Routes>
             <Route index element={<HomePage />} />
             <Route path="home" element={<HomePage />} />

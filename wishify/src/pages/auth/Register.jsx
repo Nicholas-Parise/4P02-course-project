@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import '../../register.css'
+import Navbar from '../../components/Navbarlanding/landingheader'
 
 const Register = () => {
   const [isAuthenticating, setIsAuthenticating] = React.useState(false)
@@ -155,107 +156,110 @@ const Register = () => {
   }
 
   return (
-    <section className="register-container">
-      <h2>Create your account</h2>
-      <form onSubmit={handleSubmit}>
+    <>
+      <Navbar></Navbar>
+      <section className="register-container">
+        <h2>Create your account</h2>
+        <form onSubmit={handleSubmit}>
 
-        <label htmlFor="email">Email</label>
-        <input 
-          type="email"
-          id="email"
-          name="email"
-          value={formData.email}
-          onChange={handleFormChange}
-          onBlur={handleBlur}
-          onFocus={handleFocus}
-          required
-          placeholder='bob@wishify.com'
-          className={touched.email ? (isFieldValid.email ? 'valid' : 'invalid') : ''}
-        ></input>
-
-        <label htmlFor="display-name">Display Name</label>
-        <input 
-          type="text"
-          id="display-name"
-          name="displayName"
-          value={formData.displayName}
-          onChange={handleFormChange}
-          onBlur={handleBlur}
-          onFocus={handleFocus}
-          required
-          placeholder='John Doe'
-          className={touched.displayName ? (isFieldValid.displayName ? 'valid' : 'invalid') : ''}
-        ></input>
-
-        <label htmlFor="password">Password</label>
-        <div className='login-password-input-container'>
+          <label htmlFor="email">Email</label>
           <input 
-            type={showPassword ? "text" : "password"}
-            id="password"
-            name="password"
-            value={formData.password}
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
             onChange={handleFormChange}
             onBlur={handleBlur}
             onFocus={handleFocus}
             required
-            placeholder='Password'
-            className={touched.password ? (isFieldValid.password ? 'valid' : 'invalid') : ''}
+            placeholder='bob@wishify.com'
+            className={touched.email ? (isFieldValid.email ? 'valid' : 'invalid') : ''}
           ></input>
-          <span
-            className='register-password-toggle'
-            onClick={togglePasswordVisibility}
-          >
-            {showPassword ? "Hide" : "Show"}
-          </span>
-          {showTooltip && (
-            <div className="tooltip">
-              Password must contain a minimum of:
-              <ul>
-                <li>8 characters</li>
-                <li>One uppercase letter</li>
-                <li>One lowercase letter</li>
-                <li>One number</li>
-                <li>One special symbol</li>
-              </ul>
-            </div>
-          )}
-        </div>
 
-        <label htmlFor="confirm-password">Confirm Password</label>
-        <div className='register-password-input-container'>
+          <label htmlFor="display-name">Display Name</label>
           <input 
-            type={showPassword ? "text" : "password"}
-            id="confirm-password"
-            name="confirmPassword"
-            value={formData.confirmPassword}
+            type="text"
+            id="display-name"
+            name="displayName"
+            value={formData.displayName}
             onChange={handleFormChange}
             onBlur={handleBlur}
             onFocus={handleFocus}
             required
-            placeholder='Confirm password'
-            className={touched.confirmPassword ? (isFieldValid.confirmPassword ? 'valid' : 'invalid') : ''}
+            placeholder='John Doe'
+            className={touched.displayName ? (isFieldValid.displayName ? 'valid' : 'invalid') : ''}
           ></input>
-          <span
-            className='register-password-toggle'
-            onClick={togglePasswordVisibility}
-          >
-            {showPassword ? "Hide" : "Show"}
-          </span>
+
+          <label htmlFor="password">Password</label>
+          <div className='login-password-input-container'>
+            <input 
+              type={showPassword ? "text" : "password"}
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleFormChange}
+              onBlur={handleBlur}
+              onFocus={handleFocus}
+              required
+              placeholder='Password'
+              className={touched.password ? (isFieldValid.password ? 'valid' : 'invalid') : ''}
+            ></input>
+            <span
+              className='register-password-toggle'
+              onClick={togglePasswordVisibility}
+            >
+              {showPassword ? "Hide" : "Show"}
+            </span>
+            {showTooltip && (
+              <div className="tooltip">
+                Password must contain a minimum of:
+                <ul>
+                  <li>8 characters</li>
+                  <li>One uppercase letter</li>
+                  <li>One lowercase letter</li>
+                  <li>One number</li>
+                  <li>One special symbol</li>
+                </ul>
+              </div>
+            )}
+          </div>
+
+          <label htmlFor="confirm-password">Confirm Password</label>
+          <div className='register-password-input-container'>
+            <input 
+              type={showPassword ? "text" : "password"}
+              id="confirm-password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleFormChange}
+              onBlur={handleBlur}
+              onFocus={handleFocus}
+              required
+              placeholder='Confirm password'
+              className={touched.confirmPassword ? (isFieldValid.confirmPassword ? 'valid' : 'invalid') : ''}
+            ></input>
+            <span
+              className='register-password-toggle'
+              onClick={togglePasswordVisibility}
+            >
+              {showPassword ? "Hide" : "Show"}
+            </span>
+          </div>
+
+          <button type="submit" disabled={!isValid || isAuthenticating}>Create account</button>
+        </form>
+
+        {responseMessage && (
+          <div className={`response-message ${responseType}`}>
+            {responseMessage}
+          </div>
+        )}
+
+        <div className="register-signup">
+          Already have an account? <Link to="/login">Sign in here</Link>
         </div>
-
-        <button type="submit" disabled={!isValid || isAuthenticating}>Create account</button>
-      </form>
-
-      {responseMessage && (
-        <div className={`response-message ${responseType}`}>
-          {responseMessage}
-        </div>
-      )}
-
-      <div className="register-signup">
-        Already have an account? <Link to="/login">Sign in here</Link>
-      </div>
-    </section>
+      </section>
+    </>
   )
 }
 
