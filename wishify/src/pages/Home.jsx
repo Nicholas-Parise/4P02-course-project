@@ -2,8 +2,9 @@ import React from 'react'
 import Navbar from '../components/Navbarmain.jsx'
 import '../home.css'
 import styled from '@emotion/styled'
-import {CreateWishlist} from '../components/CreateButton'
+import { NavLink } from 'react-router-dom';
 import {WishlistThumbnail} from '../components/Thumbnail'
+import {EventThumbnail} from '../components/Thumbnail'
 
 const WishlistContainer = styled.div`
       display: flex;
@@ -11,6 +12,42 @@ const WishlistContainer = styled.div`
       margin: 3vw;
       flex-wrap: wrap;
     `
+const CreateWishlistButton = styled.button`
+    background: #63d471;
+    border-radius: 25px;
+    padding: 20px;
+    width: 200px;
+    height: 200px;
+    @media screen and (max-width: 440px){
+        width: 150px;
+        height: 150px;
+    }
+    &:hover {
+        transform: scale(1.05);
+        cursor: pointer;
+    }
+`
+const EventContainer = styled.div`
+  display: flex;
+  gap: 3vw;
+  margin: 3vw;
+  flex-wrap: wrap;
+`
+const CreateEventButton = styled.button`
+    background: #63d471;
+    border-radius: 25px;
+    padding: 20px;
+    width: 200px;
+    height: 200px;
+    @media screen and (max-width: 440px){
+        width: 150px;
+        height: 150px;
+    }
+    &:hover {
+        transform: scale(1.05);
+        cursor: pointer;
+    }
+`
 
 const Home = () => {
   const [user, setUser] = React.useState({
@@ -46,7 +83,24 @@ const Home = () => {
             <WishlistThumbnail title={"Wishlist 1"} role={"contributor"} owner={"John Doe"}></WishlistThumbnail>
             <WishlistThumbnail title={"Wishlist 2"} role={"contributor"} owner={"John Doe"}></WishlistThumbnail>
             <WishlistThumbnail title={"Wishlist 3"} role={"contributor"} owner={"John Doe"}></WishlistThumbnail>
+            <NavLink to="/wishlists">
+              <CreateWishlistButton> Create a Wishlist </CreateWishlistButton>
+            </NavLink>
           </WishlistContainer>
+        </div>
+
+        <br/>
+
+        <h1>Events</h1>
+        <div className="home-wishlist-top">
+          <EventContainer>
+            <EventThumbnail title={"Event 1"} role={"contributor"} owner={"John Doe"}></EventThumbnail>
+            <EventThumbnail title={"Event 2"} role={"contributor"} owner={"John Doe"}></EventThumbnail>
+            <EventThumbnail title={"Event 3"} role={"contributor"} owner={"John Doe"}></EventThumbnail>
+            <NavLink to="/events">
+              <CreateEventButton> Create an Event </CreateEventButton>
+            </NavLink>
+          </EventContainer>
         </div>
       </section>
     </>
