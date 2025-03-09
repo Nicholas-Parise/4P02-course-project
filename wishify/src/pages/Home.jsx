@@ -1,13 +1,23 @@
 import React from 'react'
 import Navbar from '../components/Navbarmain.jsx'
 import '../home.css'
+import styled from '@emotion/styled'
+import {CreateWishlist} from '../components/CreateButton'
+import {WishlistThumbnail} from '../components/Thumbnail'
+
+const WishlistContainer = styled.div`
+      display: flex;
+      gap: 3vw;
+      margin: 3vw;
+      flex-wrap: wrap;
+    `
 
 const Home = () => {
   const [user, setUser] = React.useState({
       profilePictureURL: "",
       displayName: "John Doe",
       email: "johndoe@wishify.com",
-    })
+  })
 
   return (
     <>
@@ -28,6 +38,16 @@ const Home = () => {
           </div>
         </div>
 
+        <br/>
+
+        <h1>Wishlists</h1>
+        <div className="home-wishlist-top">
+          <WishlistContainer>
+            <WishlistThumbnail title={"Wishlist 1"} role={"contributor"} owner={"John Doe"}></WishlistThumbnail>
+            <WishlistThumbnail title={"Wishlist 2"} role={"contributor"} owner={"John Doe"}></WishlistThumbnail>
+            <WishlistThumbnail title={"Wishlist 3"} role={"contributor"} owner={"John Doe"}></WishlistThumbnail>
+          </WishlistContainer>
+        </div>
       </section>
     </>
   )
