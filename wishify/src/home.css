@@ -1,0 +1,45 @@
+.home-container {
+    max-width: 1536px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    color: #333;
+    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.home-container h1 {
+    font-weight: bold;
+}
+
+.home-user-picture {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 40px;
+}
+  
+.home-user-picture img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.home-welcome-text {
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.home-user-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
