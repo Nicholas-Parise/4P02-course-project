@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import '../../login.css'
 
-const Login = ({forceNavbarRefresh}) => {
+const Login = ({setIsLoggedIn}) => {
   const [isAuthenticating, setIsAuthenticating] = React.useState(false)
   const [showPassword, setShowPassword] = React.useState(false)
   const [isValid, setIsValid] = React.useState(false)
@@ -62,7 +62,7 @@ const Login = ({forceNavbarRefresh}) => {
             Successfully authenticated. Redirecting to your <Link to="/home" className="home-link">home page</Link>...
           </>
         );
-        forceNavbarRefresh();
+        setIsLoggedIn(true);
         setResponseType("success");
         navigate("../Home")
       } else if (response.status === 400) {
