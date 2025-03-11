@@ -1,5 +1,4 @@
 import React from 'react'
-import Navbar from '../components/Navbar'
 import '../home.css'
 import styled from '@emotion/styled'
 import { NavLink } from 'react-router-dom';
@@ -58,7 +57,6 @@ const Home = () => {
 
   return (
     <>
-      <Navbar></Navbar>
       <br/>
       <section className="home-container">
         <div className="home-user-info">

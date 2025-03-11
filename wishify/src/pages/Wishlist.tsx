@@ -6,7 +6,6 @@ import WishlistItemEntry from '../components/WishlistItemEntry';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import { FaArrowUp } from 'react-icons/fa';
-import Navbar from '../components/Navbar'
 
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -102,7 +101,6 @@ const Wishlist = () => {
 
   return (
     <>
-      <Navbar></Navbar>
       <section className='pt-5'>
           <WishlistHeader wishlist={wishlist} event={event} />
           <div className="mt-8 mb-4 flex gap-1 items-center">

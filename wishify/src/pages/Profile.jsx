@@ -1,7 +1,6 @@
 import React from 'react'
 import '../profile.css'
 import SettingsItem from '../components/SettingsItem.jsx'
-import Navbar from '../components/Navbar'
 import LikesSettingsItem from '../components/LikesSettingsItem.jsx'
 import { EditDisplayNameModal, EditBioModal, EditEmailModal, EditPasswordModal, DeleteAccountModal, AddLikesModal } from '../components/ProfileSettingModals'
 
@@ -68,7 +67,6 @@ const Profile = () => {
 
   return (
     <>
-      <Navbar></Navbar>
       <section className="profile-container">
         <h2>Profile settings</h2>
 

@@ -2,7 +2,6 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import '../../login.css'
-import Navbar from '../../components/Navbarlanding/landingheader'
 
 const Login = () => {
   const [isAuthenticating, setIsAuthenticating] = React.useState(false)
@@ -93,7 +92,6 @@ const Login = () => {
 
   return (
     <>
-      <Navbar></Navbar>
       <section className="login-container">
         <h2>Sign in to continue</h2>
         <form onSubmit={handleSubmit}>

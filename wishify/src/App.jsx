@@ -1,6 +1,6 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
-import { useState } from 'react'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ProtectedRoutes from "./components/ProtectedRoutes"
 
 import './App.css'
 
@@ -14,25 +14,33 @@ import Wishlists from "./pages/Wishlists";
 import Landing from "./pages/Landing";
 import Wishlist from "./pages/Wishlist";
 import Profile from "./pages/Profile";
+import Index from "./pages/Index";
+
+import Navbar from "./components/Navbar";
 
 function App() {
 
   return (
     <>
       <BrowserRouter>
+        <Navbar />
         <Routes>
-            <Route index element={<HomePage />} />
-            <Route path="home" element={<HomePage />} />
-            <Route path="events" element={<Events />} />
-            <Route path="events/:id" element={<Event/>}/>
+            <Route index element={<Index />} />
             <Route path="landing" element={<Landing />} />
-            <Route path="wishlists" element={<Wishlists />} />
-            <Route path="wishlists/:id" element={<Wishlist />} />
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
-            <Route path="profile" element={<Profile />} />
-            <Route path="*" element={<NoPage />} />
-            <Route path="/" element={<Navigate replace to="/home" />} />
+
+            <Route element={<ProtectedRoutes />}>
+              <Route path="home" element={<HomePage />} />
+              <Route path="events" element={<Events />} />
+              <Route path="events/:id" element={<Event/>}/>
+  
+              <Route path="wishlists" element={<Wishlists />} />
+              <Route path="wishlists/:id" element={<Wishlist />} />
+
+              <Route path="profile" element={<Profile />} />
+              <Route path="*" element={<NoPage />} />
+            </Route>
         </Routes>
       </BrowserRouter>
       </>

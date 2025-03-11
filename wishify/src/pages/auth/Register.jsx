@@ -1,7 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import '../../register.css'
-import Navbar from '../../components/Navbarlanding/landingheader'
 
 const Register = () => {
   const [isAuthenticating, setIsAuthenticating] = React.useState(false)
@@ -157,7 +156,6 @@ const Register = () => {
 
   return (
     <>
-      <Navbar></Navbar>
       <section className="register-container">
         <h2>Create your account</h2>
         <form onSubmit={handleSubmit}>
