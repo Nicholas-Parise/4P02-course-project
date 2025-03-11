@@ -7,12 +7,14 @@ import CreateItemDialog from './CreateItemDialog';
 import '../components/Navbarlanding/landingheader.css';
 import isLoggedIn from '../utils/isLoggedIn';
 
-const Navbar = () => {
-
+const Navbar = (refresh: number) => {
+  refresh;
+  
   interface NavItem{
     label: string,
     href: string
   }
+  
 
   const [listNav] = useState<NavItem[]>([
     { label: 'Wishlist', href: '/wishlists' },
@@ -25,7 +27,6 @@ const Navbar = () => {
   const [wishlists, setWishlists] = useState<Wishlist[]>([])
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
-  
 
   const [newItem, setNewItem] = useState<Partial<WishlistItem>>({})
   const [imagePreview, setImagePreview] = useState<string | null>(null)
@@ -33,12 +34,6 @@ const Navbar = () => {
   const fetchWishlists = () => {
     setToken(localStorage.getItem('token') || '')
     setLoading(true)
-
-    if(token == ''){
-      // redirect to login page
-      console.log("missing token")
-      return
-    }
 
     const url = "https://api.wishify.ca/wishlists"
 
