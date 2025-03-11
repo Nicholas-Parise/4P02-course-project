@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 import styled from 'styled-components'
-import Navbar from '../components/Navbarmain'
+import Navbar from '../components/Navbar'
 import { EditText, EditTextarea } from 'react-edit-text';
 import 'react-edit-text/dist/index.css';
 import banner from "../assets/bday-banner.jpg";

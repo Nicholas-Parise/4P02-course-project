@@ -14,11 +14,8 @@ import Wishlists from "./pages/Wishlists";
 import Landing from "./pages/Landing";
 import Wishlist from "./pages/Wishlist";
 import Profile from "./pages/Profile";
-import Navbar from './components/Navbarmain';
-
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <>
