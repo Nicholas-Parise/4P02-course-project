@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProtectedRoutes from "./components/ProtectedRoutes"
 
@@ -20,14 +20,20 @@ import Navbar from "./components/Navbar";
 
 function App() {
 
+  const [navBarRefresh, setNavbarRefresh] = useState(0)
+
+  const forceNavbarRefresh = () => {
+    setNavbarRefresh(navBarRefresh + 1)
+  }
+
   return (
     <>
       <BrowserRouter>
-        <Navbar />
+        <Navbar refresh={navBarRefresh} />
         <Routes>
             <Route index element={<Index />} />
             <Route path="landing" element={<Landing />} />
-            <Route path="login" element={<Login />} />
+            <Route path="login" element={<Login forceNavbarRefresh={forceNavbarRefresh} />} />
             <Route path="register" element={<Register />} />
 
             <Route element={<ProtectedRoutes />}>
