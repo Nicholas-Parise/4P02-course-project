@@ -18,22 +18,20 @@ import Index from "./pages/Index";
 
 import Navbar from "./components/Navbar";
 
+import isLoggedInCheck from "./utils/isLoggedIn";
+
 function App() {
 
-  const [navBarRefresh, setNavbarRefresh] = useState(0)
-
-  const forceNavbarRefresh = () => {
-    setNavbarRefresh(navBarRefresh + 1)
-  }
+  const [isLoggedIn, setIsLoggedIn] = useState(isLoggedInCheck())
 
   return (
     <>
       <BrowserRouter>
-        <Navbar refresh={navBarRefresh} />
+        <Navbar isLoggedIn={isLoggedIn} />
         <Routes>
             <Route index element={<Index />} />
             <Route path="landing" element={<Landing />} />
-            <Route path="login" element={<Login forceNavbarRefresh={forceNavbarRefresh} />} />
+            <Route path="login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
             <Route path="register" element={<Register />} />
 
             <Route element={<ProtectedRoutes />}>

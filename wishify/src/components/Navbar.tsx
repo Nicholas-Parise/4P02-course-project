@@ -5,10 +5,8 @@ import { Wishlist } from '../types/types';
 import { WishlistItem } from '../types/types';
 import CreateItemDialog from './CreateItemDialog';
 import '../components/Navbarlanding/landingheader.css';
-import isLoggedIn from '../utils/isLoggedIn';
 
-const Navbar = (refresh: number) => {
-  refresh;
+const Navbar = ({isLoggedIn}: {isLoggedIn: boolean}) => {
   
   interface NavItem{
     label: string,
@@ -32,7 +30,8 @@ const Navbar = (refresh: number) => {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
 
   const fetchWishlists = () => {
-    setToken(localStorage.getItem('token') || '')
+    const token = localStorage.getItem('token') || ''
+    setToken(token)
     setLoading(true)
 
     const url = "https://api.wishify.ca/wishlists"
@@ -66,7 +65,7 @@ const Navbar = (refresh: number) => {
 
   return (
     <>
-      {isLoggedIn() ? 
+      {isLoggedIn ? 
         <>
           <nav className='navbar'>
               <div className='container1'>

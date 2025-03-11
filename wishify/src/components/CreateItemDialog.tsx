@@ -88,7 +88,7 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
                   required
                   onChange={(event: SelectChangeEvent) => setSelectedWishlist(event.target.value)}
                 >
-                  {wishlists.map(wishlist => {
+                  {wishlists.length > 0 && wishlists.map(wishlist => {
                     return <MenuItem key={wishlist.id} value={wishlist.id}>{wishlist.name}</MenuItem>
                   })}
                 </Select>
