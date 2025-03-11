@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField';
 import Modal from '@mui/material/Modal';
 import {CreateWishlist} from '../components/CreateButton'
 import {WishlistThumbnail} from '../components/Thumbnail'
-import Navbar from '../components/Navbarmain';
+import Navbar from '../components/Navbar';
 
 const boxStyle = {
   position: 'absolute',

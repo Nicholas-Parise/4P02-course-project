@@ -2,7 +2,7 @@ import React, {act, useState} from 'react'
 import styled from '@emotion/styled'
 import {CreateEvent} from '../components/CreateButton'
 import {EventThumbnail} from '../components/Thumbnail'
-import Navbar from '../components/Navbarmain'
+import Navbar from '../components/Navbar'
 
 const EventContainer = styled.div`
   display: flex;

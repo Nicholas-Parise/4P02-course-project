@@ -1,8 +1,10 @@
-import { useState, ReactNode } from 'react'
+import { useEffect, useState } from 'react'
 import { NavLink } from "react-router-dom";
+import { AiFillGift, AiOutlinePlus, AiOutlineUser } from 'react-icons/ai';
 import { Wishlist } from '../types/types';
 import { WishlistItem } from '../types/types';
 import CreateItemDialog from './CreateItemDialog';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
 
@@ -11,21 +13,34 @@ const Navbar = () => {
     href: string
   }
 
-  const [listNav] = useState([
-    {'label':'Home', 'href':'/'},
-    {'label':'Landing', 'href':'/landing'},
-    {'label':'Wishlist', 'href':'/wishlists'},
-    {'label':'Events', 'href':'/events'},
-    {'label':'Login', 'href':'/login'},
-    {'label':'Sign up', 'href':'/register'}
+  const [listNav] = useState<NavItem[]>([
+    { label: 'Wishlist', href: '/wishlists' },
+    { label: 'Events', href: '/events' }
   ])
+
+  const navigate = useNavigate();
+  const [token, setToken] = useState<string>(localStorage.getItem('token') || '')
+
+  const checkToken = (token: string) => {
+    if(token === ""){
+      return false
+    }
+
+    return true
+  }
+
+  // Research a better way to do this. PrivateRoutes?
+  useEffect(() => {
+    if(!checkToken(token)){
+      navigate('/login')
+    }
+  }, [])
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [wishlists, setWishlists] = useState<Wishlist[]>([])
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
-  const [token, setToken] = useState<string>(localStorage.getItem('token') || '')
-
+  
 
   const [newItem, setNewItem] = useState<Partial<WishlistItem>>({})
   const [imagePreview, setImagePreview] = useState<string | null>(null)
@@ -71,18 +86,30 @@ const Navbar = () => {
 
   return (
     <>
-      <div className='pr-4 pl-4 relative'>    
+      <nav className='navbar'>
+          <div className='container1'>
+              <NavLink to="/" className='logo'>
+                  <h1><span><AiFillGift />Wish</span>ify</h1>
+              </NavLink>
 
-          <nav>
-            {listNav.map((value: NavItem, key): ReactNode => {
-              return <NavLink key={key} to={value.href}>{value.label}</NavLink>
-            })}
-          </nav>
+              <div className='nav-menu'>
+                  {listNav.map((item, index) => (
+                      <NavLink key={index} to={item.href} className='nav-link'>
+                          {item.label}
+                      </NavLink>
+                  ))}
+              </div>
 
-          <button onClick={() => (fetchWishlists(), openModal())} className=' text-white bg-linear-to-r from-cyan-500 to-blue-500 pl-1.5 pr-1.5 pt-1 pb-1 rounded-lg cursor-pointer absolute top-1.5 right-3'>+ Add Item</button>
-
-
-      </div>
+              <div className='actions'>
+                  <button onClick={() => (fetchWishlists(), openModal())} className='btn'>
+                      <AiOutlinePlus /> Add Wish
+                  </button>
+                  <NavLink to='/profile' className='profile-icon'>
+                      <AiOutlineUser />
+                  </NavLink>
+              </div>
+          </div>
+      </nav>
 
       <CreateItemDialog 
         open={isModalOpen} 

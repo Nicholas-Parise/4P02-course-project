@@ -6,7 +6,7 @@ import WishlistItemEntry from '../components/WishlistItemEntry';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import { FaArrowUp } from 'react-icons/fa';
-import Navbar from '../components/Navbarmain.jsx';
+import Navbar from '../components/Navbar'
 
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -16,63 +16,6 @@ import { IconButton } from '@mui/material';
 
 const Wishlist = () => {
     const { id } = useParams();
-
-    /* Static test data
-    const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([
-        {
-            name: "Nintendo Switch",
-            desc: "I would really like this console!",
-            url: "https://www.amazon.ca/Nintendo-SwitchTM-OLED-Model-White/dp/B098RKWHHZ/ref=asc_df_B098RKWHHZ/?tag=googleshopc0c-20&linkCode=df0&hvadid=706746737269&hvpos=&hvnetw=g&hvrand=1937906087861263014&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9000777&hvtargid=pla-1392422079323&mcid=d4b1318c9ba332afbf7bb541f05c9926&gad_source=1&th=1",
-            imageSrc: "https://m.media-amazon.com/images/I/61nqNujSF2L._AC_SL1330_.jpg",
-            quantity: 1,
-            quantitySupplied: 1,
-            dateUpdated: "Wednesday, January 29th 2025",
-            id: 1,
-            priority: 1,
-            price: 450,
-            contributions: []
-        },
-        {
-            name: "Nintendo Switch 2",
-            desc: "I would really like this console!",
-            url: "https://www.amazon.ca/Nintendo-SwitchTM-OLED-Model-White/dp/B098RKWHHZ/ref=asc_df_B098RKWHHZ/?tag=googleshopc0c-20&linkCode=df0&hvadid=706746737269&hvpos=&hvnetw=g&hvrand=1937906087861263014&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9000777&hvtargid=pla-1392422079323&mcid=d4b1318c9ba332afbf7bb541f05c9926&gad_source=1&th=1",
-            imageSrc: "https://imageio.forbes.com/specials-images/imageserve/6790213615a25651ff368372/nintendo-switch-2-hero-indybest/960x0.png?format=png&width=960",
-            quantity: 1,
-            quantitySupplied: 0,
-            dateUpdated: "Wednesday, January 29th 2025",
-            id: 2,
-            priority: 2,
-            price: 500,
-            contributions: []
-        },
-        {
-            name: "PS5 Pro",
-            desc: "I would really like this console!",
-            url: "https://www.amazon.ca/PlayStation-CFI-7019B01X-5-Pro-Console/dp/B0DGYL8TDZ",
-            imageSrc: "https://multimedia.bbycastatic.ca/multimedia/products/500x500/184/18477/18477929.jpg",
-            quantity: 1,
-            quantitySupplied: 0,
-            dateUpdated: "Wednesday, January 29th 2025",
-            id: 3,
-            priority: 3,
-            price: 960,
-            contributions: []
-        },
-        {
-            name: "Hot dogs",
-            desc: "I'm hungry",
-            url: "https://www.amazon.ca/PlayStation-CFI-7019B01X-5-Pro-Console/dp/B0DGYL8TDZ",
-            imageSrc: "https://i5.walmartimages.ca/images/Enlarge/020/808/627735020808.jpg?odnHeight=612&odnWidth=612&odnBg=FFFFFF",
-            quantity: 5,
-            quantitySupplied: 3,
-            dateUpdated: "Wednesday, January 29th 2025",
-            id: 4,
-            priority: 3,
-            price: 5,
-            contributions: []
-        },
-    ]);
-    */
 
     const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([])
     //const [error, setError] = useState(null)
@@ -126,7 +69,6 @@ const Wishlist = () => {
 
     type SortOption = "priority" | "price" | "quantity"
 
-
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event
     
@@ -152,7 +94,6 @@ const Wishlist = () => {
     return 0
   }) : []
 
-  
   // TODO: send to backend contributions
   const handleReserveItem = (itemId: number, reservation: number, user: string) => {
     itemId + reservation;
@@ -162,7 +103,7 @@ const Wishlist = () => {
   return (
     <>
       <Navbar></Navbar>
-      <section>
+      <section className='pt-5'>
           <WishlistHeader wishlist={wishlist} event={event} />
           <div className="mt-8 mb-4 flex gap-1 items-center">
               <FormControl fullWidth className='min-w-[120px] max-w-[180px]'>

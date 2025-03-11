@@ -1,5 +1,5 @@
 import React from 'react'
-import Navbar from '../components/Navbarmain.jsx'
+import Navbar from '../components/Navbar'
 import '../home.css'
 import styled from '@emotion/styled'
 import { NavLink } from 'react-router-dom';
