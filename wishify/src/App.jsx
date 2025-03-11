@@ -39,8 +39,8 @@ function App() {
               <Route path="wishlists/:id" element={<Wishlist />} />
 
               <Route path="profile" element={<Profile />} />
-              <Route path="*" element={<NoPage />} />
             </Route>
+            <Route path="*" element={<NoPage />} />
         </Routes>
       </BrowserRouter>
       </>
