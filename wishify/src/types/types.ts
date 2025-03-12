@@ -1,8 +1,9 @@
 export interface Wishlist {
     id: number,
-    eventID: number,
     name: string,
-    desc: string
+    eventID: number,
+    desc: string,
+    image: string
 };
 
 export interface Event {
