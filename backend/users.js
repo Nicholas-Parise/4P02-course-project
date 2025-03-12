@@ -74,7 +74,7 @@ router.put('/', authenticate, async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(201).json({ message: "Profile updated", user: result.rows[0] });
+    res.status(200).json({ message: "Profile updated", user: result.rows[0] });
 
   } catch (error) {
     console.error("Error updating user:", error);
