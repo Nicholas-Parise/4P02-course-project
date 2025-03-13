@@ -1,0 +1,776 @@
+{
+  "created": 1741810471.8186626,
+  "duration": 95.6181128025055,
+  "exitcode": 1,
+  "root": "/mnt/c/Users/geoff/Documents/Brock/COSC4P02/4P02-course-project/backend/tests",
+  "environment": {},
+  "summary": {
+    "passed": 26,
+    "error": 1,
+    "failed": 3,
+    "total": 30,
+    "collected": 30
+  },
+  "collectors": [
+    {
+      "nodeid": "",
+      "outcome": "passed",
+      "result": [
+        {
+          "nodeid": "test_auth.py",
+          "type": "Module"
+        },
+        {
+          "nodeid": "test_events.py",
+          "type": "Module"
+        },
+        {
+          "nodeid": "test_users.py",
+          "type": "Module"
+        },
+        {
+          "nodeid": "test_wishlists.py",
+          "type": "Module"
+        }
+      ]
+    },
+    {
+      "nodeid": "test_auth.py",
+      "outcome": "passed",
+      "result": [
+        {
+          "nodeid": "test_auth.py::test_create_account",
+          "type": "Function",
+          "lineno": 16
+        },
+        {
+          "nodeid": "test_auth.py::test_create_account_duplicate_email",
+          "type": "Function",
+          "lineno": 29
+        },
+        {
+          "nodeid": "test_auth.py::test_create_account_missing_data",
+          "type": "Function",
+          "lineno": 42
+        },
+        {
+          "nodeid": "test_auth.py::test_login_account",
+          "type": "Function",
+          "lineno": 82
+        },
+        {
+          "nodeid": "test_auth.py::test_login_missing_credentials",
+          "type": "Function",
+          "lineno": 95
+        },
+        {
+          "nodeid": "test_auth.py::test_login_account_incorrect_credentials",
+          "type": "Function",
+          "lineno": 118
+        },
+        {
+          "nodeid": "test_auth.py::test_logout",
+          "type": "Function",
+          "lineno": 141
+        },
+        {
+          "nodeid": "test_auth.py::test_auth_me",
+          "type": "Function",
+          "lineno": 159
+        },
+        {
+          "nodeid": "test_auth.py::test_auth_me_token_errors",
+          "type": "Function",
+          "lineno": 170
+        }
+      ]
+    },
+    {
+      "nodeid": "test_events.py",
+      "outcome": "passed",
+      "result": [
+        {
+          "nodeid": "test_events.py::test_create_event",
+          "type": "Function",
+          "lineno": 14
+        },
+        {
+          "nodeid": "test_events.py::test_get_events",
+          "type": "Function",
+          "lineno": 29
+        },
+        {
+          "nodeid": "test_events.py::test_get_event_by_id",
+          "type": "Function",
+          "lineno": 43
+        },
+        {
+          "nodeid": "test_events.py::test_put_event",
+          "type": "Function",
+          "lineno": 58
+        },
+        {
+          "nodeid": "test_events.py::test_delete_event",
+          "type": "Function",
+          "lineno": 84
+        }
+      ]
+    },
+    {
+      "nodeid": "test_users.py",
+      "outcome": "passed",
+      "result": [
+        {
+          "nodeid": "test_users.py::test_get_users",
+          "type": "Function",
+          "lineno": 16
+        },
+        {
+          "nodeid": "test_users.py::test_get_user_by_id",
+          "type": "Function",
+          "lineno": 28
+        },
+        {
+          "nodeid": "test_users.py::test_get_user_by_id_not_found",
+          "type": "Function",
+          "lineno": 49
+        },
+        {
+          "nodeid": "test_users.py::test_put_users",
+          "type": "Function",
+          "lineno": 61
+        },
+        {
+          "nodeid": "test_users.py::test_delete_user",
+          "type": "Function",
+          "lineno": 86
+        },
+        {
+          "nodeid": "test_users.py::test_change_password",
+          "type": "Function",
+          "lineno": 98
+        },
+        {
+          "nodeid": "test_users.py::test_change_password_error",
+          "type": "Function",
+          "lineno": 133
+        }
+      ]
+    },
+    {
+      "nodeid": "test_wishlists.py",
+      "outcome": "passed",
+      "result": [
+        {
+          "nodeid": "test_wishlists.py::test_create_wishlist",
+          "type": "Function",
+          "lineno": 14
+        },
+        {
+          "nodeid": "test_wishlists.py::test_create_wishlist_missing_name",
+          "type": "Function",
+          "lineno": 29
+        },
+        {
+          "nodeid": "test_wishlists.py::test_get_all_wishlists",
+          "type": "Function",
+          "lineno": 43
+        },
+        {
+          "nodeid": "test_wishlists.py::test_get_wishlists_token_errors",
+          "type": "Function",
+          "lineno": 57
+        },
+        {
+          "nodeid": "test_wishlists.py::test_get_wishlist_by_id",
+          "type": "Function",
+          "lineno": 78
+        },
+        {
+          "nodeid": "test_wishlists.py::test_get_wishlist_by_id_token_errors",
+          "type": "Function",
+          "lineno": 94
+        },
+        {
+          "nodeid": "test_wishlists.py::test_delete_wishlist",
+          "type": "Function",
+          "lineno": 115
+        },
+        {
+          "nodeid": "test_wishlists.py::test_put_wishlist",
+          "type": "Function",
+          "lineno": 135
+        },
+        {
+          "nodeid": "test_wishlists.py::test_put_wishlist_not_found",
+          "type": "Function",
+          "lineno": 161
+        }
+      ]
+    }
+  ],
+  "tests": [
+    {
+      "nodeid": "test_auth.py::test_create_account",
+      "lineno": 16,
+      "outcome": "passed",
+      "setup": {
+        "duration": 0.6608721279999372,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 0.67119890999993,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 1.3463074579999557,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_auth.py::test_create_account_duplicate_email",
+      "lineno": 29,
+      "outcome": "passed",
+      "setup": {
+        "duration": 0.6689694560000135,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 0.7266258559998278,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 1.441664538999703,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_auth.py::test_create_account_missing_data",
+      "lineno": 42,
+      "outcome": "passed",
+      "setup": {
+        "duration": 0.00014086900000620517,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 1.7684612390003167,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 0.00013138900021658628,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_auth.py::test_login_account",
+      "lineno": 82,
+      "outcome": "error",
+      "setup": {
+        "duration": 0.7008138129999679,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 0.6676082539997878,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 0.6614678830001139,
+        "outcome": "failed",
+        "crash": {
+          "path": "/mnt/c/Users/geoff/Documents/Brock/COSC4P02/4P02-course-project/backend/tests/conftest.py",
+          "lineno": 47,
+          "message": "KeyError: 'token'"
+        },
+        "traceback": [
+          {
+            "path": "conftest.py",
+            "lineno": 47,
+            "message": "KeyError"
+          }
+        ],
+        "longrepr": "request = <SubRequest 'cleanup_test_account' for <Function test_login_account>>\n\n    @pytest.fixture\n    def cleanup_test_account(request):\n        yield\n        sleep(sleepTime)\n        res = req.post(\n            domain+\"/auth/login\",\n            json={\n                \"email\":email,\n                \"password\":password\n            }\n        )\n>       token = res.json()[\"token\"]\nE       KeyError: 'token'\n\nconftest.py:47: KeyError"
+      }
+    },
+    {
+      "nodeid": "test_auth.py::test_login_missing_credentials",
+      "lineno": 95,
+      "outcome": "passed",
+      "setup": {
+        "duration": 0.6805346730002384,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 1.171425494000232,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 1.556205367000075,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_auth.py::test_login_account_incorrect_credentials",
+      "lineno": 118,
+      "outcome": "passed",
+      "setup": {
+        "duration": 0.6712877899999512,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 1.3752009440004258,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 1.4054922979998992,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_auth.py::test_logout",
+      "lineno": 141,
+      "outcome": "passed",
+      "setup": {
+        "duration": 0.886821835000319,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 1.1716225740001391,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 1.3830175319999398,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_auth.py::test_auth_me",
+      "lineno": 159,
+      "outcome": "passed",
+      "setup": {
+        "duration": 0.8677462750001723,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 0.5710633419998885,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 1.350255721999929,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_auth.py::test_auth_me_token_errors",
+      "lineno": 170,
+      "outcome": "passed",
+      "setup": {
+        "duration": 0.7103713610003979,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 1.212765230000059,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 1.3695351199999095,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_events.py::test_create_event",
+      "lineno": 14,
+      "outcome": "passed",
+      "setup": {
+        "duration": 0.851441939000324,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 0.681709483999839,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 1.426724443999774,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_events.py::test_get_events",
+      "lineno": 29,
+      "outcome": "passed",
+      "setup": {
+        "duration": 1.6376184559999274,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 0.6524452319999909,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 1.4264180650002345,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_events.py::test_get_event_by_id",
+      "lineno": 43,
+      "outcome": "passed",
+      "setup": {
+        "duration": 1.410889503999897,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 0.5854412199996659,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 1.3505415099998572,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_events.py::test_put_event",
+      "lineno": 58,
+      "outcome": "passed",
+      "setup": {
+        "duration": 1.4186731859999782,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 1.1575851339998735,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 1.3541092780001236,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_events.py::test_delete_event",
+      "lineno": 84,
+      "outcome": "passed",
+      "setup": {
+        "duration": 1.410208459000387,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 0.6603425510002126,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 1.4780053849999604,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_users.py::test_get_users",
+      "lineno": 16,
+      "outcome": "passed",
+      "setup": {
+        "duration": 0.8323939619999692,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 0.5714340979998269,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 1.4655680860000757,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_users.py::test_get_user_by_id",
+      "lineno": 28,
+      "outcome": "passed",
+      "setup": {
+        "duration": 0.8514227799996661,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 1.1762559750000037,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 1.331899587999942,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_users.py::test_get_user_by_id_not_found",
+      "lineno": 49,
+      "outcome": "failed",
+      "setup": {
+        "duration": 0.8484680289998323,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 0.5748135270000603,
+        "outcome": "failed",
+        "crash": {
+          "path": "/mnt/c/Users/geoff/Documents/Brock/COSC4P02/4P02-course-project/backend/tests/test_users.py",
+          "lineno": 59,
+          "message": "assert 500 == 404\n +  where 500 = <Response [500]>.status_code"
+        },
+        "traceback": [
+          {
+            "path": "test_users.py",
+            "lineno": 59,
+            "message": "AssertionError"
+          }
+        ],
+        "longrepr": "setup_test_account = None\nlog_in = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUxNSwiZW1haWwiOiJ0ZXN0QWNjb3VudDI4NzIzMkBnbWFpbC5jb20iLCJpYXQiOjE3NDE4MTA0MjYsImV4cCI6MTc0MTg5NjgyNn0.q55LOPqJ-3ZVogboosWl7KSzQc3a31RYg-hX_XASLFk'\ncleanup_test_account = None\n\n    def test_get_user_by_id_not_found(setup_test_account, log_in, cleanup_test_account):\n        token = log_in\n    \n        # get user id\n        sleep(sleepTime)\n        res = req.get(\n            domain+f\"/users/32905473148432444\",\n        )\n    \n>       assert res.status_code == 404\nE       assert 500 == 404\nE        +  where 500 = <Response [500]>.status_code\n\ntest_users.py:59: AssertionError"
+      },
+      "teardown": {
+        "duration": 1.3410215320000134,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_users.py::test_put_users",
+      "lineno": 61,
+      "outcome": "failed",
+      "setup": {
+        "duration": 0.8416255819997787,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 1.1578090019997944,
+        "outcome": "failed",
+        "crash": {
+          "path": "/mnt/c/Users/geoff/Documents/Brock/COSC4P02/4P02-course-project/backend/tests/test_users.py",
+          "lineno": 85,
+          "message": "KeyError: 'displayname'"
+        },
+        "traceback": [
+          {
+            "path": "test_users.py",
+            "lineno": 85,
+            "message": "KeyError"
+          }
+        ],
+        "longrepr": "setup_test_account = None\nlog_in = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUxNiwiZW1haWwiOiJ0ZXN0QWNjb3VudDI4NzIzMkBnbWFpbC5jb20iLCJpYXQiOjE3NDE4MTA0MjksImV4cCI6MTc0MTg5NjgyOX0.BXVPS2LLhCbzsZRBmDM_uI9wYKGYWdexkJfT6HAdYYI'\ncleanup_test_account = None\n\n    def test_put_users(setup_test_account, log_in, cleanup_test_account):\n        token = log_in\n    \n        displayName = \"Test2\"\n    \n        sleep(sleepTime)\n        res = req.put(\n            domain+f\"/users\",\n            headers={\"Authorization\": f\"Bearer {token}\"},\n            json={\"displayName\":displayName}\n        )\n    \n        print(res.json())\n    \n        assert res.status_code == 200\n        assert res.json()[\"user\"][\"displayname\"] == displayName\n    \n        sleep(sleepTime)\n        res = req.get(\n            domain+f\"/users\",\n            headers={\"Authorization\": f\"Bearer {token}\"},\n        )\n    \n>       assert res.json()[\"displayname\"] == displayName\nE       KeyError: 'displayname'\n\ntest_users.py:85: KeyError"
+      },
+      "teardown": {
+        "duration": 1.340973501999997,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_users.py::test_delete_user",
+      "lineno": 86,
+      "outcome": "passed",
+      "setup": {
+        "duration": 0.8379630959998394,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 0.6742527209999025,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 0.00018464799995854264,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_users.py::test_change_password",
+      "lineno": 98,
+      "outcome": "passed",
+      "setup": {
+        "duration": 0.8675382880001052,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 2.2232970439999917,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 2.373331005000182,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_users.py::test_change_password_error",
+      "lineno": 133,
+      "outcome": "passed",
+      "setup": {
+        "duration": 0.8289301740001065,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 1.2416810169997916,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 1.3438292429996181,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_wishlists.py::test_create_wishlist",
+      "lineno": 14,
+      "outcome": "passed",
+      "setup": {
+        "duration": 0.8332830549998107,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 0.6096709839998766,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 0.00018977800027641933,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_wishlists.py::test_create_wishlist_missing_name",
+      "lineno": 29,
+      "outcome": "passed",
+      "setup": {
+        "duration": 0.8227911029998722,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 0.5786620620001486,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 1.3277547160000722,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_wishlists.py::test_get_all_wishlists",
+      "lineno": 43,
+      "outcome": "passed",
+      "setup": {
+        "duration": 1.4109465960000307,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 0.5715319470000395,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 1.328693870999814,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_wishlists.py::test_get_wishlists_token_errors",
+      "lineno": 57,
+      "outcome": "passed",
+      "setup": {
+        "duration": 1.398418474999744,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 1.1675594289999935,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 1.3402729669996916,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_wishlists.py::test_get_wishlist_by_id",
+      "lineno": 78,
+      "outcome": "passed",
+      "setup": {
+        "duration": 1.4367352200001733,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 0.5830219750000651,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 1.3551896110002417,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_wishlists.py::test_get_wishlist_by_id_token_errors",
+      "lineno": 94,
+      "outcome": "passed",
+      "setup": {
+        "duration": 1.4036773009997887,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 1.1532940809997854,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 1.3529233060003207,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_wishlists.py::test_delete_wishlist",
+      "lineno": 115,
+      "outcome": "passed",
+      "setup": {
+        "duration": 1.411395249999714,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 1.1527308749996337,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 1.3372810159999062,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_wishlists.py::test_put_wishlist",
+      "lineno": 135,
+      "outcome": "passed",
+      "setup": {
+        "duration": 1.430203660999723,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 1.1735997199998565,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 1.396786764999888,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_wishlists.py::test_put_wishlist_not_found",
+      "lineno": 161,
+      "outcome": "failed",
+      "setup": {
+        "duration": 0.8254107259999728,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 0.5885735390002083,
+        "outcome": "failed",
+        "crash": {
+          "path": "/mnt/c/Users/geoff/Documents/Brock/COSC4P02/4P02-course-project/backend/tests/test_wishlists.py",
+          "lineno": 172,
+          "message": "assert 500 == 404\n +  where 500 = <Response [500]>.status_code"
+        },
+        "traceback": [
+          {
+            "path": "test_wishlists.py",
+            "lineno": 172,
+            "message": "AssertionError"
+          }
+        ],
+        "longrepr": "setup_test_account = None\nlog_in = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUyOCwiZW1haWwiOiJ0ZXN0QWNjb3VudDI4NzIzMkBnbWFpbC5jb20iLCJpYXQiOjE3NDE4MTA0NjksImV4cCI6MTc0MTg5Njg2OX0.W6eNje3s906lA_Fbl30_XCcYncEGhldWr8AYZEHfVAU'\ncleanup_test_account = None\n\n    def test_put_wishlist_not_found(setup_test_account, log_in, cleanup_test_account):\n        token = log_in\n    \n        sleep(sleepTime)\n        res = req.put(\n            domain+f\"/wishlists/93824521749482\",\n            headers={\"Authorization\": f\"Bearer {token}\"},\n            json={\"name\":\"rename\"}\n        )\n    \n>       assert res.status_code == 404\nE       assert 500 == 404\nE        +  where 500 = <Response [500]>.status_code\n\ntest_wishlists.py:172: AssertionError"
+      },
+      "teardown": {
+        "duration": 1.4933553380001285,
+        "outcome": "passed"
+      }
+    }
+  ]
+}
