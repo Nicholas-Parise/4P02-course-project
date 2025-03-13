@@ -37,8 +37,7 @@ def reset_test_account_state(request):
 def cleanup_test_account(request):
     token = None
 
-    def _method(tok, w_id):
-        wishlist_id = w_id
+    def _method(tok):
         token = tok
 
     yield _method

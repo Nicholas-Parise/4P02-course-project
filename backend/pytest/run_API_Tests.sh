@@ -3,7 +3,7 @@
 REPORT_DIR="reports/"
 REPORT_FILE="recent_report"
 PROCESSED_REPORT="processed_report"
-MAX_HISTORY_SIZE=24
+MAX_HISTORY_SIZE=48
 
 cd /var/www/4P02-course-project/backend/pytest
 
