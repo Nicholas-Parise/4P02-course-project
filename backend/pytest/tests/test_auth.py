@@ -7,7 +7,7 @@ import json
 # pytest --json-report --json-report-omit keywords streams root --json-report-verbosity 2 --json-report-indent 2
 
 domain = "https://api.wishify.ca"
-email = "testAccount287232@gmail.com"
+email = "testAccount287232@wishify.ca"
 password = "$eCur3Pa$$w0rD!1"
 
 sleepTime = 0.5
