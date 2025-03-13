@@ -38,15 +38,22 @@ with open(file_to_process) as f:
     for module in data["collectors"][2:]:
         modules[module["nodeid"].split("/")[-1][5:-3].title()] = []
 
+
+    outcome_summary = {
+        "passed":0,
+        "error":0,
+        "failed":0
+    } 
     for test in data["tests"]:
         module, test_name = getNames(test["nodeid"])
         test_summary = {}
         test_summary["name"] = test_name
         test_summary["outcome"] = test["outcome"]
+        outcome_summary[test["outcome"]] = outcome_summary[test["outcome"]] + 1
 
         modules[module].append(test_summary)
-    
-            
+        
+    out_data["summary"] = outcome_summary
     out_data["modules"] = []
 
     for key, value in modules.items():
