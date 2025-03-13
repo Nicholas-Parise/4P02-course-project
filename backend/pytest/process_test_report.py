@@ -35,7 +35,7 @@ with open(file_to_process) as f:
 
     modules = {}
 
-    for module in data["collectors"][0]["result"]:
+    for module in data["collectors"][2:]:
         modules[module["nodeid"].split("/")[-1][5:-3].title()] = []
 
     for test in data["tests"]:
