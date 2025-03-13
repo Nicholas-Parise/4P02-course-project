@@ -89,6 +89,8 @@ def test_login_account(setup_test_account, cleanup_test_account):
             "password":password,
         }
     )
+
+    cleanup_test_account(res.json()["token"])
     
     assert res.status_code == 200
     assert res.json()["token"]
