@@ -8,7 +8,7 @@ domain = "https://api.wishify.ca"
 email = "testAccount287232@wishify.ca"
 password = "$eCur3Pa$$w0rD!1"
 
-sleepTime = 0.5
+sleepTime = 0.8
 
 @pytest.fixture
 def reset_test_account_state(request):
@@ -35,16 +35,24 @@ def reset_test_account_state(request):
 
 @pytest.fixture
 def cleanup_test_account(request):
-    yield
+    token = None
+
+    def _method(tok, w_id):
+        wishlist_id = w_id
+        token = tok
+
+    yield _method
     sleep(sleepTime)
-    res = req.post(
-        domain+"/auth/login",
-        json={
-            "email":email,
-            "password":password
-        }
-    )
-    token = res.json()["token"]
+
+    if token is None:
+        res = req.post(
+            domain+"/auth/login",
+            json={
+                "email":email,
+                "password":password
+            }
+        )
+        token = res.json()["token"]
 
     sleep(sleepTime)
     res = req.delete(

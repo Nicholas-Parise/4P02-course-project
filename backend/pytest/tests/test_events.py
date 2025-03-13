@@ -8,7 +8,7 @@ domain = "https://api.wishify.ca"
 email = "testAccount287232@wishify.ca"
 password = "$eCur3Pa$$w0rD!1"
 
-sleepTime = 0.5
+sleepTime = 0.8
 
 ##################  /events  #########################
 
