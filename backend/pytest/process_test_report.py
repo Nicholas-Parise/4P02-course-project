@@ -35,9 +35,9 @@ with open(file_to_process) as f:
 
     modules = {}
 
-    for module in data["collectors"][2:]:
+    for module in data["collectors"]:
+        if len(module["nodeid"]) < 7: continue
         modules[module["nodeid"].split("/")[-1][5:-3].title()] = []
-
 
     outcome_summary = {
         "passed":0,
@@ -57,6 +57,7 @@ with open(file_to_process) as f:
     out_data["modules"] = []
 
     for key, value in modules.items():
+        if key == "": continue
         out_data["modules"].append({
             "name":key,
             "tests":value

@@ -1,7 +1,7 @@
 REPORT_DIR="reports/"
 REPORT_FILE="recent_report"
 PROCESSED_REPORT="processed_report"
-MAX_HISTORY_SIZE=24
+MAX_HISTORY_SIZE=48
 
 pytest --json-report --json-report-omit keywords streams root --json-report-verbosity 2 --json-report-indent 2 --json-report-file "$REPORT_DIR""$REPORT_FILE"
 
