@@ -8,6 +8,7 @@ const eventsRoutes = require('./events');
 const wishlistsRoutes = require('./wishlists');
 const categoriesRoutes = require('./categories');
 const contributionsRoutes = require('./contributions');
+const statusRoutes = require('./status');
 
 const app = express();
 
@@ -31,5 +32,6 @@ app.use('/events', eventsRoutes);
 app.use('/wishlists', wishlistsRoutes);
 app.use('/categories', categoriesRoutes);
 app.use('/contributions', contributionsRoutes);
+app.use('/status', statusRoutes);
 
 module.exports = app;
