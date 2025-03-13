@@ -143,7 +143,7 @@ const Status = () => {
                     />
                 <CardContent>
                 <div className="h-[300px]">
-                    <StatusHistoryChart historyData={statusData.history}/>
+                    <StatusHistoryChart historyData={statusData.history.slice().reverse()}/>
                 </div>
                 </CardContent>
             </Card>
