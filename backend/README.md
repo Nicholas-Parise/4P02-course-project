@@ -16,11 +16,11 @@ PUT /users → Update logged in user profile
 DELETE /users → Delete logged in user account  
 GET /users/:id → Get specific user profile**  
 
-**POST /users/categories/:categoryId → Assign a category to logged in user
+**POST /users/categories/:categoryId → Assign a category to logged in user  
 POST /users/categories → Assign an array of categories to logged in user  
 Put /users/categories/:categoryId → updates a users love or hate value  
 Put /users/categories → updates an array of categories to logged in user  
-DELETE /users/categories/:categoryId → Remove a category from logged in user
+DELETE /users/categories/:categoryId → Remove a category from logged in user  
 DELETE /users/categories → Remove an array of categories from logged in user**  
 
 ## Categories
