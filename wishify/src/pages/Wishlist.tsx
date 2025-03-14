@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import { useParams } from "react-router-dom"
-import { type Wishlist, WishlistItem, Event } from '../types/types';
+import { type Wishlist, WishlistItem, Event, Contribution } from '../types/types';
 import WishlistHeader from '../components/WishlistHeader';
 import WishlistItemEntry from '../components/WishlistItemEntry';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
@@ -12,11 +12,13 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { IconButton } from '@mui/material';
+import Alert from "@mui/material/Alert";
 
 const Wishlist = () => {
     const { id } = useParams();
 
     const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([])
+    const [wishlistContributions, setWishlistContributions] = useState<Contribution[]>([])
     //const [error, setError] = useState(null)
     //const [loading, setLoading] = useState(false)
     const [token, setToken] = useState<string>(localStorage.getItem('token') || '')
@@ -26,8 +28,8 @@ const Wishlist = () => {
         setToken(localStorage.getItem('token') || '')
         console.log(token)
 
-        const url = `https://api.wishify.ca/wishlists/${id}/items`
-
+        let url = `https://api.wishify.ca/wishlists/${id}/items`
+        // get all items in wishlist
         fetch(url, {
             method: 'get',
             headers: new Headers({
@@ -37,6 +39,25 @@ const Wishlist = () => {
             .then((response) => response.json())
             .then((data) => {
               setWishlistItems(data.items);
+              //setLoading(false)
+            })
+            .catch((error) => {
+              //setError(error)
+              //setLoading(false)
+              console.log(error)
+            })
+            //.finally(() => setLoading(false))
+        url = `https://api.wishify.ca/contributions/wishlists/${id}`
+        // get all contributions in wishlist
+        fetch(url, {
+            method: 'get',
+            headers: new Headers({
+              'Authorization': "Bearer "+token
+            })
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              setWishlistContributions(data);
               //setLoading(false)
             })
             .catch((error) => {
@@ -93,10 +114,86 @@ const Wishlist = () => {
     return 0
   }) : []
 
+
+  const [contributeAlert, setContributeAlert] = useState(false);
   // TODO: send to backend contributions
-  const handleReserveItem = (itemId: number, reservation: number, user: string) => {
-    itemId + reservation;
-    console.log(user)
+  const handleReserveItem = (itemId: number, reservation: number) => {
+    console.log(wishlistContributions)
+    const contribution = wishlistContributions.find((c) => c.item_id === itemId);
+    if (contribution) {
+      console.log(contribution)
+      const contributionID = contribution.id;
+      console.log("already reserved")
+      fetch(`https://api.wishify.ca/contributions/${contributionID}`, {
+        method: 'put',
+        headers: new Headers({
+            'Authorization': "Bearer "+token,
+            'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify({
+            "quantity": reservation,
+            //no way to see if a user purchased?
+            "purchased": false,
+            "note": "hey all scott here"
+        })})
+        .then((response) => response.json())
+        .then((data) => {
+            console.log(data)
+            setContributeAlert(true);
+            setTimeout(() => setContributeAlert(false), 3000); // auto fade after 3 seconds
+            return;
+        })
+        .catch((error) => {
+            console.log(error)
+            return
+        })
+    } else{
+      itemId + reservation;
+      // make get request to get user from token (not needed? just use the token right?)
+      /*fetch("https://api.wishify.ca/auth/me", {
+        method: 'get',
+        headers: new Headers({
+            'Authorization': "Bearer "+token,
+            'Content-Type': 'application/json'
+        }),
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            console.log(data)
+            let user = data;
+            console.log(itemId)
+            console.log(reservation)
+        })
+        .catch((error) => {
+            console.log(error)
+            return
+        })*/
+      fetch("https://api.wishify.ca/contributions/", {
+        method: 'post',
+        headers: new Headers({
+            'Authorization': "Bearer "+token,
+            'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify({
+            "item_id": itemId,
+            "quantity": reservation,
+            //no way to see if a user purchased?
+            "purchased": false,
+            "note": "hey all scott here"
+        })})
+        .then((response) => response.json())
+        .then((data) => {
+            console.log(data)
+            if (data.message == "contribution created successfully"){
+              setContributeAlert(true);
+              setTimeout(() => setContributeAlert(false), 3000); // auto fade after 3 seconds
+            }
+        })
+        .catch((error) => {
+            console.log(error)
+            return
+        })
+      }
   }
 
   return (
@@ -122,7 +219,7 @@ const Wishlist = () => {
                   <FaArrowUp className={`transition-[1]  ${sortDirection === -1 ? 'rotate-180' : 'rotate-0'}`} />
               </IconButton>
           </div>
-        
+          { sortedItems.length === 0 ? <section><p className="text-center text-gray-500">No items in your wishlist.</p><p className="text-center text-gray-500">Start adding them by clicking the Add Wish button!</p></section> :
           <DndContext onDragEnd={handleDragEnd}>
               <SortableContext items={sortedItems.map((item) => item.id)}>
                   <ul className="space-y-4">
@@ -132,8 +229,12 @@ const Wishlist = () => {
                   </ul>
               </SortableContext>
           </DndContext>
-        
+          }
       </section>   
+      <Alert severity="success" sx={{ position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)', zIndex: 1000, opacity: contributeAlert ? 1 : 0, transition: contributeAlert ? "none" : "opacity 1s ease-out"}}>
+        Reservation successfully added.
+      </Alert>
+
     </>
   );
 }

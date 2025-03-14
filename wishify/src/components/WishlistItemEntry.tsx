@@ -8,7 +8,7 @@ import { FaExternalLinkAlt, FaMinus, FaPlus } from 'react-icons/fa';
 type WishlistItemProps = {
   item: WishlistItem,
   sortBy: "priority" | "price" | "quantity"
-  onReserve: (itemId: number, reservation: number, user: string) => void
+  onReserve: (itemId: number, reservation: number) => void
 }
 
 const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
@@ -21,7 +21,7 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
   };
 
   const isDraggable = sortBy === "priority"
-  const currentUser = "Current User" // In a real app, this would come from authentication
+  //const currentUser = "Current User"  In a real app, this would come from authentication
   const totalReserved = item.quantitySupplied || 0
   const userReservation = item.contributions?.find((r) => r.user === currentUser)
   const availableQuantity = item.quantity - totalReserved
@@ -40,9 +40,11 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
 
   const handleReserve = () => {
     if (reserveQuantity > 0) {
-      onReserve(item.id, reserveQuantity, currentUser)
+      //onReserve(item.id, reserveQuantity, currentUser)
+      onReserve(item.id, reserveQuantity)
     } else {
-      onReserve(item.id, 0, currentUser) // Remove reservation if quantity is 0
+      //onReserve(item.id, 0, currentUser)  Remove reservation if quantity is 0
+      onReserve(item.id, 0)
     }
     setIsModalOpen(false)
   }
