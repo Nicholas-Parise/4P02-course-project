@@ -11,6 +11,7 @@ cd $PROJECT_DIR || exit
 git reset --hard origin/main
 git pull origin main
 chmod 770 deploy.sh
+chmod 770 backend/pytest/run_API_Tests.sh
 
 # Step 2: Install dependencies & build frontend
 echo "Installing frontend dependencies..."
