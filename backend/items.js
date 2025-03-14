@@ -108,14 +108,97 @@ router.post('/', authenticate, async (req, res, next) => {
 });
 
 
+// edit the contents of a single item: put /items/1234
+// or edit multiple items at the same time: put /items
+router.put('/:itemId?', authenticate, async (req, res, next) => {
 
-// localhost:3000/items/0
-// edit the contents of a single item
-router.put('/:itemId', authenticate, async (req, res, next) => {
+  const userId = req.user.userId; // Get user ID from authenticated token
 
+  // MULTIPLE EDIT
+
+  if (Array.isArray(req.body.items)) {
+    const items = req.body.items;
+
+    // Type checking (all) just priority for now
+    for (const item of items) {
+
+      // Type checking
+      if (item.name !== undefined && typeof item.name !== "string") {
+        return res.status(400).json({ error: "name must be a string" });
+      }
+      if (item.description !== undefined && typeof item.description !== "string") {
+        return res.status(400).json({ error: "description must be a string" });
+      }
+      if (item.url !== undefined && typeof item.url !== "string") {
+        return res.status(400).json({ error: "url must be a string" });
+      }
+      if (item.image !== undefined && typeof item.image !== "string") {
+        return res.status(400).json({ error: "image must be a string" });
+      }
+      if (item.quantity !== undefined && (!Number.isInteger(item.quantity) || quantity < 0)) {
+        return res.status(400).json({ error: "quantity must be a non-negative integer" });
+      }
+      if (item.price !== undefined && (typeof item.price !== "number" || item.price < 0)) {
+        return res.status(400).json({ error: "price must be a non-negative number" });
+      }
+      if (item.priority !== undefined && (!Number.isInteger(item.priority) || item.priority < 0)) {
+        return res.status(400).json({ error: "priority must be a non-negative integer" });
+      }
+
+    }
+
+    try {
+      await db.query("BEGIN"); // Start a transaction we want to edit all the items at the same time or not do it at all.
+
+      for (const item of items) {
+        const { id, name, description, url, image, quantity, price, priority } = item;
+
+
+        const ownershipCheck = await db.query(
+          `SELECT i.id 
+                FROM items i
+                JOIN wishlist_members wm ON i.member_id = wm.id
+                WHERE i.id = $1 AND wm.user_id = $2`,
+          [id, userId]
+        );
+
+        if (ownershipCheck.rows.length === 0) {
+          await db.query("ROLLBACK"); // Roll back the transaction if unauthorized
+          return res.status(403).json({ error: `You do not have permission to edit item: ${id}` });
+        }
+
+        // Update the items with provided values (only update fields that are passed)
+        const result = await db.query(`
+              UPDATE items
+              SET 
+                  name = COALESCE($1, name),
+                  description = COALESCE($2, description),
+                  url = COALESCE($3, url),
+                  image = COALESCE($4, image),
+                  quantity = COALESCE($5, quantity),
+                  price = COALESCE($6, price),
+                  priority = COALESCE($7, priority),
+                  dateUpdated = NOW()
+              WHERE id = $8
+              RETURNING *;
+            `, [name, description, url, image, quantity, price, priority, id]);
+      }
+
+      await db.query("COMMIT"); // Commit all changes
+      return res.json({ message: "Items updated successfully." });
+
+    } catch (error) {
+      await db.query("ROLLBACK"); // Roll back if any error occurs
+      console.error("Error updating items:", error);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
+
+
+
+  /// SINGLE EDIT
   const itemId = parseInt(req.params.itemId);
   const { name, description, url, image, quantity, price, priority } = req.body;
-  const userId = req.user.userId; // Get user ID from authenticated token
 
   // Type checking
   if (name !== undefined && typeof name !== "string") {

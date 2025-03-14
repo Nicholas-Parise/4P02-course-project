@@ -169,9 +169,18 @@ router.put('/:wishlistId', authenticate, async (req, res, next) => {
   const userId = req.user.userId; // Get user ID from the authenticated token
   const { event_id, name, description, image, deadline } = req.body;
 
-
   // make sure user is the owner of the wishlist before allowing editing
   try {
+    
+    const wishlistCheck = await db.query(`
+      SELECT id FROM wishlists WHERE id = $1;
+    `, [wishlistId]);
+
+    if (wishlistCheck.rows.length === 0) {
+      return res.status(404).json({ error: "Wishlist not found." });
+    }
+    
+    
     const ownershipCheck = await db.query(`
       SELECT m.owner
       FROM wishlist_members m
@@ -200,12 +209,7 @@ router.put('/:wishlistId', authenticate, async (req, res, next) => {
       RETURNING *;
     `, [event_id, name, description, image, deadline, wishlistId]);
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Wishlist not found." });
-    }
-
     res.json({ message: "Wishlist updated successfully.", wishlist: result.rows[0] });
-
 
   } catch (error) {
     console.error("Error editing wishlist:", error);

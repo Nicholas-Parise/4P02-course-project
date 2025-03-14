@@ -52,7 +52,7 @@ router.get('/:categoryId', async (req, res, next) => {
 
 
 // localhost:3000/categories
-// Assign a category from logged in user
+// create a category
 router.post('/', authenticate, async (req, res, next) => {
   const userId = req.user.userId; // Get user ID from authenticated token
   const { name, description, password} = req.body;
