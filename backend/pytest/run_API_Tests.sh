@@ -7,7 +7,7 @@ MAX_HISTORY_SIZE=48
 
 cd /var/www/4P02-course-project/backend/pytest
 
-/usr/bin/pytest --json-report --json-report-omit keywords streams root --json-report-verbosity 2 --json-report-indent 2 --json-report-file "$REPORT_DIR""$REPORT_FILE"
+/home/ubuntu/.local/bin/pytest --json-report --json-report-omit keywords streams root --json-report-verbosity 2 --json-report-indent 2 --json-report-file "$REPORT_DIR""$REPORT_FILE"
 
 /usr/bin/python3 process_test_report.py "$REPORT_DIR" "$REPORT_FILE" "$MAX_HISTORY_SIZE" 
 
