@@ -135,6 +135,15 @@ router.delete('/:wishlistId', authenticate, async (req, res, next) => {
 
   // make sure user is the owner of the wishlist before allowing deletion
   try {
+
+    const wishlistCheck = await db.query(`
+      SELECT id FROM wishlists WHERE id = $1;
+    `, [wishlistId]);
+
+    if (wishlistCheck.rows.length === 0) {
+      return res.status(404).json({ error: "Wishlist not found." });
+    }
+
     const ownershipCheck = await db.query(`
       SELECT m.owner
       FROM wishlist_members m
@@ -332,6 +341,15 @@ router.post('/:id/members', authenticate, async (req, res) => {
   }
 
   try {
+
+    const wishlistCheck = await db.query(`
+      SELECT id FROM wishlists WHERE id = $1;
+    `, [wishlistId]);
+
+    if (wishlistCheck.rows.length === 0) {
+      return res.status(404).json({ error: "Wishlist not found." });
+    }
+
     // make sure user is the owner of the wishlist before allowing editing of others memberships
     const ownershipCheck = await db.query(`
         SELECT m.owner
@@ -389,6 +407,15 @@ router.delete('/:id/members', authenticate, async (req, res) => {
   }
 
   try {
+
+    const wishlistCheck = await db.query(`
+      SELECT id FROM wishlists WHERE id = $1;
+    `, [wishlistId]);
+
+    if (wishlistCheck.rows.length === 0) {
+      return res.status(404).json({ error: "Wishlist not found." });
+    }
+    
     // make sure user is the owner of the wishlist before allowing editing of others memberships
     const ownershipCheck = await db.query(`
       SELECT m.owner
@@ -440,6 +467,15 @@ router.put('/:id/members', authenticate, async (req, res) => {
   }
 
   try {
+
+    const wishlistCheck = await db.query(`
+      SELECT id FROM wishlists WHERE id = $1;
+    `, [wishlistId]);
+
+    if (wishlistCheck.rows.length === 0) {
+      return res.status(404).json({ error: "Wishlist not found." });
+    }
+
     // make sure user is the owner of the wishlist before allowing editing of others memberships
     const ownershipCheck = await db.query(`
         SELECT m.owner
@@ -534,6 +570,37 @@ router.get('/share/:token', async (req, res) => {
       WHERE wm.wishlists_id = $1;`, [wishlist.id]);
 
     res.status(200).json({ wishlist, items: itemsResult.rows });
+  } catch (error) {
+    console.error("Error fetching shared wishlist:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+
+// localhost:3000/wishlists/share
+// send emails to share the wishlist 
+router.post('/share', authenticate, async (req, res) => {
+
+  const { id, email } = req.body;
+
+  if(!id || !email){
+    return res.status(400).json({ message: "id and emailare required" }); 
+  }
+
+  try {
+    const wishlistCheck = await db.query(`
+      SELECT id FROM wishlists WHERE id = $1;
+    `, [wishlistId]);
+
+    if (wishlistCheck.rows.length === 0) {
+      return res.status(404).json({ error: "Wishlist not found." });
+    }
+    
+    // send an email to that user
+
+
+    return res.status(200).json({ message: "This does nothing" }); 
   } catch (error) {
     console.error("Error fetching shared wishlist:", error);
     res.status(500).json({ error: "Internal Server Error" });
