@@ -11,7 +11,7 @@ router.get('/', authenticate, async (req, res, next) => {
     const userId = req.user.userId; // Get user ID from authenticated token
     const result = await db.query('SELECT id, email, displayName, bio, picture, datecreated, dateupdated FROM users WHERE id = $1', [userId]);
     const result2 = await db.query(
-       `SELECT c.*, uc.love FROM categories c
+      `SELECT c.*, uc.love FROM categories c
         JOIN user_categories uc ON c.id = uc.category_id
         WHERE uc.user_id = $1`, [userId]);
 
@@ -19,7 +19,7 @@ router.get('/', authenticate, async (req, res, next) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    res.status(200).json({user: result.rows[0], categories: result2.rows});
+    res.status(200).json({ user: result.rows[0], categories: result2.rows });
   } catch (error) {
     console.error("Error fetching user:", error);
     res.status(500).json({ message: 'Error retrieving user data' });
@@ -31,7 +31,7 @@ router.get('/', authenticate, async (req, res, next) => {
 router.put('/', authenticate, async (req, res) => {
   try {
     const userId = req.user.userId; // Get user ID from authenticated token
-    const { email, displayName, picture, password, newPassword, bio} = req.body;
+    const { email, displayName, picture, password, newPassword, bio } = req.body;
 
     let newhHashedPassword = null;
 
@@ -112,11 +112,11 @@ router.delete('/', authenticate, async (req, res) => {
     // Delete user if password is correct
     await db.query("DELETE FROM users WHERE id = $1", [userId]);
 
-    res.status(200).json({ message: "Account deleted successfully" });
+    return res.status(200).json({ message: "Account deleted successfully" });
 
   } catch (error) {
     console.error("Error deleting user:", error);
-    res.status(500).json({ message: "Error deleting account" });
+    return res.status(500).json({ message: "Error deleting account" });
   }
 });
 
@@ -137,28 +137,88 @@ router.get('/:userId', async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    res.status(200).json({user: result.rows[0], categories: result2.rows});
+    return res.status(200).json({ user: result.rows[0], categories: result2.rows });
   } catch (error) {
     console.error("Error fetching user:", error);
-    res.status(500).json({ message: 'Error retrieving user data' });
+    return res.status(500).json({ message: 'Error retrieving user data' });
   }
 });
 
 
-// localhost:3000/categories?page=1&pageSize=10
-// Assign a category from logged in user
-router.post('/categories/:categoryId', authenticate, async (req, res, next) => {
-  
+// Assign a category from logged in user: post /categories/1234
+// Assign multiple categories from logged in user: post /categories
+router.post('/categories/:categoryId?', authenticate, async (req, res, next) => {
+
+  const userId = req.user.userId; // Get user ID from authenticated token
+
+  // MULTIPLE INSERT
+  if (Array.isArray(req.body.categories)) {
+    const categories = req.body.categories;
+    try {
+      await db.query("BEGIN"); // Start transaction
+
+      const errors = [];
+
+      for (const category of categories) {
+        const { id, love } = category;
+
+        if (!id || love === null || love === undefined) {
+          errors.push({ id, message: "id and love are required fields" });
+          continue;
+        }
+
+        if (love !== undefined && typeof love !== "boolean") {
+          errors.push({ id, message: "love must be a boolean (true or false)" });
+          continue;
+        }
+
+        try {
+          await db.query(
+            `INSERT INTO user_categories 
+            (user_id, category_id, love, created)
+            VALUES ($1, $2, COALESCE($3, false), NOW());`,
+            [userId, id, love]
+          );
+        } catch (error) {
+          if (error.code === "23505") {
+            errors.push({ id, message: "Category is already added" });
+          } else {
+            errors.push({ id, message: "Database error" });
+          }
+        }
+      }
+
+      if (errors.length > 0) {
+        await db.query("ROLLBACK");
+        return res.status(400).json({ message: "Some categories could not be added", errors });
+      }
+
+      await db.query("COMMIT");
+      return res.status(200).json({ message: "Categories assigned successfully" });
+
+    } catch (error) {
+      await db.query("ROLLBACK");
+      console.error("Error adding categories:", error);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+  }
+
+  /// SINGLE INSERT
   try {
-    const userId = req.user.userId; // Get user ID from authenticated token
     const categoryId = parseInt(req.params.categoryId);
     const { love } = req.body;
-    
+
+    // Ensure love is not null
+    if (love === null || love === undefined) {
+      return res.status(400).json({ message: "love is a required field" });
+    }
+
     const result = await db.query(`
         INSERT INTO user_categories 
         (user_id, category_id, love, created)
         VALUES ($1, $2, COALESCE($3, false), NOW()) RETURNING id;`, [userId, categoryId, love]);
-        
+
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "categories not found." });
     }
@@ -167,22 +227,68 @@ router.post('/categories/:categoryId', authenticate, async (req, res, next) => {
 
   } catch (error) {
     // Handle duplicate category error
-    if (error.code === "23505") { 
+    if (error.code === "23505") {
       return res.status(409).json({ message: "Category is already added" });
     }
 
-    console.error("Error fetching categories:", error);
+    console.error("Error adding category:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
 
-// localhost:3000/categories?page=1&pageSize=10
-// remove a category from logged in user
-router.delete('/categories/:categoryId', authenticate, async (req, res, next) => {
-  
+
+// remove a category from logged in user: delete /categories/1234
+// remove multiple categories from logged in user: delete /categories
+router.delete('/categories/:categoryId?', authenticate, async (req, res, next) => {
+
+  const userId = req.user.userId; // Get user ID from authenticated token
+
+  // MULTIPLE DELETE
+  if (Array.isArray(req.body.categories)) {
+    const categories = req.body.categories;
+    try {
+      await db.query("BEGIN"); // Start transaction
+
+      const errors = [];
+
+      for (const category of categories) {
+        const { id } = category;
+
+        if (!id) {
+          errors.push({ id, message: "id are required fields" });
+          continue;
+        }
+
+        try {
+
+          await db.query(`
+            DELETE FROM user_categories 
+            WHERE user_id = $1 AND category_id = $2;`, [userId, id]);
+
+        } catch (error) {
+          errors.push({ id, message: "Database error" });
+        }
+      }
+
+      if (errors.length > 0) {
+        await db.query("ROLLBACK");
+        return res.status(400).json({ message: "Some categories could not be removed", errors });
+      }
+
+      await db.query("COMMIT");
+      return res.status(200).json({ message: "Categories removed successfully" });
+
+    } catch (error) {
+      await db.query("ROLLBACK");
+      console.error("Error removing categories:", error);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+  }
+
+  /// SINGLE DELETE
   try {
-    const userId = req.user.userId; // Get user ID from authenticated token
     const categoryId = parseInt(req.params.categoryId);
     // remove the category
     const result = await db.query(`
@@ -197,19 +303,70 @@ router.delete('/categories/:categoryId', authenticate, async (req, res, next) =>
 });
 
 
+// update a category from logged in user: PUT /categories/1234
+// update multiple categories from logged in user: PUT /categories
+router.put('/categories/:categoryId?', authenticate, async (req, res, next) => {
 
-// localhost:3000/categories?page=1&pageSize=10
-// update a category from logged in user
-router.put('/categories/:categoryId', authenticate, async (req, res, next) => {
-  
+  const userId = req.user.userId; // Get user ID from authenticated token
+
+  // MULTIPLE EDIT
+  if (Array.isArray(req.body.categories)) {
+    const categories = req.body.categories;
+    try {
+      await db.query("BEGIN"); // Start transaction
+
+      const errors = [];
+
+      for (const category of categories) {
+        const { id, love } = category;
+
+        if (!id || love === null || love === undefined) {
+          errors.push({ id, message: "id and love are required fields" });
+          continue;
+        }
+
+        if (love !== undefined && typeof love !== "boolean") {
+          errors.push({ id, message: "love must be a boolean (true or false)" });
+          continue;
+        }
+
+        try {
+          await db.query(`
+            UPDATE user_categories
+            SET 
+                love = COALESCE($1, love)
+            WHERE user_id = $2 AND category_id = $3;
+          `, [love, userId, id]);
+    
+        } catch (error) {
+          errors.push({ id, message: "Database error" });
+        }
+      }
+
+      if (errors.length > 0) {
+        await db.query("ROLLBACK");
+        return res.status(400).json({ message: "Some categories could not be edited", errors });
+      }
+
+      await db.query("COMMIT");
+      return res.status(200).json({ message: "Categories editing successfully" });
+
+    } catch (error) {
+      await db.query("ROLLBACK");
+      console.error("Error editing categories:", error);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+  }
+
+  /// SINGLE EDIT
   try {
-    const userId = req.user.userId; // Get user ID from authenticated token
     const categoryId = parseInt(req.params.categoryId);
     const { love } = req.body;
-      
+
     // Ensure love is not null
-    if (love === null || love === undefined) { 
-      return res.status(400).json({ message: "love is a required field" }); 
+    if (love === null || love === undefined) {
+      return res.status(400).json({ message: "love is a required field" });
     }
 
     const result = await db.query(`
