@@ -16,9 +16,12 @@ PUT /users → Update logged in user profile
 DELETE /users → Delete logged in user account  
 GET /users/:id → Get specific user profile**  
 
-**POST /users/categories/:categoryId → Assign a category from logged in user
+**POST /users/categories/:categoryId → Assign a category to logged in user  
+POST /users/categories → Assign an array of categories to logged in user  
 Put /users/categories/:categoryId → updates a users love or hate value  
-DELETE /users/categories/:categoryId → Remove a category from logged in user**  
+Put /users/categories → updates an array of categories to logged in user  
+DELETE /users/categories/:categoryId → Remove a category from logged in user  
+DELETE /users/categories → Remove an array of categories from logged in user**  
 
 ## Categories
 **GET /categories → Get all categories   
@@ -62,7 +65,8 @@ PUT /events/:id/members → Update a members status (blind/owner)**
 ## Items
 
 **GET /items/:id → Get item details  
-PUT /items/:id → Update an item  
+PUT /items/:id → Update a single item  
+PUT /items → Update an array of items  
 DELETE /items/:id → Remove an item  
 POST /items -> create an item (given wishlists_id)**
   
