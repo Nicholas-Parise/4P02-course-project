@@ -24,7 +24,7 @@ done
 END=$((MAX_HISTORY_SIZE+1))
 
 if [ -f "${REPORT_DIR}${PROCESSED_REPORT}_${END}" ]; then
-    rm "${REPORT_DIR}${PROCESSED_REPORT}_${END}"
+    /usr/bin/rm "${REPORT_DIR}${PROCESSED_REPORT}_${END}"
 fi
 
 
