@@ -7,25 +7,42 @@ require("dotenv").config();
 
 // localhost:3000/auth/register
 // register account
-router.post('/register',async (req,res,next)=>{
+router.post('/register', async (req, res, next) => {
     const { email, password, displayName, picture, bio } = req.body;
 
     if (!email || !password || !displayName) {
         return res.status(400).json({ message: "email, password and displayName are required" });
     }
 
+    // Type checking
+    if (email !== undefined && typeof email !== "string") {
+        return res.status(400).json({ error: "email must be a string" });
+    }
+    if (password !== undefined && typeof password !== "string") {
+        return res.status(400).json({ error: "password must be a string" });
+    }
+    if (displayName !== undefined && typeof displayName !== "string") {
+        return res.status(400).json({ error: "displayName must be a string" });
+    }
+    if (picture !== undefined && typeof picture !== "string") {
+        return res.status(400).json({ error: "picture must be a string" });
+    }
+    if (bio !== undefined && typeof bio !== "string") {
+        return res.status(400).json({ error: "bio must be a string" });
+    }
+
     // I don't know how to do images rn so its always gonna be the placeholder
     let tempPicture;
-    if(!picture){
+    if (!picture) {
         tempPicture = "/assets/placeholder-avatar.png";
-    }else{
+    } else {
         tempPicture = picture;
     }
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         const result = await db.query(
-            "INSERT INTO users (displayName, password, email, picture, bio, dateCreated) VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING id, displayName, email",
+            "INSERT INTO users (displayName, password, email, picture, bio, notifications, dateCreated) VALUES ($1, $2, $3, $4, $5, true, NOW()) RETURNING id, displayName, email",
             [displayName, hashedPassword, email, tempPicture, bio]
         );
 
@@ -33,9 +50,9 @@ router.post('/register',async (req,res,next)=>{
     } catch (error) {
         console.error(error);
 
-         // Handle duplicate email error
-         // error code 23505 means unique constraint violated.
-         if (error.code === "23505") { 
+        // Handle duplicate email error
+        // error code 23505 means unique constraint violated.
+        if (error.code === "23505") {
             return res.status(409).json({ message: "Email is already in use" });
         }
 
@@ -47,7 +64,7 @@ router.post('/register',async (req,res,next)=>{
 // localhost:3000/auth/login
 // log in user and return token
 router.post('/login', async (req, res, next) => {
-   
+
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -67,9 +84,9 @@ router.post('/login', async (req, res, next) => {
         }
 
         const token = jwt.sign(
-            { userId: user.rows[0].id, email: user.rows[0].email }, 
-            process.env.SECRET_KEY, 
-            {expiresIn: "24h"});
+            { userId: user.rows[0].id, email: user.rows[0].email },
+            process.env.SECRET_KEY,
+            { expiresIn: "24h" });
 
         await db.query("INSERT INTO sessions (user_id, token, created) VALUES ($1, $2, NOW())", [user.rows[0].id, token]);
 
@@ -84,14 +101,14 @@ router.post('/login', async (req, res, next) => {
 // localhost:3000/auth/logout
 // log user out and invalidate token
 router.post('/logout', async (req, res, next) => {
-   
+
     const token = req.headers.authorization?.split(" ")[1];
 
     if (!token) {
         return res.status(401).json({ message: "No token provided" });
     }
 
-    
+
     try {
         await db.query("DELETE FROM sessions WHERE token = $1", [token]);
         res.json({ message: "Logout successful" });
@@ -139,4 +156,4 @@ router.get('/me', async (req, res, next) => {
 
 
 
-  module.exports = router;
+module.exports = router;
