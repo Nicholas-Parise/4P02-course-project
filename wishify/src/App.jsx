@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import ProtectedRoutes from "./components/ProtectedRoutes"
+import { AuthProvider } from "./utils/AuthContext"; // Import AuthProvider
+import ProtectedRoutes from "./components/ProtectedRoutes";
+import "./App.css";
 
-import './App.css'
-
+// Pages
 import HomePage from "./pages/Home";
 import NoPage from "./pages/NoPage";
 import Login from "./pages/auth/Login";
@@ -14,43 +15,38 @@ import Wishlists from "./pages/Wishlists";
 import Landing from "./pages/Landing";
 import Wishlist from "./pages/Wishlist";
 import Profile from "./pages/Profile";
-import Index from "./pages/Index";
-import Status from "./pages/Status"
 
+// Components
 import Navbar from "./components/Navbar";
 
-import isLoggedInCheck from "./utils/isLoggedIn";
-
 function App() {
-
-  const [isLoggedIn, setIsLoggedIn] = useState(isLoggedInCheck())
-
   return (
-    <>
+    <AuthProvider> {/* Wrap the entire app with AuthProvider */}
       <BrowserRouter>
-        <Navbar isLoggedIn={isLoggedIn} />
+        <Navbar /> {/* Navbar will now use AuthContext internally */}
         <Routes>
-            <Route index element={<Index />} />
-            <Route path="landing" element={<Landing />} />
-            <Route path="login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
-            <Route path="register" element={<Register />} />
-            <Route path="status" element={<Status />} />
+          <Route index element={<Index />} />
+          <Route path="landing" element={<Landing />} />
+          <Route path="" element={<Landing />} />
+          <Route path="login" element={<Login />} /> {/* Login will update AuthContext */}
+          <Route path="register" element={<Register />} />
 
-            <Route element={<ProtectedRoutes />}>
-              <Route path="home" element={<HomePage />} />
-              <Route path="events" element={<Events />} />
-              <Route path="events/:id" element={<Event/>}/>
-  
-              <Route path="wishlists" element={<Wishlists />} />
-              <Route path="wishlists/:id" element={<Wishlist />} />
+          {/* Protected Routes */}
+          <Route element={<ProtectedRoutes />}>
+            <Route path="home" element={<HomePage />} />
+            <Route path="events" element={<Events />} />
+            <Route path="events/:id" element={<Event />} />
+            <Route path="wishlists" element={<Wishlists />} />
+            <Route path="wishlists/:id" element={<Wishlist />} />
+            <Route path="profile" element={<Profile />} />
+          </Route>
 
-              <Route path="profile" element={<Profile />} />
-            </Route>
-            <Route path="*" element={<NoPage />} />
+          {/* 404 Page */}
+          <Route path="*" element={<NoPage />} />
         </Routes>
       </BrowserRouter>
-      </>
-    );
+    </AuthProvider>
+  );
 }
 
-export default App
+export default App;

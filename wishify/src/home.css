@@ -19,8 +19,8 @@
 .home-user-picture {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    margin-bottom: 40px;
+    align-items: center; 
+    margin-bottom: 20px; 
 }
   
 .home-user-picture img {
@@ -36,10 +36,12 @@
     font-size: 1.5rem;
     font-weight: 600;
     color: #333;
+    text-align: center; 
 }
 
 .home-user-info {
     display: flex;
-    align-items: center;
+    flex-direction: column; 
+    align-items: center; 
     gap: 20px;
 }

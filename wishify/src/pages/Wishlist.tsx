@@ -101,7 +101,7 @@ const Wishlist = () => {
 
   return (
     <>
-      <section className='pt-5'>
+      <section>
           <WishlistHeader wishlist={wishlist} event={event} />
           <div className="mt-8 mb-4 flex gap-1 items-center">
               <FormControl fullWidth className='min-w-[120px] max-w-[180px]'>
