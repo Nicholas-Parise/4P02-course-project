@@ -6,7 +6,7 @@ import { WishlistItem } from '../types/types';
 import CreateItemDialog from './CreateItemDialog';
 import '../components/Navbarlanding/landingheader.css';
 
-const Navbar = ({isLoggedIn}: {isLoggedIn: boolean}) => {
+const Navbar = ({isLoggedIn, page}: {isLoggedIn: boolean, page: string}) => {
   
   interface NavItem{
     label: string,
@@ -101,6 +101,8 @@ const Navbar = ({isLoggedIn}: {isLoggedIn: boolean}) => {
             setNewItem={setNewItem}
             wishlists={wishlists}
             token={token}
+            page={page}
+            id={page.split('/')[2]}
           />
         </>
     : 

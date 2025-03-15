@@ -8,7 +8,7 @@ import { FaExternalLinkAlt, FaMinus, FaPlus } from 'react-icons/fa';
 type WishlistItemProps = {
   item: WishlistItem,
   sortBy: "priority" | "price" | "quantity"
-  onReserve: (itemId: number, reservation: number) => void
+  onReserve: (itemId: number, reservation: number, note: string) => void
 }
 
 const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
@@ -30,6 +30,7 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [reserveQuantity, setReserveQuantity] = useState(0)
+  const [reserveNote, setReserveNote] = useState("")
 
   const incrementReserve = () => setReserveQuantity((prev) => Math.min(prev + 1, availableQuantity))
   const decrementReserve = () => setReserveQuantity((prev) => Math.max(prev - 1, 0))
@@ -41,12 +42,19 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
   const handleReserve = () => {
     if (reserveQuantity > 0) {
       //onReserve(item.id, reserveQuantity, currentUser)
-      onReserve(item.id, reserveQuantity)
+      onReserve(item.id, reserveQuantity, reserveNote)
     } else {
       //onReserve(item.id, 0, currentUser)  Remove reservation if quantity is 0
-      onReserve(item.id, 0)
+      onReserve(item.id, 0, reserveNote)
     }
     setIsModalOpen(false)
+  }
+
+  const handleReserveQuantity = (e: any) => {
+    if (["e", "E", "-"].some((char) => e.target.value.includes(char))) return;
+
+    // handle change here
+    setReserveQuantity(parseInt(e.target.value) || NaN);
   }
 
   return (
@@ -124,12 +132,19 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
                 </Button>
                 <TextField
                   value={reserveQuantity}
+                  onChange={(e) => handleReserveQuantity(e)}
+                  
                   className="w-20 text-center"
                 />
                 <Button onClick={incrementReserve}>
                   <FaPlus className="h-4 w-4" />
                 </Button>
               </div>
+              <TextField
+                value={reserveNote}
+                label="Leave a comment"
+                onChange={(e) => setReserveNote(e.target.value)}
+              />
             </div>
             <div className="flex space-x-2">
               <Button>

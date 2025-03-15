@@ -25,47 +25,54 @@ const Wishlist = () => {
     const [sortDirection, setSortDirection] = useState<-1 | 1>(1)
 
     useEffect(() => {
-        setToken(localStorage.getItem('token') || '')
-        console.log(token)
+      setToken(localStorage.getItem('token') || '')
+      console.log(token)
 
-        let url = `https://api.wishify.ca/wishlists/${id}/items`
-        // get all items in wishlist
-        fetch(url, {
-            method: 'get',
-            headers: new Headers({
-              'Authorization': "Bearer "+token
-            })
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              setWishlistItems(data.items);
-              //setLoading(false)
-            })
-            .catch((error) => {
-              //setError(error)
-              //setLoading(false)
-              console.log(error)
-            })
-            //.finally(() => setLoading(false))
-        url = `https://api.wishify.ca/contributions/wishlists/${id}`
-        // get all contributions in wishlist
-        fetch(url, {
-            method: 'get',
-            headers: new Headers({
-              'Authorization': "Bearer "+token
-            })
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              setWishlistContributions(data);
-              //setLoading(false)
-            })
-            .catch((error) => {
-              //setError(error)
-              //setLoading(false)
-              console.log(error)
-            })
-            //.finally(() => setLoading(false))
+      let url = `https://api.wishify.ca/wishlists/${id}/items`
+      // get all items in wishlist
+      fetch(url, {
+        method: 'get',
+        headers: new Headers({
+          'Authorization': "Bearer "+token
+        })
+        })
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          setWishlistItems(data.items)
+          //setLoading(false)
+        })
+        .catch((error) => {
+          //setError(error)
+          //setLoading(false)
+          console.log(error)
+        })
+        //.finally(() => setLoading(false))
+      url = `https://api.wishify.ca/contributions/wishlists/${id}`
+      // get all contributions in wishlist
+      fetch(url, {
+        method: 'get',
+        headers: new Headers({
+          'Authorization': "Bearer "+token
+        })
+        })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(response.statusText);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          setWishlistContributions(data)
+          //setLoading(false)
+        })
+        .catch((error) => {
+          //setError(error)
+          //setLoading(false)
+          console.log("error" + error)
+        })
+        //.finally(() => setLoading(false))
     }, [])
 
     const wishlist: Wishlist = {
@@ -118,7 +125,7 @@ const Wishlist = () => {
 
   const [contributeAlert, setContributeAlert] = useState(false);
   // TODO: send to backend contributions
-  const handleReserveItem = (itemId: number, reservation: number) => {
+  const handleReserveItem = (itemId: number, reservation: number, note: string) => {
     console.log(wishlistContributions)
     const contribution = wishlistContributions.find((c) => c.item_id === itemId);
     if (contribution) {
@@ -134,12 +141,17 @@ const Wishlist = () => {
         body: JSON.stringify({
             "quantity": reservation,
             "purchased": false,
-            "note": "hey all scott here"
+            "note": note || ""
         })})
         .then((response) => response.json())
         .then((data) => {
             console.log(data)
             setContributeAlert(true);
+              // update the wishlists state with the new data
+            const updatedContributions = wishlistContributions.map(contribution =>
+              contribution.id === contributionID ? data.contribution : contribution
+            );
+            setWishlistContributions(updatedContributions);
             setTimeout(() => setContributeAlert(false), 3000); // auto fade after 3 seconds
             return;
         })
@@ -178,13 +190,14 @@ const Wishlist = () => {
             "item_id": itemId,
             "quantity": reservation,
             "purchased": false,
-            "note": "hey all scott here"
+            "note": note || ""
         })})
         .then((response) => response.json())
         .then((data) => {
             console.log(data)
             if (data.message == "contribution created successfully"){
               setContributeAlert(true);
+              setWishlistContributions([...wishlistContributions, data.contribution])
               setTimeout(() => setContributeAlert(false), 3000); // auto fade after 3 seconds
             }
         })
@@ -223,7 +236,7 @@ const Wishlist = () => {
               <SortableContext items={sortedItems.map((item) => item.id)}>
                   <ul className="space-y-4">
                   {sortedItems.map((item) => (
-                      <WishlistItemEntry key={item.id} item={item} sortBy={sortBy} onReserve={handleReserveItem} />
+                      <WishlistItemEntry key={item.id} item={item} sortBy={sortBy} onReserve={handleReserveItem}/>
                   ))}
                   </ul>
               </SortableContext>
