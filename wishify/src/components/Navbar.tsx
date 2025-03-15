@@ -1,103 +1,128 @@
-import { useState, ReactNode } from 'react'
+import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { Wishlist } from '../types/types';
-import { WishlistItem } from '../types/types';
-import CreateItemDialog from './CreateItemDialog';
+import { AiFillGift, AiOutlinePlus, AiOutlineUser } from "react-icons/ai";
+import { useAuth } from "../utils/AuthContext";
+import CreateItemDialog from "./CreateItemDialog";
+import ProfileMenu from "../components/ProfileMenu";
+import "../components/Navbarlanding/landingheader.css";
 
-const Navbar = () => {
-
-  interface NavItem{
-    label: string,
-    href: string
-  }
-
+const Navbar: React.FC = () => {
+  const { isLoggedIn, logOut } = useAuth();
   const [listNav] = useState([
-    {'label':'Home', 'href':'/'},
-    {'label':'Landing', 'href':'/landing'},
-    {'label':'Wishlist', 'href':'/wishlists'},
-    {'label':'Events', 'href':'/events'},
-    {'label':'Login', 'href':'/login'},
-    {'label':'Sign up', 'href':'/register'}
-  ])
+    { label: "Wishlist", href: "/wishlists" },
+    { label: "Events", href: "/events" },
+  ]);
 
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [wishlists, setWishlists] = useState<Wishlist[]>([])
-  const [error, setError] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [token, setToken] = useState<string>(localStorage.getItem('token') || '')
-
-
-  const [newItem, setNewItem] = useState<Partial<WishlistItem>>({})
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [wishlists, setWishlists] = useState<any[]>([]);
+  const [newItem, setNewItem] = useState<Record<string, any>>({});
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   const fetchWishlists = () => {
-    setToken(localStorage.getItem('token') || '')
-    setLoading(true)
+    const token = localStorage.getItem("token") || "";
 
-    if(token == ''){
-      // redirect to login page
-      console.log("missing token")
-      return
-    }
-
-    const url = "https://api.wishify.ca/wishlists"
-
-    fetch(url, {
-      method: 'get',
-      headers: new Headers({
-        'Authorization': "Bearer "+token
-      })
+    fetch("https://api.wishify.ca/wishlists", {
+      method: "get",
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then((response) => response.json())
       .then((data) => {
         setWishlists(data);
-        setLoading(false)
       })
-      .catch((error) => {
-        setError(error)
-        setLoading(false)
-      })
-      .finally(() => setLoading(false))
-
-
-    return { wishlists, loading, error }
-  }
+      .catch(() => {
+        console.error("Error fetching wishlists");
+      });
+  };
 
   const openModal = () => {
-    setNewItem({})
-    setImagePreview(null)
-    setIsModalOpen(true)
-  }
+    setNewItem({});
+    setImagePreview(null);
+    setIsModalOpen(true);
+  };
 
   return (
     <>
-      <div className='pr-4 pl-4 relative'>    
+      {isLoggedIn ? (
+        <>
+          <nav className="navbar">
+            <div className="container1">
+              <NavLink to="/" className="logo">
+                <h1>
+                  <span>
+                    <AiFillGift />
+                    Wish
+                  </span>
+                  ify
+                </h1>
+              </NavLink>
 
-          <nav>
-            {listNav.map((value: NavItem, key): ReactNode => {
-              return <NavLink key={key} to={value.href}>{value.label}</NavLink>
-            })}
+              <div className="nav-menu">
+                {listNav.map((item, index) => (
+                  <NavLink key={index} to={item.href} className="nav-link">
+                    {item.label}
+                  </NavLink>
+                ))}
+              </div>
+
+              <div className="actions">
+                <button onClick={() => (fetchWishlists(), openModal())} className="btn">
+                  <AiOutlinePlus /> Add Wish
+                </button>
+                <div className="profile-icon">
+                  <AiOutlineUser
+                    className="text-2xl cursor-pointer"
+                    onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                  />
+
+                  {isProfileMenuOpen && (
+                    <ProfileMenu
+                      closeMenu={() => setIsProfileMenuOpen(false)}
+                      logOut={logOut}
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
           </nav>
 
-          <button onClick={() => (fetchWishlists(), openModal())} className=' text-white bg-linear-to-r from-cyan-500 to-blue-500 pl-1.5 pr-1.5 pt-1 pb-1 rounded-lg cursor-pointer absolute top-1.5 right-3'>+ Add Item</button>
-
-
-      </div>
-
-      <CreateItemDialog 
-        open={isModalOpen} 
-        setOpen={setIsModalOpen} 
-        image={imagePreview}
-        setImage={setImagePreview} 
-        newItem={newItem}
-        setNewItem={setNewItem}
-        wishlists={wishlists}
-        token={token}
-      />
+          <CreateItemDialog
+            open={isModalOpen}
+            setOpen={setIsModalOpen}
+            image={imagePreview}
+            setImage={(image) => setImagePreview(image)}
+            newItem={newItem}
+            setNewItem={setNewItem}
+            wishlists={wishlists}
+            token={localStorage.getItem("token") || ""}
+          />
+        </>
+      ) : (
+        <div className="navbar">
+          <div className="container1">
+            <NavLink to="/landing" className="logo">
+              <h1>
+                <span>
+                  <AiFillGift />
+                  Wish
+                </span>
+                ify
+              </h1>
+            </NavLink>
+            <div className="container2">
+              <a href="/Register">
+                <button className="btn">Sign Up</button>
+              </a>
+              &nbsp;
+              <a href="/Login">
+                <button className="btn">Log In</button>
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </>
-  )
-}
+  );
+};
 
-export default Navbar
-
-
+export default Navbar;

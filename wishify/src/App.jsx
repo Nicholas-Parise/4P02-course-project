@@ -1,9 +1,10 @@
-import React from "react";
-import { BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
-import { useState } from 'react'
+import React, { useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./utils/AuthContext"; // Import AuthProvider
+import ProtectedRoutes from "./components/ProtectedRoutes";
+import "./App.css";
 
-import './App.css'
-
+// Pages
 import HomePage from "./pages/Home";
 import NoPage from "./pages/NoPage";
 import Login from "./pages/auth/Login";
@@ -14,32 +15,38 @@ import Wishlists from "./pages/Wishlists";
 import Landing from "./pages/Landing";
 import Wishlist from "./pages/Wishlist";
 import Profile from "./pages/Profile";
-import Navbar from './components/Navbarmain';
 
+// Components
+import Navbar from "./components/Navbar";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
+    <AuthProvider> {/* Wrap the entire app with AuthProvider */}
       <BrowserRouter>
+        <Navbar /> {/* Navbar will now use AuthContext internally */}
         <Routes>
-            <Route index element={<HomePage />} />
+          <Route index element={<Index />} />
+          <Route path="landing" element={<Landing />} />
+          <Route path="" element={<Landing />} />
+          <Route path="login" element={<Login />} /> {/* Login will update AuthContext */}
+          <Route path="register" element={<Register />} />
+
+          {/* Protected Routes */}
+          <Route element={<ProtectedRoutes />}>
             <Route path="home" element={<HomePage />} />
             <Route path="events" element={<Events />} />
-            <Route path="events/:id" element={<Event/>}/>
-            <Route path="landing" element={<Landing />} />
+            <Route path="events/:id" element={<Event />} />
             <Route path="wishlists" element={<Wishlists />} />
             <Route path="wishlists/:id" element={<Wishlist />} />
-            <Route path="login" element={<Login />} />
-            <Route path="register" element={<Register />} />
             <Route path="profile" element={<Profile />} />
-            <Route path="*" element={<NoPage />} />
-            <Route path="/" element={<Navigate replace to="/home" />} />
+          </Route>
+
+          {/* 404 Page */}
+          <Route path="*" element={<NoPage />} />
         </Routes>
       </BrowserRouter>
-      </>
-    );
+    </AuthProvider>
+  );
 }
 
-export default App
+export default App;

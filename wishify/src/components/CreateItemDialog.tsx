@@ -3,14 +3,14 @@ import { Dialog, DialogTitle, DialogContent, DialogContentText, Select, SelectCh
 import { Wishlist, WishlistItem } from '../types/types';
 
 interface Props {
-    open: boolean, 
-    setOpen: (state: boolean)=>void,
-    image: string | null,
-    setImage: (state: string) => void
-    newItem: Partial<WishlistItem>
-    setNewItem: (state: Partial<WishlistItem>) => void
-    wishlists: Wishlist[]
-    token: string
+  open: boolean, 
+  setOpen: (state: boolean)=>void,
+  image: string | null,
+  setImage: (state: string | null) => void
+  newItem: Partial<WishlistItem>
+  setNewItem: (state: Partial<WishlistItem>) => void
+  wishlists: Wishlist[]
+  token: string
 }
 
 const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem, wishlists, token }: Props) => {

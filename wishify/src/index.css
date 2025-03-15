@@ -1,5 +1,3 @@
-
-
 * {
   box-sizing: border-box;
 }
@@ -12,7 +10,7 @@ html {
 body {
   margin: 0;
   font-family: 'Calibri', sans-serif;
-  background-color: #f8f5ff;
+  background-color: #C8C7DF;
   color: #0d001f;
   font-size: 1.5rem;
   min-height: 100svh;
