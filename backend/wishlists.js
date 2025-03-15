@@ -602,7 +602,7 @@ router.post('/share', authenticate, async (req, res) => {
 
   try {
     const wishlistCheck = await db.query(`
-      SELECT id FROM wishlists WHERE id = $1;
+      SELECT id,share_token FROM wishlists WHERE id = $1;
     `, [id]);
 
     if (wishlistCheck.rows.length === 0) {
@@ -635,7 +635,7 @@ router.post('/share', authenticate, async (req, res) => {
 
       const fromUser = fromUserResult.rows[0].displayname;
 
-      await sendInviteEmail(email, id, fromUser);
+      await sendInviteEmail(email, wishlistCheck.rows[0].share_token, fromUser);
     }
 
     return res.status(200).json({ message: "Invitation sent." }); 
@@ -647,7 +647,7 @@ router.post('/share', authenticate, async (req, res) => {
 
 
 // send the email to user
-async function sendInviteEmail(email, wishlistId, fromUser) {
+async function sendInviteEmail(email, share_token, fromUser) {
   const transporter = nodemailer.createTransport({
     service: "gmail", // Use your email provider
     auth: {
@@ -656,7 +656,7 @@ async function sendInviteEmail(email, wishlistId, fromUser) {
     }
   });
 
-  const inviteLink = `https://wishify.ca/register?wishlist=${wishlistId}`;
+  const inviteLink = `https://wishify.ca/register?wishlist=${share_token}`;
 
   const mailOptions = {
     from: "Wishify",
