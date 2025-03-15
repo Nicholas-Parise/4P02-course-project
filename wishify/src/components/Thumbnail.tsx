@@ -1,7 +1,6 @@
-import {React} from 'react';
 import { useNavigate } from "react-router-dom";
 import styled from "@emotion/styled";
-import {FaEye, FaPencilAlt, FaKey} from 'react-icons/fa';
+import {FaEye} from 'react-icons/fa';
 
 
 const WishlistButton = styled.button`
@@ -74,7 +73,7 @@ const EventMenu = styled.div`
     }
 `
 
-const createStyledIcon = (IconComponent) => styled(IconComponent)`
+const createStyledIcon = (IconComponent: any) => styled(IconComponent)`
   position: absolute;
   left: 20px;
   top: 10px;
@@ -98,7 +97,7 @@ const MenuButton = styled.button`
 
 
 
-export const WishlistThumbnail = (props) => {
+export const WishlistThumbnail = (props: any) => {
     const WishlistOverlayMenu = () => {
         return (
             <WishlistMenu onMouseLeave={props.toggleActive}>
@@ -112,7 +111,7 @@ export const WishlistThumbnail = (props) => {
     }
 
     let navigate = useNavigate(); 
-    const openWishlist = (e) => {
+    const openWishlist = () => {
         let path = "/wishlists/" + props.id;
         navigate(path);
     }
@@ -130,7 +129,7 @@ export const WishlistThumbnail = (props) => {
     }
 }
 
-export const EventThumbnail = (props) => {
+export const EventThumbnail = (props: any) => {
 
     const EventOverlayMenu = () => {
         return (
@@ -143,7 +142,7 @@ export const EventThumbnail = (props) => {
         )
     }
     let navigate = useNavigate();
-    const openEvent = (e) => {
+    const openEvent = () => {
         let path = "/events/" + props.id;
         navigate(path);
     }

@@ -21,9 +21,9 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
   };
 
   const isDraggable = sortBy === "priority"
-  //const currentUser = "Current User"  In a real app, this would come from authentication
+  const currentUser = 1  //In a real app, this would come from authentication
   const totalReserved = item.quantitySupplied || 0
-  const userReservation = item.contributions?.find((r) => r.user === currentUser)
+  const userReservation = item.contributions?.find((r) => r.member_id === currentUser)
   const availableQuantity = item.quantity - totalReserved
 
   const reservedBadgeColour = availableQuantity <= 0 ? "bg-green-600" : "bg-yellow-500"
@@ -111,7 +111,7 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
                 <p className="font-semibold">Current Reservations:</p>
                 {item.contributions?.map((res, index) => (
                   <p key={index} className="text-green-600">
-                    {res.user}: {res.quantity}
+                    {res.member_id}: {res.quantity}
                   </p>
                 ))}
               </div>

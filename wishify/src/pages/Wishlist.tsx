@@ -72,7 +72,8 @@ const Wishlist = () => {
         id: 0,
         eventID: 0,
         name: "Geoff's Christmas Wishlist",
-        desc: "This is my wishlist for Christmas 2026"
+        desc: "This is my wishlist for Christmas 2026",
+        image: ""
     };
 
     const event: Event = {
@@ -132,7 +133,6 @@ const Wishlist = () => {
         }),
         body: JSON.stringify({
             "quantity": reservation,
-            //no way to see if a user purchased?
             "purchased": false,
             "note": "hey all scott here"
         })})
@@ -177,7 +177,6 @@ const Wishlist = () => {
         body: JSON.stringify({
             "item_id": itemId,
             "quantity": reservation,
-            //no way to see if a user purchased?
             "purchased": false,
             "note": "hey all scott here"
         })})

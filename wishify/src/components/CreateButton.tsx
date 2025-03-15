@@ -1,4 +1,3 @@
-import React, { Children } from 'react';
 import styled from "@emotion/styled";
 
 
@@ -34,13 +33,13 @@ const CreateEventButton = styled.button`
     }
 `
 
-export const CreateWishlist = (props) => {
+export const CreateWishlist = (props: any) => {
     return(
         <CreateWishlistButton onClick={props.addThumbnail}>{props.children}</CreateWishlistButton>
     )
 }
 
-export const CreateEvent = (props) => {
+export const CreateEvent = (props: any) => {
     return(
         <CreateEventButton onClick={props.addThumbnail}>{props.children}</CreateEventButton>
     )
