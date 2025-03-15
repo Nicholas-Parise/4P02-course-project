@@ -43,11 +43,13 @@ DELETE /wishlists/:id → Delete wishlist (must be the owner)**
 **GET /wishlists/:id/members → Get all members in a specific wishlist   
 POST /wishlists/:id/members → Add a member to an wishlist    
 DELETE /wishlists/:id/members → Remove a member from wishlist  
-PUT /wishlists/:id/members → Update a members status (blind/owner)**    
+PUT /wishlists/:id/members → Update a members status (blind/owner)  
+POST /wishlists/members → make logged in user a member of the wishlist given the share_token**    
 
 **POST /wishlists/:id/duplicate → Duplicate the wishlist   
 GET /wishlists/:id/items → Get all items in a wishlist (and contributions)   
-GET /wishlists/share/:token → get the shared wishlist**
+GET /wishlists/share/:token → get the shared wishlist  
+POST /wishlists/share → share the wishlist to email, if user exists membership added. else send email**
 
 ##  Events
 **GET /events → Get all events (for member)   

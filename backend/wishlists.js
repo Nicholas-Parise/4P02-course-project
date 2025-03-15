@@ -401,6 +401,65 @@ router.post('/:id/members', authenticate, async (req, res) => {
 });
 
 
+// add a member to an wishlist with the share token
+// /wishlists/members
+router.post('/members', authenticate, async (req, res) => {
+  
+  const authUserId = req.user.userId; // Get user ID from the authenticated token
+  const { share_token, blind, owner } = req.body;  // the user provides the share_token of the wishlist to add
+
+  if (!share_token) {
+    return res.status(400).json({ message: "share_token is required" });
+  }
+
+  try {
+
+    const wishlistCheck = await db.query(`
+      SELECT id FROM wishlists WHERE share_token = $1;
+    `, [share_token]);
+
+    if (wishlistCheck.rows.length === 0) {
+      return res.status(404).json({ error: "Wishlist not found." });
+    }
+
+    const wishlistId = wishlistCheck.rows[0].id;
+
+    // Check if the user is already a member of the wishlist
+    const memberCheck = await db.query(`
+          SELECT * FROM wishlist_members WHERE wishlists_id = $1 AND user_id = $2
+      `, [wishlistId, authUserId]);
+
+    if (memberCheck.rows.length > 0) {
+      return res.status(409).json({ message: "user is already a member", id: wishlistId });
+    }
+
+    // Add the user to the wishlist
+    /*
+    await db.query(`
+          INSERT INTO wishlist_members (wishlists_id, user_id, blind, owner, dateCreated)
+          VALUES ($1, $2, COALESCE($3, false), COALESCE($4, false), NOW());`, [wishlistId, authUserId, blind, owner]);
+    */
+
+    await db.query(`
+      INSERT INTO wishlist_members (wishlists_id, user_id, blind, owner, dateCreated)
+      VALUES ($1, $2, false, true, NOW());`, [wishlistId, authUserId]);
+
+
+    res.status(201).json({ message: "User added to the wishlist successfully" });
+  } catch (error) {
+
+    // Handle duplicate membership error
+    if (error.code === "23505") { 
+      return res.status(409).json({ message: "user is already a member", id: wishlistId });
+    }
+
+    console.error("Error adding member to wishlist:", error);
+    res.status(500).json({ message: "Error adding member to wishlist" });
+  }
+});
+
+
+
 
 // localhost:3000/wishlists/:id/members?page=1&pageSize=10
 // remove a member from an wishlist
