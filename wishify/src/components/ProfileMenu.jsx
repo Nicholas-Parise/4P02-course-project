@@ -7,7 +7,7 @@ import "./ProfileMenu.css";
 const ProfileMenu = ({ closeMenu, logOut }) => {
   const [isClosing, setIsClosing] = useState(false);
   const [showLogOutModal, setShowLogOutModal] = useState(false);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false); // State for notifications
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const menuRef = useRef(null);
   const navigate = useNavigate();
 
@@ -37,7 +37,7 @@ const ProfileMenu = ({ closeMenu, logOut }) => {
   };
 
   const confirmLogOut = () => {
-    logOut(); // Call the logOut function from AuthContext
+    logOut(); 
     navigate("/landing");
     handleClose();
     setShowLogOutModal(false);
@@ -53,12 +53,9 @@ const ProfileMenu = ({ closeMenu, logOut }) => {
 
   return (
     <>
-      {/* Backdrop */}
       {!isClosing && <div className="backdrop" onClick={handleClose} />}
 
-      {/* Profile Menu */}
       <div className={`profile-menu ${isClosing ? "slide-out" : ""}`} ref={menuRef}>
-        {/* Close Button and Logo */}
         <div className="header">
           <NavLink to="/home" onClick={handleClose}>
             <h1>
@@ -74,7 +71,6 @@ const ProfileMenu = ({ closeMenu, logOut }) => {
           </button>
         </div>
 
-        {/* User Info */}
         <div className="user-info">
           <div className="profile-image">
             <AiOutlineUser className="user-icon" />
@@ -85,7 +81,6 @@ const ProfileMenu = ({ closeMenu, logOut }) => {
           </div>
         </div>
 
-        {/* Notification Toggle at the Top */}
         <div className="notification-toggle-container" onClick={toggleNotifications}>
           <div className="notification-toggle">
             {notificationsEnabled ? (
@@ -97,20 +92,16 @@ const ProfileMenu = ({ closeMenu, logOut }) => {
           </div>
         </div>
         
-        {/* Notifications Placeholder Container */}
         <div className="notifications-placeholder">
           <p>Your notifications will appear here.</p>
-          {/* You can dynamically render notifications here later */}
         </div>
 
-        {/* Log Out Button (Fixed at the Bottom) */}
         <div className="menu-options-bottom">
           <div className="menu-item logout" onClick={() => setShowLogOutModal(true)}>
             <AiOutlineLogout className="menu-icon" /> Log Out
           </div>
         </div>
 
-        {/* Log Out Confirmation Modal */}
         <Dialog
           open={showLogOutModal}
           onClose={cancelLogOut}
@@ -118,8 +109,8 @@ const ProfileMenu = ({ closeMenu, logOut }) => {
           aria-describedby="log-out-dialog-description"
           sx={{
             "& .MuiDialog-paper": {
-              borderRadius: "16px", // Rounded corners
-              width: "400px", // Adjust width as needed
+              borderRadius: "16px", 
+              width: "400px", 
             },
           }}
         >

@@ -98,7 +98,7 @@ const Wishlist = () => {
     return (
         <>
             <section className="pt-5">
-                <div className="relative mb-8"> {/* Added margin-bottom here */}
+                <div className="relative mb-8"> 
                     <WishlistHeader wishlist={wishlist} event={event} />
                     <div className="absolute top-4 right-4">
                         <div className="bg-white border-2 border-[#5651e5] rounded-[25px] p-4 flex gap-2 items-center">
@@ -130,7 +130,6 @@ const Wishlist = () => {
                     </div>
                 </div>
 
-                {/* List of Wishlist Items */}
                 <DndContext onDragEnd={handleDragEnd}>
                     <SortableContext items={sortedItems.map((item) => item.id)}>
                         <ul className="space-y-4">

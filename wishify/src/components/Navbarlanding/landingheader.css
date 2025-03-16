@@ -1,4 +1,3 @@
-/* Navbar Styling */
 .navbar {
     width: 100%;
     height: 80px;
@@ -7,13 +6,12 @@
     display: flex;
     align-items: center;
     padding: 1rem 2rem;
-    position: sticky; /* Make the navbar sticky */
-    top: 0; /* Stick to the top of the viewport */
-    z-index: 1000; /* Ensure the navbar stays above other content */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for better visibility */
+    position: sticky; 
+    top: 0; 
+    z-index: 1000; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
 }
 
-/* Container for navbar content */
 .navbar .container1 {
     display: flex;
     justify-content: space-between;
@@ -23,14 +21,12 @@
     box-sizing: border-box;
 }
 
-/* Container for sign-up/login buttons */
 .navbar .container2 {
     display: flex;
     gap: 1rem;
     align-items: center;
 }
 
-/* Logo styling */
 .navbar .logo h1 {
     display: flex;
     align-items: center;
@@ -41,7 +37,7 @@
 .navbar .logo h1 span {
     display: flex;
     align-items: center;
-    color: #5651e5; /* Highlight color for "Wish" */
+    color: #5651e5;
 }
 
 .navbar .logo h1 svg {
@@ -49,7 +45,6 @@
     margin-right: 5px;
 }
 
-/* Navigation menu styling */
 .navbar .nav-menu {
     display: flex;
     gap: 2rem;
@@ -64,18 +59,16 @@
 }
 
 .navbar .nav-menu a:hover {
-    background-color: rgba(86, 81, 229, 0.1); /* Light hover effect */
+    background-color: rgba(86, 81, 229, 0.1); 
     border-radius: 5px;
 }
 
-/* Actions container (holds Add Wish and Profile buttons) */
 .navbar .actions {
     display: flex;
     align-items: center;
-    gap: 1rem; /* Space between buttons */
+    gap: 1rem; 
 }
 
-/* Button styling */
 .navbar .btn {
     display: flex;
     align-items: center;
@@ -91,10 +84,9 @@
 }
 
 .navbar .btn:hover {
-    background: linear-gradient(135deg, #5651e5, #343188); /* Darker gradient on hover */
+    background: linear-gradient(135deg, #5651e5, #343188); 
 }
 
-/* Profile icon styling */
 .navbar .profile-icon {
     font-size: 1.8rem;
     cursor: pointer;
@@ -109,5 +101,5 @@
 }
 
 .navbar .profile-icon:hover {
-    background: rgba(86, 81, 229, 0.2); /* Slightly darker on hover */
+    background: rgba(86, 81, 229, 0.2); 
 }

@@ -42,7 +42,7 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
     if (reserveQuantity > 0) {
       onReserve(item.id, reserveQuantity, currentUser);
     } else {
-      onReserve(item.id, 0, currentUser); // Remove reservation if quantity is 0
+      onReserve(item.id, 0, currentUser);
     }
     setIsModalOpen(false);
   };
@@ -101,7 +101,7 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
           style: {
             border: '2px solid #5651e5',
             borderRadius: '25px',
-            minWidth: '400px', // Ensure min width
+            minWidth: '400px',
           },
         }}
       >
@@ -114,7 +114,7 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
           </DialogContentText>
 
           <div className="grid gap-4 py-4">
-            {/* Centered Image */}
+
             <div className="flex justify-center">
               <div className="border-2 border-[#5651e5] rounded-[25px] p-2">
                 <img
@@ -131,7 +131,6 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
               Quantity: {availableQuantity} available / {item.quantity} total
             </p>
 
-            {/* Your Reservation Section */}
             <div className="space-y-2">
               <p className="text-md font-medium text-[#5651e5]">Your Reservation</p>
               <div className="flex items-center justify-center space-x-2">
@@ -145,7 +144,6 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
               </div>
             </div>
 
-            {/* Buttons */}
             <div className="flex w-full gap-2">
               <Button
                 className="w-1/2 bg-gradient-to-r from-[#8d8aee] to-[#5651e5] !text-white hover:from-[#5651e5] hover:to-[#343188]"

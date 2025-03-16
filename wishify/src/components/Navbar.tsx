@@ -84,7 +84,7 @@ const Navbar = () => {
                   {isProfileMenuOpen && (
                     <ProfileMenu
                       closeMenu={() => setIsProfileMenuOpen(false)}
-                      logOut={logOut} // Pass logOut function to ProfileMenu
+                      logOut={logOut} 
                     />
                   )}
                 </div>

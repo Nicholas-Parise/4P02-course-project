@@ -81,7 +81,6 @@ const AddLikesModal = ({ open, handleClose, type, values, onSave }) => {
       />
 
       <Grid2 container spacing={2}>
-        {/* Available Items List */}
         <Grid2 item xs={6}>
           <Paper sx={{ height: 200, overflowY: 'auto', p: 1, width: 200, minWidth: 200 }}>
             <List sx={{ width: '100%' }}>
@@ -100,7 +99,6 @@ const AddLikesModal = ({ open, handleClose, type, values, onSave }) => {
           </Paper>
         </Grid2>
 
-        {/* Selected Items List */}
         <Grid2 item xs={6}>
           <Paper sx={{ height: 200, overflowY: 'auto', p: 1, width: 200, minWidth: 200 }}>
             <Typography variant="subtitle1">Selected Items</Typography>

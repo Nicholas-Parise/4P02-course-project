@@ -8,7 +8,6 @@ import picture4 from '../assets/gift.jpg';
 import picture5 from '../assets/sports.jpg';
 import picture6 from '../assets/clothing.jpeg';
 
-// Preloaded images (you can replace these with your own image URLs)
 const preloadedImages = [
   picture1,
   picture2,
@@ -33,13 +32,12 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
   const [selectedWishlist, setSelectedWishlist] = useState<string>('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  // Function to check if all required fields are filled
   const isFormValid = () => {
     return (
-      newItem.name && // Name is required
-      newItem.price !== undefined && newItem.price >= 0 && // Price is required and non-negative
-      newItem.quantity !== undefined && newItem.quantity >= 0 && // Quantity is required and non-negative
-      selectedWishlist // Wishlist is required
+      newItem.name && 
+      newItem.price !== undefined && newItem.price >= 0 && 
+      newItem.quantity !== undefined && newItem.quantity >= 0 && 
+      selectedWishlist 
     );
   };
 
@@ -58,7 +56,7 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
         name: newItem.name,
         description: newItem.description || '',
         url: newItem.url || '',
-        image: selectedImage || '', // Use the selected image
+        image: selectedImage || '', 
         quantity: newItem.quantity,
         price: newItem.price,
         wishlists_id: Number(selectedWishlist),
@@ -82,12 +80,12 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
       aria-describedby="item-dialog-description"
       sx={{
         '& .MuiDialog-paper': {
-          borderRadius: '25px', // Rounded corners
-          background: '#FFFFFF', // Background color matching ProfileMenu
+          borderRadius: '25px', 
+          background: '#FFFFFF', 
           padding: '20px',
-          border: '2px solid #5651e5', // Border color
-          maxWidth: '900px', // Set max width to 900px
-          width: '100%', // Ensure it takes full width up to the max width
+          border: '2px solid #5651e5', 
+          maxWidth: '900px', 
+          width: '100%', 
         },
       }}
     >
@@ -100,7 +98,6 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
         </DialogContentText>
 
         <form autoComplete="off" onSubmit={createItem}>
-          {/* Preloaded Image Selection */}
           <FormControl fullWidth sx={{ mt: 3, display: 'flex', alignItems: 'center' }}>
             <DialogContentText sx={{ color: '#000', mb: 2 }}>Choose an image:</DialogContentText>
             <div
@@ -108,8 +105,8 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
                 display: 'flex',
                 flexWrap: 'wrap',
                 gap: '10px',
-                justifyContent: 'center', // Center the images horizontally
-                maxWidth: '100%', // Ensure the container doesn't overflow
+                justifyContent: 'center', 
+                maxWidth: '100%', 
               }}
             >
               {preloadedImages.map((image, index) => (
@@ -133,16 +130,15 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
             </div>
           </FormControl>
 
-          {/* Wishlist Select */}
           <FormControl fullWidth sx={{ mt: 2 }}>
             <InputLabel
               id="wishlist-select"
               required
               sx={{
                 color: '#5651e5',
-                backgroundColor: '#FFFFFF', // Match the dialog background
-                padding: '0 5px', // Add padding to prevent overlap
-                transform: 'translate(14px, -6px) scale(0.75)', // Adjust position
+                backgroundColor: '#FFFFFF', 
+                padding: '0 5px', 
+                transform: 'translate(14px, -6px) scale(0.75)', 
               }}
             >
               Wishlist
@@ -160,7 +156,7 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
                   border: 'none',
                 },
                 '& .MuiSelect-select': {
-                  padding: '12px 14px', // Adjust padding for better alignment
+                  padding: '12px 14px', 
                 },
               }}
             >
@@ -173,7 +169,6 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
             </Select>
           </FormControl>
 
-          {/* Name Field */}
           <TextField
             sx={{
               mt: 3,
@@ -181,20 +176,20 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
                 borderRadius: '8px',
                 border: '2px solid #5651e5',
                 '&.Mui-focused': {
-                  border: '2px solid #ccc', // Grey border when focused
+                  border: '2px solid #ccc', 
                 },
                 '& fieldset': {
-                  border: 'none', // Remove default border
+                  border: 'none', 
                 },
               },
             }}
-            variant="outlined" // Use the outlined variant
+            variant="outlined" 
             InputLabelProps={{
               sx: {
                 color: '#5651e5',
-                backgroundColor: '#FFFFFF', // Match the dialog background
-                padding: '0 5px', // Add padding to prevent overlap
-                transform: 'translate(14px, -6px) scale(0.75)', // Adjust position
+                backgroundColor: '#FFFFFF', 
+                padding: '0 5px', 
+                transform: 'translate(14px, -6px) scale(0.75)', 
               },
             }}
             label="Name"
@@ -204,7 +199,7 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
             fullWidth
           />
 
-          {/* Description Field */}
+
           <TextField
             sx={{
               mt: 3,
@@ -212,20 +207,20 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
                 borderRadius: '8px',
                 border: '2px solid #5651e5',
                 '&.Mui-focused': {
-                  border: '2px solid #ccc', // Grey border when focused
+                  border: '2px solid #ccc', 
                 },
                 '& fieldset': {
-                  border: 'none', // Remove default border
+                  border: 'none', 
                 },
               },
             }}
-            variant="outlined" // Use the outlined variant
+            variant="outlined" 
             InputLabelProps={{
               sx: {
                 color: '#5651e5',
-                backgroundColor: '#FFFFFF', // Match the dialog background
-                padding: '0 5px', // Add padding to prevent overlap
-                transform: 'translate(14px, -6px) scale(0.75)', // Adjust position
+                backgroundColor: '#FFFFFF', 
+                padding: '0 5px', 
+                transform: 'translate(14px, -6px) scale(0.75)', 
               },
             }}
             label="Description"
@@ -235,7 +230,6 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
             fullWidth
           />
 
-          {/* Price Field */}
           <TextField
             sx={{
               mt: 3,
@@ -243,20 +237,20 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
                 borderRadius: '8px',
                 border: '2px solid #5651e5',
                 '&.Mui-focused': {
-                  border: '2px solid #ccc', // Grey border when focused
+                  border: '2px solid #ccc', 
                 },
                 '& fieldset': {
-                  border: 'none', // Remove default border
+                  border: 'none', 
                 },
               },
             }}
-            variant="outlined" // Use the outlined variant
+            variant="outlined" 
             InputLabelProps={{
               sx: {
                 color: '#5651e5',
-                backgroundColor: '#FFFFFF', // Match the dialog background
-                padding: '0 5px', // Add padding to prevent overlap
-                transform: 'translate(14px, -6px) scale(0.75)', // Adjust position
+                backgroundColor: '#FFFFFF', 
+                padding: '0 5px', 
+                transform: 'translate(14px, -6px) scale(0.75)', 
               },
             }}
             type="number"
@@ -271,7 +265,6 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
             fullWidth
           />
 
-          {/* Quantity Field */}
           <TextField
             sx={{
               mt: 3,
@@ -279,20 +272,20 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
                 borderRadius: '8px',
                 border: '2px solid #5651e5',
                 '&.Mui-focused': {
-                  border: '2px solid #ccc', // Grey border when focused
+                  border: '2px solid #ccc', 
                 },
                 '& fieldset': {
-                  border: 'none', // Remove default border
+                  border: 'none', 
                 },
               },
             }}
-            variant="outlined" // Use the outlined variant
+            variant="outlined" 
             InputLabelProps={{
               sx: {
                 color: '#5651e5',
-                backgroundColor: '#FFFFFF', // Match the dialog background
-                padding: '0 5px', // Add padding to prevent overlap
-                transform: 'translate(14px, -6px) scale(0.75)', // Adjust position
+                backgroundColor: '#FFFFFF', 
+                padding: '0 5px', 
+                transform: 'translate(14px, -6px) scale(0.75)', 
               },
             }}
             value={newItem.quantity || ''}
@@ -307,7 +300,6 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
             fullWidth
           />
 
-          {/* Purchase Link Field */}
           <TextField
             sx={{
               mt: 3,
@@ -315,20 +307,20 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
                 borderRadius: '8px',
                 border: '2px solid #5651e5',
                 '&.Mui-focused': {
-                  border: '2px solid #000', // Grey border when focused
+                  border: '2px solid #000', 
                 },
                 '& fieldset': {
-                  border: 'none', // Remove default border
+                  border: 'none', 
                 },
               },
             }}
-            variant="outlined" // Use the outlined variant
+            variant="outlined" 
             InputLabelProps={{
               sx: {
                 color: '#5651e5',
-                backgroundColor: '#FFFFFF', // Match the dialog background
-                padding: '0 5px', // Add padding to prevent overlap
-                transform: 'translate(14px, -6px) scale(0.75)', // Adjust position
+                backgroundColor: '#FFFFFF',
+                padding: '0 5px', 
+                transform: 'translate(14px, -6px) scale(0.75)', 
               },
             }}
             label="Purchase Link"
@@ -338,33 +330,32 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
             fullWidth
           />
 
-          {/* Create Button */}
           <Button
             sx={{
               mt: 3,
-              borderRadius: '25px', // Border radius
-              padding: '10px', // Padding
+              borderRadius: '25px', 
+              padding: '10px', 
               background: isFormValid()
-                ? 'linear-gradient(135deg, #8d8aee, #5651e5)' // Default gradient when active
-                : 'none', // No background when inactive
-              color: isFormValid() ? '#fff' : '#808080', // White text when active, grey when inactive
+                ? 'linear-gradient(135deg, #8d8aee, #5651e5)' 
+                : 'none', 
+              color: isFormValid() ? '#fff' : '#808080', 
               textTransform: 'none',
-              border: isFormValid() ? 'none' : '2px solid #5651e5', // No border when active, border when inactive
+              border: isFormValid() ? 'none' : '2px solid #5651e5', 
               '&:hover': {
                 background: isFormValid()
-                  ? 'linear-gradient(135deg, #5651e5, #343188)' // Hover gradient when active
-                  : 'none', // No hover background when inactive
+                  ? 'linear-gradient(135deg, #5651e5, #343188)' 
+                  : 'none', 
               },
               '&:disabled': {
-                color: '#808080', // Grey text when disabled
-                border: '2px solid #5651e5', // Border when disabled
-                background: 'none', // No background when disabled
+                color: '#808080',
+                border: '2px solid #5651e5', 
+                background: 'none', 
               },
             }}
             type="submit"
             variant="contained"
             fullWidth
-            disabled={!isFormValid()} // Disable the button if the form is not valid
+            disabled={!isFormValid()} 
           >
           Create
         </Button>

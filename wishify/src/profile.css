@@ -62,7 +62,7 @@
 }
 
 .profile-setting-label {
-  width: 30%; /* Adjust label width */
+  width: 30%;
   font-weight: bold;
   font-size: 20px;
   color: black;
@@ -87,7 +87,6 @@
   font-weight: bold;
 }
 
-/* Rest of the content */
 .profile-content {
   margin-top: 20px;
 }
@@ -177,7 +176,6 @@
   background-color: rgba(243, 194, 194, 0.2);
 }
 
-/* Button container for horizontal stacking */
 .button-container {
   display: flex;
   width: 100%;

@@ -21,7 +21,6 @@ const Profile = () => {
     dislikes: ['Books'],
   });
 
-  // Modal setup
   const [openModals, setOpenModals] = React.useState({
     displayName: false,
     biography: false,
@@ -80,7 +79,6 @@ const Profile = () => {
       <section className="profile-container">
         <h1>Profile settings</h1>
 
-        {/* Profile header */}
         <div className="profile-header">
           <div className="profile-picture">
             <img
@@ -94,7 +92,6 @@ const Profile = () => {
           </div>
 
           <div className="profile-header-fields">
-            {/* Display Name Field */}
             <SettingsItem
               label="Display Name:"
               values={user.displayName}
@@ -102,7 +99,6 @@ const Profile = () => {
               onEdit={() => handleOpenModal('displayName')}
             />
 
-            {/* Email Field */}
             <SettingsItem
               label="Email:"
               values={user.email}
@@ -114,7 +110,6 @@ const Profile = () => {
 
         <hr />
 
-        {/* Rest of the content */}
         <div className="profile-content">
           <SettingsItem
             label="Biography:"

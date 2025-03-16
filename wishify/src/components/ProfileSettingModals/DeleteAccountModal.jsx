@@ -29,7 +29,7 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
     transform: 'translate(-50%, -50%)',
     width: 400,
     bgcolor: 'background.paper',
-    border: '2px solid #5651e5', // Same border style
+    border: '2px solid #5651e5', 
     borderRadius: '25px',
     boxShadow: 24,
     p: 4,
@@ -92,7 +92,6 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
       </Box>
     </Modal>
 
-    {/* Confirmation Modal */}
     <Modal open={confirmOpen} onClose={() => setConfirmOpen(false)}>
         <Box sx={{ ...modalStyle, width: '350px' }}>
           <Typography variant="h6" sx={{ textAlign: 'center', fontWeight: 'bold', color: '#5651e5' }}>

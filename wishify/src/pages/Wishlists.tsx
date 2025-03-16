@@ -256,7 +256,6 @@ const Wishlists = () => {
         <WishlistThumbnail title={"Birthday Blam's Birthday Bash (can view and contribute)"} role={"contributor"} owner={"Birthday Blam"}></WishlistThumbnail>
         <WishlistThumbnail title={"Geoff's Christmas Wishlist"} id={1234} role={"contributor"} owner={"Geoff"}></WishlistThumbnail>
       </WishlistContainer>
-      {/* Modal for Creating Wishlists */}
       <Modal
         open={modalOpen}
         onClose={handleModalClose}
