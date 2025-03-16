@@ -1,4 +1,5 @@
-navbar {
+/* Navbar Styling */
+.navbar {
     width: 100%;
     height: 80px;
     background-color: #fff;
@@ -6,48 +7,49 @@ navbar {
     display: flex;
     align-items: center;
     padding: 1rem 2rem;
+    position: sticky; /* Make the navbar sticky */
+    top: 0; /* Stick to the top of the viewport */
+    z-index: 1000; /* Ensure the navbar stays above other content */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for better visibility */
 }
 
+/* Container for navbar content */
 .navbar .container1 {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #fff;
     width: 100%;
-    padding: 0 1rem; 
-    box-sizing: border-box; 
+    padding: 0 1rem;
+    box-sizing: border-box;
 }
 
+/* Container for sign-up/login buttons */
 .navbar .container2 {
-    height: 100%;
     display: flex;
-    justify-content: space-between;
-    background-color: #fff;
-    align-items: left;
-    box-sizing: border-box; 
+    gap: 1rem;
+    align-items: center;
 }
 
-.navbar .container1 h1 {
+/* Logo styling */
+.navbar .logo h1 {
     display: flex;
     align-items: center;
     font-size: 3rem;
     font-weight: bold;
 }
 
-.navbar .container1 h1 span {
+.navbar .logo h1 span {
     display: flex;
     align-items: center;
+    color: #5651e5; /* Highlight color for "Wish" */
 }
 
-.navbar .container1 h1 svg {
+.navbar .logo h1 svg {
     font-size: 2.5rem;
     margin-right: 5px;
 }
 
-.navbar span {
-    color: #5651e5;
-}
-
+/* Navigation menu styling */
 .navbar .nav-menu {
     display: flex;
     gap: 2rem;
@@ -58,34 +60,22 @@ navbar {
     text-decoration: none;
     color: black;
     padding: 0.5rem 1rem;
+    transition: 0.3s ease-in-out;
 }
 
-.navbar li {
-    padding: 1rem;
+.navbar .nav-menu a:hover {
+    background-color: rgba(86, 81, 229, 0.1); /* Light hover effect */
+    border-radius: 5px;
 }
 
-.navbar .icon {
-    font-size: 1.5rem;
-}
-
-.navbar .logo {
-    display: flex;
-    align-items: center;
-    font-size: 2rem;
-    font-weight: bold;
-}
-
-.navbar .logo span {
-    color: #5651e5;
-    margin-left: 5px;
-}
-
+/* Actions container (holds Add Wish and Profile buttons) */
 .navbar .actions {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 1rem; /* Space between buttons */
 }
 
+/* Button styling */
 .navbar .btn {
     display: flex;
     align-items: center;
@@ -94,29 +84,17 @@ navbar {
     color: white;
     border: none;
     padding: 0.7rem 1.2rem;
-    border-radius: 8px;
+    border-radius: 25px;
     font-size: 1rem;
     cursor: pointer;
     transition: 0.3s;
-    margin: 0.5rem 0; 
 }
 
 .navbar .btn:hover {
-    background: linear-gradient(135deg, #5651e5, #343188);
+    background: linear-gradient(135deg, #5651e5, #343188); /* Darker gradient on hover */
 }
 
-navbar .nav-menu a {
-    text-decoration: none;
-    color: black;
-    padding: 0.5rem 1rem;
-    transition: 0.3s ease-in-out;
-}
-
-.navbar .nav-menu a:hover {
-    background-color: rgba(86, 81, 229, 0.1); 
-    border-radius: 5px;
-}
-
+/* Profile icon styling */
 .navbar .profile-icon {
     font-size: 1.8rem;
     cursor: pointer;
@@ -131,5 +109,5 @@ navbar .nav-menu a {
 }
 
 .navbar .profile-icon:hover {
-    background: rgba(86, 81, 229, 0.2); 
+    background: rgba(86, 81, 229, 0.2); /* Slightly darker on hover */
 }

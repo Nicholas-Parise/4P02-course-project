@@ -1,127 +1,134 @@
-import { useState } from 'react'
-import { NavLink } from "react-router-dom";
+import React, { useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import { AiFillGift, AiOutlinePlus, AiOutlineUser } from 'react-icons/ai';
-import { Wishlist } from '../types/types';
-import { WishlistItem } from '../types/types';
+import { useAuth } from '../utils/AuthContext.jsx';
 import CreateItemDialog from './CreateItemDialog';
+import ProfileMenu from '../components/ProfileMenu.jsx';
 import '../components/Navbarlanding/landingheader.css';
 
-const Navbar = ({isLoggedIn}: {isLoggedIn: boolean}) => {
-  
-  interface NavItem{
-    label: string,
-    href: string
-  }
-  
-
-  const [listNav] = useState<NavItem[]>([
+const Navbar = () => {
+  const { isLoggedIn, logOut } = useAuth(); // Use the useAuth hook
+  const [listNav] = useState([
     { label: 'Wishlist', href: '/wishlists' },
-    { label: 'Events', href: '/events' }
-  ])
+    { label: 'Events', href: '/events' },
+  ]);
 
-  const [token, setToken] = useState<string>(localStorage.getItem('token') || '')
-
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [wishlists, setWishlists] = useState<Wishlist[]>([])
-  const [error, setError] = useState(null)
-  const [loading, setLoading] = useState(false)
-
-  const [newItem, setNewItem] = useState<Partial<WishlistItem>>({})
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [wishlists, setWishlists] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [newItem, setNewItem] = useState({});
+  const [imagePreview, setImagePreview] = useState(null);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   const fetchWishlists = () => {
-    const token = localStorage.getItem('token') || ''
-    setToken(token)
-    setLoading(true)
+    const token = localStorage.getItem('token') || '';
+    setLoading(true);
 
-    const url = "https://api.wishify.ca/wishlists"
-
-    fetch(url, {
+    fetch('https://api.wishify.ca/wishlists', {
       method: 'get',
-      headers: new Headers({
-        'Authorization': "Bearer "+token
-      })
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then((response) => response.json())
       .then((data) => {
         setWishlists(data);
-        setLoading(false)
+        setLoading(false);
       })
       .catch((error) => {
-        setError(error)
-        setLoading(false)
-      })
-      .finally(() => setLoading(false))
-
-
-    return { wishlists, loading, error }
-  }
+        setError(error);
+        setLoading(false);
+      });
+  };
 
   const openModal = () => {
-    setNewItem({})
-    setImagePreview(null)
-    setIsModalOpen(true)
-  }
+    setNewItem({});
+    setImagePreview(null);
+    setIsModalOpen(true);
+  };
 
   return (
     <>
-      {isLoggedIn ? 
+      {isLoggedIn ? (
         <>
-          <nav className='navbar'>
-              <div className='container1'>
-                  <NavLink to="/" className='logo'>
-                      <h1><span><AiFillGift />Wish</span>ify</h1>
+          <nav className="navbar">
+            <div className="container1">
+              <NavLink to="/" className="logo">
+                <h1>
+                  <span>
+                    <AiFillGift />
+                    Wish
+                  </span>
+                  ify
+                </h1>
+              </NavLink>
+
+              <div className="nav-menu">
+                {listNav.map((item, index) => (
+                  <NavLink key={index} to={item.href} className="nav-link">
+                    {item.label}
                   </NavLink>
-
-                  <div className='nav-menu'>
-                      {listNav.map((item, index) => (
-                          <NavLink key={index} to={item.href} className='nav-link'>
-                              {item.label}
-                          </NavLink>
-                      ))}
-                  </div>
-
-                  <div className='actions'>
-                      <button onClick={() => (fetchWishlists(), openModal())} className='btn'>
-                          <AiOutlinePlus /> Add Wish
-                      </button>
-                      <NavLink to='/profile' className='profile-icon'>
-                          <AiOutlineUser />
-                      </NavLink>
-                  </div>
+                ))}
               </div>
+
+              <div className="actions">
+                <button onClick={() => (fetchWishlists(), openModal())} className="btn">
+                  <AiOutlinePlus /> Add Wish
+                </button>
+                <div className="profile-icon">
+                  <AiOutlineUser
+                    className="text-2xl cursor-pointer"
+                    onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                  />
+
+                  {/* Profile Menu Component */}
+                  {isProfileMenuOpen && (
+                    <ProfileMenu
+                      closeMenu={() => setIsProfileMenuOpen(false)}
+                      logOut={logOut} // Pass logOut function to ProfileMenu
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
           </nav>
 
-          <CreateItemDialog 
-            open={isModalOpen} 
-            setOpen={setIsModalOpen} 
-            image={imagePreview}
-            setImage={setImagePreview} 
+          <CreateItemDialog
+            open={isModalOpen}
+            setOpen={setIsModalOpen}
+            image={imagePreview} // Pass the image prop
+            setImage={setImagePreview} // Pass the setImage prop
             newItem={newItem}
             setNewItem={setNewItem}
             wishlists={wishlists}
-            token={token}
+            token={localStorage.getItem('token') || ''}
           />
         </>
-    : 
-      <div className='navbar'>
-        <div className='container1'>
-            <NavLink to="/landing" className='logo'>
-                <h1><span><AiFillGift />Wish</span>ify</h1>
+      ) : (
+        <div className="navbar">
+          <div className="container1">
+            <NavLink to="/landing" className="logo">
+              <h1>
+                <span>
+                  <AiFillGift />
+                  Wish
+                </span>
+                ify
+              </h1>
             </NavLink>
-            <div className='container2'>
-                <a href='/Register'><button  className='btn'>Sign Up</button></a>
-                &nbsp;
-                <a href='/Login'><button  className='btn'>Log In</button></a>
+            <div className="container2">
+              <a href="/Register">
+                <button className="btn">Sign Up</button>
+              </a>
+              &nbsp;
+              <a href="/Login">
+                <button className="btn">Log In</button>
+              </a>
             </div>
+          </div>
         </div>
-      </div>
-      
-      }
+      )}
     </>
-  )
-}
+  );
+};
 
-export default Navbar
-
-
+export default Navbar;

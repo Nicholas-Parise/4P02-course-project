@@ -1,48 +1,49 @@
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Link } from 'react-router-dom'
-import '../../login.css'
+import React from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../../utils/AuthContext.jsx"; 
+import "../../login.css";
 
-const Login = ({setIsLoggedIn}) => {
-  const [isAuthenticating, setIsAuthenticating] = React.useState(false)
-  const [showPassword, setShowPassword] = React.useState(false)
-  const [isValid, setIsValid] = React.useState(false)
+const Login = () => {
+  const [isAuthenticating, setIsAuthenticating] = React.useState(false);
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [isValid, setIsValid] = React.useState(false);
   const [responseMessage, setResponseMessage] = React.useState("");
   const [responseType, setResponseType] = React.useState(""); // "success" or "error"
   const [formData, setFormData] = React.useState({
     email: "",
-    password: ""
+    password: "",
   });
 
   const navigate = useNavigate();
+  const { logIn } = useAuth(); // Use logIn from AuthContext
 
   const handleFormChange = (event) => {
-    const { name, value } = event.target
+    const { name, value } = event.target;
 
-    setFormData(prevData => {
-      const newData = { ...prevData, [name]: value}
-      validateForm(newData)
-      return newData
-    })
-  }
+    setFormData((prevData) => {
+      const newData = { ...prevData, [name]: value };
+      validateForm(newData);
+      return newData;
+    });
+  };
 
   const validateForm = (data) => {
-    const isEmailValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(data.email)
-    const isPasswordValid = data.password.length >= 8 && data.password.length <= 64
+    const isEmailValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(data.email);
+    const isPasswordValid = data.password.length >= 8 && data.password.length <= 64;
 
-    const isFormValid = isEmailValid && isPasswordValid
+    const isFormValid = isEmailValid && isPasswordValid;
 
-    setIsValid(isFormValid)
-  }
-  
+    setIsValid(isFormValid);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!isValid || isAuthenticating) { 
-      return 
+    if (!isValid || isAuthenticating) {
+      return;
     }
-    
-    setIsAuthenticating(true)
+
+    setIsAuthenticating(true);
 
     try {
       const response = await fetch("https://api.wishify.ca/auth/login", {
@@ -50,21 +51,21 @@ const Login = ({setIsLoggedIn}) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email: formData.email, password: formData.password })
-      })
+        body: JSON.stringify({ email: formData.email, password: formData.password }),
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (response.status === 200 && data.token) {
-        localStorage.setItem('token', data.token)
+        localStorage.setItem("token", data.token); // Save token to localStorage
+        logIn(data.token); // Update AuthContext
         setResponseMessage(
           <>
             Successfully authenticated. Redirecting to your <Link to="/home" className="home-link">home page</Link>...
           </>
         );
-        setIsLoggedIn(true);
         setResponseType("success");
-        navigate("../Home")
+        navigate("/home"); // Redirect to home page
       } else if (response.status === 400) {
         setResponseMessage("Bad request. Please fill in all required fields.");
         setResponseType("error");
@@ -78,18 +79,17 @@ const Login = ({setIsLoggedIn}) => {
         setResponseMessage("An unexpected error occurred. Please try again.");
         setResponseType("error");
       }
-
     } catch (err) {
       setResponseMessage(`An error occurred: ${err.message}`);
       setResponseType("error");
     } finally {
-      setIsAuthenticating(false)
+      setIsAuthenticating(false);
     }
-  }
-  
+  };
+
   const togglePasswordVisibility = () => {
-    setShowPassword(prevState => !prevState)
-  }
+    setShowPassword((prevState) => !prevState);
+  };
 
   return (
     <>
@@ -97,51 +97,50 @@ const Login = ({setIsLoggedIn}) => {
         <h2>Sign in to continue</h2>
         <form onSubmit={handleSubmit}>
           <label htmlFor="email">Email</label>
-          <input 
+          <input
             type="email"
             id="email"
             name="email"
             value={formData.email}
             onChange={handleFormChange}
             required
-            placeholder='johndoe@wishify.com'
+            placeholder="johndoe@wishify.com"
           ></input>
 
           <label htmlFor="password">Password</label>
-          <div className='login-password-input-container'>
-            <input 
+          <div className="login-password-input-container">
+            <input
               type={showPassword ? "text" : "password"}
               id="password"
               name="password"
               value={formData.password}
               onChange={handleFormChange}
               required
-              placeholder='Password'
+              placeholder="Password"
             ></input>
-            <span
-              className='login-password-toggle'
-              onClick={togglePasswordVisibility}
-            >
+            <span className="login-password-toggle" onClick={togglePasswordVisibility}>
               {showPassword ? "Hide" : "Show"}
             </span>
           </div>
 
-          <button type="submit" disabled={!isValid || isAuthenticating}>Login</button>
+          <button type="submit" disabled={!isValid || isAuthenticating}>
+            Login
+          </button>
         </form>
 
         {responseMessage && (
-          <div className={`response-message ${responseType}`}>
-            {responseMessage}
-          </div>
+          <div className={`response-message ${responseType}`}>{responseMessage}</div>
         )}
 
-        <Link to="/forgot-password" className="login-forgot-password">Forgot password?</Link>
+        <Link to="/forgot-password" className="login-forgot-password">
+          Forgot password?
+        </Link>
         <div className="login-signup">
           Don't have an account? <Link to="/register">Sign up here</Link>
         </div>
       </section>
     </>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

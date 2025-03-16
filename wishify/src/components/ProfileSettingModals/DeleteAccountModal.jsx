@@ -22,15 +22,15 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
     setConfirmOpen(true)
   }
 
-  const style = {
+  const modalStyle = {
     position: 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 500,
+    width: 400,
     bgcolor: 'background.paper',
-    border: 'none',
-    borderRadius: 4,
+    border: '2px solid #5651e5', // Same border style
+    borderRadius: '25px',
     boxShadow: 24,
     p: 4,
   }
@@ -38,16 +38,18 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
   return (
     <>
     <Modal open={open} onClose={handleClose}>
-      <Box sx={style}>
-        <Typography variant='h6' color="error">Delete Account</Typography>
+      <Box sx={modalStyle}>
+        <Typography variant='h6' sx={{ textAlign: 'center', fontWeight: 'bold', color: '#5651e5' }}>
+          Delete Account
+        </Typography>
 
         <Divider sx={{mb: 2}} />
 
-        <Typography variant='body1' mb={2}>
+        <Typography variant='body1' mb={2} sx={{ textAlign: 'center' }}>
           To delete your account, please enter your password.
         </Typography>
 
-        <Typography variant='body2' mb={2} style={{color: 'red'}}>
+        <Typography variant='body2' mb={2} sx={{ color: 'red', textAlign: 'center' }}>
           Warning: This action is final and cannot be undone.
         </Typography>
 
@@ -64,58 +66,67 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
             sx={{mb: 2}}
           />
 
-          <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
+          <Box sx={{display: 'flex', justifyContent: 'center', gap: 2}}>
+            <Button
+              variant="contained"
+              sx={{
+                background: 'white',
+                color: 'red',
+                border: '2px solid red',
+                borderRadius: '25px',
+                '&:hover': { background: '#ffebeb' }
+              }}
+              type="submit"
+            >
+              Delete Account
+            </Button>
             <Button
               variant="outlined"
               onClick={handleClose}
-              sx={{ mr: 1 }}>
+              sx={{ borderRadius: '25px', borderColor: '#5651e5', color: '#5651e5' }}
+            >
               Cancel
-            </Button>
-            <Button
-              variant="contained"
-              color='error'
-              type="submit">
-              Delete Account
             </Button>
           </Box>
         </form>
       </Box>
     </Modal>
 
-    {/* Child modal for confirmation */}
+    {/* Confirmation Modal */}
     <Modal open={confirmOpen} onClose={() => setConfirmOpen(false)}>
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            backgroundColor: 'white',
-            padding: 3,
-            borderRadius: 4,
-            boxShadow: 24,
-            width: '400px',
-          }}
-        >
-          <Typography variant="h6" mb={2} color="error">
+        <Box sx={{ ...modalStyle, width: '350px' }}>
+          <Typography variant="h6" sx={{ textAlign: 'center', fontWeight: 'bold', color: '#5651e5' }}>
             Confirm Account Deletion
           </Typography>
-          <Typography variant="body2" mb={2}>
+          <Typography variant="body2" mb={2} sx={{ textAlign: 'center' }}>
             Are you sure you want to delete your account? This action cannot be undone.
           </Typography>
           <Divider sx={{ mb: 2 }} />
 
-          {/* Buttons */}
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button variant="outlined" onClick={() => setConfirmOpen(false)} sx={{ mr: 1 }}>
-              Cancel
-            </Button>
-            <Button variant="contained" color="error" onClick={handleConfirmDelete}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+            <Button
+              variant="contained"
+              sx={{
+                background: 'white',
+                color: 'red',
+                border: '2px solid red',
+                borderRadius: '25px',
+                '&:hover': { background: '#ffebeb' }
+              }}
+              onClick={handleConfirmDelete}
+            >
               Confirm Deletion
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => setConfirmOpen(false)}
+              sx={{ borderRadius: '25px', borderColor: '#5651e5', color: '#5651e5' }}
+            >
+              Cancel
             </Button>
           </Box>
         </Box>
-      </Modal>
+    </Modal>
     </>
   )
 }

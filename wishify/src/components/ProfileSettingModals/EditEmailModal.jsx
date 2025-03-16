@@ -14,7 +14,7 @@ const EditEmailModal = ({ open, handleClose, value, onSave }) => {
 
   const handleSave = () => {
     onSave(inputValue)
-    handleClose();
+    handleClose()
   }
 
   const handleSubmit = (e) => {
@@ -22,35 +22,37 @@ const EditEmailModal = ({ open, handleClose, value, onSave }) => {
     handleSave()
   }
 
-  const style = {
+  const modalStyle = {
     position: 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: 500,
     bgcolor: 'background.paper',
-    border: 'none',
-    borderRadius: 4,
+    border: '2px solid #5651e5',
+    borderRadius: '25px',
     boxShadow: 24,
     p: 4,
   }
 
   return (
     <Modal open={open} onClose={handleClose}>
-      <Box sx={style}>
-        <Typography variant='h6'>Edit Email Address</Typography>
+      <Box sx={modalStyle}>
+        <Typography variant='h6' sx={{ textAlign: 'center', fontWeight: 'bold', color: '#5651e5' }}>
+          Edit Email Address
+        </Typography>
 
-        <Divider sx={{mb: 2}} />
+        <Divider sx={{ mb: 2 }} />
 
-        <Typography variant='body1' mb={2}>
+        <Typography variant='body1' mb={2} sx={{ textAlign: 'center' }}>
           Your current email address is <strong>{value}</strong>
         </Typography>
 
-        <Typography variant='body2' mb={2}>
-          Your email address is used to log in to your account and to receive notifications.
+        <Typography variant='body2' mb={2} sx={{ textAlign: 'center' }}>
+          Your email address is used to log in to your account and receive notifications.
         </Typography>
 
-        <Divider sx={{mb: 2}} />
+        <Divider sx={{ mb: 2 }} />
 
         <form onSubmit={handleSubmit}>
           <TextField
@@ -60,32 +62,38 @@ const EditEmailModal = ({ open, handleClose, value, onSave }) => {
             onChange={(e) => setInputValue(e.target.value)}
             fullWidth
             variant='outlined'
-            sx={{mb: 2}}
+            sx={{ mb: 2 }}
           />
 
-<         TextField
+          <TextField
             label="Enter your account password"
             type="password"
             value={passwordValue}
             onChange={(e) => setPasswordValue(e.target.value)}
             fullWidth
             variant='outlined'
-            sx={{mb: 2}}
+            sx={{ mb: 2 }}
           />
 
-          <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
-            <Button
-              variant="contained"
-              type="submit"
-              sx={{ mr: 1 }}
-            >
-              Save
-            </Button>
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
             <Button
               variant="outlined"
               onClick={handleClose}
+              sx={{ borderRadius: '25px', borderColor: '#5651e5', color: '#5651e5' }}
             >
               Cancel
+            </Button>
+            <Button
+              variant="contained"
+              type="submit"
+              sx={{
+                background: 'linear-gradient(to right, #8d8aee, #5651e5)',
+                color: 'white',
+                borderRadius: '25px',
+                '&:hover': { background: 'linear-gradient(to right, #5651e5, #343188)' }
+              }}
+            >
+              Save
             </Button>
           </Box>
         </form>
@@ -94,4 +102,4 @@ const EditEmailModal = ({ open, handleClose, value, onSave }) => {
   )
 }
 
-export default EditEmailModal;
+export default EditEmailModal

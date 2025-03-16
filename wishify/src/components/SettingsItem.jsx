@@ -1,6 +1,5 @@
 import React from 'react'
 
-
 const SettingsItem = ({ label, values, buttonText, onEdit }) => {
 
   return (
