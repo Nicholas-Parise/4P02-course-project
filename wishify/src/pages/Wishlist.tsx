@@ -208,6 +208,11 @@ const Wishlist = () => {
       }
   }
 
+  const getItemReservations = (itemId: number) => {
+    const itemReservations = wishlistContributions.filter((c) => c.item_id === itemId)
+    return itemReservations
+  }
+
   return (
     <>
       <section className='pt-5'>
@@ -236,7 +241,7 @@ const Wishlist = () => {
               <SortableContext items={sortedItems.map((item) => item.id)}>
                   <ul className="space-y-4">
                   {sortedItems.map((item) => (
-                      <WishlistItemEntry key={item.id} item={item} sortBy={sortBy} onReserve={handleReserveItem}/>
+                      <WishlistItemEntry key={item.id} item={item} sortBy={sortBy} reservations={getItemReservations(item.id)} onReserve={handleReserveItem}/>
                   ))}
                   </ul>
               </SortableContext>
