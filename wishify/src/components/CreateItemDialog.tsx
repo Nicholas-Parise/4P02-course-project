@@ -1,7 +1,6 @@
 import { useState, type ChangeEvent, FormEvent } from 'react'
 import { Dialog, DialogTitle, DialogContent, DialogContentText, Select, SelectChangeEvent, InputLabel, FormControl, Button, MenuItem, TextField } from '@mui/material';
 import { Wishlist, WishlistItem } from '../types/types';
-import { useParams } from 'react-router-dom';
 
 interface Props {
     open: boolean, 
