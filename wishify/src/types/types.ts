@@ -34,6 +34,12 @@ export interface WishlistItem {
 };
 
 export interface Contribution{
-    user: string,
-    quantity: number
+    id: number,
+    item_id: number,
+    member_id: number,
+    quantity: number,
+    purchased: boolean,
+    note: string,
+    dateUpdated: string,
+    dateCreated: string
 }

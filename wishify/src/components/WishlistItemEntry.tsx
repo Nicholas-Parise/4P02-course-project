@@ -8,7 +8,7 @@ import { FaExternalLinkAlt, FaMinus, FaPlus } from 'react-icons/fa';
 type WishlistItemProps = {
   item: WishlistItem,
   sortBy: "priority" | "price" | "quantity"
-  onReserve: (itemId: number, reservation: number, user: string) => void
+  onReserve: (itemId: number, reservation: number, note: string) => void
 }
 
 const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
@@ -21,15 +21,16 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
   };
 
   const isDraggable = sortBy === "priority"
-  const currentUser = "Current User" // In a real app, this would come from authentication
+  const currentUser = 1  //In a real app, this would come from authentication
   const totalReserved = item.quantitySupplied || 0
-  const userReservation = item.contributions?.find((r) => r.user === currentUser)
+  const userReservation = item.contributions?.find((r) => r.member_id === currentUser)
   const availableQuantity = item.quantity - totalReserved
 
   const reservedBadgeColour = availableQuantity <= 0 ? "bg-green-600" : "bg-yellow-500"
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [reserveQuantity, setReserveQuantity] = useState(0)
+  const [reserveNote, setReserveNote] = useState("")
 
   const incrementReserve = () => setReserveQuantity((prev) => Math.min(prev + 1, availableQuantity))
   const decrementReserve = () => setReserveQuantity((prev) => Math.max(prev - 1, 0))
@@ -40,11 +41,20 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
 
   const handleReserve = () => {
     if (reserveQuantity > 0) {
-      onReserve(item.id, reserveQuantity, currentUser)
+      //onReserve(item.id, reserveQuantity, currentUser)
+      onReserve(item.id, reserveQuantity, reserveNote)
     } else {
-      onReserve(item.id, 0, currentUser) // Remove reservation if quantity is 0
+      //onReserve(item.id, 0, currentUser)  Remove reservation if quantity is 0
+      onReserve(item.id, 0, reserveNote)
     }
     setIsModalOpen(false)
+  }
+
+  const handleReserveQuantity = (e: any) => {
+    if (["e", "E", "-"].some((char) => e.target.value.includes(char))) return;
+
+    // handle change here
+    setReserveQuantity(parseInt(e.target.value) || NaN);
   }
 
   return (
@@ -109,7 +119,7 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
                 <p className="font-semibold">Current Reservations:</p>
                 {item.contributions?.map((res, index) => (
                   <p key={index} className="text-green-600">
-                    {res.user}: {res.quantity}
+                    {res.member_id}: {res.quantity}
                   </p>
                 ))}
               </div>
@@ -122,12 +132,19 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
                 </Button>
                 <TextField
                   value={reserveQuantity}
+                  onChange={(e) => handleReserveQuantity(e)}
+                  
                   className="w-20 text-center"
                 />
                 <Button onClick={incrementReserve}>
                   <FaPlus className="h-4 w-4" />
                 </Button>
               </div>
+              <TextField
+                value={reserveNote}
+                label="Leave a comment"
+                onChange={(e) => setReserveNote(e.target.value)}
+              />
             </div>
             <div className="flex space-x-2">
               <Button>

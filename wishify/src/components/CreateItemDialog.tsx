@@ -10,10 +10,12 @@ interface Props {
     newItem: Partial<WishlistItem>
     setNewItem: (state: Partial<WishlistItem>) => void
     wishlists: Wishlist[]
-    token: string
+    token: string,
+    page: string,
+    id: string
 }
 
-const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem, wishlists, token }: Props) => {
+const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem, wishlists, token, id }: Props) => {
 
     const [selectedWishlist, setSelectedWishlist] = useState<string>('')
 
@@ -53,7 +55,9 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
         .then((response) => response.json())
         .then((data) => {
             setOpen(false)
-            console.log(data);
+            if(id!=undefined && data.item.member_id == id){
+                window.location.reload()
+            }
         })
         .catch((error) => {
             console.log(error)

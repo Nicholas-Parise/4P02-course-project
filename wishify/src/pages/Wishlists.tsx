@@ -1,5 +1,4 @@
-import React, {useState, useEffect, FormEvent, act} from 'react'
-import { useParams } from "react-router-dom"
+import React, {useState, useEffect, FormEvent} from 'react'
 import { type Wishlist } from '../types/types'
 import {CreateWishlist} from '../components/CreateButton'
 import {WishlistThumbnail} from '../components/Thumbnail'
@@ -32,7 +31,6 @@ const WishlistContainer = styled.div`
 `
 
 const Wishlists = () => {
-  const { id } = useParams();
   const wishlistUrl = `https://api.wishify.ca/wishlists/`
 
   const [token, setToken] = useState<string>(localStorage.getItem('token') || '')
@@ -141,7 +139,7 @@ const Wishlists = () => {
     handleModalClose();
   }
 
-  const changeActiveOverlay = (title) => {
+  const changeActiveOverlay = (title: string) => {
     if(activeOverlay == title){
       setActiveOverlay("")
     } else{
