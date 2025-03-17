@@ -31,10 +31,33 @@ router.get('/', authenticate, async (req, res, next) => {
 router.put('/', authenticate, async (req, res) => {
   try {
     const userId = req.user.userId; // Get user ID from authenticated token
-    const { email, displayName, picture, password, newPassword, bio } = req.body;
-
+    const { email, displayName, picture, password, newPassword, bio, notifications } = req.body;
     let newhHashedPassword = null;
 
+    // Type checking
+    if (email !== undefined && typeof email !== "string") {
+      return res.status(400).json({ error: "email must be a string" });
+    }
+    if (displayName !== undefined && typeof displayName !== "string") {
+      return res.status(400).json({ error: "displayName must be a string" });
+    }
+    if (picture !== undefined && typeof picture !== "string") {
+      return res.status(400).json({ error: "picture must be a string" });
+    }
+    if (password !== undefined && typeof password !== "string") {
+      return res.status(400).json({ error: "password must be a string" });
+    }
+    if (newPassword !== undefined && typeof newPassword !== "string") {
+      return res.status(400).json({ error: "newPassword must be a string" });
+    }
+    if (bio !== undefined && typeof bio !== "string") {
+      return res.status(400).json({ error: "bio must be a string" });
+    }
+    if (notifications !== undefined && typeof notifications !== "boolean") {
+      return res.status(400).json({ error: "notifications must be a boolean" });
+    }
+
+    // if user sends a new password, make sure they supply their old password and it is correct.
     if (newPassword) {
       if (!password) {
         return res.status(400).json({ message: "Current password is required to change password" });
@@ -66,9 +89,10 @@ router.put('/', authenticate, async (req, res) => {
               password = COALESCE($3, password),
               email = COALESCE($4, email),
               bio = COALESCE($5, bio),
+              notifications = COALESCE($6, notifications),
               dateupdated = NOW()
-          WHERE id = $6
-          RETURNING id, email, displayName, picture, datecreated, dateupdated`, [displayName, picture, newhHashedPassword, email, bio, userId]);
+          WHERE id = $7
+          RETURNING id, email, displayName, picture, datecreated, dateupdated`, [displayName, picture, newhHashedPassword, email, bio, notifications, userId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "User not found" });
@@ -127,7 +151,7 @@ router.delete('/', authenticate, async (req, res) => {
 router.get('/:userId', async (req, res) => {
   try {
     const userId = req.params.userId;
-    const result = await db.query('SELECT id, displayName, bio, picture, datecreated FROM users WHERE id = $1', [userId]);
+    const result = await db.query('SELECT id, displayName, bio, picture, notifications, datecreated FROM users WHERE id = $1', [userId]);
     const result2 = await db.query(
       `SELECT c.*, uc.love FROM categories c
         JOIN user_categories uc ON c.id = uc.category_id
@@ -337,7 +361,7 @@ router.put('/categories/:categoryId?', authenticate, async (req, res, next) => {
                 love = COALESCE($1, love)
             WHERE user_id = $2 AND category_id = $3;
           `, [love, userId, id]);
-    
+
         } catch (error) {
           errors.push({ id, message: "Database error" });
         }

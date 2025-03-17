@@ -17,6 +17,7 @@ email TEXT UNIQUE NOT NULL,
 displayName TEXT,
 bio TEXT,
 picture TEXT,
+notifications BOOLEAN,
 datecreated TIMESTAMP,
 dateupdated TIMESTAMP
 );
