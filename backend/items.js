@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('./db');
-const authenticate = require('./authenticate');
-
+const authenticate = require('./middleware/authenticate');
 
 // localhost:3000/items/0
 // get the contents of a single item
@@ -21,7 +20,7 @@ router.get('/:itemId', authenticate, async (req, res, next) => {
       return res.status(404).json({ error: "Item not found." });
     }
 
-    res.json(result.rows[0]);
+    res.status(200).json(result.rows[0]);
   } catch (error) {
     console.error("Error fetching wishlists:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -185,7 +184,7 @@ router.put('/:itemId?', authenticate, async (req, res, next) => {
       }
 
       await db.query("COMMIT"); // Commit all changes
-      return res.json({ message: "Items updated successfully." });
+      return res.status(201).json({ message: "Items updated successfully." });
 
     } catch (error) {
       await db.query("ROLLBACK"); // Roll back if any error occurs
@@ -257,7 +256,7 @@ router.put('/:itemId?', authenticate, async (req, res, next) => {
       return res.status(404).json({ error: "item not found." });
     }
 
-    res.json({ message: "item updated successfully.", item: result.rows[0] });
+    res.status(201).json({ message: "item updated successfully.", item: result.rows[0] });
 
 
   } catch (error) {
@@ -292,7 +291,7 @@ router.delete('/:itemId', authenticate, async (req, res, next) => {
     // Delete the wishlist
     await db.query(`DELETE FROM items WHERE id = $1;`, [itemId]);
 
-    res.json({ message: "Item deleted successfully." });
+    res.status(200).json({ message: "Item deleted successfully." });
   } catch (error) {
     console.error("Error editing item:", error);
     res.status(500).json({ error: "Internal Server Error" });

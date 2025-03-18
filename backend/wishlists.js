@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('./db');
 const { v4: uuidv4 } = require('uuid');
-const authenticate = require('./authenticate');
+const authenticate = require('./middleware/authenticate');
 const nodemailer = require('nodemailer');
 require("dotenv").config();
 
@@ -22,7 +22,7 @@ router.get('/', authenticate, async (req, res, next) => {
           JOIN wishlist_members m ON w.id = m.wishlists_id
           WHERE m.user_id = $1;`, [userId]);
 
-    res.json(result.rows);
+    res.status(200).json(result.rows);
   } catch (error) {
     console.error("Error fetching wishlists:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -168,7 +168,7 @@ router.delete('/:wishlistId', authenticate, async (req, res, next) => {
     // Delete the wishlist
     await db.query(`DELETE FROM wishlists WHERE id = $1;`, [wishlistId]);
 
-    res.json({ message: "Wishlist deleted successfully." });
+    res.status(200).json({ message: "Wishlist deleted successfully." });
   } catch (error) {
     console.error("Error deleting  wishlists:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -225,7 +225,7 @@ router.put('/:wishlistId', authenticate, async (req, res, next) => {
       RETURNING *;
     `, [event_id, name, description, image, deadline, wishlistId]);
 
-    res.json({ message: "Wishlist updated successfully.", wishlist: result.rows[0] });
+    res.status(201).json({ message: "Wishlist updated successfully.", wishlist: result.rows[0] });
 
   } catch (error) {
     console.error("Error editing wishlist:", error);
@@ -327,7 +327,7 @@ router.get('/:wishlistId/members', authenticate, async (req, res) => {
       return res.status(404).json({ message: "No members found for this wishlist" });
     }
 
-    res.json({ members: result.rows });
+    res.status(200).json({ members: result.rows });
   } catch (error) {
     console.error("Error fetching members for wishlist:", error);
     res.status(500).json({ message: "Error fetching members" });
@@ -512,7 +512,7 @@ router.delete('/:id/members', authenticate, async (req, res) => {
           DELETE FROM wishlist_members WHERE wishlists_id = $1 AND user_id = $2
       `, [wishlistId, userId]);
 
-    res.json({ message: "User removed from the wishlist successfully" });
+    res.status(200).json({ message: "User removed from the wishlist successfully" });
   } catch (error) {
     console.error("Error removing member from wishlist:", error);
     res.status(500).json({ message: "Error removing member from wishlist" });
@@ -578,7 +578,7 @@ router.put('/:id/members', authenticate, async (req, res) => {
         RETURNING *;
       `, [blind, owner, memberCheck.rows[0].id]);
 
-    res.json({ message: "membership updated successfully.", membership: result.rows[0] });
+    res.status(201).json({ message: "membership updated successfully.", membership: result.rows[0] });
   } catch (error) {
     console.error("Error editing membership to wishlist:", error);
     res.status(500).json({ message: "Error editing membership to wishlist" });
@@ -605,7 +605,7 @@ router.get('/:wishlistId/items', authenticate, async (req, res) => {
       return res.status(404).json({ message: "No items found for this wishlist" });
     }
 
-    res.json({ items: result.rows });
+    res.status(200).json({ items: result.rows });
   } catch (error) {
     console.error("Error fetching items for wishlist:", error);
     res.status(500).json({ message: "Error fetching items" });

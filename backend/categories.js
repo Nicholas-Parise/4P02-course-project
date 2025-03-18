@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('./db');
-const authenticate = require('./authenticate');
+const authenticate = require('./middleware/authenticate');
 require('dotenv').config();
 
 // localhost:3000/categories?page=1&pageSize=10
@@ -19,7 +19,7 @@ router.get('/', async (req, res, next) => {
       return res.status(404).json({ error: "categories not found." });
     }
 
-    res.json(result.rows);
+    res.status(200).json(result.rows);
 
   } catch (error) {
     console.error("Error fetching categories:", error);
@@ -41,7 +41,7 @@ router.get('/:categoryId', async (req, res, next) => {
       return res.status(404).json({ error: "category not found." });
     }
 
-    res.json(result.rows[0]);
+    res.status(200).json(result.rows[0]);
   } catch (error) {
     console.error("Error fetching category:", error);
     res.status(500).json({ error: "Internal Server Error" });
