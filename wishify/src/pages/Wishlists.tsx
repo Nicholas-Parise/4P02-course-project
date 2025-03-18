@@ -17,8 +17,9 @@ const boxStyle = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
+  bgcolor: 'white',
+  border: '2px solid #5651e5',
+  borderRadius: "25px",
   boxShadow: 24,
   p: 4,
 };
@@ -233,7 +234,7 @@ const Wishlists = () => {
   }
 
   return (
-    <>
+    <section className='bg-white border-2 border-solid border-[#5651e5] rounded-[25px]'>
       <h1>My Wishlists</h1>
       <WishlistContainer>
         <CreateWishlist addThumbnail={handleModalOpen}>Create a Wishlist</CreateWishlist>
@@ -338,7 +339,7 @@ const Wishlists = () => {
         </Modal>
       </ModalBox>
       </Modal>
-    </>
+    </section>
   )
 }
 

@@ -4,9 +4,9 @@ import {FaEye} from 'react-icons/fa';
 
 
 const WishlistButton = styled.button`
-    background: rgb(91, 241, 252);
+    background: #FFFFFF;
     border-radius: 25px;
-    border-color: black;
+    border: 2px solid #5651e5;
     padding: 20px;
     width: 200px;
     height: 200px;
@@ -22,12 +22,12 @@ const WishlistButton = styled.button`
 `
 
 const WishlistMenu = styled.div`
-    background: rgb(91, 241, 252);
+    background: #FFFFFF;
     display: grid;
     gap: 0px;
     grid-template-rows: 20% 1fr 1fr 1fr 1fr;
     border-radius: 25px;
-    border-color: black;
+    border: 2px solid #5651e5;
     width: 200px;
     height: 200px;
     font-size: clamp(0.5em, 0.75em, 1em);
@@ -39,9 +39,9 @@ const WishlistMenu = styled.div`
 `
 
 const EventButton = styled.button`
-    background: rgb(91, 241, 252);
+    background:  #FFFFFF;
     border-radius: 25px;
-    border-color: black;
+    border: 2px solid #5651e5;
     padding: 20px;
     width: 200px;
     height: 200px;
@@ -57,12 +57,12 @@ const EventButton = styled.button`
 `
 
 const EventMenu = styled.div`
-    background: rgb(91, 241, 252);
+    background:  #FFFFFF;
     display: grid;
     gap: 0px;
     grid-template-rows: 37.5% 1fr 1fr 1fr;
     border-radius: 25px;
-    border-color: black;
+    border-color: #5651e5;
     width: 200px;
     height: 200px;
     font-size: clamp(0.5em, 0.75em, 1em);
@@ -89,7 +89,7 @@ const Eye = createStyledIcon(FaEye);
 
 const MenuButton = styled.button`
     &:hover{
-        border: solid #5fd5dd 1px;
+        border: solid #5651e5 1px;
         border-radius: 20px;
         cursor: pointer;
     } 

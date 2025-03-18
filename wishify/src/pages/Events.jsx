@@ -28,7 +28,7 @@ const Events = () => {
   }
 
   return (
-    <>
+    <section className='bg-white border-2 border-solid border-[#5651e5] rounded-[25px]'>
       <h1>My Events</h1>
       <EventContainer value={activeOverlay}>
         <CreateEvent addThumbnail={addThumbnailFunc}>Create an Event</CreateEvent>
@@ -40,7 +40,7 @@ const Events = () => {
       <EventContainer>
         <EventThumbnail title={"Stephen's Birthday"} id={1234} role={"contributor"}></EventThumbnail>
       </EventContainer>
-    </>
+    </section>
   )
 }
 

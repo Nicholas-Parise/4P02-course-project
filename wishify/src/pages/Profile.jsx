@@ -68,116 +68,147 @@ const Profile = () => {
   return (
     <>
       <section className="profile-container">
-        <h2>Profile settings</h2>
+        <h1>Profile settings</h1>
 
-        <div className="profile-picture">
-          <img
-            src={user.profilePicture || "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?t=st=1738333167~exp=1738336767~hmac=d1a2645bf22eff4e35bc060e5a7529cb9cbf09696ae232ab6690c137ad06d5e4&w=1060"}
-            alt='User profile picture'
-          />
-          <button>Update Picture</button>
+        <div className="profile-header">
+          <div className="profile-picture">
+            <img
+              src={
+                user.profilePicture ||
+                'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?t=st=1738333167~exp=1738336767~hmac=d1a2645bf22eff4e35bc060e5a7529cb9cbf09696ae232ab6690c137ad06d5e4&w=1060'
+              }
+              alt="User profile picture"
+            />
+            <button>Update Picture</button>
+          </div>
+
+          <div className="profile-header-fields">
+            <SettingsItem
+              label="Display Name:"
+              values={user.displayName}
+              buttonText={'Edit'}
+              onEdit={() => handleOpenModal('displayName')}
+            />
+
+            <SettingsItem
+              label="Email:"
+              values={user.email}
+              buttonText={'Edit'}
+              onEdit={() => handleOpenModal('email')}
+            />
+          </div>
         </div>
 
         <hr />
 
+      <div className="profile-content">
+        <SettingsItem
+          label="Biography:"
+          values={user.biography}
+          buttonText={'Edit'}
+          onEdit={() => handleOpenModal("biography")}
+        />
 
-      <SettingsItem
-        label='Display name:'
-        values={user.displayName}
-        buttonText={'Edit'}
-        onEdit={() => handleOpenModal("displayName")}
-      />
+        <LikesSettingsItem
+          label="Likes:"
+          values={user.likes}
+          onEdit={() => handleOpenModal("likes")}
+          onSave={handleSaveLikes}
+        />
 
-      <SettingsItem
-        label="Biography:"
-        values={user.biography}
-        buttonText={'Edit'}
-        onEdit={() => handleOpenModal("biography")}
-      />
+        <LikesSettingsItem
+          label="Dislikes:"
+          values={user.dislikes}
+          onEdit={() => handleOpenModal("dislikes")}
+          onSave={handleSaveLikes}
+        />
 
-      <LikesSettingsItem
-        label="Likes:"
-        values={user.likes}
-        onEdit={() => handleOpenModal("likes")}
-        onSave={handleSaveLikes}
-      />
+        <div className="button-container">
+            <button
+              className="delete-account-button"
+              style={{
+                border: '2px solid red',
+                color: 'red',
+                background: 'white',
+                padding: '10px 20px',
+                borderRadius: '25px',
+                cursor: 'pointer',
+                fontSize: '1rem',
+                transition: 'background 0.3s ease, color 0.3s ease',
+                width: '50%',
+              }}
+              onClick={() => handleOpenDeleteAccountModal()}
+            >
+              Delete Account
+            </button>
 
-      <LikesSettingsItem
-        label="Dislikes:"
-        values={user.dislikes}
-        onEdit={() => handleOpenModal("dislikes")}
-        onSave={handleSaveLikes}
-      />
+            <button
+              className="change-password-button"
+              style={{
+                background: 'linear-gradient(135deg, #8d8aee, #5651e5)',
+                color: 'white',
+                padding: '10px 20px',
+                borderRadius: '25px',
+                cursor: 'pointer',
+                fontSize: '1rem',
+                transition: 'background 0.3s ease',
+                width: '50%',
+              }}
+              onClick={() => handleOpenPasswordModal()}
+            >
+              Change Password
+            </button>
+        </div>
 
-      <SettingsItem
-        label='Email address:'
-        values={[user.email]}
-        buttonText='Edit'
-        onEdit={() => handleOpenModal("email")}
-      />
+        <EditDisplayNameModal
+          open={openModals.displayName}
+          value={currentValue}
+          onSave={handleSave}
+          handleClose={handleClose}
+        />
 
-      <SettingsItem
-        label='Password:'
-        values={['********']}
-        buttonText='Change Password'
-        onEdit={() => handleOpenPasswordModal()}
-      />
+        <EditBioModal
+          open={openModals.biography}
+          value={currentValue}
+          onSave={handleSave}
+          handleClose={handleClose}
+        />
 
-      <button
-        className='delete-account-button'
-        style={{color: 'red'}}
-        onClick={() => handleOpenDeleteAccountModal()}
-        >Delete account
-      </button>
+        <AddLikesModal
+          open={openModals.likes}
+          values={currentValue}
+          type='Likes'
+          onSave={handleSave}
+          handleClose={handleClose}
+        />
 
-      <EditDisplayNameModal
-        open={openModals.displayName}
-        value={currentValue}
-        onSave={handleSave}
-        handleClose={handleClose}
-      />
+        <AddLikesModal
+          open={openModals.dislikes}
+          values={currentValue}
+          type='Dislikes'
+          onSave={handleSave}
+          handleClose={handleClose}
+        />
 
-      <EditBioModal
-        open={openModals.biography}
-        value={currentValue}
-        onSave={handleSave}
-        handleClose={handleClose}
-      />
+        <EditEmailModal
+          open={openModals.email}
+          value={currentValue}
+          onSave={handleSave}
+          handleClose={handleClose}
+        />
 
-      <AddLikesModal
-        open={openModals.likes}
-        values={currentValue}
-        type='Likes'
-        onSave={handleSave}
-        handleClose={handleClose}
-      />
+        <EditPasswordModal
+          open={openModals.password}
+          onSave={handleSave}
+          handleClose={handleClose}
+        />
 
-      <AddLikesModal
-        open={openModals.dislikes}
-        values={currentValue}
-        type='Dislikes'
-        onSave={handleSave}
-        handleClose={handleClose}
-      />
-
-      <EditEmailModal
-        open={openModals.email}
-        value={currentValue}
-        onSave={handleSave}
-        handleClose={handleClose}
-      />
-
-      <EditPasswordModal
-        open={openModals.password}
-        onSave={handleSave}
-        handleClose={handleClose}
-      />
-
-      <DeleteAccountModal
-        open={openModals.deleteAccount}
-        onSave={handleSave}
-        handleClose={handleClose}
-      />
+        <DeleteAccountModal
+          open={openModals.deleteAccount}
+          onSave={handleSave}
+          handleClose={handleClose}
+        />
+      </div>
 
     </section>
     </>

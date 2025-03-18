@@ -161,25 +161,7 @@ const Wishlist = () => {
         })
     } else{
       itemId + reservation;
-      // make get request to get user from token (not needed? just use the token right?)
-      /*fetch("https://api.wishify.ca/auth/me", {
-        method: 'get',
-        headers: new Headers({
-            'Authorization': "Bearer "+token,
-            'Content-Type': 'application/json'
-        }),
-        })
-        .then((response) => response.json())
-        .then((data) => {
-            console.log(data)
-            let user = data;
-            console.log(itemId)
-            console.log(reservation)
-        })
-        .catch((error) => {
-            console.log(error)
-            return
-        })*/
+    
       fetch("https://api.wishify.ca/contributions/", {
         method: 'post',
         headers: new Headers({
@@ -213,7 +195,7 @@ const Wishlist = () => {
       <section className='pt-5'>
           <WishlistHeader wishlist={wishlist} event={event} />
           <div className="mt-8 mb-4 flex gap-1 items-center">
-              <FormControl fullWidth className='min-w-[120px] max-w-[180px]'>
+              <FormControl fullWidth className='min-w-[120px] max-w-[180px] '>
                   <InputLabel id="sort-select-label">Sort by</InputLabel>
                   <Select
                       labelId="sort-select-label"
