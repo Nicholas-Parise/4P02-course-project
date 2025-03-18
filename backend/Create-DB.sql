@@ -6,6 +6,7 @@ DROP TABLE IF EXISTS wishlists;
 DROP TABLE IF EXISTS events;
 DROP TABLE IF EXISTS user_categories;
 DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS notifications
 DROP TABLE IF EXISTS sessions;
 DROP TABLE IF EXISTS users;
 
@@ -18,8 +19,8 @@ displayName TEXT,
 bio TEXT,
 picture TEXT,
 notifications BOOLEAN,
-datecreated TIMESTAMP,
-dateupdated TIMESTAMP
+dateupdated TIMESTAMP,
+datecreated TIMESTAMP DEFAULT NOW()
 );
 
 
@@ -27,7 +28,17 @@ CREATE TABLE sessions(
 id SERIAL PRIMARY KEY,   
 user_id integer REFERENCES users(id) ON DELETE CASCADE,
 token TEXT UNIQUE,
-created TIMESTAMP
+created TIMESTAMP DEFAULT NOW()
+);
+
+
+CREATE TABLE notifications(
+id SERIAL PRIMARY KEY,   
+user_id integer REFERENCES users(id) ON DELETE CASCADE,
+body TEXT,
+url TEXT,
+is_read BOOLEAN,
+created TIMESTAMP DEFAULT NOW()
 );
 
 
@@ -35,7 +46,7 @@ CREATE TABLE categories(
 id SERIAL PRIMARY KEY,   
 name TEXT UNIQUE,
 description TEXT,
-created TIMESTAMP
+created TIMESTAMP DEFAULT NOW()
 );
 
 
@@ -44,7 +55,7 @@ id SERIAL PRIMARY KEY,
 user_id INTEGER REFERENCES users (id) ON DELETE CASCADE,
 category_id INTEGER REFERENCES categories (id) ON DELETE CASCADE,
 love BOOLEAN,
-created TIMESTAMP,
+created TIMESTAMP DEFAULT NOW(),
 UNIQUE (user_id,category_id) -- only need one entry per category per user
 );
 
@@ -59,7 +70,7 @@ city TEXT,
 image TEXT,
 deadline TIMESTAMP,
 dateUpdated TIMESTAMP,
-dateCreated TIMESTAMP
+dateCreated TIMESTAMP DEFAULT NOW()
 );
 
 
@@ -72,7 +83,7 @@ image TEXT,
 deadline TIMESTAMP,
 share_token TEXT UNIQUE,
 dateUpdated TIMESTAMP,
-dateCreated TIMESTAMP
+dateCreated TIMESTAMP DEFAULT NOW()
 );
 
 
@@ -83,7 +94,7 @@ wishlists_id INTEGER REFERENCES wishlists (id) ON DELETE CASCADE,
 blind BOOLEAN,
 owner BOOLEAN,
 dateUpdated TIMESTAMP,
-dateCreated TIMESTAMP,
+dateCreated TIMESTAMP DEFAULT NOW(),
 UNIQUE (user_id,wishlists_id) --only want one membership per user per wishlist
 );
 
@@ -93,7 +104,7 @@ user_id INTEGER REFERENCES users (id) ON DELETE CASCADE,
 event_id INTEGER REFERENCES events (id) ON DELETE CASCADE,
 owner BOOLEAN,
 dateUpdated TIMESTAMP,
-dateCreated TIMESTAMP,
+dateCreated TIMESTAMP DEFAULT NOW(),
 UNIQUE (user_id,event_id) --only want one membership per user per event
 );
 
@@ -110,7 +121,7 @@ quantity INTEGER,
 price real,
 priority INTEGER,
 dateUpdated TIMESTAMP,
-dateCreated TIMESTAMP
+dateCreated TIMESTAMP DEFAULT NOW()
 );
 
 
@@ -122,7 +133,14 @@ quantity INTEGER,
 purchased BOOLEAN,
 note TEXT,
 dateUpdated TIMESTAMP,
-dateCreated TIMESTAMP,
+dateCreated TIMESTAMP DEFAULT NOW(),
 UNIQUE (item_id,member_id) --only want one contribution per user per item
 );
 
+GRANT CONNECT ON DATABASE wishify TO wishify;
+GRANT USAGE ON SCHEMA public TO wishify;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO wishify;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO wishify;
+-- Ensure future tables also get permissions
+ALTER DEFAULT PRIVILEGES IN SCHEMA public 
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO wishify;

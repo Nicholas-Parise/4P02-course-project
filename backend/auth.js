@@ -90,10 +90,10 @@ router.post('/login', async (req, res, next) => {
 
         await db.query("INSERT INTO sessions (user_id, token, created) VALUES ($1, $2, NOW())", [user.rows[0].id, token]);
 
-        res.json({ message: "Login successful", token });
+        return res.status(200).json({ message: "Login successful", token });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Error logging in" });
+        return res.status(500).json({ message: "Error logging in" });
     }
 });
 
@@ -111,10 +111,10 @@ router.post('/logout', async (req, res, next) => {
 
     try {
         await db.query("DELETE FROM sessions WHERE token = $1", [token]);
-        res.json({ message: "Logout successful" });
+        return res.status(200).json({ message: "Logout successful" });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Error logging out" });
+        return res.status(500).json({ message: "Error logging out" });
     }
 
 
@@ -138,22 +138,19 @@ router.get('/me', async (req, res, next) => {
             return res.status(401).json({ message: "Invalid token" });
         }
 
-        const user = await db.query("SELECT id, displayName, email, picture FROM users WHERE id = $1", [session.rows[0].user_id]);
+        const user = await db.query("SELECT id, displayName, email, picture, bio FROM users WHERE id = $1", [session.rows[0].user_id]);
 
         if (user.rows.length === 0) { // If a user gets removed but the token is still active 
             return res.status(404).json({ message: "User not found" });
         }
 
-        res.json(user.rows[0]);
+        return res.status(200).json(user.rows[0]);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error" });
     }
 
 });
-
-
-
 
 
 module.exports = router;
