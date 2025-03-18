@@ -28,7 +28,7 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        <Navbar isLoggedIn={isLoggedIn} page={window.location.pathname}/>
+        <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} page={window.location.pathname}/>
         <Routes>
             <Route index element={<Index />} />
             <Route path="landing" element={<Landing />} />

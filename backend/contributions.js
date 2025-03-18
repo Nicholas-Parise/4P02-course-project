@@ -145,7 +145,7 @@ router.post('/', authenticate, async (req, res, next) => {
     const result = await db.query(`
         INSERT INTO contributions 
         (item_id, member_id, quantity, purchased, note, dateCreated)
-        VALUES ($1, $2, $3, COALESCE($4, false), $5, NOW()) RETURNING *;
+        VALUES ($1, $2, $3, COALESCE($4, false), $5, NOW()) RETURNING id, item_id, quantity, purchased, note, dateUpdated, dateCreated;
       `, [item_id, member_id, quantity, purchased, note]);
 
     res.status(201).json({ message: "contribution created successfully", contribution: result.rows[0] });
@@ -188,9 +188,10 @@ router.put('/:id', authenticate, async (req, res, next) => {
   try {
     /// make sure that only the user that created the contribution can edit it.
     const ownershipCheck = await db.query(
-      `SELECT c.id 
+      `SELECT c.id, u.displayName AS user_displayName, u.id AS user_id
         FROM contributions c
         JOIN wishlist_members wm ON c.member_id = wm.id
+        JOIN users u ON wm.user_id = u.id
         WHERE c.id = $1 AND wm.user_id = $2`,
       [contributionId, userId]
     );
@@ -208,15 +209,18 @@ router.put('/:id', authenticate, async (req, res, next) => {
             note = COALESCE($3, note),
             dateUpdated = NOW()
         WHERE id = $4
-        RETURNING *;
+        RETURNING id, item_id, quantity, purchased, note, dateUpdated, dateCreated;
       `, [quantity, purchased, note, contributionId]);
-
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "contribution not found." });
     }
 
-    res.json({ message: "contribution updated successfully.", contribution: result.rows[0] });
+    const contribution_results = result.rows[0];
+    const user_displayname = ownershipCheck.rows[0].user_displayname;
+    const user_id = ownershipCheck.rows[0].user_id;
+
+    res.json({ message: "contribution updated successfully.", contribution: {...contribution_results, user_displayname, user_id} });
 
 
   } catch (error) {
