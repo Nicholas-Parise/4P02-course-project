@@ -76,17 +76,17 @@ const ProfileMenu = ({ closeMenu, logOut }: Props) => {
           </button>
         </div>
 
-        <div className="user-info">
+        <div className="user-info cursor-pointer" onClick={handleAccountSettings}>
           <div className="profile-image">
             <AiOutlineUser className="user-icon" />
           </div>
-          <div className="profile-text" onClick={handleAccountSettings}>
+          <div className="profile-text">
             <p className="user-name">Justin Bijoy</p>
             <p className="user-email">justinbijoy@gmail.com</p>
           </div>
         </div>
 
-        <div className="notification-toggle-container" onClick={toggleNotifications}>
+        <div className="notification-toggle-container cursor-pointer" onClick={toggleNotifications}>
           <div className="notification-toggle">
             {notificationsEnabled ? (
               <AiFillBell className="bell-icon" />
