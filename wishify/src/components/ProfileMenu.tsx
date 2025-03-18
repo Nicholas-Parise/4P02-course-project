@@ -1,14 +1,19 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AiOutlineUser, AiOutlineLogout, AiFillGift, AiOutlineCloseCircle, AiOutlineBell, AiFillBell } from "react-icons/ai";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from "@mui/material";
 import "./ProfileMenu.css";
 
-const ProfileMenu = ({ closeMenu, logOut }) => {
+interface Props {
+  closeMenu: () => void,
+  logOut: () => void
+}
+
+const ProfileMenu = ({ closeMenu, logOut }: Props) => {
   const [isClosing, setIsClosing] = useState(false);
   const [showLogOutModal, setShowLogOutModal] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
-  const menuRef = useRef(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
 
   const handleClose = () => {
@@ -19,8 +24,8 @@ const ProfileMenu = ({ closeMenu, logOut }) => {
   };
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         handleClose();
       }
     };

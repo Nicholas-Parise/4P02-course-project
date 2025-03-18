@@ -4,10 +4,10 @@ import { AiFillGift, AiOutlinePlus, AiOutlineUser } from 'react-icons/ai';
 import { Wishlist } from '../types/types';
 import { WishlistItem } from '../types/types';
 import CreateItemDialog from './CreateItemDialog';
-import ProfileMenu from './ProfileMenu';  // Import ProfileMenu component
+import ProfileMenu from './ProfileMenu';
 import '../components/Navbarlanding/landingheader.css';
 
-const Navbar = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
+const Navbar = ({ isLoggedIn, setIsLoggedIn, page }: { isLoggedIn: boolean, setIsLoggedIn: (val: boolean)=>void, page: string }) => {
   interface NavItem {
     label: string;
     href: string;
@@ -26,7 +26,6 @@ const Navbar = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   const [newItem, setNewItem] = useState<Partial<WishlistItem>>({});
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   
-  // Profile menu state
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   const fetchWishlists = () => {
@@ -93,7 +92,9 @@ const Navbar = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
                   />
                   
                   {/* Profile Menu Component */}
-                  {isProfileMenuOpen && <ProfileMenu closeMenu={() => setIsProfileMenuOpen(false)} />}
+                  {isProfileMenuOpen && <ProfileMenu 
+                    logOut={() => {setIsLoggedIn(false), localStorage.removeItem("token")}}
+                    closeMenu={() => setIsProfileMenuOpen(false)} />}
                 </div>
               </div>
             </div>
@@ -108,6 +109,8 @@ const Navbar = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
             setNewItem={setNewItem}
             wishlists={wishlists}
             token={token}
+            page={page}
+            id={page.split('/')[2]}
           />
         </>
       ) : (
