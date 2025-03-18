@@ -1,25 +1,42 @@
+.profile-page-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0;
+}
+
 .profile-container {
-  max-width: 1536px;
+  max-width: 1300px;
   padding-top: 20px;
   padding-bottom: 20px;
   background: white;
-  border-radius: 8px;
+  border: 2px solid #5651e5; 
+  border-radius: 25px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   color: #333;
   font-weight: 500;
+  margin: auto; 
 }
 
-.profile-container hr {
-  border: none;
-  height: 1px;
-  background-color: #DDD;
+.profile-container h1 {
+  text-align: center;
+  font-weight: bold;
+  font-size: 30px;
+  margin-bottom: 20px;
+}
+
+.profile-header {
+  display: flex;
+  align-items: flex-start; 
+  gap: 20px;
+  margin-bottom: 20px;
 }
 
 .profile-picture {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 40px;
 }
 
 .profile-picture img {
@@ -29,16 +46,68 @@
   object-fit: cover;
 }
 
+.profile-header-fields {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 10px;
+}
+
+.profile-settings-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.profile-setting-label {
+  width: 30%; /* Adjust label width */
+  font-weight: bold;
+  font-size: 20px;
+  color: black;
+}
+
+.profile-setting-value {
+  flex: 1;
+  padding-right: 25px;
+  font-size: 20px;
+}
+
+.profile-setting-value div {
+  border-radius: 25px;
+  padding: 8px 16px;
+  display: inline-block;
+}
+
+.profile-setting-button {
+  width: 15%;
+  text-align: right;
+  color: #5651e5;
+  font-weight: bold;
+}
+
+/* Rest of the content */
+.profile-content {
+  margin-top: 20px;
+}
+
+.profile-container hr {
+  border: none;
+  height: 1px;
+  background-color: #DDD;
+}
+
 .profile-container button {
   border: none;
   cursor: pointer;
-  background-color: none;
-  color: rgb(26, 134, 242);
+  background-color: transparent;
+  color: inherit;
   font-size: 1rem;
+  text-decoration: none;
 }
 
 .profile-container button:hover {
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .profile-details {
@@ -56,14 +125,6 @@
   margin-top: 5px;
   border-radius: 5px;
   border: 1px solid #ccc;
-}
-
-.profile-settings-item {
-  font-size: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 0;
 }
 
 .likes-list-item {
@@ -115,26 +176,10 @@
   background-color: rgba(243, 194, 194, 0.2);
 }
 
-.profile-setting-label {
-  width: 20%;
-}
-
-.profile-setting-value {
-  flex: 1;
-  padding-right: 25px;
-}
-
-.profile-setting-value ul {
-  margin: 0;
-}
-
-.profile-setting-button {
-  width: 15%;
-  text-align: right;
-}
-
-.delete-account-button {
+.button-container {
+  display: flex;
+  width: 100%;
+  gap: 10px;
+  justify-content: flex-end;
   margin-top: 20px;
-  display: block;
-  margin-left: auto;
 }

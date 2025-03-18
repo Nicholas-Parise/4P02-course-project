@@ -71,12 +71,22 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
         onClose={() => setOpen(false)}
         aria-labelledby="item-dialog-title"
         aria-describedby="item-dialog-description"
+        sx={{
+          '& .MuiDialog-paper': {
+            borderRadius: '25px', // Rounded corners
+            background: '#FFFFFF', // Background color matching ProfileMenu
+            padding: '20px',
+            border: '2px solid #5651e5', // Border color
+            maxWidth: '900px', // Set max width to 900px
+            //width: '100%', // Ensure it takes full width up to the max width
+          },
+        }}
       >
-        <DialogTitle id="item-dialog-title">
+        <DialogTitle id="item-dialog-title" sx={{ textAlign: 'center', fontWeight: 'bold', color: '#000', fontSize: '24px' }}>
             Add New Item
         </DialogTitle>
         <DialogContent className="sm:max-w-[425px]">
-            <DialogContentText id="item-dialog-description">
+            <DialogContentText id="item-dialog-description" sx={{ color: '#000' }}>
               Enter the details for the new wishlist item.
             </DialogContentText>
             

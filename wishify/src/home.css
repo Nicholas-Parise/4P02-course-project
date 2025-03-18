@@ -1,9 +1,10 @@
 .home-container {
-    max-width: 1536px;
+    max-width: 1300px;
     padding-top: 20px;
     padding-bottom: 20px;
     background: white;
-    border-radius: 8px;
+    border: 2px solid #5651e5; 
+    border-radius: 25px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     color: #333;
     font-weight: 500;

@@ -62,7 +62,7 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
       <li
         ref={setNodeRef}
         style={style}
-        className="bg-white shadow-md rounded-lg p-4 flex items-center space-x-4 cursor-pointer"
+        className="bg-white shadow-md p-4 flex items-center space-x-4 cursor-pointer rounded-[25px] border-2 border-[#5651e5]"
         onClick={() => setIsModalOpen(true)}
       >
         {isDraggable && (
@@ -87,7 +87,7 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
             Quantity: {availableQuantity} available / {item.quantity} total
           </p>
         </div>
-        <div className="flex-shrink-0 p-3 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center">
+        <div className="flex-shrink-0 p-3 h-8 bg-[#5651e5] text-white rounded-full flex items-center justify-center">
           {item.priority}
         </div>
     </li>
@@ -97,12 +97,19 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
       onClose={() => setIsModalOpen(false)}
       aria-labelledby="item-dialog-title"
       aria-describedby="item-dialog-description"
+      PaperProps={{
+        style: {
+          border: '2px solid #5651e5',
+          borderRadius: '25px',
+          minWidth: '400px', // Ensure min width
+        },
+      }}
     >
-      <DialogTitle id="item-dialog-title">
-          {item.name}
+      <DialogTitle id="item-dialog-title" className="text-[#5651e5]">
+        <div className="text-center font-bold">{item.name}</div>
       </DialogTitle>
       <DialogContent className="sm:max-w-[425px]">
-          <DialogContentText id="alert-dialog-description">
+          <DialogContentText id="alert-dialog-description" className="text-[#5651e5] text-center">
             Item Details
           </DialogContentText>
           <div className="grid gap-4 py-4">
@@ -110,7 +117,7 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
               <img src={item.image || "/placeholder.svg"} alt={item.name}/>
             </div>
             <p className="text-gray-700">{item.description}</p>
-            <p className="font-semibold">Price: ${item.price.toFixed(2)}</p>
+            <p className="font-semibold text-[#5651e5]">Price: ${item.price.toFixed(2)}</p>
             <p className="text-gray-600">
               Quantity: {availableQuantity} available / {item.quantity} total
             </p>
@@ -125,19 +132,18 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
               </div>
             )}
             <div className="space-y-2">
-              <p className="text-md font-medium">Your Reservation</p>
+              <p className="text-md font-medium text-[#5651e5]">Your Reservation</p>
               <div className="flex items-center space-x-2">
                 <Button onClick={decrementReserve}>
-                  <FaMinus className="h-4 w-4" />
+                  <FaMinus className="h-4 w-4 text-[#5651e5]" />
                 </Button>
                 <TextField
                   value={reserveQuantity}
                   onChange={(e) => handleReserveQuantity(e)}
-                  
                   className="w-20 text-center"
                 />
                 <Button onClick={incrementReserve}>
-                  <FaPlus className="h-4 w-4" />
+                  <FaPlus className="h-4 w-4 text-[#5651e5]" />
                 </Button>
               </div>
               <TextField
@@ -146,14 +152,18 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
                 onChange={(e) => setReserveNote(e.target.value)}
               />
             </div>
-            <div className="flex space-x-2">
-              <Button>
-                <a href={item.url} target="_blank" rel="noopener noreferrer" className="flex items-center">
-                  Purchase <FaExternalLinkAlt className="ml-2 h-4 w-4" />
-                </a>
+            <div className="flex space-x-2 gap-2">
+              <Button
+                className="!text-[#5651e5] !rounded-[25px]" sx={{border: '2px solid #5651e5', '&:hover': { background: '#EDEDFF'}}} // TODO edit this on hover colour to be the same as everything else
+                onClick={() => window.open(item.url, '_blank')}
+              >
+                Purchase <FaExternalLinkAlt className="ml-2 h-4 w-4" />
               </Button>
-              <Button onClick={handleReserve}>
-                {userReservation ? "Update Reservation" : "Reserve"}
+              <Button
+                className="!rounded-[25px] bg-gradient-to-r from-[#8d8aee] to-[#5651e5] !text-white hover:from-[#5651e5] hover:to-[#343188]"
+                onClick={handleReserve}
+              >
+                {userReservation ? 'Update Reservation' : 'Reserve'}
               </Button>
             </div>
           </div>
