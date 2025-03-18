@@ -233,6 +233,43 @@ const Wishlists = () => {
       })
   }
 
+  const handleDuplicate = () => {
+    // find the wishlist to duplicate
+    const wishlistToDuplicate = wishlists.find(wishlist => wishlist.name === activeOverlay);
+    // this condition should never happen but I've left it here just in case
+    if (!wishlistToDuplicate) {
+      console.log("Wishlist not found");
+      return;
+    }
+    const wishlistId = wishlistToDuplicate.id;
+    console.log(wishlistToDuplicate)
+
+    const url = `https://api.wishify.ca/wishlists/${wishlistId}/duplicate`
+    fetch(url, {
+      method: 'post',
+      headers: new Headers({
+        'Authorization': "Bearer "+token,
+        'Content-Type': 'application/json'
+      }),
+      })
+      .then((response) => response.json())
+      .then((data) => {
+          console.log(data)
+          // update the wishlists state with the new data
+          let duplicatedWishlist: Wishlist = structuredClone(wishlistToDuplicate);
+          console.log(wishlistToDuplicate)
+          duplicatedWishlist.id = data.wishlist_id;
+          duplicatedWishlist.name = wishlistToDuplicate.name + " (Copy)";
+          console.log(wishlistToDuplicate)
+          const updatedWishlists = [...wishlists, duplicatedWishlist];
+          setWishlists(updatedWishlists);
+      })
+      .catch((error) => {
+          console.log(error)
+      })
+  }
+    
+
   return (
     <section className='bg-white border-2 border-solid border-[#5651e5] rounded-[25px]'>
       <h1>My Wishlists</h1>
@@ -246,6 +283,7 @@ const Wishlists = () => {
             id={wishlist.id}
             title={wishlist.name}
             edit={handleEditOpen}
+            duplicate={handleDuplicate}
             owner={"Me"}
           />
         ))}
