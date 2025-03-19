@@ -9,11 +9,12 @@ type WishlistItemProps = {
   item: WishlistItem,
   sortBy: "priority" | "price" | "quantity",
   reservations: Contribution[],
-  onReserve: (itemId: number, reservation: number, note: string) => void
+  onReserve: (itemId: number, reservation: number, note: string) => void,
+  id: string
 }
 
-const WishlistItemEntry = ({ item, sortBy, reservations, onReserve }: WishlistItemProps) => {
-  const id = item.id;
+const WishlistItemEntry = ({ item, sortBy, reservations, onReserve, id }: WishlistItemProps) => {
+  const item_id = item.id;
   const { attributes, listeners, setNodeRef, transform, transition, } = useSortable({ id, animateLayoutChanges: () => false });
 
   const style = {
@@ -64,6 +65,7 @@ const WishlistItemEntry = ({ item, sortBy, reservations, onReserve }: WishlistIt
   return (
     <>
       <li
+        id={id}
         ref={setNodeRef}
         style={style}
         className="bg-white shadow-md p-4 flex items-center space-x-4 cursor-pointer rounded-[25px] border-2 border-[#5651e5]"
