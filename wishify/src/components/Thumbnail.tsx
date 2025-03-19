@@ -6,11 +6,14 @@ import {FaEye} from 'react-icons/fa';
 const WishlistButton = styled.button`
     background: #FFFFFF;
     border-radius: 25px;
+    overflow: hidden;
+    text-overflow: ellipsis;
     border: 2px solid #5651e5;
     padding: 20px;
     width: 200px;
     height: 200px;
     position: relative;
+    font-size: clamp(0.5em, 0.75em, 1em);
     @media screen and (max-width: 440px){
         width: 150px;
         height: 150px;
@@ -25,7 +28,7 @@ const WishlistMenu = styled.div`
     background: #FFFFFF;
     display: grid;
     gap: 0px;
-    grid-template-rows: 20% 1fr 1fr 1fr 1fr;
+    grid-template-rows: 20% 1fr 1fr 1fr 1fr 1fr;
     border-radius: 25px;
     border: 2px solid #5651e5;
     width: 200px;
@@ -95,6 +98,15 @@ const MenuButton = styled.button`
     } 
 `
 
+const OverlayTitle = styled.p`
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 18px;
+    text-align: center;
+    border-bottom: 1px solid black;
+    text-overflow: ellipsis;
+`
+
 
 
 export const WishlistThumbnail = (props: any) => {
@@ -102,10 +114,11 @@ export const WishlistThumbnail = (props: any) => {
         return (
             <WishlistMenu onMouseLeave={props.toggleActive}>
                 <p style={{margin: "4px"}}>Owner: {props.owner}</p>
-                <p style={{overflow: 'hidden', fontSize: '25px', textAlign: 'center', borderBottom: '1px solid black'}}>{props.title}</p>
+                <OverlayTitle title={props.title}>{props.title}</OverlayTitle>
                 <MenuButton onClick={openWishlist}>Open</MenuButton>
                 <MenuButton onClick={props.edit}>Edit</MenuButton>
                 <MenuButton>Share</MenuButton>
+                <MenuButton onClick={props.duplicate}>Duplicate</MenuButton>
             </WishlistMenu>
         )
     }
@@ -134,7 +147,7 @@ export const EventThumbnail = (props: any) => {
     const EventOverlayMenu = () => {
         return (
             <EventMenu onMouseLeave={props.toggleActive}>
-                <button style={{overflow: 'hidden', fontSize: "initial", textAlign: 'center', borderBottom: '1px solid black'}}>{props.title}</button>
+                <button title={props.title} style={{ overflow: 'hidden', fontSize: "initial", textAlign: 'center', borderBottom: '1px solid black' }}>{props.title}</button>
                 <MenuButton onClick={openEvent}>Open</MenuButton>
                 <MenuButton>Edit</MenuButton>
                 <MenuButton>Share</MenuButton>
