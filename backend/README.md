@@ -28,10 +28,6 @@ DELETE /users/categories → Remove an array of categories from logged in user**
 GET /categories/:id → Get category details  
 POST /categories → Create a new category**  
 
-should these be admin only?  
-PUT /categories/:id → Update category details   
-DELETE /categories/:id → Delete a category  
-
 ## Wishlists
 
 **POST /wishlists/ → Create a wishlist (also creates a membership)  
@@ -80,7 +76,12 @@ POST /contributions → Add a contribution (given item_id)
 PUT /contributions/:id → Update a contribution (mark as purchased, etc.)  
 DELETE /contributions/:id → Remove a contribution**  
 
+## Notifications
+**GET /notifications → Get all notifications from logged in user  
+PUT /notifications/:id → Edit a notifications (ex: is_read)   
+DELETE /notifications/:id → Delete a notifications**  
+
 # Database
 
-![Screenshot of database UML.](4P02-Database-UML.png)
+![Screenshot of database UML.](database/4P02-Database-UML.png)
 

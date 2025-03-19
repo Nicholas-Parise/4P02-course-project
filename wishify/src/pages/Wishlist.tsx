@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import { useParams } from "react-router-dom"
+import { useParams, useLocation } from "react-router-dom"
 import { type Wishlist, WishlistItem, Event, Contribution } from '../types/types';
 import WishlistHeader from '../components/WishlistHeader';
 import WishlistItemEntry from '../components/WishlistItemEntry';
@@ -74,6 +74,23 @@ const Wishlist = () => {
         })
         //.finally(() => setLoading(false))
     }, [])
+
+    // scroll to item on page load if a hash is present in the URL
+    const location = useLocation();
+    useEffect(() => {
+      if (location.hash) {
+        const interval = setInterval(() => {
+          const element = document.getElementById(location.hash.substring(1));
+          if (element) {
+            console.log("Element found:", element);
+            element.scrollIntoView({ behavior: "smooth" });
+            clearInterval(interval); // Stop checking once the element is found
+          }
+        }, 100); // Check every 100ms
+    
+        return () => clearInterval(interval); // Cleanup interval on component unmount
+      }
+    }, [location]);
 
     const wishlist: Wishlist = {
         id: 0,
@@ -190,6 +207,11 @@ const Wishlist = () => {
       }
   }
 
+  const getItemReservations = (itemId: number) => {
+    const itemReservations = wishlistContributions.filter((c) => c.item_id === itemId)
+    return itemReservations
+  }
+
   return (
     <>
       <section className='pt-5'>
@@ -218,7 +240,7 @@ const Wishlist = () => {
               <SortableContext items={sortedItems.map((item) => item.id)}>
                   <ul className="space-y-4">
                   {sortedItems.map((item) => (
-                      <WishlistItemEntry key={item.id} item={item} sortBy={sortBy} onReserve={handleReserveItem}/>
+                      <WishlistItemEntry id={item.id.toString()} key={item.id} item={item} sortBy={sortBy} reservations={getItemReservations(item.id)} onReserve={handleReserveItem}/>
                   ))}
                   </ul>
               </SortableContext>

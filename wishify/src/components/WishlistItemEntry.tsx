@@ -1,18 +1,20 @@
 import { useState, useEffect } from 'react';
-import { type WishlistItem } from '../types/types';
+import { type WishlistItem, Contribution } from '../types/types';
 import { useSortable } from '@dnd-kit/sortable';
 import {CSS} from '@dnd-kit/utilities';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, Button, TextField } from '@mui/material';
-import { FaExternalLinkAlt, FaMinus, FaPlus } from 'react-icons/fa';
+import { FaExternalLinkAlt, FaMinus, FaPlus, FaChevronDown, FaChevronRight } from 'react-icons/fa';
 
 type WishlistItemProps = {
   item: WishlistItem,
-  sortBy: "priority" | "price" | "quantity"
-  onReserve: (itemId: number, reservation: number, note: string) => void
+  sortBy: "priority" | "price" | "quantity",
+  reservations: Contribution[],
+  onReserve: (itemId: number, reservation: number, note: string) => void,
+  id: string
 }
 
-const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
-  const id = item.id;
+const WishlistItemEntry = ({ item, sortBy, reservations, onReserve, id }: WishlistItemProps) => {
+  const item_id = item.id;
   const { attributes, listeners, setNodeRef, transform, transition, } = useSortable({ id, animateLayoutChanges: () => false });
 
   const style = {
@@ -23,7 +25,7 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
   const isDraggable = sortBy === "priority"
   const currentUser = 1  //In a real app, this would come from authentication
   const totalReserved = item.quantitySupplied || 0
-  const userReservation = item.contributions?.find((r) => r.member_id === currentUser)
+  const userReservation = item.contributions?.find((r) => r.user_id === currentUser)
   const availableQuantity = item.quantity - totalReserved
 
   const reservedBadgeColour = availableQuantity <= 0 ? "bg-green-600" : "bg-yellow-500"
@@ -49,17 +51,21 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
     }
     setIsModalOpen(false)
   }
+  
 
   const handleReserveQuantity = (e: any) => {
     if (["e", "E", "-"].some((char) => e.target.value.includes(char))) return;
 
     // handle change here
-    setReserveQuantity(parseInt(e.target.value) || NaN);
+    setReserveQuantity(parseInt(e.target.value) || 0);
   }
+
+  const [showNote, setShowNote] = useState<{ [key: number]: boolean }>({});
 
   return (
     <>
       <li
+        id={id}
         ref={setNodeRef}
         style={style}
         className="bg-white shadow-md p-4 flex items-center space-x-4 cursor-pointer rounded-[25px] border-2 border-[#5651e5]"
@@ -121,13 +127,25 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
             <p className="text-gray-600">
               Quantity: {availableQuantity} available / {item.quantity} total
             </p>
-            {item.contributions?.length > 0 && (
+            {reservations?.length > 0 && (
               <div>
                 <p className="font-semibold">Current Reservations:</p>
-                {item.contributions?.map((res, index) => (
-                  <p key={index} className="text-green-600">
-                    {res.member_id}: {res.quantity}
-                  </p>
+                {reservations?.map((res, index) => (
+                    <div key={index}>
+                      <div 
+                        className="text-green-600 cursor-pointer flex items-center"
+                        onClick={() => {
+                          setShowNote((prev) => ({
+                            ...prev,
+                            [index]: !prev[index],
+                          }));
+                        }}
+                      >
+                        <p>{res.user_displayname}: {res.quantity} {res.note ? "(note is attached)" : null}</p>
+                        { res.note ? (showNote[index] ? <FaChevronDown className="ml-2" /> : <FaChevronRight className="ml-2" />) : null}
+                      </div>
+                      {showNote[index] ? <p className="text-gray-600">{res.note}</p> : null}
+                    </div>
                 ))}
               </div>
             )}
@@ -167,8 +185,6 @@ const WishlistItemEntry = ({ item, sortBy, onReserve }: WishlistItemProps) => {
               </Button>
             </div>
           </div>
-
-          
       </DialogContent>
     </Dialog>
     </>

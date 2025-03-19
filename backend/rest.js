@@ -9,6 +9,7 @@ const wishlistsRoutes = require('./wishlists');
 const categoriesRoutes = require('./categories');
 const contributionsRoutes = require('./contributions');
 const statusRoutes = require('./status');
+const notificationsRoutes = require('./notifications');
 
 const app = express();
 
@@ -33,5 +34,7 @@ app.use('/wishlists', wishlistsRoutes);
 app.use('/categories', categoriesRoutes);
 app.use('/contributions', contributionsRoutes);
 app.use('/status', statusRoutes);
+app.use('/notifications', notificationsRoutes);
+
 
 module.exports = app;

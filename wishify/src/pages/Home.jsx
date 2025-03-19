@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import '../home.css'
 import styled from '@emotion/styled'
 import { NavLink } from 'react-router-dom';
@@ -54,12 +54,74 @@ const CreateEventButton = styled.button`
     }
 `
 
+const ContributionContainer = styled.div`
+  display: grid;
+  margin: 3vw;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  @media screen and (max-width: 768px){
+    grid-template-columns: repeat(3, 1fr);
+  }
+  @media screen and (max-width: 440px){
+    grid-template-columns: repeat(2, 1fr);
+  }
+`
+
+const ItemDisplay = ({ item }) => {
+  let item_name = "Temporarily Unavailable" // will be replaced with item.name when backend is ready
+  let wishlist_id = "562" // will be replaced with item.wishlist_id when backend is ready
+
+  return (
+    <div className="p-1 border rounded-lg shadow-lg max-w-sm bg-white">
+      <h2 className="text-xl font-bold mb-2">Wishlist Title</h2>
+      <ul className="list-disc list-inside text-base">
+        <li><strong>Item:</strong> <a href={`/wishlists/${wishlist_id}#${item.item_id}`}>{item_name}</a></li>
+        <li><strong>Note:</strong> {item.note? item.note: <span className='text-red-400'>None</span>}</li>
+        <li><strong>Quantity:</strong> {item.quantity}</li>
+        <li><strong>Purchased:</strong> {item.purchased ? "Yes" : "No"}</li>
+        <li><strong>Created:</strong> {new Date(item.datecreated).toLocaleString()}</li>
+        <li><strong>Updated:</strong> {item.dateupdated ? new Date(item.dateupdated).toLocaleString() : "Not Updated"}</li>
+      </ul>
+    </div>
+  );
+};
+
+
 const Home = () => {
+  // all the get requests to the backend should be done here
+  const [contributions, setContributions] = useState([])
+
+  const backendLoading = () => {
+    let url = `https://api.wishify.ca/contributions`
+    useEffect(() => {
+      let token = localStorage.getItem('token') || ''
+      fetch(url, {
+          method: 'get',
+          headers: new Headers({
+            'Authorization': "Bearer "+token
+          })
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            let newContributions = data;
+            newContributions.sort((a, b) => b.wishlist_id - new Date(a.wishlist_id));
+            setContributions(newContributions);
+            console.log(data);
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+    }, [])
+  }
+
+
   const [user, setUser] = React.useState({
       profilePictureURL: "",
       displayName: "John Doe",
       email: "johndoe@wishify.com",
   })
+
+  backendLoading()
 
   return (
     <>
@@ -104,6 +166,17 @@ const Home = () => {
               <CreateEventButton> Create an Event </CreateEventButton>
             </NavLink>
           </EventContainer>
+        </div>
+
+        <br/>
+
+        <h1>Contributions</h1>
+        <div className="home-wishlist-top">
+          <ContributionContainer>
+            {contributions.map((contribution) => (
+              <ItemDisplay key={contribution.id} item={contribution} />
+            ))}
+          </ContributionContainer>
         </div>
       </section>
     </>
