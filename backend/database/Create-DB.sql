@@ -34,6 +34,7 @@ created TIMESTAMP DEFAULT NOW()
 CREATE TABLE notifications(
 id SERIAL PRIMARY KEY,   
 user_id integer REFERENCES users(id) ON DELETE CASCADE,
+title TEXT,
 body TEXT,
 url TEXT,
 is_read BOOLEAN,

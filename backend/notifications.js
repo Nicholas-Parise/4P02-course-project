@@ -13,8 +13,8 @@ router.get('/', authenticate, async (req, res, next) => {
 
   try {
 
-    const result = await db.query(`SELECT id, body, url, is_read, created FROM notifications WHERE user_id = $1`[userId]);
-
+    const result = await db.query(`SELECT id, title, body, url, is_read, created FROM notifications WHERE user_id = $1;`, [userId]);
+    
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "notifications not found." });
     }
@@ -44,7 +44,7 @@ router.put('/:id', authenticate, async (req, res, next) => {
   try {
     /// make sure that only the user that owns the notifications can edit it.
     const ownershipCheck = await db.query(
-      `SELECT * FROM notifications WHERE id = $1 AND user_id = $2`,
+      `SELECT * FROM notifications WHERE id = $1 AND user_id = $2;`,
       [notificationId, userId]
     );
 
@@ -87,7 +87,7 @@ router.delete('/:id', authenticate, async (req, res, next) => {
   try {
     /// make sure that only the user that owns the notifications can delete it.
     const ownershipCheck = await db.query(
-      `SELECT * FROM notifications WHERE id = $1 AND user_id = $2`,
+      `SELECT * FROM notifications WHERE id = $1 AND user_id = $2;`,
       [notificationId, userId]
     );
 

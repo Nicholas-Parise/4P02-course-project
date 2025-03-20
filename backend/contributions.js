@@ -15,9 +15,10 @@ router.get('/', authenticate, async (req, res, next) => {
     const userId = req.user.userId; // Get user ID from authenticated token
 
     const result = await db.query(
-      `SELECT c.id, c.item_id, c.quantity, c.purchased, c.note, c.dateUpdated, c.dateCreated 
+      `SELECT c.id, c.item_id, c.quantity, c.purchased, c.note, c.dateUpdated, c.dateCreated, wm.wishlists_id, i.name 
            FROM contributions c 
            JOIN wishlist_members wm ON c.member_id = wm.id
+           JOIN items i ON c.item_id = i.id
            WHERE wm.user_id = $1`, [userId]);
 
     if (result.rows.length === 0) {

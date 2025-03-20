@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
 const db = require('./db');
+const createNotification = require("./middleware/createNotification");
 require("dotenv").config();
 
 // localhost:3000/auth/register
@@ -45,6 +46,8 @@ router.post('/register', async (req, res, next) => {
             "INSERT INTO users (displayName, password, email, picture, bio, notifications, dateCreated) VALUES ($1, $2, $3, $4, $5, true, NOW()) RETURNING id, displayName, email",
             [displayName, hashedPassword, email, tempPicture, bio]
         );
+      
+          await createNotification( [result.rows[0].id], "Welcome to Wishify!", "Hello from the wishify team! we are so excited to welcome you to this platform, if you need any assistance checkout the help page.", "/help" );
 
         res.status(201).json({ message: "User registered successfully", user: result.rows[0] });
     } catch (error) {
