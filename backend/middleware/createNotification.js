@@ -1,24 +1,25 @@
 const db = require("../db");
 
 // send a notification to users
-async function createNotification(notifications) {
+//async function createNotification(userIDs, title, body, url) {
 
-    if (!Array.isArray(notifications) || notifications.length === 0) {
-        console.error("No notifications to insert.");
+const createNotification = async (userIDs, title, body, url) => {
+    if (!Array.isArray(userIDs) || userIDs.length === 0) {
+        console.error("No userIDs to send.");
         return;
     }
 
-    // create list of placeholders example: ($1, $2, $3, false), ($4, $5, $6, false), ...
-    const values = notifications.map((n, index) =>
-        `($${index * 3 + 1}, $${index * 3 + 2}, $${index * 3 + 3}, false)`
-    ).join(", ");
+    // Generate placeholders only for user_id dynamically ($1, $n+1, $n+2, $n+3, false), ($2, $n+1, $n+2, $n+3, false), ...
+    const values = userIDs
+    .map((_, index) => `($${index + 1}, $${userIDs.length + 1}, $${userIDs.length + 2}, $${userIDs.length + 3}, false)`)
+    .join(", ");
 
-    // now convert the array input from [[userID1, body1, url1],[userID2, body2, url2]] -> [userID1, body1, url1, userID2, body2, url2]
-    const params = notifications.flatMap(n => [n.userID, n.body, n.url]);
+    // now convert the array input from [[userID1,userID2], title, body, url], -> [userID1, userID2, title, body, url]
+    const params = [...userIDs, title, body, url];
 
     try {
         await db.query(`
-        INSERT INTO notifications (user_id, body, url, is_read) 
+        INSERT INTO notifications (user_id, title, body, url, is_read) 
         VALUES ${values}
         `, params);
 
@@ -26,18 +27,12 @@ async function createNotification(notifications) {
     } catch (error) {
         console.error("Error creating notifications:", error);
     }
-}
+};
 
 module.exports = createNotification;
 
 /*
-const createNotification = require("./middlewares/createNotification");
+const createNotification = require("./middleware/createNotification");
 
-const notifications = [
-  { userID: 1, body: "User A liked your post", url: "/post/123" },
-  { userID: 2, body: "User B commented on your photo", url: "/photo/456" },
-  { userID: 3, body: "User C sent you a friend request", url: "/friends" }
-];
-
-createNotification(notifications);
+await createNotification([1,2,3],"title", "body", "link");
 */

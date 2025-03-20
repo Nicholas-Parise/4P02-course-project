@@ -151,7 +151,7 @@ try {
     return res.status(404).json({ error: "Event not found." });
   }
 
-  res.status(201).json({ message: "Event updated successfully.", event: result.rows[0] });
+  res.status(200).json({ message: "Event updated successfully.", event: result.rows[0] });
 
 
 } catch (error) {
