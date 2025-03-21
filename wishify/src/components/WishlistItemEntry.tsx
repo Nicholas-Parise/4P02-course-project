@@ -10,7 +10,7 @@ type WishlistItemProps = {
   sortBy: "priority" | "price" | "quantity",
   reservations: Contribution[],
   onReserve: (itemId: number, reservation: number, note: string) => void,
-  id: string
+  id: number
 }
 
 const WishlistItemEntry = ({ item, sortBy, reservations, onReserve, id }: WishlistItemProps) => {
@@ -64,7 +64,6 @@ const WishlistItemEntry = ({ item, sortBy, reservations, onReserve, id }: Wishli
   return (
     <>
       <li
-        id={id}
         ref={setNodeRef}
         style={style}
         className="bg-white shadow-md p-4 flex items-center space-x-4 cursor-pointer rounded-[25px] border-2 border-[#5651e5]"

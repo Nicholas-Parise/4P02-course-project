@@ -240,7 +240,7 @@ const Wishlist = () => {
               <SortableContext items={sortedItems.map((item) => item.id)}>
                   <ul className="space-y-4">
                   {sortedItems.map((item) => (
-                      <WishlistItemEntry id={item.id.toString()} key={item.id} item={item} sortBy={sortBy} reservations={getItemReservations(item.id)} onReserve={handleReserveItem}/>
+                      <WishlistItemEntry id={item.id} key={item.id} item={item} sortBy={sortBy} reservations={getItemReservations(item.id)} onReserve={handleReserveItem}/>
                   ))}
                   </ul>
               </SortableContext>
