@@ -14,7 +14,6 @@ type WishlistItemProps = {
 }
 
 const WishlistItemEntry = ({ item, sortBy, reservations, onReserve, id }: WishlistItemProps) => {
-  const item_id = item.id;
   const { attributes, listeners, setNodeRef, transform, transition, } = useSortable({ id, animateLayoutChanges: () => false });
 
   const style = {
