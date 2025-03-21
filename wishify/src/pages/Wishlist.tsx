@@ -212,6 +212,31 @@ const Wishlist = () => {
     return itemReservations
   }
 
+  const deleteItem = (id: number) => {
+    // send delete request
+    fetch(`https://api.wishify.ca/items/${id}`, {
+      method: 'delete',
+      headers: new Headers({
+        'Authorization': "Bearer "+token
+      })
+      })
+      .then((response) => {
+        return response.json();
+      })
+      .then(() => {
+        // remove from array
+        const newItems = wishlistItems.filter(item => item.id !== id)
+        setWishlistItems(newItems)
+      })
+      .catch((error) => {
+        //setError(error)
+        //setLoading(false)
+        console.log("Failed to delete wishlist\n" + error)
+      })
+
+   
+  }
+
   return (
     <>
       <section className='pt-5'>
@@ -240,7 +265,15 @@ const Wishlist = () => {
               <SortableContext items={sortedItems.map((item) => item.id)}>
                   <ul className="space-y-4">
                   {sortedItems.map((item) => (
-                      <WishlistItemEntry id={item.id} key={item.id} item={item} sortBy={sortBy} reservations={getItemReservations(item.id)} onReserve={handleReserveItem}/>
+                      <WishlistItemEntry 
+                        id={item.id} 
+                        key={item.id} 
+                        item={item} 
+                        sortBy={sortBy} 
+                        reservations={getItemReservations(item.id)} 
+                        onReserve={handleReserveItem}
+                        onDelete={deleteItem}
+                      />
                   ))}
                   </ul>
               </SortableContext>
