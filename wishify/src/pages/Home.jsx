@@ -57,9 +57,8 @@ const CreateEventButton = styled.button`
 const ContributionContainer = styled.div`
   display: grid;
   margin: 3vw;
-  grid-template-columns: repeat(4, 1fr);
-  flex: 1;
   gap: 3vw;
+  grid-template-columns: repeat(4, 1fr);
   @media screen and (max-width: 768px){
     grid-template-columns: repeat(3, 1fr);
   }
@@ -71,10 +70,10 @@ const ContributionContainer = styled.div`
 const ItemDisplay = ({ item }) => {
 
   return (
-    <div className="p-1 border rounded-lg shadow-lg bg-white" style={{width: "200px"}}>
+    <div className="p-1 border rounded-lg shadow-lg bg-white" style={{maxWidth: "200px"}}>
       <h2 className="text-xl font-bold mb-2">{item.wishlist_name}</h2>
       <ul className="list-disc list-inside text-base">
-        <li><strong>Item:</strong> <a href={`/wishlists/${item.wishlists_id}#${item.item_id}`}>{item.name}</a></li>
+        <li><strong>Item:</strong> <a href={`/wishlists/${item.wishlists_id}#${item.item_id}`} className={"font-medium text-blue-600 dark:text-blue-500 hover:underline"}>{item.name}</a></li>
         <li><strong>Note:</strong> {item.note? item.note: <span className='text-red-400'>None</span>}</li>
         <li><strong>Quantity:</strong> {item.quantity}</li>
         <li><strong>Purchased:</strong> {item.purchased ? "Yes" : "No"}</li>
@@ -131,7 +130,6 @@ const Home = () => {
   
           // Process contributions
           let newContributions = contributionsData;
-          newContributions.sort((a, b) => b.wishlist_id - a.wishlist_id);
           newContributions = newContributions.map((contribution) => ({
             ...contribution,
             wishlist_name:
@@ -139,6 +137,9 @@ const Home = () => {
               wishlistsData.find((wishlist) => wishlist.id === contribution.wishlists_id)?.name ||
               "Unknown",
           }));
+          newContributions = newContributions.sort((a, b) => 
+            a.wishlist_name.localeCompare(b.wishlist_name) // Sort alphabetically by wishlist_name
+          );
   
           setContributions(newContributions);
           console.log("Processed Contributions:", newContributions);
