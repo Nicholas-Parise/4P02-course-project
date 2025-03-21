@@ -4,6 +4,7 @@ import { Modal, Button, TextField, Typography, Box, Divider } from '@mui/materia
 const DeleteAccountModal = ({ open, handleClose, onSave }) => {
   const [password, setPassword] = React.useState("")
   const [confirmOpen, setConfirmOpen] = React.useState(false)
+  const [input, setInput] = React.useState('')
 
   React.useEffect(() => {
     if (open) {
@@ -90,7 +91,8 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
     </Modal>
 
     {/* Child modal for confirmation */}
-    <Modal open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+
+    <Modal open={confirmOpen} onClose={() => {setConfirmOpen(false); setInput('')}}>
         <Box
           sx={{
             position: 'absolute',
@@ -108,9 +110,22 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
           <Typography variant="h6" mb={2} color="error">
             Confirm Account Deletion
           </Typography>
+
           <Typography variant="body2" mb={2}>
             Are you sure you want to delete your account? This action cannot be undone.
+            <br /><br />
+            Type <b>DELETE</b> in the box below to confirm.
           </Typography>
+            
+          <TextField
+            fullWidth
+            variant="outlined"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder='Type DELETE here'
+            sx={{ mb: 2 }}
+          />
+            
           <Divider sx={{ mb: 2 }} />
 
           {/* Buttons */}
@@ -118,18 +133,24 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
             <Button variant="outlined" onClick={() => setConfirmOpen(false)} sx={{ borderRadius: '25px', borderColor: '#5651e5', color: '#5651e5', mr: '8px' }}>
               Cancel
             </Button>
-            <Button variant="contained" color="error" onClick={handleConfirmDelete} sx={{
-                background: 'white',
-                color: 'red',
-                border: '2px solid red',
-                borderRadius: '25px',
-                '&:hover': { background: '#ffebeb' }
-              }}>
+            <Button 
+                variant="contained" 
+                color="error" 
+                onClick={handleConfirmDelete}
+                disabled={input !== 'DELETE'}
+                sx={{
+                  background: 'white',
+                  color: 'red',
+                  border: '2px solid red',
+                  borderRadius: '25px',
+                  '&:hover': { background: '#ffebeb' }
+                }}>
               Confirm Deletion
             </Button>
           </Box>
         </Box>
-      </Modal>
+      </Box>
+    </Modal>
     </>
   )
 }

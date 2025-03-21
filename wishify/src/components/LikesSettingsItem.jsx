@@ -47,9 +47,9 @@ const LikesSettingsItem = ({ label, values, onEdit, onSave }) => {
                   <button
                     style={{
                       position: 'absolute',
-                      top: '0px',
-                      right: '0px',
-                      background: 'red',
+                      top: '-5px',
+                      right: '-5px',
+                      background: '#5651e5',
                       border: 'none',
                       borderRadius: '50%',
                       width: '15px',
@@ -59,7 +59,7 @@ const LikesSettingsItem = ({ label, values, onEdit, onSave }) => {
                       alignItems: 'center',
                       cursor: 'pointer',
                       color: 'white',
-                      margin: '-5px'
+                      margin: '0px'
                     }}
                     onClick={() => onDelete(index)} // Call onDelete with the item's index
                   >

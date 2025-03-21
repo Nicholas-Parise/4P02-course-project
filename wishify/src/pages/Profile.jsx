@@ -1,23 +1,80 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import '../profile.css'
 import SettingsItem from '../components/SettingsItem.jsx'
 import LikesSettingsItem from '../components/LikesSettingsItem.jsx'
 import { EditDisplayNameModal, EditBioModal, EditEmailModal, EditPasswordModal, DeleteAccountModal, AddLikesModal } from '../components/ProfileSettingModals'
+import { CircularProgress, Typography, Snackbar, Alert } from '@mui/material'
 
 const Profile = () => {
+  const navigate = useNavigate()
+
   const [user, setUser] = React.useState({
-    profilePictureURL: "",
-    displayName: "John Doe",
-    biography: "I like copilot.",
-    email: "johndoe@wishify.com",
-    likes: [],
-    dislikes: ["Books"]
+    email: '',
+    displayName: '',
+    bio: '',
+    picture: '',
+    likes: []
   })
+
+  const [loading, setLoading] = React.useState(true)
+  const [error, setError] = React.useState(null)
+  const [successMessage, setSuccessMessage] = React.useState(false)
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const token = localStorage.getItem("token")
+      if (!token) {
+        setError("User not authenticated")
+        setLoading(false)
+        return
+      }
+
+      try {
+        const response = await fetch('https://api.wishify.ca/users', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        })
+
+        if (response.status === 200) {
+          const data = await response.json()
+          console.log(data)
+          setUser({
+            email: data.user.email,
+            displayName: data.user.displayname,
+            bio: data.user.bio === null ? '' : data.user.bio,
+            picture: data.user.picture,
+            likes: data.categories
+          })
+          console.log(user)
+        }
+        else if (response.status === 404) {
+          setError("User not found.")
+        }
+        else if (response.status === 500) {
+          setError("Internal server error. Please try again later.")
+        }
+        else {
+          setError(`An unexpected error occurred: ${response.status}`)
+        }
+      } catch (err) {
+        setError(`An error occurred: ${err.message}`)
+      }
+      finally {
+        setLoading(false)
+      }
+    }
+
+    fetchUserData()
+  }, [])
 
   // Modal setup
   const [openModals, setOpenModals] = React.useState({
     displayName: false,
-    biography: false,
+    bio: false,
     email: false,
     password: false,
     likes: false,
@@ -46,18 +103,113 @@ const Profile = () => {
 
   const handleClose = () => setOpenModals({
     displayName: false,
-    biography: false,
+    bio: false,
     email: false,
     password: false,
     likes: false,
+    dislikes: false,
     deleteAccount: false
   })
 
-  const handleSave = (value) => {
-    setUser((prevUser) => ({
-      ...prevUser, [currentField]: value 
-    }))
+  const handleSave = async (value) => {
+    try {
+      const response = await fetch('https://api.wishify.ca/users', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ [currentField]: value })
+      })
+
+      if (response.status === 400) {
+        throw new Error(response.message)
+      } else if (response.status === 403) {
+        throw new Error(response.message)
+      } else if (response.status === 404) {
+        throw new Error(response.message)
+      } else if (response.status === 500) {
+        throw new Error("Internal server error. Please try again later.")
+      } else if (!response.ok) {
+        throw new Error(`An unexpected error occurred: ${response.status}`)
+      }
+
+      const data = await response.json()
+      setUser(prevUser => ({
+        ...prevUser, [currentField]: data.user[currentField.toLowerCase()]
+      }))
+    } catch (err) {
+      setError(`An error occurred: ${err.message}`)
+    }
   }
+
+  const handleChangePassword = async (oldPassword, newPassword) => {
+    try {
+      const response = await fetch('https://api.wishify.ca/users', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ['password']: oldPassword, ['newPassword']: newPassword })
+      })
+
+      console.log(response)
+
+      if (response.status === 200) {
+        setSuccessMessage(true)
+      } else if (response.status === 400) {
+        throw new Error(response.statusText)
+      } else if (response.status === 403) {
+        throw new Error(response.statusText)
+      } else if (response.status === 404) {
+        throw new Error(response.statusText)
+      } else if (response.status === 500) {
+        throw new Error("Internal server error. Please try again later.")
+      } else if (!response.ok) {
+        throw new Error(`An unexpected error occurred: ${response.statusText}`)
+      }
+    } catch (err) {
+      setError(`An error occurred: ${err.message}`)
+    }
+  }
+
+  const handleDeleteAccount = async (password) => {
+    try {
+      const response = await fetch('https://api.wishify.ca/users', {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ['password']: password })
+      })
+
+      console.log(password)
+      console.log(response)
+
+      if (response.status === 200) {
+        setSuccessMessage(true)
+        setTimeout(() => {
+          localStorage.removeItem("token")
+          navigate('/')
+        }, 3000)
+      } else if (response.status === 400) {
+        throw new Error(response.statusText)
+      } else if (response.status === 403) {
+        throw new Error(response.statusText)
+      } else if (response.status === 404) {
+        throw new Error(response.statusText)
+      } else if (response.status === 500) {
+        throw new Error("Internal server error. Please try again later.")
+      } else if (!response.ok) {
+        throw new Error(`An unexpected error occurred: ${response.statusText}`)
+      }
+    } catch (err) {
+      setError(`An error occurred: ${err.message}`)
+    }
+  }
+
 
   const handleSaveLikes = (value, type) => {
     setUser((prevUser) => ({
@@ -65,9 +217,24 @@ const Profile = () => {
     }))
   }
 
+  if (loading) return <CircularProgress />
+  if (error) return <Typography variant='h6' color='error'>{error}</Typography>
+
   return (
     <>
       <section className="profile-container">
+
+      <Snackbar
+        open={successMessage}
+        autoHideDuration={6000}
+        onClose={() => setSuccessMessage(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert onClose={() => setSuccessMessage(false)} severity="success" variant="filled">
+          Account deleted. Redirecting to landing page...
+        </Alert>
+      </Snackbar>
+
         <h1>Profile settings</h1>
 
         <div className="profile-header">
@@ -160,56 +327,103 @@ const Profile = () => {
             </button>
         </div>
 
-        <EditDisplayNameModal
-          open={openModals.displayName}
-          value={currentValue}
-          onSave={handleSave}
-          handleClose={handleClose}
-        />
+      <SettingsItem
+        label='Display name:'
+        values={user.displayName}
+        buttonText={'Edit'}
+        onEdit={() => handleOpenModal("displayName")}
+      />
 
-        <EditBioModal
-          open={openModals.biography}
-          value={currentValue}
-          onSave={handleSave}
-          handleClose={handleClose}
-        />
+      <SettingsItem
+        label="Biography:"
+        values={user.bio}
+        buttonText={'Edit'}
+        onEdit={() => handleOpenModal("bio")}
+      />
 
-        <AddLikesModal
-          open={openModals.likes}
-          values={currentValue}
-          type='Likes'
-          onSave={handleSave}
-          handleClose={handleClose}
-        />
+      <LikesSettingsItem
+        label="Likes:"
+        values={user.likes}
+        onEdit={() => handleOpenModal("likes")}
+        onSave={handleSaveLikes}
+      />
 
-        <AddLikesModal
-          open={openModals.dislikes}
-          values={currentValue}
-          type='Dislikes'
-          onSave={handleSave}
-          handleClose={handleClose}
-        />
+      <LikesSettingsItem
+        label="Dislikes:"
+        values={user.likes}
+        onEdit={() => handleOpenModal("dislikes")}
+        onSave={handleSaveLikes}
+      />
 
-        <EditEmailModal
-          open={openModals.email}
-          value={currentValue}
-          onSave={handleSave}
-          handleClose={handleClose}
-        />
+      <SettingsItem
+        label='Email address:'
+        values={[user.email]}
+        buttonText='Edit'
+        onEdit={() => handleOpenModal("email")}
+      />
 
-        <EditPasswordModal
-          open={openModals.password}
-          onSave={handleSave}
-          handleClose={handleClose}
-        />
+      <SettingsItem
+        label='Password:'
+        values={['********']}
+        buttonText='Change Password'
+        onEdit={() => handleOpenPasswordModal()}
+      />
 
-        <DeleteAccountModal
-          open={openModals.deleteAccount}
-          onSave={handleSave}
-          handleClose={handleClose}
-        />
-      </div>
+      <button
+        className='delete-account-button'
+        style={{color: 'red'}}
+        onClick={() => handleOpenDeleteAccountModal()}
+        >Delete account
+      </button>
 
+      <EditDisplayNameModal
+        open={openModals.displayName}
+        value={currentValue}
+        onSave={handleSave}
+        handleClose={handleClose}
+      />
+
+      <EditBioModal
+        open={openModals.bio}
+        value={currentValue}
+        onSave={handleSave}
+        handleClose={handleClose}
+      />
+
+      <AddLikesModal
+        open={openModals.likes}
+        values={currentValue}
+        type='Likes'
+        onSave={handleSaveLikes}
+        handleClose={handleClose}
+      />
+
+      <AddLikesModal
+        open={openModals.dislikes}
+        values={currentValue}
+        type='Dislikes'
+        onSave={handleSaveLikes}
+        handleClose={handleClose}
+      />
+
+      <EditEmailModal
+        open={openModals.email}
+        value={currentValue}
+        onSave={handleSave}
+        handleClose={handleClose}
+      />
+
+      <EditPasswordModal
+        open={openModals.password}
+        onSave={handleChangePassword}
+        handleClose={handleClose}
+      />
+
+      <DeleteAccountModal
+        open={openModals.deleteAccount}
+        onSave={handleDeleteAccount}
+        handleClose={handleClose}
+      />
     </section>
     </>
   )
