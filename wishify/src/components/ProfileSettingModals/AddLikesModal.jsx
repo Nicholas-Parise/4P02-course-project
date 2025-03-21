@@ -1,11 +1,26 @@
 import React from 'react'
 import { Box, Button, Modal, Typography, TextField, List, ListItem, ListItemText, Divider, IconButton, Grid2, Paper } from '@mui/material'
 import { Add, Close } from '@mui/icons-material'
-import wishlistCategories from '../../data/categories'
 
 const AddLikesModal = ({ open, handleClose, type, values, onSave }) => {
-  const predefinedItems = wishlistCategories
-  
+  const [predefinedItems, setPredefinedItems] = React.useState([])
+  React.useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(`https://api.wishify.ca/categories`)
+        if (!response.ok) {
+          throw new Error('Failed to fetch categories')
+        }
+        const data = await response.json()
+        setPredefinedItems(data)
+      } catch (error) {
+        console.error("Error fetching categories: ", error)
+      }
+    }
+
+    fetchCategories()
+  }, [])
+
   const [itemsLeft, setItemsLeft] = React.useState(0)
   const [items, setItems] = React.useState([])
   const [itemsToAdd, setItemsToAdd] = React.useState([])
@@ -19,7 +34,7 @@ const AddLikesModal = ({ open, handleClose, type, values, onSave }) => {
   const handleSave = () => {
     setItems((prev) => {
       const updatedItems = [...prev, ...itemsToAdd];
-      onSave(updatedItems);
+      onSave(updatedItems, type.toLowerCase());
       return updatedItems;
     });
 
@@ -86,12 +101,12 @@ const AddLikesModal = ({ open, handleClose, type, values, onSave }) => {
           <Paper sx={{ height: 200, overflowY: 'auto', p: 1, width: 200, minWidth: 200 }}>
             <List sx={{ width: '100%' }}>
               {predefinedItems
-                .filter((item) => !items.includes(item) && !itemsToAdd.includes(item))
-                .filter((item) => item.toLowerCase().includes(search.toLowerCase()))
+                .filter((item) => !items.includes(item.name) && !itemsToAdd.includes(item.name))
+                .filter((item) => item.name.toLowerCase().includes(search.toLowerCase()))
                 .map((item) => (
-                  <ListItem key={item} button onClick={() => handleAddItem(item)}>
+                  <ListItem key={item.id} button onClick={() => handleAddItem(item.name)}>
                     <ListItemText
-                      primary={item}
+                      primary={item.name}
                       sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
                     />
                   </ListItem>

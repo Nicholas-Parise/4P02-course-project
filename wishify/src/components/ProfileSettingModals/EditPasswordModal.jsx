@@ -5,6 +5,7 @@ const EditPasswordModal = ({ open, handleClose, onSave }) => {
   const [newPasswordValue, setNewPasswordValue] = React.useState("")
   const [confirmPasswordValue, setConfirmPasswordValue] = React.useState("")
   const [oldPasswordValue, setOldPasswordValue] = React.useState("")
+  const [error, setError] = React.useState("")
 
   React.useEffect(() => {
     if (open) {
@@ -15,13 +16,27 @@ const EditPasswordModal = ({ open, handleClose, onSave }) => {
   }, [open])
 
   const handleSave = () => {
+    if (newPasswordValue !== confirmPasswordValue) {
+      setError("Passwords do not match")
+      return
+    } else if (/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,64}$/.test(newPasswordValue) === false) {
+      setError("Password must contain at least 8 characters, including one uppercase letter, one lowercase letter, one number, and one special character")
+      return
+    }
+
     onSave(newPasswordValue)
+    setError('')
     handleClose();
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
     handleSave()
+  }
+
+  const handleCancel = () => {
+    setError('')
+    handleClose()
   }
 
   const style = {
@@ -38,7 +53,7 @@ const EditPasswordModal = ({ open, handleClose, onSave }) => {
   }
 
   return (
-    <Modal open={open} onClose={handleClose}>
+    <Modal open={open} onClose={handleCancel}>
       <Box sx={style}>
         <Typography variant='h6'>Change Password</Typography>
 
@@ -83,6 +98,8 @@ const EditPasswordModal = ({ open, handleClose, onSave }) => {
             sx={{mb: 2}}
           />
 
+          {error && <Typography sx={{ fontSize: '0.875rem'}}  color='error'>{error}</Typography>}
+
           <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
             <Button
               variant="contained"
@@ -93,7 +110,7 @@ const EditPasswordModal = ({ open, handleClose, onSave }) => {
             </Button>
             <Button
               variant="outlined"
-              onClick={handleClose}
+              onClick={handleCancel}
             >
               Cancel
             </Button>

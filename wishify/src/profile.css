@@ -67,9 +67,11 @@
 }
 
 .likes-list-item {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  position: relative;
+  overflow: visible;
+  display: inline-block;
+  vertical-align: middle;
+  text-align: center;
   width: 150px;
   background-color: #c2f3d1;
   padding: 3px 0;
@@ -78,7 +80,6 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   margin-bottom: 0.5rem;
   break-inside: avoid;
-  overflow: hidden;
 }
 
 #add-likes-button {

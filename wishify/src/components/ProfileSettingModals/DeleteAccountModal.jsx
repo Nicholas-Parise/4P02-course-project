@@ -4,6 +4,7 @@ import { Modal, Button, TextField, Typography, Box, Divider } from '@mui/materia
 const DeleteAccountModal = ({ open, handleClose, onSave }) => {
   const [password, setPassword] = React.useState("")
   const [confirmOpen, setConfirmOpen] = React.useState(false)
+  const [input, setInput] = React.useState('')
 
   React.useEffect(() => {
     if (open) {
@@ -83,39 +84,55 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
     </Modal>
 
     {/* Child modal for confirmation */}
-    <Modal open={confirmOpen} onClose={() => setConfirmOpen(false)}>
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            backgroundColor: 'white',
-            padding: 3,
-            borderRadius: 4,
-            boxShadow: 24,
-            width: '400px',
-          }}
-        >
-          <Typography variant="h6" mb={2} color="error">
-            Confirm Account Deletion
-          </Typography>
-          <Typography variant="body2" mb={2}>
-            Are you sure you want to delete your account? This action cannot be undone.
-          </Typography>
-          <Divider sx={{ mb: 2 }} />
+    <Modal open={confirmOpen} onClose={() => {setConfirmOpen(false); setInput('')}}>
+      <Box
+        sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          backgroundColor: 'white',
+          padding: 3,
+          borderRadius: 4,
+          boxShadow: 24,
+          width: '400px',
+        }}
+      >
+        <Typography variant="h6" mb={2} color="error">
+          Confirm Account Deletion
+        </Typography>
+        <Typography variant="body2" mb={2}>
+          Are you sure you want to delete your account? This action cannot be undone.
+          <br /><br />
+          Type <b>DELETE</b> in the box below to confirm.
+        </Typography>
 
-          {/* Buttons */}
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button variant="outlined" onClick={() => setConfirmOpen(false)} sx={{ mr: 1 }}>
-              Cancel
-            </Button>
-            <Button variant="contained" color="error" onClick={handleConfirmDelete}>
-              Confirm Deletion
-            </Button>
-          </Box>
+        <TextField
+          fullWidth
+          variant="outlined"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder='Type DELETE here'
+          sx={{ mb: 2 }}
+        />
+
+        <Divider sx={{ mb: 2 }} />
+
+        {/* Buttons */}
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Button variant="outlined" onClick={() => setConfirmOpen(false)} sx={{ mr: 1 }}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleConfirmDelete}
+            disabled={input !== 'DELETE'}>
+            Confirm Deletion
+          </Button>
         </Box>
-      </Modal>
+      </Box>
+    </Modal>
     </>
   )
 }
