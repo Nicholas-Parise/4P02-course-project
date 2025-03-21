@@ -7,7 +7,7 @@ import CreateItemDialog from './CreateItemDialog';
 import ProfileMenu from './ProfileMenu';
 import '../components/Navbarlanding/landingheader.css';
 
-const Navbar = ({ isLoggedIn, setIsLoggedIn, page }: { isLoggedIn: boolean, setIsLoggedIn: (val: boolean)=>void, page: string }) => {
+const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLoggedIn: (val: boolean)=>void, page: string }) => {
   interface NavItem {
     label: string;
     href: string;
@@ -109,8 +109,6 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn, page }: { isLoggedIn: boolean, setI
             setNewItem={setNewItem}
             wishlists={wishlists}
             token={token}
-            page={page}
-            id={page.split('/')[2]}
           />
         </>
       ) : (

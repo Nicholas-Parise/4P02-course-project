@@ -259,7 +259,7 @@ const Wishlists = () => {
           let duplicatedWishlist: Wishlist = structuredClone(wishlistToDuplicate);
           console.log(wishlistToDuplicate)
           duplicatedWishlist.id = data.wishlist_id;
-          duplicatedWishlist.name = wishlistToDuplicate.name + " (Copy)";
+          duplicatedWishlist.name = wishlistToDuplicate.name;
           console.log(wishlistToDuplicate)
           const updatedWishlists = [...wishlists, duplicatedWishlist];
           setWishlists(updatedWishlists);

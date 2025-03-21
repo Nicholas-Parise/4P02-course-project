@@ -23,6 +23,9 @@ const Wishlist = () => {
     //const [loading, setLoading] = useState(false)
     const [token, setToken] = useState<string>(localStorage.getItem('token') || '')
     const [sortDirection, setSortDirection] = useState<-1 | 1>(1)
+    
+    // used by navbar to refresh the page
+    localStorage.setItem('id', id || '')
 
     useEffect(() => {
       setToken(localStorage.getItem('token') || '')
