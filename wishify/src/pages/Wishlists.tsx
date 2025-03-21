@@ -1,5 +1,4 @@
-import React, {useState, useEffect, FormEvent, act} from 'react'
-import { useParams } from "react-router-dom"
+import React, {useState, useEffect, FormEvent} from 'react'
 import { type Wishlist } from '../types/types'
 import {CreateWishlist} from '../components/CreateButton'
 import {WishlistThumbnail} from '../components/Thumbnail'
@@ -18,8 +17,9 @@ const boxStyle = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
+  bgcolor: 'white',
+  border: '2px solid #5651e5',
+  borderRadius: "25px",
   boxShadow: 24,
   p: 4,
 };
@@ -32,7 +32,6 @@ const WishlistContainer = styled.div`
 `
 
 const Wishlists = () => {
-  const { id } = useParams();
   const wishlistUrl = `https://api.wishify.ca/wishlists/`
 
   const [token, setToken] = useState<string>(localStorage.getItem('token') || '')
@@ -141,7 +140,7 @@ const Wishlists = () => {
     handleModalClose();
   }
 
-  const changeActiveOverlay = (title) => {
+  const changeActiveOverlay = (title: string) => {
     if(activeOverlay == title){
       setActiveOverlay("")
     } else{
@@ -234,8 +233,45 @@ const Wishlists = () => {
       })
   }
 
+  const handleDuplicate = () => {
+    // find the wishlist to duplicate
+    const wishlistToDuplicate = wishlists.find(wishlist => wishlist.name === activeOverlay);
+    // this condition should never happen but I've left it here just in case
+    if (!wishlistToDuplicate) {
+      console.log("Wishlist not found");
+      return;
+    }
+    const wishlistId = wishlistToDuplicate.id;
+    console.log(wishlistToDuplicate)
+
+    const url = `https://api.wishify.ca/wishlists/${wishlistId}/duplicate`
+    fetch(url, {
+      method: 'post',
+      headers: new Headers({
+        'Authorization': "Bearer "+token,
+        'Content-Type': 'application/json'
+      }),
+      })
+      .then((response) => response.json())
+      .then((data) => {
+          console.log(data)
+          // update the wishlists state with the new data
+          let duplicatedWishlist: Wishlist = structuredClone(wishlistToDuplicate);
+          console.log(wishlistToDuplicate)
+          duplicatedWishlist.id = data.wishlist_id;
+          duplicatedWishlist.name = wishlistToDuplicate.name + " (Copy)";
+          console.log(wishlistToDuplicate)
+          const updatedWishlists = [...wishlists, duplicatedWishlist];
+          setWishlists(updatedWishlists);
+      })
+      .catch((error) => {
+          console.log(error)
+      })
+  }
+    
+
   return (
-    <>
+    <section className='bg-white border-2 border-solid border-[#5651e5] rounded-[25px]'>
       <h1>My Wishlists</h1>
       <WishlistContainer>
         <CreateWishlist addThumbnail={handleModalOpen}>Create a Wishlist</CreateWishlist>
@@ -247,6 +283,7 @@ const Wishlists = () => {
             id={wishlist.id}
             title={wishlist.name}
             edit={handleEditOpen}
+            duplicate={handleDuplicate}
             owner={"Me"}
           />
         ))}
@@ -340,7 +377,7 @@ const Wishlists = () => {
         </Modal>
       </ModalBox>
       </Modal>
-    </>
+    </section>
   )
 }
 

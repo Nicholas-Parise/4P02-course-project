@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('./db');
-const authenticate = require('./authenticate');
+const authenticate = require('./middleware/authenticate');
 
 
 // localhost:3000/contributions/
@@ -15,16 +15,17 @@ router.get('/', authenticate, async (req, res, next) => {
     const userId = req.user.userId; // Get user ID from authenticated token
 
     const result = await db.query(
-      `SELECT c.id, c.item_id, c.quantity, c.purchased, c.note, c.dateUpdated, c.dateCreated 
+      `SELECT c.id, c.item_id, c.quantity, c.purchased, c.note, c.dateUpdated, c.dateCreated, wm.wishlists_id, i.name 
            FROM contributions c 
            JOIN wishlist_members wm ON c.member_id = wm.id
+           JOIN items i ON c.item_id = i.id
            WHERE wm.user_id = $1`, [userId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "contributions not found." });
     }
 
-    res.json(result.rows);
+    res.status(200).json(result.rows);
   } catch (error) {
     console.error("Error fetching contributions:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -57,7 +58,7 @@ router.get('/wishlists/:id', authenticate, async (req, res, next) => {
       return res.status(404).json({ error: "no contributions found." });
     }
 
-    res.json(result.rows);
+    res.status(200).json(result.rows);
   } catch (error) {
     console.error("Error fetching contributions:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -88,7 +89,7 @@ router.get('/items/:id', authenticate, async (req, res, next) => {
       return res.status(404).json({ error: "contributions not found." });
     }
 
-    res.json(result.rows);
+    res.status(200).json(result.rows);
   } catch (error) {
     console.error("Error fetching contributions:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -145,7 +146,7 @@ router.post('/', authenticate, async (req, res, next) => {
     const result = await db.query(`
         INSERT INTO contributions 
         (item_id, member_id, quantity, purchased, note, dateCreated)
-        VALUES ($1, $2, $3, COALESCE($4, false), $5, NOW()) RETURNING *;
+        VALUES ($1, $2, $3, COALESCE($4, false), $5, NOW()) RETURNING id, item_id, quantity, purchased, note, dateUpdated, dateCreated;
       `, [item_id, member_id, quantity, purchased, note]);
 
     res.status(201).json({ message: "contribution created successfully", contribution: result.rows[0] });
@@ -188,9 +189,10 @@ router.put('/:id', authenticate, async (req, res, next) => {
   try {
     /// make sure that only the user that created the contribution can edit it.
     const ownershipCheck = await db.query(
-      `SELECT c.id 
+      `SELECT c.id, u.displayName AS user_displayName, u.id AS user_id
         FROM contributions c
         JOIN wishlist_members wm ON c.member_id = wm.id
+        JOIN users u ON wm.user_id = u.id
         WHERE c.id = $1 AND wm.user_id = $2`,
       [contributionId, userId]
     );
@@ -208,15 +210,18 @@ router.put('/:id', authenticate, async (req, res, next) => {
             note = COALESCE($3, note),
             dateUpdated = NOW()
         WHERE id = $4
-        RETURNING *;
+        RETURNING id, item_id, quantity, purchased, note, dateUpdated, dateCreated;
       `, [quantity, purchased, note, contributionId]);
-
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "contribution not found." });
     }
 
-    res.json({ message: "contribution updated successfully.", contribution: result.rows[0] });
+    const contribution_results = result.rows[0];
+    const user_displayname = ownershipCheck.rows[0].user_displayname;
+    const user_id = ownershipCheck.rows[0].user_id;
+
+    res.status(200).json({ message: "contribution updated successfully.", contribution: {...contribution_results, user_displayname, user_id} });
 
 
   } catch (error) {
@@ -252,7 +257,7 @@ router.delete('/:id', authenticate, async (req, res, next) => {
     // Delete the contribution
     await db.query(`DELETE FROM contributions WHERE id = $1;`, [contributionId]);
 
-    res.json({ message: "Contribution deleted successfully." });
+    res.status(200).json({ message: "Contribution deleted successfully." });
   } catch (error) {
     console.error("Error editing item:", error);
     res.status(500).json({ error: "Internal Server Error" });

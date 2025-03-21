@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('./db');
 const bcrypt = require("bcryptjs");
-const authenticate = require('./authenticate');
+const authenticate = require('./middleware/authenticate');
 
 // localhost:3000/users
 // get logged in users

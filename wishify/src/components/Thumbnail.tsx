@@ -1,17 +1,19 @@
-import {React} from 'react';
 import { useNavigate } from "react-router-dom";
 import styled from "@emotion/styled";
-import {FaEye, FaPencilAlt, FaKey} from 'react-icons/fa';
+import {FaEye} from 'react-icons/fa';
 
 
 const WishlistButton = styled.button`
-    background: rgb(91, 241, 252);
+    background: #FFFFFF;
     border-radius: 25px;
-    border-color: black;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border: 2px solid #5651e5;
     padding: 20px;
     width: 200px;
     height: 200px;
     position: relative;
+    font-size: clamp(0.5em, 0.75em, 1em);
     @media screen and (max-width: 440px){
         width: 150px;
         height: 150px;
@@ -23,12 +25,12 @@ const WishlistButton = styled.button`
 `
 
 const WishlistMenu = styled.div`
-    background: rgb(91, 241, 252);
+    background: #FFFFFF;
     display: grid;
     gap: 0px;
-    grid-template-rows: 20% 1fr 1fr 1fr 1fr;
+    grid-template-rows: 20% 1fr 1fr 1fr 1fr 1fr;
     border-radius: 25px;
-    border-color: black;
+    border: 2px solid #5651e5;
     width: 200px;
     height: 200px;
     font-size: clamp(0.5em, 0.75em, 1em);
@@ -40,9 +42,9 @@ const WishlistMenu = styled.div`
 `
 
 const EventButton = styled.button`
-    background: rgb(91, 241, 252);
+    background:  #FFFFFF;
     border-radius: 25px;
-    border-color: black;
+    border: 2px solid #5651e5;
     padding: 20px;
     width: 200px;
     height: 200px;
@@ -58,12 +60,12 @@ const EventButton = styled.button`
 `
 
 const EventMenu = styled.div`
-    background: rgb(91, 241, 252);
+    background:  #FFFFFF;
     display: grid;
     gap: 0px;
     grid-template-rows: 37.5% 1fr 1fr 1fr;
     border-radius: 25px;
-    border-color: black;
+    border-color: #5651e5;
     width: 200px;
     height: 200px;
     font-size: clamp(0.5em, 0.75em, 1em);
@@ -74,7 +76,7 @@ const EventMenu = styled.div`
     }
 `
 
-const createStyledIcon = (IconComponent) => styled(IconComponent)`
+const createStyledIcon = (IconComponent: any) => styled(IconComponent)`
   position: absolute;
   left: 20px;
   top: 10px;
@@ -90,29 +92,39 @@ const Eye = createStyledIcon(FaEye);
 
 const MenuButton = styled.button`
     &:hover{
-        border: solid #5fd5dd 1px;
+        border: solid #5651e5 1px;
         border-radius: 20px;
         cursor: pointer;
     } 
 `
 
+const OverlayTitle = styled.p`
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 18px;
+    text-align: center;
+    border-bottom: 1px solid black;
+    text-overflow: ellipsis;
+`
 
 
-export const WishlistThumbnail = (props) => {
+
+export const WishlistThumbnail = (props: any) => {
     const WishlistOverlayMenu = () => {
         return (
             <WishlistMenu onMouseLeave={props.toggleActive}>
                 <p style={{margin: "4px"}}>Owner: {props.owner}</p>
-                <p style={{overflow: 'hidden', fontSize: '25px', textAlign: 'center', borderBottom: '1px solid black'}}>{props.title}</p>
+                <OverlayTitle title={props.title}>{props.title}</OverlayTitle>
                 <MenuButton onClick={openWishlist}>Open</MenuButton>
                 <MenuButton onClick={props.edit}>Edit</MenuButton>
                 <MenuButton>Share</MenuButton>
+                <MenuButton onClick={props.duplicate}>Duplicate</MenuButton>
             </WishlistMenu>
         )
     }
 
     let navigate = useNavigate(); 
-    const openWishlist = (e) => {
+    const openWishlist = () => {
         let path = "/wishlists/" + props.id;
         navigate(path);
     }
@@ -130,12 +142,12 @@ export const WishlistThumbnail = (props) => {
     }
 }
 
-export const EventThumbnail = (props) => {
+export const EventThumbnail = (props: any) => {
 
     const EventOverlayMenu = () => {
         return (
             <EventMenu onMouseLeave={props.toggleActive}>
-                <button style={{overflow: 'hidden', fontSize: "initial", textAlign: 'center', borderBottom: '1px solid black'}}>{props.title}</button>
+                <button title={props.title} style={{ overflow: 'hidden', fontSize: "initial", textAlign: 'center', borderBottom: '1px solid black' }}>{props.title}</button>
                 <MenuButton onClick={openEvent}>Open</MenuButton>
                 <MenuButton>Edit</MenuButton>
                 <MenuButton>Share</MenuButton>
@@ -143,7 +155,7 @@ export const EventThumbnail = (props) => {
         )
     }
     let navigate = useNavigate();
-    const openEvent = (e) => {
+    const openEvent = () => {
         let path = "/events/" + props.id;
         navigate(path);
     }

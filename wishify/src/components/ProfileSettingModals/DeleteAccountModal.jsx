@@ -28,10 +28,10 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 500,
+    width: 400,
     bgcolor: 'background.paper',
-    border: 'none',
-    borderRadius: 4,
+    border: '2px solid #5651e5', // Same border style
+    borderRadius: '25px',
     boxShadow: 24,
     p: 4,
   }
@@ -40,7 +40,7 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
     <>
     <Modal open={open} onClose={handleClose}>
       <Box sx={style}>
-        <Typography variant='h6' color="error">Delete Account</Typography>
+        <Typography variant='h6' color="error" sx={{ textAlign: 'center', fontWeight: 'bold', color: '#5651e5' }}>Delete Account</Typography>
 
         <Divider sx={{mb: 2}} />
 
@@ -65,16 +65,23 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
             sx={{mb: 2}}
           />
 
-          <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
             <Button
               variant="outlined"
               onClick={handleClose}
-              sx={{ mr: 1 }}>
+              sx={{ borderRadius: '25px', borderColor: '#5651e5', color: '#5651e5', mr: '8px' }}>
               Cancel
             </Button>
             <Button
               variant="contained"
               color='error'
+              sx={{
+                background: 'white',
+                color: 'red',
+                border: '2px solid red',
+                borderRadius: '25px',
+                '&:hover': { background: '#ffebeb' }
+              }}
               type="submit">
               Delete Account
             </Button>
@@ -84,52 +91,63 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
     </Modal>
 
     {/* Child modal for confirmation */}
+
     <Modal open={confirmOpen} onClose={() => {setConfirmOpen(false); setInput('')}}>
-      <Box
-        sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          backgroundColor: 'white',
-          padding: 3,
-          borderRadius: 4,
-          boxShadow: 24,
-          width: '400px',
-        }}
-      >
-        <Typography variant="h6" mb={2} color="error">
-          Confirm Account Deletion
-        </Typography>
-        <Typography variant="body2" mb={2}>
-          Are you sure you want to delete your account? This action cannot be undone.
-          <br /><br />
-          Type <b>DELETE</b> in the box below to confirm.
-        </Typography>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            backgroundColor: 'white',
+            padding: 3,
+            borderRadius: 4,
+            boxShadow: 24,
+            width: '400px',
+            border: '2px solid #5651e5', // Same border style
+          }}
+        >
+          <Typography variant="h6" mb={2} color="error">
+            Confirm Account Deletion
+          </Typography>
 
-        <TextField
-          fullWidth
-          variant="outlined"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder='Type DELETE here'
-          sx={{ mb: 2 }}
-        />
+          <Typography variant="body2" mb={2}>
+            Are you sure you want to delete your account? This action cannot be undone.
+            <br /><br />
+            Type <b>DELETE</b> in the box below to confirm.
+          </Typography>
+            
+          <TextField
+            fullWidth
+            variant="outlined"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder='Type DELETE here'
+            sx={{ mb: 2 }}
+          />
+            
+          <Divider sx={{ mb: 2 }} />
 
-        <Divider sx={{ mb: 2 }} />
-
-        {/* Buttons */}
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button variant="outlined" onClick={() => setConfirmOpen(false)} sx={{ mr: 1 }}>
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={handleConfirmDelete}
-            disabled={input !== 'DELETE'}>
-            Confirm Deletion
-          </Button>
+          {/* Buttons */}
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+            <Button variant="outlined" onClick={() => setConfirmOpen(false)} sx={{ borderRadius: '25px', borderColor: '#5651e5', color: '#5651e5', mr: '8px' }}>
+              Cancel
+            </Button>
+            <Button 
+                variant="contained" 
+                color="error" 
+                onClick={handleConfirmDelete}
+                disabled={input !== 'DELETE'}
+                sx={{
+                  background: 'white',
+                  color: 'red',
+                  border: '2px solid red',
+                  borderRadius: '25px',
+                  '&:hover': { background: '#ffebeb' }
+                }}>
+              Confirm Deletion
+            </Button>
+          </Box>
         </Box>
       </Box>
     </Modal>

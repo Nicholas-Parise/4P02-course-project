@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('./db');
-const authenticate = require('./authenticate');
+const authenticate = require('./middleware/authenticate');
 
 
 // localhost:3000/events?page=1&pageSize=10
@@ -20,7 +20,7 @@ router.get('/', authenticate, async(req,res,next)=>{
         JOIN event_members m ON e.id = m.event_id
         WHERE m.user_id = $1;`, [userId]);
 
-    res.json(result.rows);
+    res.status(200).json(result.rows);
 } catch (error) {
     console.error("Error fetching events:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -98,7 +98,7 @@ try {
       }
 
 
-  res.json(result.rows[0]);
+  res.status(200).json(result.rows[0]);
 } catch (error) {
   console.error("Error fetching event:", error);
   res.status(500).json({ error: "Internal Server Error" });
@@ -151,7 +151,7 @@ try {
     return res.status(404).json({ error: "Event not found." });
   }
 
-  res.json({ message: "Event updated successfully.", event: result.rows[0] });
+  res.status(200).json({ message: "Event updated successfully.", event: result.rows[0] });
 
 
 } catch (error) {
@@ -189,7 +189,7 @@ router.delete('/:eventId', authenticate, async(req,res,next)=>{
     // Delete the event
     await db.query(`DELETE FROM events WHERE id = $1;`, [eventId]);
   
-    res.json({ message: "event deleted successfully." });
+    res.status(200).json({ message: "event deleted successfully." });
   } catch (error) {
     console.error("Error deleting event:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -220,7 +220,7 @@ try {
         }
 
 
-      res.json({ wishlists: result.rows });
+      res.status(200).json({ wishlists: result.rows });
 } catch (error) {
   console.error("Error fetching wishlists for event:", error);
   res.status(500).json({ error: "Internal Server Error" });
@@ -246,7 +246,7 @@ router.get('/:id/members', authenticate, async (req, res) => {
           return res.status(404).json({ message: "No members found for this event" });
       }
 
-      res.json({ members: result.rows });
+      res.status(200).json({ members: result.rows });
   } catch (error) {
       console.error("Error fetching members for event:", error);
       res.status(500).json({ message: "Error fetching members" });
@@ -354,7 +354,7 @@ router.delete('/:id/members', authenticate, async (req, res) => {
           DELETE FROM event_members WHERE event_id = $1 AND user_id = $2
       `, [eventId, userId]);
 
-      res.json({ message: "User removed from the event successfully" });
+      res.status(200).json({ message: "User removed from the event successfully" });
   } catch (error) {
       console.error("Error removing member from event:", error);
       res.status(500).json({ message: "Error removing member from event" });
@@ -411,7 +411,7 @@ router.put('/:id/members', authenticate, async (req, res) => {
             RETURNING *;
           `, [owner, memberCheck.rows[0].id]);
       
-          res.json({ message: "membership updated successfully.", membership: result.rows[0] });
+          res.status(200).json({ message: "membership updated successfully.", membership: result.rows[0] });
   } catch (error) {
       console.error("Error adding member to event:", error);
       res.status(500).json({ message: "Error adding member to event" });

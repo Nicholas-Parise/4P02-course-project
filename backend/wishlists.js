@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const db = require('./db');
 const { v4: uuidv4 } = require('uuid');
-const authenticate = require('./authenticate');
+const authenticate = require('./middleware/authenticate');
 const nodemailer = require('nodemailer');
+const createNotification = require("./middleware/createNotification");
 require("dotenv").config();
 
 // localhost:3000/wishlists?page=1&pageSize=10
@@ -22,7 +23,7 @@ router.get('/', authenticate, async (req, res, next) => {
           JOIN wishlist_members m ON w.id = m.wishlists_id
           WHERE m.user_id = $1;`, [userId]);
 
-    res.json(result.rows);
+    res.status(200).json(result.rows);
   } catch (error) {
     console.error("Error fetching wishlists:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -47,15 +48,52 @@ router.post('/', authenticate, async (req, res, next) => {
       return res.status(400).json({ error: "name is required" });
     }
 
-    await db.query("BEGIN"); // Start a transaction since we want to go all or nothing
+    // make sure name is unique with a user
+    // this query gets the most recently created wishlist with a name like the one provided
+    const checkNames = await db.query(
+      `SELECT name FROM wishlists w
+       JOIN wishlist_members wm ON w.id = wm.wishlists_id
+       WHERE wm.user_id = $1 AND wm.owner = TRUE AND w.name LIKE $2
+       ORDER BY w.dateCreated DESC`,  // Get the most recently created duplicate
+      [user_id, `${name}%`]
+    );
+
+    let newName = name;
+
+    const escapedRegex = name.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+
+    if (checkNames.rows.length > 0) {
+      // we get the latest name 
+      const existingNames = checkNames.rows.map(row => row.name);
+      const regex = new RegExp(`^${escapedRegex} \\((\\d+)\\)$`);
+      //const regex = new RegExp(`^${name}(?: \\(([^)]+)\\))*( \\((\\d+)\\))?$`);
+
+      let highestNum = 0;
+      for (const existingName of existingNames) {
+
+        // Ignore names containing "(copy)"
+        if (existingName.toLowerCase().includes("(copy)")) {
+          continue;
+        }
+
+        const match = existingName.match(regex);
+        if (match) {
+          highestNum = Math.max(highestNum, parseInt(match[1]));
+        }
+      }
+      // if there is only one duplicate and it is called: name 
+      newName = highestNum > 0 ? `${name} (${highestNum + 1})` : `${name} (2)`;
+    }
 
     const shareToken = uuidv4();
+
+    await db.query("BEGIN"); // Start a transaction since we want to go all or nothing
 
     // Step 1: Insert wishlist
     const wishlistResult = await db.query(
       `INSERT INTO wishlists (event_id, name, description, image, deadline, share_token, dateCreated, dateUpdated) 
           VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW()) RETURNING id`,
-      [event_id, name, description, image, deadline, shareToken]
+      [event_id, newName, description, image, deadline, shareToken]
     );
 
     const wishlist_id = wishlistResult.rows[0].id;
@@ -168,7 +206,7 @@ router.delete('/:wishlistId', authenticate, async (req, res, next) => {
     // Delete the wishlist
     await db.query(`DELETE FROM wishlists WHERE id = $1;`, [wishlistId]);
 
-    res.json({ message: "Wishlist deleted successfully." });
+    res.status(200).json({ message: "Wishlist deleted successfully." });
   } catch (error) {
     console.error("Error deleting  wishlists:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -225,7 +263,7 @@ router.put('/:wishlistId', authenticate, async (req, res, next) => {
       RETURNING *;
     `, [event_id, name, description, image, deadline, wishlistId]);
 
-    res.json({ message: "Wishlist updated successfully.", wishlist: result.rows[0] });
+    res.status(200).json({ message: "Wishlist updated successfully.", wishlist: result.rows[0] });
 
   } catch (error) {
     console.error("Error editing wishlist:", error);
@@ -242,7 +280,6 @@ router.post('/:wishlistId/duplicate', authenticate, async (req, res, next) => {
     const user_id = req.user.userId; // Get user ID from authenticated request
     const wishlistId = parseInt(req.params.wishlistId);
 
-    await db.query("BEGIN"); // Start a transaction
 
     //Fetch original wishlist
     const wishlistResult = await db.query(
@@ -252,17 +289,50 @@ router.post('/:wishlistId/duplicate', authenticate, async (req, res, next) => {
     );
 
     if (wishlistResult.rows.length === 0) {
-      await db.query("ROLLBACK"); // Rollback on error
       return res.status(404).json({ error: "Wishlist not found" });
     }
-
     const { event_id, name, description, image, deadline } = wishlistResult.rows[0];
+    let newName = `${name} (Copy)`;
+
+    // make sure name is unique with a user
+    // this query gets the most recently created wishlist with a name like the one provided
+    const checkNames = await db.query(
+      `SELECT name FROM wishlists w
+       JOIN wishlist_members wm ON w.id = wm.wishlists_id
+       WHERE wm.user_id = $1 AND wm.owner = TRUE AND w.name LIKE $2
+       ORDER BY w.dateCreated DESC`,  // Get the most recently created duplicate
+      [user_id, `${newName}%`]
+    );
+
+    const escapedRegex = newName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+
+    if (checkNames.rows.length > 0) {
+      // we get the latest name 
+      const existingNames = checkNames.rows.map(row => row.name);
+      const regex = new RegExp(`^${escapedRegex} \\((\\d+)\\)$`);
+
+      let highestNum = 0;
+      for (const existingName of existingNames) {
+      
+        const match = existingName.match(regex);
+        if (match) {
+          highestNum = Math.max(highestNum, parseInt(match[1]));
+        }
+      }
+      if(highestNum > 0){
+        newName = `${newName} (${highestNum + 1})`
+      }else{
+        newName = `${newName} (2)`;   // if there is only one duplicate and it is called: name 
+      }
+    }
+
+    await db.query("BEGIN"); // Start a transaction
 
     // Create the duplicated wishlist
     const newWishlistResult = await db.query(
       `INSERT INTO wishlists (event_id, name, description, image, deadline, dateCreated, dateUpdated) 
        VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING id;`,
-      [event_id, `${name} (Copy)`, description, image, deadline]
+      [event_id, newName, description, image, deadline]
     );
 
     const newWishlistId = newWishlistResult.rows[0].id;
@@ -327,7 +397,7 @@ router.get('/:wishlistId/members', authenticate, async (req, res) => {
       return res.status(404).json({ message: "No members found for this wishlist" });
     }
 
-    res.json({ members: result.rows });
+    res.status(200).json({ members: result.rows });
   } catch (error) {
     console.error("Error fetching members for wishlist:", error);
     res.status(500).json({ message: "Error fetching members" });
@@ -512,7 +582,7 @@ router.delete('/:id/members', authenticate, async (req, res) => {
           DELETE FROM wishlist_members WHERE wishlists_id = $1 AND user_id = $2
       `, [wishlistId, userId]);
 
-    res.json({ message: "User removed from the wishlist successfully" });
+    res.status(200).json({ message: "User removed from the wishlist successfully" });
   } catch (error) {
     console.error("Error removing member from wishlist:", error);
     res.status(500).json({ message: "Error removing member from wishlist" });
@@ -578,7 +648,7 @@ router.put('/:id/members', authenticate, async (req, res) => {
         RETURNING *;
       `, [blind, owner, memberCheck.rows[0].id]);
 
-    res.json({ message: "membership updated successfully.", membership: result.rows[0] });
+    res.status(201).json({ message: "membership updated successfully.", membership: result.rows[0] });
   } catch (error) {
     console.error("Error editing membership to wishlist:", error);
     res.status(500).json({ message: "Error editing membership to wishlist" });
@@ -605,7 +675,7 @@ router.get('/:wishlistId/items', authenticate, async (req, res) => {
       return res.status(404).json({ message: "No items found for this wishlist" });
     }
 
-    res.json({ items: result.rows });
+    res.status(200).json({ items: result.rows });
   } catch (error) {
     console.error("Error fetching items for wishlist:", error);
     res.status(500).json({ message: "Error fetching items" });
@@ -661,7 +731,7 @@ router.post('/share', authenticate, async (req, res) => {
 
   try {
     const wishlistCheck = await db.query(`
-      SELECT id,share_token FROM wishlists WHERE id = $1;
+      SELECT id,share_token,name FROM wishlists WHERE id = $1;
     `, [id]);
 
     if (wishlistCheck.rows.length === 0) {
@@ -673,30 +743,32 @@ router.post('/share', authenticate, async (req, res) => {
       SELECT id FROM users WHERE email = $1;
     `, [email]);
     
-
-      // if the user has an account add them as a member
-    if (userCheck.rows.length > 0) {
-      // User exists, add them as a wishlist member
-      const memberUserId = userCheck.rows[0].id;
-      await db.query(`
-        INSERT INTO wishlist_members (user_id, wishlists_id, owner, blind, dateCreated, dateUpdated)
-        VALUES ($1, $2, false, false, NOW(), NOW()) ON CONFLICT DO NOTHING;
-      `, [memberUserId, id]);
-
-      return res.status(200).json({ message: "User added to wishlist." });
-    }else{
-      // else send an email to that user with an invite link 
-      
       // get name of person doing inviting:
       const fromUserResult = await db.query(`
         SELECT displayName FROM users WHERE id = $1;
       `, [userId]);
 
       const fromUser = fromUserResult.rows[0].displayname;
+      const memberUserId = userCheck.rows[0].id;
 
+      // if the user has an account add them as a member
+    if (userCheck.rows.length > 0) {
+      // User exists, add them as a wishlist member
+      
+      await db.query(`
+        INSERT INTO wishlist_members (user_id, wishlists_id, owner, blind, dateCreated, dateUpdated)
+        VALUES ($1, $2, false, false, NOW(), NOW()) ON CONFLICT DO NOTHING;
+      `, [memberUserId, id]);
+
+      // send notification:
+      await createNotification( [memberUserId], "You've been invited to a wishlist!", `${fromUser} has invited you to the wishlist: ${wishlistCheck.rows[0].name}`, `/wishlists/${wishlistCheck.rows[0].id}` );
+
+      return res.status(200).json({ message: "User added to wishlist." });
+    }else{
+      // else send an email to that user with an invite link 
       await sendInviteEmail(email, wishlistCheck.rows[0].share_token, fromUser);
     }
-
+    
     return res.status(200).json({ message: "Invitation sent." }); 
   } catch (error) {
     console.error("Error fetching shared wishlist:", error);

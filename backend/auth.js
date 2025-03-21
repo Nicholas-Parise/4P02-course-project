@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
 const db = require('./db');
+const createNotification = require("./middleware/createNotification");
 require("dotenv").config();
 
 // localhost:3000/auth/register
@@ -45,6 +46,8 @@ router.post('/register', async (req, res, next) => {
             "INSERT INTO users (displayName, password, email, picture, bio, notifications, dateCreated) VALUES ($1, $2, $3, $4, $5, true, NOW()) RETURNING id, displayName, email",
             [displayName, hashedPassword, email, tempPicture, bio]
         );
+      
+          await createNotification( [result.rows[0].id], "Welcome to Wishify!", "Hello from the wishify team! we are so excited to welcome you to this platform, if you need any assistance checkout the help page.", "/help" );
 
         res.status(201).json({ message: "User registered successfully", user: result.rows[0] });
     } catch (error) {
@@ -90,10 +93,10 @@ router.post('/login', async (req, res, next) => {
 
         await db.query("INSERT INTO sessions (user_id, token, created) VALUES ($1, $2, NOW())", [user.rows[0].id, token]);
 
-        res.json({ message: "Login successful", token });
+        return res.status(200).json({ message: "Login successful", token });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Error logging in" });
+        return res.status(500).json({ message: "Error logging in" });
     }
 });
 
@@ -111,10 +114,10 @@ router.post('/logout', async (req, res, next) => {
 
     try {
         await db.query("DELETE FROM sessions WHERE token = $1", [token]);
-        res.json({ message: "Logout successful" });
+        return res.status(200).json({ message: "Logout successful" });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Error logging out" });
+        return res.status(500).json({ message: "Error logging out" });
     }
 
 
@@ -138,22 +141,19 @@ router.get('/me', async (req, res, next) => {
             return res.status(401).json({ message: "Invalid token" });
         }
 
-        const user = await db.query("SELECT id, displayName, email, picture FROM users WHERE id = $1", [session.rows[0].user_id]);
+        const user = await db.query("SELECT id, displayName, email, picture, bio FROM users WHERE id = $1", [session.rows[0].user_id]);
 
         if (user.rows.length === 0) { // If a user gets removed but the token is still active 
             return res.status(404).json({ message: "User not found" });
         }
 
-        res.json(user.rows[0]);
+        return res.status(200).json(user.rows[0]);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error" });
     }
 
 });
-
-
-
 
 
 module.exports = router;

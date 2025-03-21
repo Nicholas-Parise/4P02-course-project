@@ -46,8 +46,8 @@ const EditPasswordModal = ({ open, handleClose, onSave }) => {
     transform: 'translate(-50%, -50%)',
     width: 500,
     bgcolor: 'background.paper',
-    border: 'none',
-    borderRadius: 4,
+    border: '2px solid #5651e5',
+    borderRadius: '25px',
     boxShadow: 24,
     p: 4,
   }
@@ -55,7 +55,7 @@ const EditPasswordModal = ({ open, handleClose, onSave }) => {
   return (
     <Modal open={open} onClose={handleCancel}>
       <Box sx={style}>
-        <Typography variant='h6'>Change Password</Typography>
+        <Typography variant='h6' sx={{ textAlign: 'center', fontWeight: 'bold', color: '#5651e5' }}>Change Password</Typography>
 
         <Divider sx={{mb: 2}} />
 
@@ -104,13 +104,19 @@ const EditPasswordModal = ({ open, handleClose, onSave }) => {
             <Button
               variant="contained"
               type="submit"
-              sx={{ mr: 1 }}
+              sx={{
+                background: 'linear-gradient(to right, #8d8aee, #5651e5)',
+                color: 'white',
+                borderRadius: '25px',
+                '&:hover': { background: 'linear-gradient(to right, #5651e5, #343188)' }
+              }}
             >
               Save
             </Button>
             <Button
               variant="outlined"
               onClick={handleCancel}
+              sx={{ borderRadius: '25px', borderColor: '#5651e5', color: '#5651e5' }}
             >
               Cancel
             </Button>
