@@ -2,19 +2,21 @@ import { useState, useEffect } from 'react';
 import { type WishlistItem, Contribution } from '../types/types';
 import { useSortable } from '@dnd-kit/sortable';
 import {CSS} from '@dnd-kit/utilities';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, Button, TextField } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogContentText, Button, TextField, IconButton } from '@mui/material';
 import { FaExternalLinkAlt, FaMinus, FaPlus, FaChevronDown, FaChevronRight } from 'react-icons/fa';
+import { FaTrashCan } from "react-icons/fa6";
+import DeleteItemModal from './DeleteItemModal';
 
 type WishlistItemProps = {
   item: WishlistItem,
   sortBy: "priority" | "price" | "quantity",
   reservations: Contribution[],
   onReserve: (itemId: number, reservation: number, note: string) => void,
-  id: string
+  id: number,
+  onDelete: (id: number) => void,
 }
 
-const WishlistItemEntry = ({ item, sortBy, reservations, onReserve, id }: WishlistItemProps) => {
-  const item_id = item.id;
+const WishlistItemEntry = ({ item, sortBy, reservations, onReserve, id, onDelete }: WishlistItemProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, } = useSortable({ id, animateLayoutChanges: () => false });
 
   const style = {
@@ -31,6 +33,7 @@ const WishlistItemEntry = ({ item, sortBy, reservations, onReserve, id }: Wishli
   const reservedBadgeColour = availableQuantity <= 0 ? "bg-green-600" : "bg-yellow-500"
 
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [reserveQuantity, setReserveQuantity] = useState(0)
   const [reserveNote, setReserveNote] = useState("")
 
@@ -51,7 +54,6 @@ const WishlistItemEntry = ({ item, sortBy, reservations, onReserve, id }: Wishli
     }
     setIsModalOpen(false)
   }
-  
 
   const handleReserveQuantity = (e: any) => {
     if (["e", "E", "-"].some((char) => e.target.value.includes(char))) return;
@@ -65,7 +67,6 @@ const WishlistItemEntry = ({ item, sortBy, reservations, onReserve, id }: Wishli
   return (
     <>
       <li
-        id={id}
         ref={setNodeRef}
         style={style}
         className="bg-white shadow-md p-4 flex items-center space-x-4 cursor-pointer rounded-[25px] border-2 border-[#5651e5]"
@@ -87,6 +88,9 @@ const WishlistItemEntry = ({ item, sortBy, reservations, onReserve, id }: Wishli
                 {availableQuantity <= 0 ? "Fully Reserved" : "Partially Reserved"}
               </div>
             }
+            <IconButton sx={{marginLeft: 2, ":hover":{color:'#fb2c36'}}} onClick={(e) => {e.stopPropagation(), setIsDeleteModalOpen(true)}} className='w-8 h-8'>
+              <FaTrashCan className='transition-[1]'/>
+            </IconButton>
           </div>
           <p className="text-gray-600">Price: ${item.price.toFixed(2)}</p>
           <p className="text-gray-600">
@@ -187,6 +191,14 @@ const WishlistItemEntry = ({ item, sortBy, reservations, onReserve, id }: Wishli
           </div>
       </DialogContent>
     </Dialog>
+
+    <DeleteItemModal 
+      isModalOpen={isDeleteModalOpen}
+      setIsModalOpen={setIsDeleteModalOpen}
+      onDelete={onDelete}
+      item={item}
+    />
+
     </>
   )
 }
