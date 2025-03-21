@@ -149,7 +149,6 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
             </Button>
           </Box>
         </Box>
-      </Box>
     </Modal>
     </>
   )
