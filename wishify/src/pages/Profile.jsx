@@ -41,15 +41,14 @@ const Profile = () => {
 
         if (response.status === 200) {
           const data = await response.json()
-          console.log(data)
+          console.log("Check1", data)
           setUser({
             email: data.user.email,
             displayName: data.user.displayname,
             bio: data.user.bio === null ? '' : data.user.bio,
             picture: data.user.picture,
-            likes: data.categories
+            likes: ["Books"]//data.categories
           })
-          console.log(user)
         }
         else if (response.status === 404) {
           setError("User not found.")
@@ -222,7 +221,7 @@ const Profile = () => {
 
   return (
     <>
-      <section className="profile-container">
+    <section className="profile-container">
 
       <Snackbar
         open={successMessage}
@@ -235,45 +234,45 @@ const Profile = () => {
         </Alert>
       </Snackbar>
 
-        <h1>Profile settings</h1>
+      <h1>Profile settings</h1>
 
-        <div className="profile-header">
-          <div className="profile-picture">
-            <img
-              src={
-                user.profilePicture ||
-                'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?t=st=1738333167~exp=1738336767~hmac=d1a2645bf22eff4e35bc060e5a7529cb9cbf09696ae232ab6690c137ad06d5e4&w=1060'
-              }
-              alt="User profile picture"
-            />
-            <button>Update Picture</button>
-          </div>
-
-          <div className="profile-header-fields">
-            <SettingsItem
-              label="Display Name:"
-              values={user.displayName}
-              buttonText={'Edit'}
-              onEdit={() => handleOpenModal('displayName')}
-            />
-
-            <SettingsItem
-              label="Email:"
-              values={user.email}
-              buttonText={'Edit'}
-              onEdit={() => handleOpenModal('email')}
-            />
-          </div>
+      <div className="profile-header">
+        <div className="profile-picture">
+          <img
+            src={
+              user.profilePicture ||
+              'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?t=st=1738333167~exp=1738336767~hmac=d1a2645bf22eff4e35bc060e5a7529cb9cbf09696ae232ab6690c137ad06d5e4&w=1060'
+            }
+            alt="User profile picture"
+          />
+          <button>Update Picture</button>
         </div>
 
-        <hr />
+        <div className="profile-header-fields">
+          <SettingsItem
+            label="Display Name:"
+            values={user.displayName}
+            buttonText={'Edit'}
+            onEdit={() => handleOpenModal('displayName')}
+          />
+
+          <SettingsItem
+            label="Email:"
+            values={user.email}
+            buttonText={'Edit'}
+            onEdit={() => handleOpenModal('email')}
+          />
+        </div>
+      </div>
+
+      <hr />
 
       <div className="profile-content">
         <SettingsItem
           label="Biography:"
-          values={user.biography}
+          values={user.bio}
           buttonText={'Edit'}
-          onEdit={() => handleOpenModal("biography")}
+          onEdit={() => handleOpenModal("bio")}
         />
 
         <LikesSettingsItem
@@ -285,7 +284,7 @@ const Profile = () => {
 
         <LikesSettingsItem
           label="Dislikes:"
-          values={user.dislikes}
+          values={user.likes}
           onEdit={() => handleOpenModal("dislikes")}
           onSave={handleSaveLikes}
         />
@@ -326,55 +325,7 @@ const Profile = () => {
               Change Password
             </button>
         </div>
-
-      <SettingsItem
-        label='Display name:'
-        values={user.displayName}
-        buttonText={'Edit'}
-        onEdit={() => handleOpenModal("displayName")}
-      />
-
-      <SettingsItem
-        label="Biography:"
-        values={user.bio}
-        buttonText={'Edit'}
-        onEdit={() => handleOpenModal("bio")}
-      />
-
-      <LikesSettingsItem
-        label="Likes:"
-        values={user.likes}
-        onEdit={() => handleOpenModal("likes")}
-        onSave={handleSaveLikes}
-      />
-
-      <LikesSettingsItem
-        label="Dislikes:"
-        values={user.likes}
-        onEdit={() => handleOpenModal("dislikes")}
-        onSave={handleSaveLikes}
-      />
-
-      <SettingsItem
-        label='Email address:'
-        values={[user.email]}
-        buttonText='Edit'
-        onEdit={() => handleOpenModal("email")}
-      />
-
-      <SettingsItem
-        label='Password:'
-        values={['********']}
-        buttonText='Change Password'
-        onEdit={() => handleOpenPasswordModal()}
-      />
-
-      <button
-        className='delete-account-button'
-        style={{color: 'red'}}
-        onClick={() => handleOpenDeleteAccountModal()}
-        >Delete account
-      </button>
+      </div>
 
       <EditDisplayNameModal
         open={openModals.displayName}
