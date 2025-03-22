@@ -114,6 +114,32 @@ const Home = () => {
     }, [])
   }
 
+  const [wishlists, setWishlists] = useState([])
+
+  const wishlistLoading = () => {
+    const wishlistUrl = `https://api.wishify.ca/wishlists/`
+
+    useEffect(() => {
+      let token = localStorage.getItem('token') || ''
+      console.log(token)
+      fetch(wishlistUrl, {
+          method: 'get',
+          headers: new Headers({
+            'Authorization': "Bearer "+token
+          })
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            setWishlists(data);
+            console.log('Wishlists:');
+            console.log(wishlists);
+            console.log(data);
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+    }, [])
+  }
 
   const [user, setUser] = React.useState({
       profilePictureURL: "",
@@ -122,6 +148,7 @@ const Home = () => {
   })
 
   backendLoading()
+  wishlistLoading()
 
   return (
     <>
@@ -145,12 +172,20 @@ const Home = () => {
         <h1>Wishlists</h1>
         <div className="home-wishlist-top">
           <WishlistContainer>
-            <WishlistThumbnail title={"Wishlist 1"} role={"contributor"} owner={"John Doe"}></WishlistThumbnail>
-            <WishlistThumbnail title={"Wishlist 2"} role={"contributor"} owner={"John Doe"}></WishlistThumbnail>
-            <WishlistThumbnail title={"Wishlist 3"} role={"contributor"} owner={"John Doe"}></WishlistThumbnail>
-            <NavLink to="/wishlists">
+          <NavLink to="/wishlists">
               <CreateWishlistButton> Create a Wishlist </CreateWishlistButton>
             </NavLink>
+
+            {wishlists.map((wishlist, index) => (
+              <WishlistThumbnail 
+                //active={''}
+                key={index}
+                id={wishlist.id}
+                title={wishlist.name}
+                owner={"Me"}
+                role={"contributor"}
+              />
+            ))}
           </WishlistContainer>
         </div>
 
@@ -159,12 +194,12 @@ const Home = () => {
         <h1>Events</h1>
         <div className="home-wishlist-top">
           <EventContainer>
+          <NavLink to="/events">
+              <CreateEventButton> Create an Event </CreateEventButton>
+            </NavLink>
             <EventThumbnail title={"Event 1"} role={"contributor"} owner={"John Doe"}></EventThumbnail>
             <EventThumbnail title={"Event 2"} role={"contributor"} owner={"John Doe"}></EventThumbnail>
             <EventThumbnail title={"Event 3"} role={"contributor"} owner={"John Doe"}></EventThumbnail>
-            <NavLink to="/events">
-              <CreateEventButton> Create an Event </CreateEventButton>
-            </NavLink>
           </EventContainer>
         </div>
 
