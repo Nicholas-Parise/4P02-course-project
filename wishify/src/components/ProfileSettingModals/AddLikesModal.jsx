@@ -4,6 +4,7 @@ import { Add, Close } from '@mui/icons-material'
 
 const AddLikesModal = ({ open, handleClose, type, values, onSave }) => {
   const [predefinedItems, setPredefinedItems] = React.useState([])
+
   React.useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -27,14 +28,16 @@ const AddLikesModal = ({ open, handleClose, type, values, onSave }) => {
   const [search, setSearch] = React.useState('')
 
   React.useEffect(() => {
-    setItems(values)
-    setItemsLeft(12 - values.length)
+    const filteredItems = values.filter(item => (type === "Likes" ? item.love : !item.love))
+
+    setItems(filteredItems)
+    setItemsLeft(12 - filteredItems.length)
   }, [values])
 
   const handleSave = () => {
     setItems((prev) => {
       const updatedItems = [...prev, ...itemsToAdd];
-      onSave(updatedItems, type.toLowerCase());
+      onSave(itemsToAdd, type.toLowerCase());
       return updatedItems;
     });
 
@@ -101,10 +104,14 @@ const AddLikesModal = ({ open, handleClose, type, values, onSave }) => {
           <Paper sx={{ height: 200, overflowY: 'auto', p: 1, width: 200, minWidth: 200 }}>
             <List sx={{ width: '100%' }}>
               {predefinedItems
-                .filter((item) => !items.includes(item.name) && !itemsToAdd.includes(item.name))
-                .filter((item) => item.name.toLowerCase().includes(search.toLowerCase()))
+                .filter((item) => 
+                  !itemsToAdd.some((value) => value.name === item.name))
+                .filter((item) =>
+                  !values.some((value) => value.name === item.name))
+                .filter((item) =>
+                  item.name.toLowerCase().includes(search.toLowerCase()))
                 .map((item) => (
-                  <ListItem key={item.id} button onClick={() => handleAddItem(item.name)}>
+                  <ListItem key={item.id} button onClick={() => handleAddItem(item)}>
                     <ListItemText
                       primary={item.name}
                       sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
@@ -122,13 +129,13 @@ const AddLikesModal = ({ open, handleClose, type, values, onSave }) => {
             {itemsToAdd.length > 0 ? (
               <List sx={{ width: '100%' }}>
                 {itemsToAdd.map((item) => (
-                  <ListItem key={item} secondaryAction={
+                  <ListItem key={item.id} secondaryAction={
                     <IconButton edge="end" onClick={() => handleRemoveItem(item)}>
                       <Close />
                     </IconButton>
                   }>
                     <ListItemText 
-                      primary={item} 
+                      primary={item.name} 
                       sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
                     />
                   </ListItem>

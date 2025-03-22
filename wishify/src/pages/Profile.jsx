@@ -19,54 +19,54 @@ const Profile = () => {
 
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState(null)
-  const [successMessage, setSuccessMessage] = React.useState(false)
+  const [openSuccessMessage, setOpenSuccessMessage] = React.useState(false)
+  const [successMessage, setSuccessMessage] = React.useState('')
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const token = localStorage.getItem("token")
-      if (!token) {
-        setError("User not authenticated")
-        setLoading(false)
-        return
-      }
-
-      try {
-        const response = await fetch('https://api.wishify.ca/users', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        })
-
-        if (response.status === 200) {
-          const data = await response.json()
-          console.log("Check1", data)
-          setUser({
-            email: data.user.email,
-            displayName: data.user.displayname,
-            bio: data.user.bio === null ? '' : data.user.bio,
-            picture: data.user.picture,
-            likes: ["Books"]//data.categories
-          })
-        }
-        else if (response.status === 404) {
-          setError("User not found.")
-        }
-        else if (response.status === 500) {
-          setError("Internal server error. Please try again later.")
-        }
-        else {
-          setError(`An unexpected error occurred: ${response.status}`)
-        }
-      } catch (err) {
-        setError(`An error occurred: ${err.message}`)
-      }
-      finally {
-        setLoading(false)
-      }
+  const fetchUserData = async () => {
+    const token = localStorage.getItem("token")
+    if (!token) {
+      setError("User not authenticated")
+      setLoading(false)
+      return
     }
 
+    try {
+      const response = await fetch('https://api.wishify.ca/users', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      })
+
+      if (response.status === 200) {
+        const data = await response.json()
+
+        setUser({
+          email: data.user.email,
+          displayName: data.user.displayname,
+          bio: data.user.bio === null ? '' : data.user.bio,
+          picture: data.user.picture,
+          likes: data.categories
+        })
+      }
+      else if (response.status === 404) {
+        setError("User not found.")
+      }
+      else if (response.status === 500) {
+        setError("Internal server error. Please try again later.")
+      }
+      else {
+        setError(`An unexpected error occurred: ${response.status}`)
+      }
+    } catch (err) {
+      setError(`An error occurred: ${err.message}`)
+    }
+    finally {
+      setLoading(false)
+    }
+  }
+  useEffect(() => {
     fetchUserData()
   }, [])
 
@@ -134,6 +134,7 @@ const Profile = () => {
       }
 
       const data = await response.json()
+
       setUser(prevUser => ({
         ...prevUser, [currentField]: data.user[currentField.toLowerCase()]
       }))
@@ -143,6 +144,8 @@ const Profile = () => {
   }
 
   const handleChangePassword = async (oldPassword, newPassword) => {
+    console.log(oldPassword, newPassword)
+
     try {
       const response = await fetch('https://api.wishify.ca/users', {
         method: 'PUT',
@@ -153,10 +156,10 @@ const Profile = () => {
         body: JSON.stringify({ ['password']: oldPassword, ['newPassword']: newPassword })
       })
 
-      console.log(response)
-
       if (response.status === 200) {
-        setSuccessMessage(true)
+        setSuccessMessage("Password updated successfully.")
+        setOpenSuccessMessage(true)
+        console.log(response)
       } else if (response.status === 400) {
         throw new Error(response.statusText)
       } else if (response.status === 403) {
@@ -184,11 +187,9 @@ const Profile = () => {
         body: JSON.stringify({ ['password']: password })
       })
 
-      console.log(password)
-      console.log(response)
-
       if (response.status === 200) {
-        setSuccessMessage(true)
+        setSuccessMessage("Account deleted. Redirecting to home page...")
+        setOpenSuccessMessage(true)
         setTimeout(() => {
           localStorage.removeItem("token")
           navigate('/')
@@ -210,10 +211,64 @@ const Profile = () => {
   }
 
 
-  const handleSaveLikes = (value, type) => {
-    setUser((prevUser) => ({
-      ...prevUser, [type]: value
+  const handleSaveLikes = async (newItems, type) => {
+    if (!newItems) return
+
+    const categories = newItems.map(item => ({
+      id: item.id,
+      love: type === 'likes' // true if likes, false if dislikes
     }))
+
+    console.log("HI", categories)
+
+    try {
+      const response = await fetch('https://api.wishify.ca/users/categories', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({categories})
+      })
+
+
+      if (response.status === 400) {
+        throw new Error(response.message)
+      } else if (response.status === 500) {
+        throw new Error("Internal server error. Please try again later.")
+      } else if (!response.ok) {
+        throw new Error(`An unexpected error occurred: ${response.status}`)
+      }} catch (err) {
+        setError(`An error occurred: ${err.message}`)
+      }
+
+      fetchUserData()
+  }
+
+  const handleDeleteLikes = async (id) => {
+    const url = `https://api.wishify.ca/users/categories/${id}`
+
+    try {
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      })
+
+      if (response.status === 400) {
+        throw new Error(response.message)
+      } else if (response.status === 500) {
+        throw new Error("Internal server error. Please try again later.")
+      } else if (!response.ok) {
+        throw new Error(`An unexpected error occurred: ${response.status}`)
+      }
+    } catch (err) {
+      setError(`An error occurred: ${err.message}`)
+    }
+
+    fetchUserData()
   }
 
   if (loading) return <CircularProgress />
@@ -224,13 +279,13 @@ const Profile = () => {
     <section className="profile-container">
 
       <Snackbar
-        open={successMessage}
+        open={openSuccessMessage}
         autoHideDuration={6000}
-        onClose={() => setSuccessMessage(false)}
+        onClose={() => setOpenSuccessMessage(false)}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <Alert onClose={() => setSuccessMessage(false)} severity="success" variant="filled">
-          Account deleted. Redirecting to landing page...
+        <Alert onClose={() => setOpenSuccessMessage(false)} severity="success" variant="filled">
+          {successMessage}
         </Alert>
       </Snackbar>
 
@@ -240,12 +295,11 @@ const Profile = () => {
         <div className="profile-picture">
           <img
             src={
-              user.profilePicture ||
-              'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?t=st=1738333167~exp=1738336767~hmac=d1a2645bf22eff4e35bc060e5a7529cb9cbf09696ae232ab6690c137ad06d5e4&w=1060'
+              user.picture
             }
             alt="User profile picture"
           />
-          <button>Update Picture</button>
+          <button style={{color: "#5651e5"}}>Update Picture</button>
         </div>
 
         <div className="profile-header-fields">
@@ -279,14 +333,14 @@ const Profile = () => {
           label="Likes:"
           values={user.likes}
           onEdit={() => handleOpenModal("likes")}
-          onSave={handleSaveLikes}
+          onDelete={handleDeleteLikes}
         />
 
         <LikesSettingsItem
           label="Dislikes:"
           values={user.likes}
           onEdit={() => handleOpenModal("dislikes")}
-          onSave={handleSaveLikes}
+          onDelete={handleDeleteLikes}
         />
 
         <div className="button-container">
@@ -343,7 +397,7 @@ const Profile = () => {
 
       <AddLikesModal
         open={openModals.likes}
-        values={currentValue}
+        values={user.likes}
         type='Likes'
         onSave={handleSaveLikes}
         handleClose={handleClose}
@@ -351,7 +405,7 @@ const Profile = () => {
 
       <AddLikesModal
         open={openModals.dislikes}
-        values={currentValue}
+        values={user.likes}
         type='Dislikes'
         onSave={handleSaveLikes}
         handleClose={handleClose}
