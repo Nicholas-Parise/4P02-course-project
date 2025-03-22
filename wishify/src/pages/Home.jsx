@@ -114,14 +114,101 @@ const Home = () => {
     }, [])
   }
 
+  const [wishlists, setWishlists] = useState([])
+
+  const wishlistLoading = () => {
+    const wishlistUrl = `https://api.wishify.ca/wishlists/`
+
+    useEffect(() => {
+      let token = localStorage.getItem('token') || ''
+      console.log(token)
+      fetch(wishlistUrl, {
+          method: 'get',
+          headers: new Headers({
+            'Authorization': "Bearer "+token
+          })
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            setWishlists(data);
+            console.log(wishlists);
+            console.log(data);
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+    }, [])
+  }
+
+  const [eventList, setEventList] = useState([])
+
+  const eventListLoading = () => {
+    const eventListURL = `https://api.wishify.ca/events`
+
+    useEffect(() => {
+      let token = localStorage.getItem('token') || ''
+      console.log(token)
+      fetch(eventListURL, {
+          method: 'get',
+          headers: new Headers({
+            'Authorization': "Bearer "+token
+          })
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            setEventList(data);
+            console.log(eventList);
+            console.log(data);
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+    }, [])
+  }
 
   const [user, setUser] = React.useState({
-      profilePictureURL: "",
-      displayName: "John Doe",
-      email: "johndoe@wishify.com",
-  })
+      email: '',
+      displayName: '',
+      bio: '',
+      picture: '',
+      likes: []
+    })
+
+  const userLoading = () => {
+    const userURL = `https://api.wishify.ca/users`
+
+    useEffect(() => {
+      let token = localStorage.getItem('token') || ''
+      console.log(token)
+      fetch(userURL, {
+          method: 'get',
+          headers: new Headers({
+            'Authorization': "Bearer "+token
+          })
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            setUser({
+              email: data.user.email,
+              displayName: data.user.displayname,
+              bio: data.user.bio === null ? '' : data.user.bio,
+              picture: data.user.picture,
+              likes: data.categories
+            })
+            console.log(user);
+            console.log(data);
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+    }, [])
+  }
+      
 
   backendLoading()
+  wishlistLoading()
+  eventListLoading()
+  userLoading()
 
   return (
     <>
@@ -145,12 +232,20 @@ const Home = () => {
         <h1>Wishlists</h1>
         <div className="home-wishlist-top">
           <WishlistContainer>
-            <WishlistThumbnail title={"Wishlist 1"} role={"contributor"} owner={"John Doe"}></WishlistThumbnail>
-            <WishlistThumbnail title={"Wishlist 2"} role={"contributor"} owner={"John Doe"}></WishlistThumbnail>
-            <WishlistThumbnail title={"Wishlist 3"} role={"contributor"} owner={"John Doe"}></WishlistThumbnail>
-            <NavLink to="/wishlists">
+          <NavLink to="/wishlists">
               <CreateWishlistButton> Create a Wishlist </CreateWishlistButton>
             </NavLink>
+
+            {wishlists.map((wishlist, index) => (
+              <WishlistThumbnail 
+                //active={''}
+                key={index}
+                id={wishlist.id}
+                title={wishlist.name}
+                owner={user.displayName}
+                role={"contributor"}
+              />
+            ))}
           </WishlistContainer>
         </div>
 
@@ -159,12 +254,19 @@ const Home = () => {
         <h1>Events</h1>
         <div className="home-wishlist-top">
           <EventContainer>
-            <EventThumbnail title={"Event 1"} role={"contributor"} owner={"John Doe"}></EventThumbnail>
-            <EventThumbnail title={"Event 2"} role={"contributor"} owner={"John Doe"}></EventThumbnail>
-            <EventThumbnail title={"Event 3"} role={"contributor"} owner={"John Doe"}></EventThumbnail>
-            <NavLink to="/events">
+          <NavLink to="/events">
               <CreateEventButton> Create an Event </CreateEventButton>
             </NavLink>
+            {eventList.map((event, index) => (
+              <WishlistThumbnail 
+                //active={''}
+                key={index}
+                id={event.id}
+                title={event.name}
+                owner={user.displayName}
+                role={"contributor"}
+              />
+            ))}
           </EventContainer>
         </div>
 
