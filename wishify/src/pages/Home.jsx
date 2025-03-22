@@ -131,8 +131,34 @@ const Home = () => {
           .then((response) => response.json())
           .then((data) => {
             setWishlists(data);
-            console.log('Wishlists:');
             console.log(wishlists);
+            console.log(data);
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+    }, [])
+  }
+
+  const [eventList, setEventList] = useState([])
+
+  const eventListLoading = () => {
+    const eventListURL = `https://api.wishify.ca/events`
+
+    useEffect(() => {
+      let token = localStorage.getItem('token') || ''
+      console.log(token)
+      fetch(eventListURL, {
+          method: 'get',
+          headers: new Headers({
+            'Authorization': "Bearer "+token
+          })
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            setEventList(data);
+            console.log("Events:");
+            console.log(eventList);
             console.log(data);
           })
           .catch((error) => {
@@ -149,6 +175,7 @@ const Home = () => {
 
   backendLoading()
   wishlistLoading()
+  eventListLoading()
 
   return (
     <>
@@ -197,9 +224,16 @@ const Home = () => {
           <NavLink to="/events">
               <CreateEventButton> Create an Event </CreateEventButton>
             </NavLink>
-            <EventThumbnail title={"Event 1"} role={"contributor"} owner={"John Doe"}></EventThumbnail>
-            <EventThumbnail title={"Event 2"} role={"contributor"} owner={"John Doe"}></EventThumbnail>
-            <EventThumbnail title={"Event 3"} role={"contributor"} owner={"John Doe"}></EventThumbnail>
+            {eventList.map((event, index) => (
+              <WishlistThumbnail 
+                //active={''}
+                key={index}
+                id={event.id}
+                title={event.name}
+                owner={"Me"}
+                role={"contributor"}
+              />
+            ))}
           </EventContainer>
         </div>
 
