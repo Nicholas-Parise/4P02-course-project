@@ -24,7 +24,7 @@ const EditPasswordModal = ({ open, handleClose, onSave }) => {
       return
     }
 
-    onSave(newPasswordValue)
+    onSave(oldPasswordValue, newPasswordValue)
     setError('')
     handleClose();
   }

@@ -1,7 +1,8 @@
 import React from 'react'
 import { Add, RemoveCircleOutline } from '@mui/icons-material'
+import DeleteIcon from '@mui/icons-material/Delete'
 
-const LikesSettingsItem = ({ label, values, onEdit, onSave }) => {
+const LikesSettingsItem = ({ label, values, onEdit, onDelete }) => {
 
   const [items, setItems] = React.useState([])
   const [editing, setEditing] = React.useState(false)
@@ -11,14 +12,6 @@ const LikesSettingsItem = ({ label, values, onEdit, onSave }) => {
   }, [values])
 
   const toggleEditing = () => setEditing(!editing)
-
-  const onDelete = (index) => {
-    setItems((prevItems) => {
-      const newValues = prevItems.filter((_, i) => i !== index);
-      onSave(newValues, label.slice(0, -1).toLowerCase());
-      return newValues;
-    });
-  }
 
   return (
     <>
@@ -30,17 +23,20 @@ const LikesSettingsItem = ({ label, values, onEdit, onSave }) => {
 
         <div className='profile-setting-value'>
           <ul className="max-w-xl mx-auto columns-1 sm:columns-1 md:columns-2 lg:columns-3 space-y-2">
-            {items.map((value, index) => (
+            {items
+              .filter(item => (label === "Likes:" ? item.love : !item.love)) // Filter items based on if it's a like or dislike
+              .sort((a, b) => a.name.localeCompare(b.name)) // Sort items alphabetically
+              .map((item) => (
               <li 
                 className='likes-list-item'
-                  key={index}
+                  key={item.id}
                   style={{
                     backgroundColor: label === "Likes:" ? "#c2f3d1" : "#f3c2c2",
                     position: 'relative',
                     overflow: 'visible'
                 }}
               >
-                {value}
+                {item.name}
 
                 {/* Delete button (appears only in editing mode) */}
                 {editing && (
@@ -49,7 +45,7 @@ const LikesSettingsItem = ({ label, values, onEdit, onSave }) => {
                       position: 'absolute',
                       top: '-5px',
                       right: '-5px',
-                      background: '#5651e5',
+                      // background: '#5651e5',
                       border: 'none',
                       borderRadius: '50%',
                       width: '15px',
@@ -58,12 +54,12 @@ const LikesSettingsItem = ({ label, values, onEdit, onSave }) => {
                       justifyContent: 'center',
                       alignItems: 'center',
                       cursor: 'pointer',
-                      color: 'white',
-                      margin: '0px'
+                      color: '#5651e5',
+                      margin: '0px',
                     }}
-                    onClick={() => onDelete(index)} // Call onDelete with the item's index
+                    onClick={() =>  onDelete(item.id)} 
                   >
-                    <RemoveCircleOutline />
+                    <DeleteIcon fontSize='small' />
                   </button>
                 )}
               </li>
