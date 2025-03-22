@@ -157,7 +157,6 @@ const Home = () => {
           .then((response) => response.json())
           .then((data) => {
             setEventList(data);
-            console.log("Events:");
             console.log(eventList);
             console.log(data);
           })
@@ -168,14 +167,48 @@ const Home = () => {
   }
 
   const [user, setUser] = React.useState({
-      profilePictureURL: "",
-      displayName: "John Doe",
-      email: "johndoe@wishify.com",
-  })
+      email: '',
+      displayName: '',
+      bio: '',
+      picture: '',
+      likes: []
+    })
+
+  const userLoading = () => {
+    const userURL = `https://api.wishify.ca/users`
+
+    useEffect(() => {
+      let token = localStorage.getItem('token') || ''
+      console.log(token)
+      fetch(userURL, {
+          method: 'get',
+          headers: new Headers({
+            'Authorization': "Bearer "+token
+          })
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            setUser({
+              email: data.user.email,
+              displayName: data.user.displayname,
+              bio: data.user.bio === null ? '' : data.user.bio,
+              picture: data.user.picture,
+              likes: data.categories
+            })
+            console.log(user);
+            console.log(data);
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+    }, [])
+  }
+      
 
   backendLoading()
   wishlistLoading()
   eventListLoading()
+  userLoading()
 
   return (
     <>
@@ -209,7 +242,7 @@ const Home = () => {
                 key={index}
                 id={wishlist.id}
                 title={wishlist.name}
-                owner={"Me"}
+                owner={user.displayName}
                 role={"contributor"}
               />
             ))}
@@ -230,7 +263,7 @@ const Home = () => {
                 key={index}
                 id={event.id}
                 title={event.name}
-                owner={"Me"}
+                owner={user.displayName}
                 role={"contributor"}
               />
             ))}
