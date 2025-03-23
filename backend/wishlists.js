@@ -331,11 +331,12 @@ router.post('/:wishlistId/duplicate', authenticate, async (req, res, next) => {
     // Create the duplicated wishlist
     const newWishlistResult = await db.query(
       `INSERT INTO wishlists (event_id, name, description, image, deadline, dateCreated, dateUpdated) 
-       VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING id;`,
+       VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING *;`,
       [event_id, newName, description, image, deadline]
     );
 
-    const newWishlistId = newWishlistResult.rows[0].id;
+    const newWishlist = newWishlistResult.rows[0];
+    const newWishlistId = newWishlist.id;
    
     // make creator owner
     const membersResult = await db.query(
@@ -367,7 +368,7 @@ router.post('/:wishlistId/duplicate', authenticate, async (req, res, next) => {
     await db.query("COMMIT"); // Commit the transaction
 
     res.status(201).json({
-      wishlist_id: newWishlistId,
+      wishlist: newWishlist,
       message: "Wishlist duplicated successfully!"
     });
 
