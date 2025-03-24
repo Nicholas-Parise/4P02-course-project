@@ -155,6 +155,23 @@ router.get('/me', async (req, res, next) => {
 });
 
 
+// helper function to generate a gaurnetted unique one time code
+ // since it's hex there is no 'o' only 'zero' 0->9 + A->F
+ // example code: 1F5A7B
+const generateUniqueToken = async () => {
+    let token;
+    let exists = true;
+
+    while (exists) {
+        token = crypto.randomBytes(3).toString("hex"); // generate 6-character hex token
+        const tokenCheck = await db.query("SELECT 1 FROM sessions WHERE token = $1", [token]);
+        exists = tokenCheck.rows.length > 0; // If a row exists, try again
+    }
+
+    return token;
+};
+
+
 // localhost:3000/auth/forgot-password
 // start the account recovery process, 
 // send an email with recovery code to provided email if there is an account linked to it.
@@ -175,10 +192,10 @@ router.post('/forgot-password', async (req, res, next) => {
         }
 
         const userId = userCheck.rows[0].id;
-        const resetToken = crypto.randomBytes(3).toString("hex");  // generate 6 random characters (2*3) 
-        // Generate secure token, since it's hex there is no 'o' only 'zero'
+        const resetToken = await generateUniqueToken(); // need to ensure a unique token, don't want a crash
+       
 
-        //await db.query("INSERT INTO sessions (user_id, token, created) VALUES ($1, $2, NOW())",[userId, resetToken]);
+        await db.query("INSERT INTO sessions (user_id, token, created) VALUES ($1, $2, NOW())",[userId, resetToken]);
 
         const resetLink = `https://www.wishify.ca/auth/forgot?token=${resetToken}`;
 
