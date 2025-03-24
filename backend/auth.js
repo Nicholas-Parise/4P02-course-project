@@ -156,8 +156,8 @@ router.get('/me', async (req, res, next) => {
 
 
 // helper function to generate a gaurnetted unique one time code
- // since it's hex there is no 'o' only 'zero' 0->9 + A->F
- // example code: 1F5A7B
+// since it's hex there is no 'o' only 'zero' 0->9 + A->F
+// example code: 1F5A7B
 const generateUniqueToken = async () => {
     let token;
     let exists = true;
@@ -193,9 +193,9 @@ router.post('/forgot-password', async (req, res, next) => {
 
         const userId = userCheck.rows[0].id;
         const resetToken = await generateUniqueToken(); // need to ensure a unique token, don't want a crash
-       
 
-        await db.query("INSERT INTO sessions (user_id, token, created) VALUES ($1, $2, NOW())",[userId, resetToken]);
+
+        await db.query("INSERT INTO sessions (user_id, token, created) VALUES ($1, $2, NOW())", [userId, resetToken]);
 
         const resetLink = `https://www.wishify.ca/auth/forgot?token=${resetToken}`;
 
@@ -214,45 +214,55 @@ router.post('/forgot-password', async (req, res, next) => {
 
 // localhost:3000/auth/reset-password
 router.post("/reset-password", async (req, res) => {
-    const { token, newPassword } = req.body;
-  
-    if (!token || !newPassword) {
-        return res.status(401).json({ message: "token and newPassword required" });
+    const { email, token, newPassword } = req.body;
+
+    if (!email || !token || !newPassword) {
+        return res.status(401).json({ message: "email, token and newPassword required" });
     }
 
     try {
-      // Fetch session with token
-      const tokenQuery = await db.query(
-        `SELECT user_id, created FROM sessions WHERE token = $1`, [token]
-      );
-  
-      if (tokenQuery.rows.length === 0) {
-        return res.status(400).json({ error: "Invalid or expired token." });
-      }
-  
-      const { user_id, created } = tokenQuery.rows[0];
-  
-      // Check if token is expired (1 hour limit)
-      const expiryTime = 3600000; // 1 hour in milliseconds
-      if (Date.now() - new Date(created).getTime() > expiryTime) {
-        return res.status(400).json({ error: "Token has expired." });
-      }
-  
-      // Hash new password
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
-  
-      // Update password
-      await db.query("UPDATE users SET password = $1 WHERE id = $2", [hashedPassword, user_id]);
-  
-      // Delete used reset token
-      await db.query("DELETE FROM sessions WHERE token = $1", [token]);
-  
-      res.json({ message: "Password updated successfully." });
+        // Fetch session with token
+        const tokenQuery = await db.query(
+            `SELECT user_id, created FROM sessions WHERE token = $1`, [token]
+        );
+
+        if (tokenQuery.rows.length === 0) {
+            return res.status(400).json({ error: "Invalid or expired token." });
+        }
+
+        const { user_id, created } = tokenQuery.rows[0];
+
+        // Verify that the email matches the user_id
+        const emailCheck = await db.query(
+            `SELECT id FROM users WHERE id = $1 AND email = $2`,
+            [user_id, email]
+        );
+
+        if (emailCheck.rows.length === 0) {
+            return res.status(400).json({ error: "Invalid email or token." });
+        }
+
+        // Check if token is expired (1 hour limit)
+        const expiryTime = 3600000; // 1 hour in milliseconds
+        if (Date.now() - new Date(created).getTime() > expiryTime) {
+            return res.status(400).json({ error: "Token has expired." });
+        }
+
+        // Hash new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update password
+        await db.query("UPDATE users SET password = $1 WHERE id = $2", [hashedPassword, user_id]);
+
+        // Delete used reset token
+        await db.query("DELETE FROM sessions WHERE token = $1", [token]);
+
+        res.json({ message: "Password updated successfully." });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal Server Error" });
+        console.error(error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
-  });
+});
 
 
 module.exports = router;
