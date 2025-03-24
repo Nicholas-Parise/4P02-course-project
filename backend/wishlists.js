@@ -3,9 +3,8 @@ const router = express.Router();
 const db = require('./db');
 const { v4: uuidv4 } = require('uuid');
 const authenticate = require('./middleware/authenticate');
-const nodemailer = require('nodemailer');
 const createNotification = require("./middleware/createNotification");
-require("dotenv").config();
+const sendEmail = require("./middleware/sendEmail");
 
 // localhost:3000/wishlists?page=1&pageSize=10
 // get list of wishlists from a member or is in an event 
@@ -326,13 +325,15 @@ router.post('/:wishlistId/duplicate', authenticate, async (req, res, next) => {
       }
     }
 
+    const shareToken = uuidv4(); // need to make a unique share token for this 
+
     await db.query("BEGIN"); // Start a transaction
 
     // Create the duplicated wishlist
     const newWishlistResult = await db.query(
-      `INSERT INTO wishlists (event_id, name, description, image, deadline, dateCreated, dateUpdated) 
-       VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING *;`,
-      [event_id, newName, description, image, deadline]
+      `INSERT INTO wishlists (event_id, name, description, image, deadline, share_token, dateCreated) 
+       VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING *;`,
+      [event_id, newName, description, image, deadline, shareToken]
     );
 
     const newWishlist = newWishlistResult.rows[0];
@@ -724,16 +725,16 @@ router.get('/share/:token', async (req, res) => {
 router.post('/share', authenticate, async (req, res) => {
 
   const userId = req.user.userId; // Get user ID from authenticated token
-  const { id, email, owner, blind } = req.body;
+  const { wishlist_id, email, blind } = req.body;
 
-  if(!id || !email){
-    return res.status(400).json({ message: "id and emailare required" }); 
+  if(!wishlist_id || !email){
+    return res.status(400).json({ message: "wishlist_id and email are required" }); 
   }
 
   try {
     const wishlistCheck = await db.query(`
       SELECT id,share_token,name FROM wishlists WHERE id = $1;
-    `, [id]);
+    `, [wishlist_id]);
 
     if (wishlistCheck.rows.length === 0) {
       return res.status(404).json({ error: "Wishlist not found." });
@@ -750,16 +751,17 @@ router.post('/share', authenticate, async (req, res) => {
       `, [userId]);
 
       const fromUser = fromUserResult.rows[0].displayname;
-      const memberUserId = userCheck.rows[0].id;
 
       // if the user has an account add them as a member
     if (userCheck.rows.length > 0) {
       // User exists, add them as a wishlist member
       
+      const memberUserId = userCheck.rows[0].id;
+
       await db.query(`
         INSERT INTO wishlist_members (user_id, wishlists_id, owner, blind, dateCreated, dateUpdated)
         VALUES ($1, $2, false, false, NOW(), NOW()) ON CONFLICT DO NOTHING;
-      `, [memberUserId, id]);
+      `, [memberUserId, wishlist_id]);
 
       // send notification:
       await createNotification( [memberUserId], "You've been invited to a wishlist!", `${fromUser} has invited you to the wishlist: ${wishlistCheck.rows[0].name}`, `/wishlists/${wishlistCheck.rows[0].id}` );
@@ -780,35 +782,15 @@ router.post('/share', authenticate, async (req, res) => {
 
 // send the email to user
 async function sendInviteEmail(email, share_token, fromUser) {
-  const transporter = nodemailer.createTransport({
-    service: "gmail", // Use your email provider
-    auth: {
-      user: process.env.EMAIL_USER,  
-      pass: process.env.EMAIL_APPPASSWORD
-    }
-  });
 
   const inviteLink = `https://wishify.ca/register?wishlist=${share_token}`;
 
-  const mailOptions = {
-    from: "Wishify",
-    to: email,
-    subject: `${fromUser} has invited you to collaborate on their wishlist!`,
-    text: `${fromUser} has invited you to collaborate on their wishlist! Click here to join: ${inviteLink} or copy and paste this link into your browser: ${inviteLink} Best, The Wishify Team`,
-    html: `<p><strong>${fromUser}</strong> has invited to their wishlist! Click <a href="${inviteLink}">here</a> to join. <br> Or copy and paste this link into your browser: ${inviteLink}</p><p>Best, The Wishify Team</p>`
-  };
-
-//  try {
-    await transporter.sendMail(mailOptions);
-    console.log(`Invitation email sent to ${email}`);
-  //} catch (error) {
-  //  console.error("Error sending email:", error);
- // }
+  await sendEmail(email, 
+    `${fromUser} has invited you to collaborate on their wishlist!`,
+  `${fromUser} has invited you to collaborate on their wishlist! Click here to join: ${inviteLink} or copy and paste this link into your browser: ${inviteLink} Best, The Wishify Team`,
+`<p><strong>${fromUser}</strong> has invited to their wishlist! Click <a href="${inviteLink}">here</a> to join. <br> Or copy and paste this link into your browser: ${inviteLink}</p><p>Best, The Wishify Team</p>`);
 
 }
-
-
-
 
 
 module.exports = router;

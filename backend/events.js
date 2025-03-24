@@ -39,7 +39,7 @@ router.post('/', authenticate, async (req, res, next) => {
   try{
     const user_id = req.user.userId; // Get user ID from authenticated request
 
-    const {name, description, url, addr, city, image } = req.body;
+    const {name, description, url, addr, city, image, deadline } = req.body;
 
     if (!name) {
       return res.status(400).json({ error: "name is required" });
@@ -49,9 +49,9 @@ router.post('/', authenticate, async (req, res, next) => {
 
     // Step 1: Insert events
     const eventResult = await db.query(
-        `INSERT INTO events (name, description, url, addr, city, image, dateCreated, dateUpdated) 
-        VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW()) RETURNING id`,
-        [name, description, url, addr, city, image]
+        `INSERT INTO events (name, description, url, addr, city, image, deadline, dateCreated, dateUpdated) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW()) RETURNING id`,
+        [name, description, url, addr, city, image, deadline]
     );
 
     const event_id = eventResult.rows[0].id;
@@ -112,7 +112,7 @@ router.put('/:eventId', authenticate, async(req,res,next)=>{
   
 const eventId = parseInt(req.params.eventId);
 const userId = req.user.userId; // Get user ID from the authenticated token
-const {name, description, url, addr, city, image } = req.body;
+const {name, description, url, addr, city, image, deadline } = req.body;
 
 
 // make sure user is the owner of the event before allowing editing
@@ -141,10 +141,11 @@ try {
         addr = COALESCE($4, addr),
         city = COALESCE($5, city),
         image = COALESCE($6, image),
+        deadline = COALESCE($7, deadline),
         dateUpdated = NOW()
-    WHERE id = $7
+    WHERE id = $8
     RETURNING *;
-  `, [name, description, url, addr, city, image, eventId]);
+  `, [name, description, url, addr, city, image, deadline, eventId]);
 
 
   if (result.rows.length === 0) {
