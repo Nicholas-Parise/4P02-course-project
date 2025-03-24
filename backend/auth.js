@@ -194,6 +194,7 @@ router.post('/forgot-password', async (req, res, next) => {
         const userId = userCheck.rows[0].id;
         const resetToken = await generateUniqueToken(); // need to ensure a unique token, don't want a crash
 
+        await db.query("BEGIN"); // Start a transaction
 
         await db.query("INSERT INTO sessions (user_id, token, created) VALUES ($1, $2, NOW())", [userId, resetToken]);
 
@@ -203,8 +204,11 @@ router.post('/forgot-password', async (req, res, next) => {
             "Password Reset Request",
             `Your one time code is: ${resetToken} or click the link to reset your password: ${resetLink}`)
 
+        await db.query("COMMIT"); // Commit the transaction
+
         return res.status(200).json({ message: "email sent successfully" });
     } catch (error) {
+        await db.query("ROLLBACK"); // if we can't send an email we want to Rollback
         console.error(error);
         return res.status(500).json({ message: "Server error" });
     }
@@ -213,17 +217,18 @@ router.post('/forgot-password', async (req, res, next) => {
 
 
 // localhost:3000/auth/reset-password
+// given one time code, email and password reset password
 router.post("/reset-password", async (req, res) => {
-    const { email, token, newPassword } = req.body;
+    const { email, otc, newPassword } = req.body;
 
-    if (!email || !token || !newPassword) {
-        return res.status(401).json({ message: "email, token and newPassword required" });
+    if (!email || !otc || !newPassword) {
+        return res.status(401).json({ message: "email, otc and newPassword required" });
     }
 
     try {
         // Fetch session with token
         const tokenQuery = await db.query(
-            `SELECT user_id, created FROM sessions WHERE token = $1`, [token]
+            `SELECT user_id, created FROM sessions WHERE token = $1`, [otc]
         );
 
         if (tokenQuery.rows.length === 0) {
@@ -255,7 +260,7 @@ router.post("/reset-password", async (req, res) => {
         await db.query("UPDATE users SET password = $1 WHERE id = $2", [hashedPassword, user_id]);
 
         // Delete used reset token
-        await db.query("DELETE FROM sessions WHERE token = $1", [token]);
+        await db.query("DELETE FROM sessions WHERE token = $1", [otc]);
 
         res.json({ message: "Password updated successfully." });
     } catch (error) {

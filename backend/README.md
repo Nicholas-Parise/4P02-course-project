@@ -8,7 +8,10 @@ An end point in **BOLD** specifies it's implemented.
 ## Authentication
 **POST /auth/register → Create a new user  
 POST /auth/login → Authenticate a user and generate a session token  
-POST /auth/logout → Invalidate the session token**  
+POST /auth/logout → Invalidate the session token  
+GET /auth/me → get logged in user info  
+POST /auth/forgot-password → send an email with recovery code  
+POST /auth/reset-password → reset password with one time code**
 
 ## Users
 **GET /users → Get logged in user profile and categories   
@@ -45,7 +48,7 @@ POST /wishlists/members → make logged in user a member of the wishlist given t
 **POST /wishlists/:id/duplicate → Duplicate the wishlist   
 GET /wishlists/:id/items → Get all items in a wishlist (and contributions)   
 GET /wishlists/share/:token → get the shared wishlist  
-POST /wishlists/share → share the wishlist to email, if user exists membership added. else send email**
+POST /wishlists/share → share the wishlist to email, if user exists membership added. Else send email**
 
 ##  Events
 **GET /events → Get all events (for member)   
