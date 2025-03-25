@@ -11,7 +11,7 @@ require("dotenv").config();
 // localhost:3000/auth/register
 // register account
 router.post('/register', async (req, res, next) => {
-    const { email, password, displayName, picture, bio } = req.body;
+    const { email, password, displayName, bio } = req.body;
 
     if (!email || !password || !displayName) {
         return res.status(400).json({ message: "email, password and displayName are required" });
@@ -27,26 +27,19 @@ router.post('/register', async (req, res, next) => {
     if (displayName !== undefined && typeof displayName !== "string") {
         return res.status(400).json({ error: "displayName must be a string" });
     }
-    if (picture !== undefined && typeof picture !== "string") {
-        return res.status(400).json({ error: "picture must be a string" });
-    }
+    
     if (bio !== undefined && typeof bio !== "string") {
         return res.status(400).json({ error: "bio must be a string" });
     }
 
-    // I don't know how to do images rn so its always gonna be the placeholder
-    let tempPicture;
-    if (!picture) {
-        tempPicture = "/assets/placeholder-avatar.png";
-    } else {
-        tempPicture = picture;
-    }
-
+    // default picture
+    const picture = "/assets/placeholder-avatar.png";
+    
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         const result = await db.query(
             "INSERT INTO users (displayName, password, email, picture, bio, notifications, dateCreated) VALUES ($1, $2, $3, $4, $5, true, NOW()) RETURNING id, displayName, email",
-            [displayName, hashedPassword, email, tempPicture, bio]
+            [displayName, hashedPassword, email, picture, bio]
         );
 
         await createNotification([result.rows[0].id], "Welcome to Wishify!", "Hello from the wishify team! we are so excited to welcome you to this platform, if you need any assistance checkout the help page.", "/help");
