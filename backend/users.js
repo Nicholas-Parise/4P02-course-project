@@ -432,14 +432,11 @@ router.post('/upload', authenticate, uploadPicture, async (req, res) => {
     // Delete the old image off of server
     const user = await db.query("SELECT picture FROM users WHERE id = $1", [userId]);
     // if the file is different that default
-    console.log("current picture: "+user.rows[0].picture);
-
     if (user.rows[0].picture !== "/assets/placeholder-avatar.png") { 
-      const oldPicPath = path.join(__dirname, '..', user.rows[0].picture);
-      console.log(oldPicPath);
+      const oldPicPath = path.join(__dirname, '.', user.rows[0].picture);
       if (fs.existsSync(oldPicPath)) {
         console.log("deleting this file: "+oldPicPath);
-        //fs.unlinkSync(oldPicPath);
+        fs.unlinkSync(oldPicPath);
       } else {
         console.log("Old picture file does not exist:", oldPicPath);
     }

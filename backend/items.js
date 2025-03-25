@@ -1,7 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const db = require('./db');
+const fs = require('fs');
+const path = require('path');
+
 const authenticate = require('./middleware/authenticate');
+const uploadPicture = require('./middleware/upload');
 
 // localhost:3000/items/0
 // get the contents of a single item
@@ -32,7 +36,7 @@ router.get('/:itemId', authenticate, async (req, res, next) => {
 // create an item (given wishlists id)
 router.post('/', authenticate, async (req, res, next) => {
 
-  const { name, description, url, image, quantity, price, wishlists_id } = req.body;
+  const { name, description, url, quantity, price, wishlists_id } = req.body;
   const userId = req.user.userId; // Get user ID from authenticated token
 
   if (!wishlists_id || !name || !quantity) {
@@ -48,9 +52,6 @@ router.post('/', authenticate, async (req, res, next) => {
   }
   if (url !== undefined && typeof url !== "string") {
     return res.status(400).json({ error: "url must be a string" });
-  }
-  if (image !== undefined && typeof image !== "string") {
-    return res.status(400).json({ error: "image must be a string" });
   }
   if (quantity !== undefined && (!Number.isInteger(quantity) || quantity < 0)) {
     return res.status(400).json({ error: "quantity must be a non-negative integer" });
@@ -92,12 +93,7 @@ router.post('/', authenticate, async (req, res, next) => {
 
 
     // set default image if one isn't supplied
-    let tempPicture;
-    if (!image) {
-        tempPicture = "/assets/placeholder-item.png";
-    } else {
-        tempPicture = image;
-    }
+    const image = "/assets/placeholder-item.png";
 
 
     // insert the item
@@ -141,9 +137,6 @@ router.put('/:itemId?', authenticate, async (req, res, next) => {
       if (item.url !== undefined && typeof item.url !== "string") {
         return res.status(400).json({ error: "url must be a string" });
       }
-      if (item.image !== undefined && typeof item.image !== "string") {
-        return res.status(400).json({ error: "image must be a string" });
-      }
       if (item.quantity !== undefined && (!Number.isInteger(item.quantity) || item.quantity < 0)) {
         return res.status(400).json({ error: "quantity must be a non-negative integer" });
       }
@@ -160,7 +153,7 @@ router.put('/:itemId?', authenticate, async (req, res, next) => {
       await db.query("BEGIN"); // Start a transaction we want to edit all the items at the same time or not do it at all.
 
       for (const item of items) {
-        const { id, name, description, url, image, quantity, price, priority } = item;
+        const { id, name, description, url, quantity, price, priority } = item;
 
 
         const ownershipCheck = await db.query(
@@ -183,14 +176,13 @@ router.put('/:itemId?', authenticate, async (req, res, next) => {
                   name = COALESCE($1, name),
                   description = COALESCE($2, description),
                   url = COALESCE($3, url),
-                  image = COALESCE($4, image),
-                  quantity = COALESCE($5, quantity),
-                  price = COALESCE($6, price),
-                  priority = COALESCE($7, priority),
+                  quantity = COALESCE($4, quantity),
+                  price = COALESCE($5, price),
+                  priority = COALESCE($6, priority),
                   dateUpdated = NOW()
-              WHERE id = $8
+              WHERE id = $7
               RETURNING *;
-            `, [name, description, url, image, quantity, price, priority, id]);
+            `, [name, description, url, quantity, price, priority, id]);
       }
 
       await db.query("COMMIT"); // Commit all changes
@@ -207,7 +199,7 @@ router.put('/:itemId?', authenticate, async (req, res, next) => {
 
   /// SINGLE EDIT
   const itemId = parseInt(req.params.itemId);
-  const { name, description, url, image, quantity, price, priority } = req.body;
+  const { name, description, url, quantity, price, priority } = req.body;
 
   // Type checking
   if (name !== undefined && typeof name !== "string") {
@@ -218,9 +210,6 @@ router.put('/:itemId?', authenticate, async (req, res, next) => {
   }
   if (url !== undefined && typeof url !== "string") {
     return res.status(400).json({ error: "url must be a string" });
-  }
-  if (image !== undefined && typeof image !== "string") {
-    return res.status(400).json({ error: "image must be a string" });
   }
   if (quantity !== undefined && (!Number.isInteger(quantity) || quantity < 0)) {
     return res.status(400).json({ error: "quantity must be a non-negative integer" });
@@ -253,14 +242,13 @@ router.put('/:itemId?', authenticate, async (req, res, next) => {
             name = COALESCE($1, name),
             description = COALESCE($2, description),
             url = COALESCE($3, url),
-            image = COALESCE($4, image),
             quantity = COALESCE($5, quantity),
             price = COALESCE($6, price),
             priority = COALESCE($7, priority),
             dateUpdated = NOW()
         WHERE id = $8
         RETURNING *;
-      `, [name, description, url, image, quantity, price, priority, itemId]);
+      `, [name, description, url, quantity, price, priority, itemId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "item not found." });
@@ -308,6 +296,57 @@ router.delete('/:itemId', authenticate, async (req, res, next) => {
   }
 
 });
+
+
+
+// localhost:3000/items/upload-profile
+// upload new item picture
+router.post('/upload/:itemId', authenticate, uploadPicture, async (req, res) => {
+
+  const itemId = parseInt(req.params.itemId);
+  const userId = req.user.userId; // Get user ID from authenticated token
+
+  if (!req.file) {
+    return res.status(400).json({ message: "No file uploaded." });
+  }
+
+  const filePath = `/uploads/${req.file.filename}`; // get file name from file
+
+  try {
+    // make sure owner has permission to do this
+    const ownershipCheck = await db.query(
+      `SELECT i.id 
+        FROM items i
+        JOIN wishlist_members wm ON i.member_id = wm.id
+        WHERE i.id = $1 AND wm.user_id = $2`,
+      [itemId, userId]
+    );
+
+    if (ownershipCheck.rows.length === 0) {
+      return res.status(403).json({ error: "You do not have permission to edit this item" });
+    }
+
+    // Delete the old image off of server
+    const user = await db.query("SELECT image FROM items WHERE id = $1", [itemId]);
+    // if the file is different that default
+    if (user.rows[0].image !== "/assets/placeholder-item.png") { 
+      const oldPicPath = path.join(__dirname, '.', user.rows[0].image);
+      if (fs.existsSync(oldPicPath)) {
+        console.log("deleting this file: "+oldPicPath);
+        fs.unlinkSync(oldPicPath);
+      } else {
+        console.log("Old image file does not exist:", oldPicPath);
+    }
+    }
+
+    await db.query("UPDATE items SET image = $1 WHERE id = $2", [filePath, itemId]);
+    res.json({ message: "item image updated!", imageUrl: `http://wishify.ca${filePath}` });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 
 
 
