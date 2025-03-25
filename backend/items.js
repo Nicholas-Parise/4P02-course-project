@@ -90,6 +90,16 @@ router.post('/', authenticate, async (req, res, next) => {
     // make this be the bottom of the list using the amount of items in a wishlist
     const priority = priorityResult.rows[0].next_priority;
 
+
+    // set default image if one isn't supplied
+    let tempPicture;
+    if (!image) {
+        tempPicture = "/assets/placeholder-item.png";
+    } else {
+        tempPicture = image;
+    }
+
+
     // insert the item
     const result = await db.query(`
         INSERT INTO items 
@@ -134,7 +144,7 @@ router.put('/:itemId?', authenticate, async (req, res, next) => {
       if (item.image !== undefined && typeof item.image !== "string") {
         return res.status(400).json({ error: "image must be a string" });
       }
-      if (item.quantity !== undefined && (!Number.isInteger(item.quantity) || quantity < 0)) {
+      if (item.quantity !== undefined && (!Number.isInteger(item.quantity) || item.quantity < 0)) {
         return res.status(400).json({ error: "quantity must be a non-negative integer" });
       }
       if (item.price !== undefined && (typeof item.price !== "number" || item.price < 0)) {

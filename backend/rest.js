@@ -36,5 +36,7 @@ app.use('/contributions', contributionsRoutes);
 app.use('/status', statusRoutes);
 app.use('/notifications', notificationsRoutes);
 
+// static Routes
+app.use('/uploads', express.static('uploads'));
 
 module.exports = app;
