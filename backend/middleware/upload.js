@@ -12,8 +12,8 @@ const storage = multer.diskStorage({
     destination: './uploads/',
     filename: (req, file, cb) => {
         const extension = path.extname(file.originalname);
-        cb(null, file.fieldname + '-' + Date.now() + extension); // save file name as "filename-11684523.png"
-        //cb(null, `${req.user.userId}${extension}`); // Save file as userId.extension
+        //cb(null, file.fieldname + '-' + Date.now() + extension); // save file name as "filename-11684523.png"
+        cb(null, `${req.user.userId}-${Date.now()}${extension}`); // Save file as userId-11684523.extension
     }
 });
 
