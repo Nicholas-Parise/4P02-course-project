@@ -144,7 +144,8 @@ router.get('/:wishlistId', authenticate, async (req, res, next) => {
       FROM items i
       JOIN wishlist_members wm ON i.member_id = wm.id
       JOIN users u ON wm.user_id = u.id
-      WHERE wm.wishlists_id = $1;`, [wishlist.id]);
+      WHERE wm.wishlists_id = $1
+      ORDER BY i.priority;`, [wishlist.id]);
 
     let contributionResult = null;
 
@@ -671,7 +672,8 @@ router.get('/:wishlistId/items', authenticate, async (req, res) => {
       FROM items i
       JOIN wishlist_members wm ON i.member_id = wm.id
       JOIN users u ON wm.user_id = u.id
-      WHERE wm.wishlists_id = $1;`, [wishlistId]);
+      WHERE wm.wishlists_id = $1
+      ORDER BY i.priority;`, [wishlistId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "No items found for this wishlist" });
@@ -706,10 +708,11 @@ router.get('/share/:token', async (req, res) => {
     // Get all items
     const itemsResult = await db.query(`
       SELECT i.id, i.name, i.description, i.url, i.image, i.quantity, i.price, i.priority, i.dateUpdated, i.dateCreated, u.displayName AS user_displayName, u.id AS user_id 
-      FROM items i
-      JOIN wishlist_members wm ON i.member_id = wm.id
-      JOIN users u ON wm.user_id = u.id
-      WHERE wm.wishlists_id = $1;`, [wishlist.id]);
+      FROM items i 
+      JOIN wishlist_members wm ON i.member_id = wm.id 
+      JOIN users u ON wm.user_id = u.id 
+      WHERE wm.wishlists_id = $1 
+      ORDER BY i.priority;`, [wishlist.id]);
 
     res.status(200).json({ wishlist, items: itemsResult.rows });
   } catch (error) {
