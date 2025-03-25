@@ -203,12 +203,40 @@ const Home = () => {
           })
     }, [])
   }
+
+  const [notifications, setNotificationList] = useState([])
+
+  const notificationsLoading = () => {
+    const notificationsURL = `https://api.wishify.ca/notifications`
+
+    useEffect(() => {
+      let token = localStorage.getItem('token') || ''
+      console.log(token)
+      fetch(notificationsURL, {
+          method: 'get',
+          headers: new Headers({
+            'Authorization': "Bearer "+token
+          })
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            setNotificationList(data);
+            console.log("Notifications:")
+            console.log(notifications);
+            console.log(data);
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+    }, [])
+  }
       
 
   backendLoading()
   wishlistLoading()
   eventListLoading()
   userLoading()
+  notificationsLoading()
 
   return (
     <>
