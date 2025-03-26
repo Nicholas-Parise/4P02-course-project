@@ -34,29 +34,35 @@ router.get('/:itemId', authenticate, async (req, res, next) => {
 
 // localhost:3000/items
 // create an item (given wishlists id)
-router.post('/', authenticate, async (req, res, next) => {
+router.post('/', authenticate, uploadPicture, async (req, res, next) => {
 
   const { name, description, url, quantity, price, wishlists_id } = req.body;
   const userId = req.user.userId; // Get user ID from authenticated token
 
   if (!wishlists_id || !name || !quantity) {
+    deleteUploadedFile(req);
     return res.status(400).json({ message: "wishlists_id, name and quantity are required" });
   }
 
   // Type checking
   if (name !== undefined && typeof name !== "string") {
+    deleteUploadedFile(req);
     return res.status(400).json({ error: "name must be a string" });
   }
   if (description !== undefined && typeof description !== "string") {
+    deleteUploadedFile(req);
     return res.status(400).json({ error: "description must be a string" });
   }
   if (url !== undefined && typeof url !== "string") {
+    deleteUploadedFile(req);
     return res.status(400).json({ error: "url must be a string" });
   }
   if (quantity !== undefined && (!Number.isInteger(quantity) || quantity < 0)) {
+    deleteUploadedFile(req);
     return res.status(400).json({ error: "quantity must be a non-negative integer" });
   }
   if (price !== undefined && (typeof price !== "number" || price < 0)) {
+    deleteUploadedFile(req);
     return res.status(400).json({ error: "price must be a non-negative number" });
   }
 
@@ -68,10 +74,12 @@ router.post('/', authenticate, async (req, res, next) => {
       [userId, wishlists_id]);
 
     if (member.rows.length === 0) {
+      deleteUploadedFile(req);
       return res.status(403).json({ error: "You are not a member of this wishlist" });
     }
 
     if (!member.rows[0].owner) {
+      deleteUploadedFile(req);
       return res.status(403).json({ error: "You do not have permission to add items to this wishlist" });
     }
 
@@ -91,10 +99,11 @@ router.post('/', authenticate, async (req, res, next) => {
     // make this be the bottom of the list using the amount of items in a wishlist
     const priority = priorityResult.rows[0].next_priority;
 
-
-    // set default image if one isn't supplied
-    const image = "/assets/placeholder-item.png";
-
+    // Determine image path 
+    let image = "/assets/placeholder-item.png"; // Default image
+    if (req.file) {
+        image = `/uploads/items/${req.file.filename}`; // Use uploaded image path
+    }
 
     // insert the item
     const result = await db.query(`
@@ -107,6 +116,7 @@ router.post('/', authenticate, async (req, res, next) => {
 
   } catch (error) {
     console.error("Error adding item:", error);
+    deleteUploadedFile(req);
     res.status(500).json({ error: "Internal Server Error" });
   }
 
@@ -286,6 +296,9 @@ router.delete('/:itemId', authenticate, async (req, res, next) => {
       return res.status(403).json({ error: "You do not have permission to edit this item" });
     }
 
+    // Delete the old image off of server
+    await deleteImage(itemId);
+
     // Delete the wishlist
     await db.query(`DELETE FROM items WHERE id = $1;`, [itemId]);
 
@@ -310,7 +323,7 @@ router.post('/upload/:itemId', authenticate, uploadPicture, async (req, res) => 
     return res.status(400).json({ message: "No file uploaded." });
   }
 
-  const filePath = `/uploads/${req.file.filename}`; // get file name from file
+  const filePath = `/uploads/items/${req.file.filename}`; // get file name from file
 
   try {
     // make sure owner has permission to do this
@@ -327,17 +340,7 @@ router.post('/upload/:itemId', authenticate, uploadPicture, async (req, res) => 
     }
 
     // Delete the old image off of server
-    const user = await db.query("SELECT image FROM items WHERE id = $1", [itemId]);
-    // if the file is different that default
-    if (user.rows[0].image !== "/assets/placeholder-item.png") { 
-      const oldPicPath = path.join(__dirname, '.', user.rows[0].image);
-      if (fs.existsSync(oldPicPath)) {
-        console.log("deleting this file: "+oldPicPath);
-        fs.unlinkSync(oldPicPath);
-      } else {
-        console.log("Old image file does not exist:", oldPicPath);
-    }
-    }
+    await deleteImage(itemId);
 
     await db.query("UPDATE items SET image = $1 WHERE id = $2", [filePath, itemId]);
     res.json({ message: "item image updated!", imageUrl: `http://wishify.ca${filePath}` });
@@ -348,6 +351,40 @@ router.post('/upload/:itemId', authenticate, uploadPicture, async (req, res) => 
 });
 
 
+// Delete the old profile picture off of server
+async function deleteImage(itemId) {
+  
+  //get the file name
+  const item = await db.query("SELECT image FROM items WHERE id = $1", [itemId]);
+
+  const filePath = item.rows[0].image;
+
+  // if the file is not null and is different that default
+  if (filePath && filePath !== "/assets/placeholder-item.png") {
+    const oldPicPath = path.join(__dirname, '.', filePath);
+    if (fs.existsSync(oldPicPath)) {
+      console.log("deleting this file: " + oldPicPath);
+      fs.unlinkSync(oldPicPath);
+    } else {
+      console.log("Old picture file does not exist:", oldPicPath);
+    }
+  }
+}
+
+
+// Helper function to delete uploaded file if it exists
+// used in case of an error
+function deleteUploadedFile(req) {
+  if (req.file) {
+      const filePath = path.join(__dirname, './uploads/items', req.file.filename);
+      fs.unlink(filePath, (err) => {
+          if (err) {
+              console.error("Failed to delete uploaded file:", err);
+          }
+      });
+      console.log("deleting this file: " + `./uploads/items${req.file.filename}`);
+  }
+}
 
 
 
