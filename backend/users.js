@@ -133,6 +133,9 @@ router.delete('/', authenticate, async (req, res) => {
       return res.status(403).json({ message: "Incorrect password" });
     }
 
+    // Delete the users profile picture
+    await deleteImage(userId);
+
     // Delete user if password is correct
     await db.query("DELETE FROM users WHERE id = $1", [userId]);
 
@@ -426,29 +429,43 @@ router.post('/upload', authenticate, uploadPicture, async (req, res) => {
     return res.status(400).json({ message: "No file uploaded." });
   }
 
-  const filePath = `/uploads/${req.file.filename}`; // get file name from file
+  const filePath = `/uploads/users/${req.file.filename}`; // get file name from file
 
   try {
-    // Delete the old image off of server
-    const user = await db.query("SELECT picture FROM users WHERE id = $1", [userId]);
-    // if the file is different that default
-    if (user.rows[0].picture !== "/assets/placeholder-avatar.png") { 
-      const oldPicPath = path.join(__dirname, '.', user.rows[0].picture);
-      if (fs.existsSync(oldPicPath)) {
-        console.log("deleting this file: "+oldPicPath);
-        fs.unlinkSync(oldPicPath);
-      } else {
-        console.log("Old picture file does not exist:", oldPicPath);
-    }
-    }
+
+    await deleteImage(userId);
 
     await db.query("UPDATE users SET picture = $1 WHERE id = $2", [filePath, userId]);
+
     res.json({ message: "Profile picture updated!", imageUrl: `http://wishify.ca${filePath}` });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
+
+// Delete the old profile picture off of server
+async function deleteImage(userId) {
+  
+  //get the file name
+  const user = await db.query("SELECT picture FROM users WHERE id = $1", [userId]);
+
+  const filePath = user.rows[0].picture;
+
+  // if the file is not null and is different that default
+  if (filePath && filePath !== "/assets/placeholder-avatar.png") {
+    const oldPicPath = path.join(__dirname, '.', filePath);
+    if (fs.existsSync(oldPicPath)) {
+      console.log("deleting this file: " + oldPicPath);
+      fs.unlinkSync(oldPicPath);
+    } else {
+      console.log("Old picture file does not exist:", oldPicPath);
+    }
+  }
+}
+
+
 
 
 module.exports = router;

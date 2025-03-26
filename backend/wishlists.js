@@ -160,9 +160,15 @@ router.get('/:wishlistId', authenticate, async (req, res, next) => {
       );
     }
 
+    const memberResult = await db.query(`
+            SELECT u.id, u.displayName, u.email, u.picture
+            FROM users u
+            JOIN wishlist_members wm ON u.id = wm.user_id
+            WHERE wm.wishlists_id = $1;
+        `, [wishlistId]);
 
 
-    res.status(200).json({ wishlist, items: itemsResult.rows, contributions: contributionResult.rows });
+    res.status(200).json({ wishlist, items: itemsResult.rows, contributions: contributionResult.rows, members: memberResult.rows });
   } catch (error) {
     console.error("Error fetching wishlists:", error);
     res.status(500).json({ error: "Internal Server Error" });
