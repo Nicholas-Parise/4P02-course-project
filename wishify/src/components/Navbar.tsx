@@ -6,7 +6,7 @@ import { WishlistItem } from '../types/types';
 import CreateItemDialog from './CreateItemDialog';
 import ProfileMenu from './ProfileMenu';
 import HelpMenu from './HelpMenu';
-import '../components/Navbarlanding/landingheader.css';
+import '../components/landingheader.css';
 
 const Navbar = ({ isLoggedIn, setIsLoggedIn, page }: { isLoggedIn: boolean, setIsLoggedIn: (val: boolean)=>void, page: string }) => {
   interface NavItem {
