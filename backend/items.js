@@ -106,7 +106,7 @@ router.post('/', authenticate, uploadPicture, async (req, res, next) => {
     // Determine image path 
     let image = "/assets/placeholder-item.png"; // Default image
     if (req.file) {
-        image = `/uploads/items/${req.file.filename}`; // Use uploaded image path
+      image = `/uploads/items/${req.file.filename}`; // Use uploaded image path
     }
 
     // insert the item
@@ -170,16 +170,37 @@ router.put('/:itemId?', authenticate, async (req, res, next) => {
         const { id, name, description, url, quantity, price, priority } = item;
 
 
+        // see if item exists, also get wishlist id
+        const itemCheck = await db.query(
+          `SELECT i.id, wm.wishlists_id 
+      FROM items i 
+      JOIN wishlist_members wm ON i.member_id = wm.id
+      WHERE i.id = $1;`,
+          [itemId]
+        );
+
+        if (itemCheck.rows.length === 0) {
+          await db.query("ROLLBACK");
+          return res.status(404).json({ error: "Item not found" });
+        }
+
+        const wishlist_id = itemCheck.rows[0].wishlists_id;
+
+        // determine if user is an owner of the wishlist
         const ownershipCheck = await db.query(
-          `SELECT i.id 
-                FROM items i
-                JOIN wishlist_members wm ON i.member_id = wm.id
-                WHERE i.id = $1 AND wm.user_id = $2`,
-          [id, userId]
+          `SELECT owner 
+        FROM wishlist_members wm
+        WHERE wishlists_id = $1 AND user_id = $2`,
+          [wishlist_id, userId]
         );
 
         if (ownershipCheck.rows.length === 0) {
-          await db.query("ROLLBACK"); // Roll back the transaction if unauthorized
+          await db.query("ROLLBACK");
+          return res.status(403).json({ error: "You are not a member of this wishlist" });
+        }
+
+        if (!ownershipCheck.rows[0].owner) {
+          await db.query("ROLLBACK");
           return res.status(403).json({ error: `You do not have permission to edit item: ${id}` });
         }
 
@@ -237,17 +258,39 @@ router.put('/:itemId?', authenticate, async (req, res, next) => {
 
 
   try {
+
+    // see if item exists, also get wishlist id
+    const itemCheck = await db.query(
+      `SELECT i.id, wm.wishlists_id 
+      FROM items i 
+      JOIN wishlist_members wm ON i.member_id = wm.id
+      WHERE i.id = $1;`,
+      [itemId]
+    );
+
+    if (itemCheck.rows.length === 0) {
+      return res.status(404).json({ error: "Item not found" });
+    }
+
+    const wishlist_id = itemCheck.rows[0].wishlists_id;
+
+    // determine if user is an owner of the wishlist
     const ownershipCheck = await db.query(
-      `SELECT i.id 
-        FROM items i
-        JOIN wishlist_members wm ON i.member_id = wm.id
-        WHERE i.id = $1 AND wm.user_id = $2`,
-      [itemId, userId]
+      `SELECT owner 
+        FROM wishlist_members wm
+        WHERE wishlists_id = $1 AND user_id = $2`,
+      [wishlist_id, userId]
     );
 
     if (ownershipCheck.rows.length === 0) {
+      return res.status(403).json({ error: "You are not a member of this wishlist" });
+    }
+
+    if (!ownershipCheck.rows[0].owner) {
       return res.status(403).json({ error: "You do not have permission to edit this item" });
     }
+
+
 
     // Update the wishlist with provided values (only update fields that are passed)
     const result = await db.query(`
@@ -288,16 +331,35 @@ router.delete('/:itemId', authenticate, async (req, res, next) => {
   const userId = req.user.userId; // Get user ID from authenticated token
 
   try {
+    // see if item exists, also get wishlist id
+    const itemCheck = await db.query(
+      `SELECT i.id, wm.wishlists_id 
+      FROM items i 
+      JOIN wishlist_members wm ON i.member_id = wm.id
+      WHERE i.id = $1;`,
+      [itemId]
+    );
+
+    if (itemCheck.rows.length === 0) {
+      return res.status(404).json({ error: "Item not found" });
+    }
+
+    const wishlist_id = itemCheck.rows[0].wishlists_id;
+
+    // determine if user is an owner of the wishlist
     const ownershipCheck = await db.query(
-      `SELECT i.id 
-        FROM items i
-        JOIN wishlist_members wm ON i.member_id = wm.id
-        WHERE i.id = $1 AND wm.user_id = $2`,
-      [itemId, userId]
+      `SELECT owner 
+        FROM wishlist_members wm
+        WHERE wishlists_id = $1 AND user_id = $2`,
+      [wishlist_id, userId]
     );
 
     if (ownershipCheck.rows.length === 0) {
-      return res.status(403).json({ error: "You do not have permission to edit this item" });
+      return res.status(403).json({ error: "You are not a member of this wishlist" });
+    }
+
+    if (!ownershipCheck.rows[0].owner) {
+      return res.status(403).json({ error: "You do not have permission to delete this item" });
     }
 
     // Delete the old image off of server
@@ -358,7 +420,7 @@ router.post('/upload/:itemId', authenticate, uploadPicture, async (req, res) => 
 
 // Delete the old profile picture off of server
 async function deleteImage(itemId) {
-  
+
   //get the file name
   const item = await db.query("SELECT image FROM items WHERE id = $1", [itemId]);
 
@@ -381,13 +443,13 @@ async function deleteImage(itemId) {
 // used in case of an error
 function deleteUploadedFile(req) {
   if (req.file) {
-      const filePath = path.join(__dirname, './uploads/items', req.file.filename);
-      fs.unlink(filePath, (err) => {
-          if (err) {
-              console.error("Failed to delete uploaded file:", err);
-          }
-      });
-      console.log("deleting this file: " + `./uploads/items${req.file.filename}`);
+    const filePath = path.join(__dirname, './uploads/items', req.file.filename);
+    fs.unlink(filePath, (err) => {
+      if (err) {
+        console.error("Failed to delete uploaded file:", err);
+      }
+    });
+    console.log("deleting this file: " + `./uploads/items${req.file.filename}`);
   }
 }
 

@@ -494,7 +494,7 @@ router.post('/members', authenticate, async (req, res) => {
   try {
 
     const wishlistCheck = await db.query(`
-      SELECT id FROM wishlists WHERE share_token = $1;
+      SELECT * FROM wishlists WHERE share_token = $1;
     `, [share_token]);
 
     if (wishlistCheck.rows.length === 0) {
@@ -502,6 +502,7 @@ router.post('/members', authenticate, async (req, res) => {
     }
 
     const wishlistId = wishlistCheck.rows[0].id;
+    const eventId = wishlistCheck.rows[0].event_id;
 
     // Check if the user is already a member of the wishlist
     const memberCheck = await db.query(`
@@ -512,18 +513,25 @@ router.post('/members', authenticate, async (req, res) => {
       return res.status(409).json({ message: "user is already a member", id: wishlistId });
     }
 
-    // Add the user to the wishlist
+    // Add the user to the wishlist with 
     /*
     await db.query(`
           INSERT INTO wishlist_members (wishlists_id, user_id, blind, owner, dateCreated)
           VALUES ($1, $2, COALESCE($3, false), COALESCE($4, false), NOW());`, [wishlistId, authUserId, blind, owner]);
     */
 
+    // add the 
     await db.query(`
       INSERT INTO wishlist_members (wishlists_id, user_id, blind, owner, dateCreated)
-      VALUES ($1, $2, false, false, NOW());`, [wishlistId, authUserId]);
+      VALUES ($1, $2, false, false, NOW()) ON CONFLICT DO NOTHING;`, [wishlistId, authUserId]);
 
-
+      /*
+    // add the event membership
+    await db.query(`
+      INSERT INTO event_members (event_id, user_id, owner, dateCreated)
+      VALUES ($1, $2, false, NOW()) ON CONFLICT DO NOTHING;`, [eventId, authUserId]);
+    */
+      
     res.status(201).json({ message: "User added to the wishlist successfully", id: wishlistId });
   } catch (error) {
 
