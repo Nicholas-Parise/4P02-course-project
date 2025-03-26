@@ -64,7 +64,37 @@ const Login = ({setIsLoggedIn}) => {
         );
         setIsLoggedIn(true);
         setResponseType("success");
-        navigate("../Home")
+        const share_token = sessionStorage.getItem("share_token")
+        if(share_token) {
+          fetch(`https://api.wishify.ca/wishlists/members`, {
+            method: 'post',
+            headers: new Headers({
+              'Authorization': "Bearer "+data.token,
+              'Content-Type': 'application/json'
+            }),
+            body: JSON.stringify({
+                share_token: share_token,
+                owner: false,
+                blind: false
+            })
+            })
+            .then((response) => {
+                return response.json();
+            })
+            .then((data) => {
+                sessionStorage.removeItem("share_token")
+                navigate(`/wishlists/${data.id}`)
+            })
+            .catch((error) => {
+              console.log("Failed to share wishlist\n" + error)
+              alert("Failed to share wishlist\n" + error)
+              navigate("/home")
+            }
+          )
+        }
+        else{
+          navigate("../home")
+        }
       } else if (response.status === 400) {
         setResponseMessage("Bad request. Please fill in all required fields.");
         setResponseType("error");
