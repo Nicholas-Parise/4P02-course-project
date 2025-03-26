@@ -340,6 +340,7 @@ router.post('/upload/:itemId', authenticate, uploadPicture, async (req, res) => 
     );
 
     if (ownershipCheck.rows.length === 0) {
+      deleteUploadedFile(req);
       return res.status(403).json({ error: "You do not have permission to edit this item" });
     }
 
