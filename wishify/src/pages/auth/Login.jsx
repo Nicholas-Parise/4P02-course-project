@@ -82,6 +82,7 @@ const Login = ({setIsLoggedIn}) => {
                 return response.json();
             })
             .then((data) => {
+                sessionStorage.removeItem("share_token")
                 navigate(`/wishlists/${data.id}`)
             })
             .catch((error) => {
