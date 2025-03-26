@@ -36,8 +36,12 @@ router.get('/:itemId', authenticate, async (req, res, next) => {
 // create an item (given wishlists id)
 router.post('/', authenticate, uploadPicture, async (req, res, next) => {
 
-  const { name, description, url, quantity, price, wishlists_id } = req.body;
+  const { name, description, url, wishlists_id } = req.body;
   const userId = req.user.userId; // Get user ID from authenticated token
+
+  const quantity = req.body.quantity ? parseInt(req.body.quantity, 10) : undefined;
+  const price = req.body.price ? parseFloat(req.body.price) : undefined;
+
 
   if (!wishlists_id || !name || !quantity) {
     deleteUploadedFile(req);

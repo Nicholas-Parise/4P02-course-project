@@ -524,7 +524,7 @@ router.post('/members', authenticate, async (req, res) => {
       VALUES ($1, $2, false, true, NOW());`, [wishlistId, authUserId]);
 
 
-    res.status(201).json({ message: "User added to the wishlist successfully" });
+    res.status(201).json({ message: "User added to the wishlist successfully", id: wishlistId });
   } catch (error) {
 
     // Handle duplicate membership error
