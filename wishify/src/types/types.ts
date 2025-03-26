@@ -1,18 +1,23 @@
 export interface Wishlist {
     id: number,
     name: string,
-    eventID: number,
-    desc: string,
+    event_id: number,
+    description: string,
     image: string
+    blind?: boolean,
+    owner?: boolean,
+    share_token?: string,
+    deadline?: string
 };
 
 export interface Event {
     id: number,
     name: string,
-    desc: string,
+    description: string,
     url: string,
     addr: string,
     city: string,
+    deadline: string,
     image: string,
     dateUpdated: string,
     dateCreated: string

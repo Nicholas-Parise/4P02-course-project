@@ -107,6 +107,13 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
                   })}
                 </Select>
 
+                <TextField 
+                  sx={{mt: 3}}
+                  label="Name" 
+                  value={newItem.name || ""} 
+                  onChange={e => setNewItem({ ...newItem, name: e.target.value})}
+                  required
+                />
                 
                 <TextField
                   sx={{mt: 3}}
@@ -126,14 +133,6 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
                 </div>
                 )}
                 
-
-                <TextField 
-                  sx={{mt: 3}}
-                  label="Name" 
-                  value={newItem.name || ""} 
-                  onChange={e => setNewItem({ ...newItem, name: e.target.value})}
-                  required
-                />
 
                 <TextField 
                   sx={{mt: 3}}

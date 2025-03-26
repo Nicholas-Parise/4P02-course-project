@@ -15,7 +15,8 @@ import Landing from "./pages/Landing";
 import Wishlist from "./pages/Wishlist";
 import Profile from "./pages/Profile";
 import Index from "./pages/Index";
-import Status from "./pages/Status"
+import Status from "./pages/Status";
+import Share from"./pages/Share";
 
 import Navbar from "./components/Navbar";
 
@@ -35,6 +36,7 @@ function App() {
             <Route path="login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
             <Route path="register" element={<Register />} />
             <Route path="status" element={<Status />} />
+            <Route path="wishlists/share/:share_token" element={<Share isLoggedIn={isLoggedIn} />} />
 
             <Route element={<ProtectedRoutes />}>
               <Route path="home" element={<HomePage />} />
