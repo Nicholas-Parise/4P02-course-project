@@ -161,7 +161,7 @@ router.get('/:wishlistId', authenticate, async (req, res, next) => {
     }
 
     const memberResult = await db.query(`
-            SELECT u.id, u.displayName, u.email, u.picture
+            SELECT u.id, u.displayName, u.email, u.picture, wm.blind, wm.owner
             FROM users u
             JOIN wishlist_members wm ON u.id = wm.user_id
             WHERE wm.wishlists_id = $1;
@@ -396,7 +396,7 @@ router.get('/:wishlistId/members', authenticate, async (req, res) => {
 
   try {
     const result = await db.query(`
-          SELECT u.id, u.displayName, u.email, u.picture
+          SELECT u.id, u.displayName, u.email, u.picture, wm.blind, wm.owner
           FROM users u
           JOIN wishlist_members wm ON u.id = wm.user_id
           WHERE wm.wishlists_id = $1;
@@ -521,7 +521,7 @@ router.post('/members', authenticate, async (req, res) => {
 
     await db.query(`
       INSERT INTO wishlist_members (wishlists_id, user_id, blind, owner, dateCreated)
-      VALUES ($1, $2, false, true, NOW());`, [wishlistId, authUserId]);
+      VALUES ($1, $2, false, false, NOW());`, [wishlistId, authUserId]);
 
 
     res.status(201).json({ message: "User added to the wishlist successfully", id: wishlistId });
