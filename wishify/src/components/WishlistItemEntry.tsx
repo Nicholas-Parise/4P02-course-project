@@ -3,20 +3,22 @@ import { type WishlistItem, Contribution } from '../types/types';
 import { useSortable } from '@dnd-kit/sortable';
 import {CSS} from '@dnd-kit/utilities';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, Button, TextField, IconButton } from '@mui/material';
-import { FaExternalLinkAlt, FaMinus, FaPlus, FaChevronDown, FaChevronRight } from 'react-icons/fa';
+import { FaExternalLinkAlt, FaMinus, FaPlus, FaChevronDown, FaChevronRight, FaPencilAlt } from 'react-icons/fa';
 import { FaTrashCan } from "react-icons/fa6";
 import DeleteItemModal from './DeleteItemModal';
+import EditItemDialog from './EditItemDialog';
 
 type WishlistItemProps = {
   item: WishlistItem,
+  editWishlistItem: (item: WishlistItem) => void,
   sortBy: "priority" | "price" | "quantity",
   reservations: Contribution[],
-  onReserve: (itemId: number, reservation: number, note: string) => void,
+  onReserve: (item: WishlistItem, reservation: number, note: string) => void,
   id: number,
   onDelete: (id: number) => void,
 }
 
-const WishlistItemEntry = ({ item, sortBy, reservations, onReserve, id, onDelete }: WishlistItemProps) => {
+const WishlistItemEntry = ({ item, editWishlistItem, sortBy, reservations, onReserve, id, onDelete }: WishlistItemProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, } = useSortable({ id, animateLayoutChanges: () => false });
 
   const style = {
@@ -25,32 +27,65 @@ const WishlistItemEntry = ({ item, sortBy, reservations, onReserve, id, onDelete
   };
 
   const isDraggable = sortBy === "priority"
-  const currentUser = 1  //In a real app, this would come from authentication
   const totalReserved = item.quantitySupplied || 0
-  const userReservation = item.contributions?.find((r) => r.user_id === currentUser)
   const availableQuantity = item.quantity - totalReserved
 
   const reservedBadgeColour = availableQuantity <= 0 ? "bg-green-600" : "bg-yellow-500"
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [reserveQuantity, setReserveQuantity] = useState(0)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [reserveNote, setReserveNote] = useState("")
+  const [userReservation, setUserReservation] = useState<number>(0)
+  const [tempUserReservation, setTempUserResrvation] = useState<number>(0)
+  const [userID, setUserID] = useState()
 
-  const incrementReserve = () => setReserveQuantity((prev) => Math.min(prev + 1, availableQuantity))
-  const decrementReserve = () => setReserveQuantity((prev) => Math.max(prev - 1, 0))
+  const incrementReserve = () => setTempUserResrvation((prev) => Math.min(prev + 1, availableQuantity + userReservation))
+  const decrementReserve = () => setTempUserResrvation((prev) => Math.max(prev - 1, 0))
 
   useEffect(() => {
-    setReserveQuantity(userReservation?.quantity || 0)
+    fetch(`https://api.wishify.ca/auth/me`, {
+      method: 'get',
+      headers: new Headers({
+          'Authorization': "Bearer "+localStorage.getItem("token"),
+          'Content-Type': 'application/json'
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+          setUserID(data.id)
+      })
+      .catch((error) => {
+          console.log(error)
+      })
+  }, [])
+
+  useEffect(() => {
+    const contribution = reservations.find(i => i.item_id === item.id && i.user_id === userID)
+    if(contribution) {
+      setUserReservation(contribution.quantity)
+      setReserveNote(contribution.note)
+    }
+    else {
+      setUserReservation(0)
+    }
+    
+  }, [userID])
+
+  useEffect(() => {
+    setTempUserResrvation(userReservation)
   }, [userReservation])
 
   const handleReserve = () => {
-    if (reserveQuantity > 0) {
+    console.log(tempUserReservation, availableQuantity, userReservation)
+    if (tempUserReservation > availableQuantity + userReservation) return; // TODO Add alert that there is not enough available quantity
+    if (tempUserReservation > 0) {
       //onReserve(item.id, reserveQuantity, currentUser)
-      onReserve(item.id, reserveQuantity, reserveNote)
+      onReserve(item, tempUserReservation, reserveNote)
+      setUserReservation(tempUserReservation)
     } else {
-      //onReserve(item.id, 0, currentUser)  Remove reservation if quantity is 0
-      onReserve(item.id, 0, reserveNote)
+      onReserve(item, 0, reserveNote)
+      setUserReservation(0)
     }
     setIsModalOpen(false)
   }
@@ -59,7 +94,7 @@ const WishlistItemEntry = ({ item, sortBy, reservations, onReserve, id, onDelete
     if (["e", "E", "-"].some((char) => e.target.value.includes(char))) return;
 
     // handle change here
-    setReserveQuantity(parseInt(e.target.value) || 0);
+    setTempUserResrvation(parseInt(e.target.value) || 0);
   }
 
   const [showNote, setShowNote] = useState<{ [key: number]: boolean }>({});
@@ -67,6 +102,7 @@ const WishlistItemEntry = ({ item, sortBy, reservations, onReserve, id, onDelete
   return (
     <>
       <li
+        id={id.toString()}
         ref={setNodeRef}
         style={style}
         className="bg-white shadow-md p-4 flex items-center space-x-4 cursor-pointer rounded-[25px] border-2 border-[#5651e5]"
@@ -88,7 +124,10 @@ const WishlistItemEntry = ({ item, sortBy, reservations, onReserve, id, onDelete
                 {availableQuantity <= 0 ? "Fully Reserved" : "Partially Reserved"}
               </div>
             }
-            <IconButton sx={{marginLeft: 2, ":hover":{color:'#fb2c36'}}} onClick={(e) => {e.stopPropagation(), setIsDeleteModalOpen(true)}} className='w-8 h-8'>
+            <IconButton sx={{marginLeft: 2, ":hover":{color:'#5651e5'}}} onClick={(e) => {e.stopPropagation(), setIsEditModalOpen(true)}} className='w-8 h-8'>
+              <FaPencilAlt className='transition-[1]'/>
+            </IconButton>
+            <IconButton sx={{marginLeft: 1, ":hover":{color:'#fb2c36'}}} onClick={(e) => {e.stopPropagation(), setIsDeleteModalOpen(true)}} className='w-8 h-8'>
               <FaTrashCan className='transition-[1]'/>
             </IconButton>
           </div>
@@ -160,7 +199,7 @@ const WishlistItemEntry = ({ item, sortBy, reservations, onReserve, id, onDelete
                   <FaMinus className="h-4 w-4 text-[#5651e5]" />
                 </Button>
                 <TextField
-                  value={reserveQuantity}
+                  value={tempUserReservation}
                   onChange={(e) => handleReserveQuantity(e)}
                   className="w-20 text-center"
                 />
@@ -169,6 +208,8 @@ const WishlistItemEntry = ({ item, sortBy, reservations, onReserve, id, onDelete
                 </Button>
               </div>
               <TextField
+                sx={{width:'100%'}}
+                multiline
                 value={reserveNote}
                 label="Leave a comment"
                 onChange={(e) => setReserveNote(e.target.value)}
@@ -185,7 +226,7 @@ const WishlistItemEntry = ({ item, sortBy, reservations, onReserve, id, onDelete
                 className="!rounded-[25px] bg-gradient-to-r from-[#8d8aee] to-[#5651e5] !text-white hover:from-[#5651e5] hover:to-[#343188]"
                 onClick={handleReserve}
               >
-                {userReservation ? 'Update Reservation' : 'Reserve'}
+                {userReservation > 0 ? 'Update Reservation' : 'Reserve'}
               </Button>
             </div>
           </div>
@@ -199,6 +240,12 @@ const WishlistItemEntry = ({ item, sortBy, reservations, onReserve, id, onDelete
       item={item}
     />
 
+    <EditItemDialog
+      open={isEditModalOpen}
+      setOpen={setIsEditModalOpen}
+      item={item}
+      editWishlistItem={editWishlistItem}
+    />
     </>
   )
 }
