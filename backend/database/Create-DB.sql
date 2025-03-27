@@ -176,7 +176,7 @@ BEGIN
         SELECT 1 FROM event_members WHERE event_id = OLD.event_id
     ) THEN
         -- Delete the event if no members are left
-        DELETE FROM event WHERE id = OLD.event_id;
+        DELETE FROM events WHERE id = OLD.event_id;
     END IF;
     RETURN OLD;
 END;
