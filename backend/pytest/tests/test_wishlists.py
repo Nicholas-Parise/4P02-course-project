@@ -41,7 +41,7 @@ def test_create_wishlist_missing_name(setup_test_account, log_in, cleanup_test_a
 
     assert res.status_code == 400
 
-def test_get_all_wishlists(setup_test_account, setup_test_wishlist, cleanup_test_wishlist, cleanup_test_account):
+def test_get_all_wishlists(setup_test_account, setup_test_wishlist, cleanup_test_account, cleanup_test_wishlist):
     token, wishlist_id = setup_test_wishlist
 
     sleep(sleepTime)
@@ -55,7 +55,7 @@ def test_get_all_wishlists(setup_test_account, setup_test_wishlist, cleanup_test
     assert res.status_code == 200
     assert res.json()[0]["id"] == wishlist_id
 
-def test_get_wishlists_token_errors(setup_test_account, setup_test_wishlist, cleanup_test_wishlist, cleanup_test_account):
+def test_get_wishlists_token_errors(setup_test_account, setup_test_wishlist, cleanup_test_account, cleanup_test_wishlist ):
     token, wishlist_id = setup_test_wishlist
 
     sleep(sleepTime)
@@ -76,7 +76,7 @@ def test_get_wishlists_token_errors(setup_test_account, setup_test_wishlist, cle
 
     assert res.status_code == 401
 
-def test_get_wishlist_by_id(setup_test_account, setup_test_wishlist, cleanup_test_wishlist, cleanup_test_account):
+def test_get_wishlist_by_id(setup_test_account, setup_test_wishlist, cleanup_test_account, cleanup_test_wishlist):
     token, wishlist_id = setup_test_wishlist
 
     sleep(sleepTime)
@@ -92,7 +92,7 @@ def test_get_wishlist_by_id(setup_test_account, setup_test_wishlist, cleanup_tes
     assert res.status_code == 200
     assert res.json()["wishlist"]["id"] == wishlist_id
 
-def test_get_wishlist_by_id_token_errors(setup_test_account, setup_test_wishlist, cleanup_test_wishlist, cleanup_test_account):
+def test_get_wishlist_by_id_token_errors(setup_test_account, setup_test_wishlist, cleanup_test_account, cleanup_test_wishlist):
     token, wishlist_id = setup_test_wishlist
 
     sleep(sleepTime)
@@ -133,7 +133,7 @@ def test_delete_wishlist(setup_test_account, setup_test_wishlist, cleanup_test_a
 
     assert res.status_code == 404
 
-def test_put_wishlist(setup_test_account, setup_test_wishlist, cleanup_test_wishlist, cleanup_test_account):
+def test_put_wishlist(setup_test_account, setup_test_wishlist, cleanup_test_account, cleanup_test_wishlist):
     token, wishlist_id = setup_test_wishlist
 
     rename = "My renamed Wishlist"

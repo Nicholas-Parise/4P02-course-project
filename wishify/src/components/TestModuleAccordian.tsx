@@ -24,11 +24,12 @@ const TestModuleAccordian = ({module}: {module: {name: string, tests: {name: str
         </AccordionSummary>
         <AccordionDetails>
             {module.tests.map(test => {
+                console.log(test)
                 return(
                     <div key={test.name} className={`mb-2 text-lg p-3 rounded-md flex justify-between items-center ${test.outcome === "passed" ? "bg-green-50" : test.outcome === "error" ? "bg-amber-50" : "bg-red-50"}`}>
                         {test.name}
                         {test.outcome === "passed" ? <FaCheckCircle className="text-green-500" /> :
-                            outcome === "error" ? <FaExclamationTriangle className="text-amber-500" /> :
+                            test.outcome === "error" ? <FaExclamationTriangle className="text-amber-500" /> :
                             <FaCircleXmark className="text-red-500" />
                         }
                     </div>
