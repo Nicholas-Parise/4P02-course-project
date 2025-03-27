@@ -36,6 +36,7 @@ const Wishlist = () => {
 
     // Fetch page data onload
     useEffect(() => {
+      let status_code = -1
       let url = `https://api.wishify.ca/wishlists/${id}`
       // get wishlist info
       fetch(url, {
@@ -45,9 +46,14 @@ const Wishlist = () => {
         })
         })
         .then((response) => {
+          status_code = response.status
           return response.json();
         })
         .then((data) => {
+          if(status_code != 200){
+            navigate("/404")
+            return
+          }
           setWishlist(data.wishlist)
           setWishlistItems(data.items)
           setWishlistContributions(data.contributions)
