@@ -38,6 +38,7 @@ def cleanup_test_account(request):
     token = None
 
     def _method(tok):
+        nonlocal token
         token = tok
 
     yield _method
@@ -112,18 +113,29 @@ def cleanup_test_event(request):
     event_id = None
     token = None
     def _method(tok, e_id):
+        nonlocal event_id
+        nonlocal token
         event_id = e_id
         token = tok
 
     yield _method
 
-    if event_id is None: return
+    assert event_id is not None # event_id must not be none!
 
     sleep(sleepTime)
     res = req.delete(
         domain+f"/events/{event_id}",
         headers={"Authorization": f"Bearer {token}"},
     )
+
+    # check that the wishlist no longer exists
+    sleep(sleepTime)
+    res = req.get(
+        domain+f"/events/{event_id}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert res.status_code == 404
 
 @pytest.fixture
 def setup_test_wishlist(request):
@@ -149,17 +161,29 @@ def setup_test_wishlist(request):
 @pytest.fixture
 def cleanup_test_wishlist(request):
     wishlist_id = None
-    token = None
+    wishlist_token = None
+
     def _method(tok, w_id):
+        nonlocal wishlist_id
+        nonlocal wishlist_token
         wishlist_id = w_id
-        token = tok
+        wishlist_token = tok
 
     yield _method
 
-    if wishlist_id is None: return
+    assert wishlist_id is not None # wishlist_id must not be none!
 
     sleep(sleepTime)
     res = req.delete(
         domain+f"/wishlists/{wishlist_id}",
-        headers={"Authorization": f"Bearer {token}"},
+        headers={"Authorization": f"Bearer {cleanup_wishlist_token}"},
     )
+
+    # check that the wishlist no longer exists
+    sleep(sleepTime)
+    res = req.get(
+        domain+f"/wishlists/{wishlist_id}",
+        headers={"Authorization": f"Bearer {cleanup_wishlist_token}"},
+    )
+
+    assert res.status_code == 404
