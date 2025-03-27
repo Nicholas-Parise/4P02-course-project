@@ -52,6 +52,7 @@ const EditBioModal = ({ open, handleClose, value, onSave }) => {
           multiline
           rows={4}
           variant='outlined'
+          slotProps={{ htmlInput: { maxLength: 300 } }}
           sx={{mb: 2}}
         />
 

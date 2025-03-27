@@ -1,3 +1,4 @@
+export { default as EditPictureModal } from './EditPictureModal';
 export { default as EditDisplayNameModal } from './EditDisplayNameModal';
 export { default as EditBioModal } from './EditBioModal';
 export { default as EditEmailModal } from './EditEmailModal';
