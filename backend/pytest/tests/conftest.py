@@ -176,14 +176,14 @@ def cleanup_test_wishlist(request):
     sleep(sleepTime)
     res = req.delete(
         domain+f"/wishlists/{wishlist_id}",
-        headers={"Authorization": f"Bearer {cleanup_wishlist_token}"},
+        headers={"Authorization": f"Bearer {wishlist_token}"},
     )
 
     # check that the wishlist no longer exists
     sleep(sleepTime)
     res = req.get(
         domain+f"/wishlists/{wishlist_id}",
-        headers={"Authorization": f"Bearer {cleanup_wishlist_token}"},
+        headers={"Authorization": f"Bearer {wishlist_token}"},
     )
 
     assert res.status_code == 404
