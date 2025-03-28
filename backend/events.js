@@ -55,6 +55,7 @@ router.post('/', authenticate, async (req, res, next) => {
     );
 
     const event_id = eventResult.rows[0].id;
+    const event = eventResult.rows[0];
 
     // Step 2: Add the users membership (owner)
     await db.query(
@@ -65,7 +66,7 @@ router.post('/', authenticate, async (req, res, next) => {
 
     await db.query("COMMIT"); // Commit the transaction
     
-    res.status(201).json({ event_id, message: "Event created successfully!" });
+    res.status(201).json({ event, message: "Event created successfully!" });
   
   }catch (error) {
     await db.query("ROLLBACK"); // Rollback if an error occurs

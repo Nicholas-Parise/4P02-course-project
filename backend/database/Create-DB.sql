@@ -18,6 +18,7 @@ displayName TEXT,
 bio TEXT,
 picture TEXT,
 notifications BOOLEAN,
+pro BOOLEAN,
 dateupdated TIMESTAMP,
 datecreated TIMESTAMP DEFAULT NOW()
 );
