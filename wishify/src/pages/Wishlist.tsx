@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import { useParams, useLocation } from "react-router-dom"
-import { type Wishlist, WishlistItem, Event, Contribution } from '../types/types';
+import { type Wishlist, WishlistItem, Event, Contribution, Member } from '../types/types';
 import WishlistHeader from '../components/WishlistHeader';
 import WishlistItemEntry from '../components/WishlistItemEntry';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
@@ -14,6 +14,8 @@ import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { IconButton } from '@mui/material';
 import Alert from "@mui/material/Alert";
+import { FaPeopleGroup } from 'react-icons/fa6';
+import MemberDialog from '../components/MemberDialog';
 
 const Wishlist = () => {
     const navigate = useNavigate();
@@ -22,16 +24,25 @@ const Wishlist = () => {
 
     const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([])
     const [wishlistContributions, setWishlistContributions] = useState<Contribution[]>([])
+    const [wishlistMembers, setWishlistMembers] = useState<Member[]>([])
     //const [error, setError] = useState(null)
     //const [loading, setLoading] = useState(false)
     const [token] = useState<string>(localStorage.getItem('token') || '')
     const [sortDirection, setSortDirection] = useState<-1 | 1>(1)
+    const [isMemberDialogOpen, setIsMemberDialogOpen] = useState<boolean>(false)
 
     const editWishlistItem = (item: WishlistItem) => {
       const index = wishlistItems.findIndex(i => i.id === item.id);
       const newArray = [...wishlistItems] 
       newArray[index] = item
       setWishlistItems(newArray)
+    }
+
+    const editMember = (member: Member) => {
+      const index = wishlistMembers.findIndex(i => i.id === member.id);
+      const newArray = [...wishlistMembers] 
+      newArray[index] = member
+      setWishlistMembers(newArray)
     }
 
     // Fetch page data onload
@@ -58,6 +69,7 @@ const Wishlist = () => {
           setWishlistItems(data.items)
           setWishlistContributions(data.contributions)
           setEventID(data.wishlist?.event_id)
+          setWishlistMembers(data.members)
         })
         .catch((error) => {
           console.log(error)
@@ -318,8 +330,9 @@ const Wishlist = () => {
     <>
       <section className='pt-5'>
           <WishlistHeader wishlist={wishlist} event={event} />
-          <div className="mt-8 mb-4 flex gap-1 items-center">
-              <FormControl fullWidth className='min-w-[120px] max-w-[180px] '>
+          <div className="mt-8 mb-4 flex gap-1 items-center justify-between">
+            <div className='flex'>
+              <FormControl fullWidth>
                   <InputLabel id="sort-select-label">Sort by</InputLabel>
                   <Select
                       labelId="sort-select-label"
@@ -327,6 +340,7 @@ const Wishlist = () => {
                       value={sortBy}
                       label="Sort by"
                       onChange={(event: SelectChangeEvent) => setSortBy(event.target.value as SortOption)}
+                      sx={{width:120}}
                   >
                       <MenuItem value={'priority'}>Priority</MenuItem>
                       <MenuItem value={'price'}>Price</MenuItem>
@@ -336,6 +350,16 @@ const Wishlist = () => {
               <IconButton className='w-12 h-12' onClick={() => setSortDirection(sortDirection === 1 ? -1 : 1)}>
                   <FaArrowUp className={`transition-[1]  ${sortDirection === -1 ? 'rotate-180' : 'rotate-0'}`} />
               </IconButton>
+            </div>
+            <div>
+              <div 
+                onClick={() => setIsMemberDialogOpen(true)}
+                className="items-center flex gap-2 cursor-pointer select-none text-[1rem] hover:bg-gray-200 bg-gray-100 p-4 rounded-[25px] border-2 border-[#5651e5]"
+              >
+                View Members
+                <FaPeopleGroup className='text-2xl text-[#5651e5]' />
+              </div>
+            </div>
           </div>
           { sortedItems.length === 0 ? <section><p className="text-center text-gray-500">No items in your wishlist.</p><p className="text-center text-gray-500">Start adding them by clicking the Add Wish button!</p></section> :
           <DndContext onDragEnd={handleDragEnd}>
@@ -361,6 +385,13 @@ const Wishlist = () => {
       <Alert severity="success" sx={{ position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)', zIndex: 1000, opacity: contributeAlert ? 1 : 0, transition: contributeAlert ? "none" : "opacity 1s ease-out"}}>
         Reservation successfully added.
       </Alert>
+
+      <MemberDialog 
+        open={isMemberDialogOpen}
+        setOpen={setIsMemberDialogOpen}
+        members={wishlistMembers}
+        editMember={editMember}
+      />
 
     </>
   );
