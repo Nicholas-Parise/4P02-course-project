@@ -127,9 +127,9 @@ const Wishlists = () => {
       .then((data) => {
           let newWishlist: Wishlist = 
           {id: data.wishlist_id,
-            eventID: 0, // TODO add event support
+            event_id: 0, // TODO add event support
             name: uniqueTitle,
-            desc: "",
+            description: "",
             image: ""} // TODO add descriptions
           setWishlists([...wishlists, newWishlist])
       })

@@ -158,7 +158,7 @@ const Status = () => {
                 />
                 <CardContent>
                     {statusData.modules.map(module => {
-                            return <TestModuleAccordian module={module} />
+                            return <TestModuleAccordian key={module.name} module={module} />
                         }) 
                     }
 

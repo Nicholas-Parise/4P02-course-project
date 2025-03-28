@@ -1,8 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const db = require('./db');
+const fs = require('fs');
+const path = require('path');
 const bcrypt = require("bcryptjs");
+
 const authenticate = require('./middleware/authenticate');
+const uploadPicture = require('./middleware/upload');
 
 // localhost:3000/users
 // get logged in users
@@ -31,7 +35,7 @@ router.get('/', authenticate, async (req, res, next) => {
 router.put('/', authenticate, async (req, res) => {
   try {
     const userId = req.user.userId; // Get user ID from authenticated token
-    const { email, displayName, picture, password, newPassword, bio, notifications } = req.body;
+    const { email, displayName, password, newPassword, bio, notifications } = req.body;
     let newhHashedPassword = null;
 
     // Type checking
@@ -40,9 +44,6 @@ router.put('/', authenticate, async (req, res) => {
     }
     if (displayName !== undefined && typeof displayName !== "string") {
       return res.status(400).json({ error: "displayName must be a string" });
-    }
-    if (picture !== undefined && typeof picture !== "string") {
-      return res.status(400).json({ error: "picture must be a string" });
     }
     if (password !== undefined && typeof password !== "string") {
       return res.status(400).json({ error: "password must be a string" });
@@ -84,15 +85,14 @@ router.put('/', authenticate, async (req, res) => {
     const result = await db.query(`
           UPDATE users 
           SET 
-              displayName = COALESCE($1, displayName), 
-              picture = COALESCE($2, picture), 
-              password = COALESCE($3, password),
-              email = COALESCE($4, email),
-              bio = COALESCE($5, bio),
-              notifications = COALESCE($6, notifications),
+              displayName = COALESCE($1, displayName),  
+              password = COALESCE($2, password),
+              email = COALESCE($3, email),
+              bio = COALESCE($4, bio),
+              notifications = COALESCE($5, notifications),
               dateupdated = NOW()
-          WHERE id = $7
-          RETURNING id, email, displayName, picture, datecreated, dateupdated`, [displayName, picture, newhHashedPassword, email, bio, notifications, userId]);
+          WHERE id = $6
+          RETURNING id, email, displayName, bio, notifications, datecreated, dateupdated`, [displayName, newhHashedPassword, email, bio, notifications, userId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "User not found" });
@@ -132,6 +132,9 @@ router.delete('/', authenticate, async (req, res) => {
     if (!isMatch) {
       return res.status(403).json({ message: "Incorrect password" });
     }
+
+    // Delete the users profile picture
+    await deleteImage(userId);
 
     // Delete user if password is correct
     await db.query("DELETE FROM users WHERE id = $1", [userId]);
@@ -413,6 +416,56 @@ router.put('/categories/:categoryId?', authenticate, async (req, res, next) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+
+
+// localhost:3000/users/upload-profile
+// upload new profile picture
+router.post('/upload', authenticate, uploadPicture, async (req, res) => {
+
+  const userId = req.user.userId; // Get user ID from authenticated token
+
+  if (!req.file) {
+    return res.status(400).json({ message: "No file uploaded." });
+  }
+
+  const filePath = `/uploads/users/${req.file.filename}`; // get file name from file
+
+  try {
+
+    await deleteImage(userId);
+
+    await db.query("UPDATE users SET picture = $1 WHERE id = $2", [filePath, userId]);
+
+    res.json({ message: "Profile picture updated!", imageUrl: `http://wishify.ca${filePath}` });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+
+// Delete the old profile picture off of server
+async function deleteImage(userId) {
+  
+  //get the file name
+  const user = await db.query("SELECT picture FROM users WHERE id = $1", [userId]);
+
+  const filePath = user.rows[0].picture;
+
+  // if the file is not null and is different that default
+  if (filePath && filePath !== "/assets/placeholder-avatar.png") {
+    const oldPicPath = path.join(__dirname, '.', filePath);
+    if (fs.existsSync(oldPicPath)) {
+      console.log("deleting this file: " + oldPicPath);
+      fs.unlinkSync(oldPicPath);
+    } else {
+      console.log("Old picture file does not exist:", oldPicPath);
+    }
+  }
+}
+
+
 
 
 module.exports = router;

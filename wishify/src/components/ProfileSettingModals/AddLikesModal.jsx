@@ -1,25 +1,45 @@
 import React from 'react'
 import { Box, Button, Modal, Typography, TextField, List, ListItem, ListItemText, Divider, IconButton, Grid2, Paper } from '@mui/material'
 import { Add, Close } from '@mui/icons-material'
-import wishlistCategories from '../../data/categories'
 
 const AddLikesModal = ({ open, handleClose, type, values, onSave }) => {
-  const predefinedItems = wishlistCategories
-  
+  const [predefinedItems, setPredefinedItems] = React.useState([])
+  const [unableToFetchCategories, setUnableToFetchMessage] = React.useState(false)
+
+  React.useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(`https://api.wishify.ca/categories`)
+        if (!response.ok) {
+          throw new Error('Failed to fetch categories')
+        }
+        const data = await response.json()
+        setPredefinedItems(data)
+      } catch (error) {
+        console.error("Error fetching categories: ", error.message)
+        setUnableToFetchMessage(true)
+      }
+    }
+
+    fetchCategories()
+  }, [])
+
   const [itemsLeft, setItemsLeft] = React.useState(0)
   const [items, setItems] = React.useState([])
   const [itemsToAdd, setItemsToAdd] = React.useState([])
   const [search, setSearch] = React.useState('')
 
   React.useEffect(() => {
-    setItems(values)
-    setItemsLeft(12 - values.length)
+    const filteredItems = values.filter(item => (type === "Likes" ? item.love : !item.love))
+
+    setItems(filteredItems)
+    setItemsLeft(12 - filteredItems.length)
   }, [values])
 
   const handleSave = () => {
     setItems((prev) => {
       const updatedItems = [...prev, ...itemsToAdd];
-      onSave(updatedItems);
+      onSave(itemsToAdd, type.toLowerCase());
       return updatedItems;
     });
 
@@ -45,6 +65,7 @@ const AddLikesModal = ({ open, handleClose, type, values, onSave }) => {
   const handleCancel = () => {
     setItemsToAdd([])
     setItemsLeft(12 - items.length)
+    setSearch('')
     handleClose()
   }
 
@@ -71,6 +92,12 @@ const AddLikesModal = ({ open, handleClose, type, values, onSave }) => {
         You can select {itemsLeft} more {itemsLeft === 1 ? type.toLowerCase().slice(0, -1) : type.toLowerCase()}.
       </Typography>
 
+      {unableToFetchCategories && (
+        <div className={`response-message error`}>
+          There was an error fetching the categories. Please refresh the page and try again later.
+        </div>
+      )}
+
       <TextField
         fullwidth
         variant="outlined"
@@ -86,12 +113,16 @@ const AddLikesModal = ({ open, handleClose, type, values, onSave }) => {
           <Paper sx={{ height: 200, overflowY: 'auto', p: 1, width: 200, minWidth: 200 }}>
             <List sx={{ width: '100%' }}>
               {predefinedItems
-                .filter((item) => !items.includes(item) && !itemsToAdd.includes(item))
-                .filter((item) => item.toLowerCase().includes(search.toLowerCase()))
+                .filter((item) => 
+                  !itemsToAdd.some((value) => value.name === item.name))
+                .filter((item) =>
+                  !values.some((value) => value.name === item.name))
+                .filter((item) =>
+                  item.name.toLowerCase().includes(search.toLowerCase()))
                 .map((item) => (
-                  <ListItem key={item} button onClick={() => handleAddItem(item)}>
+                  <ListItem key={item.id} button onClick={() => handleAddItem(item)}>
                     <ListItemText
-                      primary={item}
+                      primary={item.name}
                       sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
                     />
                   </ListItem>
@@ -107,13 +138,13 @@ const AddLikesModal = ({ open, handleClose, type, values, onSave }) => {
             {itemsToAdd.length > 0 ? (
               <List sx={{ width: '100%' }}>
                 {itemsToAdd.map((item) => (
-                  <ListItem key={item} secondaryAction={
+                  <ListItem key={item.id} secondaryAction={
                     <IconButton edge="end" onClick={() => handleRemoveItem(item)}>
                       <Close />
                     </IconButton>
                   }>
                     <ListItemText 
-                      primary={item} 
+                      primary={item.name} 
                       sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
                     />
                   </ListItem>

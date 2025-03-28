@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { NavLink } from "react-router-dom";
-import { AiFillGift, AiOutlinePlus, AiOutlineUser } from 'react-icons/ai';
+import { AiFillGift, AiOutlinePlus, AiOutlineUser, AiFillQuestionCircle } from 'react-icons/ai';
 import { Wishlist } from '../types/types';
 import { WishlistItem } from '../types/types';
 import CreateItemDialog from './CreateItemDialog';
 import ProfileMenu from './ProfileMenu';
-import '../components/Navbarlanding/landingheader.css';
+import HelpMenu from './HelpMenu';
+import '../components/landingheader.css';
 
 const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLoggedIn: (val: boolean)=>void, page: string }) => {
   interface NavItem {
@@ -25,7 +26,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
   const [loading, setLoading] = useState(false);
   const [newItem, setNewItem] = useState<Partial<WishlistItem>>({});
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  
+  const [isHelpMenuOpen, setIsHelpMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   const fetchWishlists = () => {
@@ -84,6 +85,19 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
                   <AiOutlinePlus /> Add Wish
                 </button>
                 
+                {/* Help Icon with Click Event */}
+                <div className="relative">
+                  <AiFillQuestionCircle
+                    className="text-2xl cursor-pointer"
+                    onClick={() => setIsHelpMenuOpen(!isHelpMenuOpen)}
+                  />
+                  
+                  {/* Help Menu Component */}
+                  {isHelpMenuOpen && <HelpMenu
+                    closeMenu={() => setIsHelpMenuOpen(false)} />}
+                  
+                </div>
+
                 {/* Profile Icon with Click Event */}
                 <div className="relative">
                   <AiOutlineUser

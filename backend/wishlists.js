@@ -3,9 +3,8 @@ const router = express.Router();
 const db = require('./db');
 const { v4: uuidv4 } = require('uuid');
 const authenticate = require('./middleware/authenticate');
-const nodemailer = require('nodemailer');
 const createNotification = require("./middleware/createNotification");
-require("dotenv").config();
+const sendEmail = require("./middleware/sendEmail");
 
 // localhost:3000/wishlists?page=1&pageSize=10
 // get list of wishlists from a member or is in an event 
@@ -145,11 +144,12 @@ router.get('/:wishlistId', authenticate, async (req, res, next) => {
       FROM items i
       JOIN wishlist_members wm ON i.member_id = wm.id
       JOIN users u ON wm.user_id = u.id
-      WHERE wm.wishlists_id = $1;`, [wishlist.id]);
+      WHERE wm.wishlists_id = $1
+      ORDER BY i.priority;`, [wishlist.id]);
 
-      let contributionResult = null;
+    let contributionResult = null;
 
-      if(!wishlist.blind){  // return the contributions but only if user is not blind 
+    if (!wishlist.blind) {  // return the contributions but only if user is not blind 
       contributionResult = await db.query(
         `SELECT c.id, c.item_id, c.quantity, c.purchased, c.note, c.dateUpdated, c.dateCreated, u.displayName AS user_displayName, u.id AS user_id
         FROM contributions c
@@ -160,9 +160,15 @@ router.get('/:wishlistId', authenticate, async (req, res, next) => {
       );
     }
 
-    
-        
-    res.status(200).json({ wishlist, items: itemsResult.rows, contributions: contributionResult.rows });
+    const memberResult = await db.query(`
+            SELECT u.id, u.displayName, u.email, u.picture, wm.blind, wm.owner
+            FROM users u
+            JOIN wishlist_members wm ON u.id = wm.user_id
+            WHERE wm.wishlists_id = $1;
+        `, [wishlistId]);
+
+
+    res.status(200).json({ wishlist, items: itemsResult.rows, contributions: contributionResult.rows, members: memberResult.rows });
   } catch (error) {
     console.error("Error fetching wishlists:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -225,7 +231,7 @@ router.put('/:wishlistId', authenticate, async (req, res, next) => {
 
   // make sure user is the owner of the wishlist before allowing editing
   try {
-    
+
     const wishlistCheck = await db.query(`
       SELECT id FROM wishlists WHERE id = $1;
     `, [wishlistId]);
@@ -233,8 +239,8 @@ router.put('/:wishlistId', authenticate, async (req, res, next) => {
     if (wishlistCheck.rows.length === 0) {
       return res.status(404).json({ error: "Wishlist not found." });
     }
-    
-    
+
+
     const ownershipCheck = await db.query(`
       SELECT m.owner
       FROM wishlist_members m
@@ -313,39 +319,42 @@ router.post('/:wishlistId/duplicate', authenticate, async (req, res, next) => {
 
       let highestNum = 0;
       for (const existingName of existingNames) {
-      
+
         const match = existingName.match(regex);
         if (match) {
           highestNum = Math.max(highestNum, parseInt(match[1]));
         }
       }
-      if(highestNum > 0){
+      if (highestNum > 0) {
         newName = `${newName} (${highestNum + 1})`
-      }else{
+      } else {
         newName = `${newName} (2)`;   // if there is only one duplicate and it is called: name 
       }
     }
+
+    const shareToken = uuidv4(); // need to make a unique share token for this 
 
     await db.query("BEGIN"); // Start a transaction
 
     // Create the duplicated wishlist
     const newWishlistResult = await db.query(
-      `INSERT INTO wishlists (event_id, name, description, image, deadline, dateCreated, dateUpdated) 
-       VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING id;`,
-      [event_id, newName, description, image, deadline]
+      `INSERT INTO wishlists (event_id, name, description, image, deadline, share_token, dateCreated) 
+       VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING *;`,
+      [event_id, newName, description, image, deadline, shareToken]
     );
 
-    const newWishlistId = newWishlistResult.rows[0].id;
-   
+    const newWishlist = newWishlistResult.rows[0];
+    const newWishlistId = newWishlist.id;
+
     // make creator owner
     const membersResult = await db.query(
       `INSERT INTO wishlist_members (user_id, wishlists_id, blind, owner, dateCreated)
        VALUES ($1, $2, false, true, NOW()) RETURNING id;`,
-      [user_id,newWishlistId]
+      [user_id, newWishlistId]
     );
 
     const newMemberId = membersResult.rows[0].id;
-    
+
     /*
     //  Copy wishlist members (keeping same roles)
     const membersResult = await db.query(
@@ -363,11 +372,11 @@ router.post('/:wishlistId/duplicate', authenticate, async (req, res, next) => {
        FROM items WHERE member_id IN (SELECT id FROM wishlist_members WHERE wishlists_id = $2) RETURNING id`,
       [newMemberId, wishlistId] // Assign to the new member_id of the current user
     );
-    
+
     await db.query("COMMIT"); // Commit the transaction
 
     res.status(201).json({
-      wishlist_id: newWishlistId,
+      wishlist: newWishlist,
       message: "Wishlist duplicated successfully!"
     });
 
@@ -387,7 +396,7 @@ router.get('/:wishlistId/members', authenticate, async (req, res) => {
 
   try {
     const result = await db.query(`
-          SELECT u.id, u.displayName, u.email, u.picture
+          SELECT u.id, u.displayName, u.email, u.picture, wm.blind, wm.owner
           FROM users u
           JOIN wishlist_members wm ON u.id = wm.user_id
           WHERE wm.wishlists_id = $1;
@@ -461,7 +470,7 @@ router.post('/:id/members', authenticate, async (req, res) => {
   } catch (error) {
 
     // Handle duplicate membership error
-    if (error.code === "23505") { 
+    if (error.code === "23505") {
       return res.status(409).json({ message: "user is already a member" });
     }
 
@@ -474,7 +483,7 @@ router.post('/:id/members', authenticate, async (req, res) => {
 // add a member to an wishlist with the share token
 // /wishlists/members
 router.post('/members', authenticate, async (req, res) => {
-  
+
   const authUserId = req.user.userId; // Get user ID from the authenticated token
   const { share_token, blind, owner } = req.body;  // the user provides the share_token of the wishlist to add
 
@@ -485,7 +494,7 @@ router.post('/members', authenticate, async (req, res) => {
   try {
 
     const wishlistCheck = await db.query(`
-      SELECT id FROM wishlists WHERE share_token = $1;
+      SELECT * FROM wishlists WHERE share_token = $1;
     `, [share_token]);
 
     if (wishlistCheck.rows.length === 0) {
@@ -493,6 +502,7 @@ router.post('/members', authenticate, async (req, res) => {
     }
 
     const wishlistId = wishlistCheck.rows[0].id;
+    const eventId = wishlistCheck.rows[0].event_id;
 
     // Check if the user is already a member of the wishlist
     const memberCheck = await db.query(`
@@ -503,23 +513,30 @@ router.post('/members', authenticate, async (req, res) => {
       return res.status(409).json({ message: "user is already a member", id: wishlistId });
     }
 
-    // Add the user to the wishlist
+    // Add the user to the wishlist with 
     /*
     await db.query(`
           INSERT INTO wishlist_members (wishlists_id, user_id, blind, owner, dateCreated)
           VALUES ($1, $2, COALESCE($3, false), COALESCE($4, false), NOW());`, [wishlistId, authUserId, blind, owner]);
     */
 
+    // add the 
     await db.query(`
       INSERT INTO wishlist_members (wishlists_id, user_id, blind, owner, dateCreated)
-      VALUES ($1, $2, false, true, NOW());`, [wishlistId, authUserId]);
+      VALUES ($1, $2, false, false, NOW()) ON CONFLICT DO NOTHING;`, [wishlistId, authUserId]);
 
-
-    res.status(201).json({ message: "User added to the wishlist successfully" });
+      /*
+    // add the event membership
+    await db.query(`
+      INSERT INTO event_members (event_id, user_id, owner, dateCreated)
+      VALUES ($1, $2, false, NOW()) ON CONFLICT DO NOTHING;`, [eventId, authUserId]);
+    */
+      
+    res.status(201).json({ message: "User added to the wishlist successfully", id: wishlistId });
   } catch (error) {
 
     // Handle duplicate membership error
-    if (error.code === "23505") { 
+    if (error.code === "23505") {
       return res.status(409).json({ message: "user is already a member", id: wishlistId });
     }
 
@@ -551,7 +568,7 @@ router.delete('/:id/members', authenticate, async (req, res) => {
     if (wishlistCheck.rows.length === 0) {
       return res.status(404).json({ error: "Wishlist not found." });
     }
-    
+
     // make sure user is the owner of the wishlist before allowing editing of others memberships
     const ownershipCheck = await db.query(`
       SELECT m.owner
@@ -669,7 +686,8 @@ router.get('/:wishlistId/items', authenticate, async (req, res) => {
       FROM items i
       JOIN wishlist_members wm ON i.member_id = wm.id
       JOIN users u ON wm.user_id = u.id
-      WHERE wm.wishlists_id = $1;`, [wishlistId]);
+      WHERE wm.wishlists_id = $1
+      ORDER BY i.priority;`, [wishlistId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "No items found for this wishlist" });
@@ -704,10 +722,11 @@ router.get('/share/:token', async (req, res) => {
     // Get all items
     const itemsResult = await db.query(`
       SELECT i.id, i.name, i.description, i.url, i.image, i.quantity, i.price, i.priority, i.dateUpdated, i.dateCreated, u.displayName AS user_displayName, u.id AS user_id 
-      FROM items i
-      JOIN wishlist_members wm ON i.member_id = wm.id
-      JOIN users u ON wm.user_id = u.id
-      WHERE wm.wishlists_id = $1;`, [wishlist.id]);
+      FROM items i 
+      JOIN wishlist_members wm ON i.member_id = wm.id 
+      JOIN users u ON wm.user_id = u.id 
+      WHERE wm.wishlists_id = $1 
+      ORDER BY i.priority;`, [wishlist.id]);
 
     res.status(200).json({ wishlist, items: itemsResult.rows });
   } catch (error) {
@@ -723,16 +742,16 @@ router.get('/share/:token', async (req, res) => {
 router.post('/share', authenticate, async (req, res) => {
 
   const userId = req.user.userId; // Get user ID from authenticated token
-  const { id, email, owner, blind } = req.body;
+  const { wishlist_id, email, blind } = req.body;
 
-  if(!id || !email){
-    return res.status(400).json({ message: "id and emailare required" }); 
+  if (!wishlist_id || !email) {
+    return res.status(400).json({ message: "wishlist_id and email are required" });
   }
 
   try {
     const wishlistCheck = await db.query(`
       SELECT id,share_token,name FROM wishlists WHERE id = $1;
-    `, [id]);
+    `, [wishlist_id]);
 
     if (wishlistCheck.rows.length === 0) {
       return res.status(404).json({ error: "Wishlist not found." });
@@ -742,71 +761,46 @@ router.post('/share', authenticate, async (req, res) => {
     const userCheck = await db.query(`
       SELECT id FROM users WHERE email = $1;
     `, [email]);
-    
-      // get name of person doing inviting:
-      const fromUserResult = await db.query(`
+
+    // get name of person doing inviting:
+    const fromUserResult = await db.query(`
         SELECT displayName FROM users WHERE id = $1;
       `, [userId]);
 
-      const fromUser = fromUserResult.rows[0].displayname;
-      const memberUserId = userCheck.rows[0].id;
+    const fromUser = fromUserResult.rows[0].displayname;
 
-      // if the user has an account add them as a member
+    // if the user has an account add them as a member
     if (userCheck.rows.length > 0) {
       // User exists, add them as a wishlist member
-      
+
+      const memberUserId = userCheck.rows[0].id;
+
       await db.query(`
         INSERT INTO wishlist_members (user_id, wishlists_id, owner, blind, dateCreated, dateUpdated)
         VALUES ($1, $2, false, false, NOW(), NOW()) ON CONFLICT DO NOTHING;
-      `, [memberUserId, id]);
+      `, [memberUserId, wishlist_id]);
 
       // send notification:
-      await createNotification( [memberUserId], "You've been invited to a wishlist!", `${fromUser} has invited you to the wishlist: ${wishlistCheck.rows[0].name}`, `/wishlists/${wishlistCheck.rows[0].id}` );
+      await createNotification([memberUserId], "You've been invited to a wishlist!", `${fromUser} has invited you to the wishlist: ${wishlistCheck.rows[0].name}`, `/wishlists/${wishlistCheck.rows[0].id}`);
 
       return res.status(200).json({ message: "User added to wishlist." });
-    }else{
+    } else {
       // else send an email to that user with an invite link 
-      await sendInviteEmail(email, wishlistCheck.rows[0].share_token, fromUser);
+
+      const inviteLink = `https://wishify.ca/register?wishlist=${wishlistCheck.rows[0].share_token}`;
+
+      await sendEmail(email,
+        `${fromUser} has invited you to collaborate on their wishlist!`,
+        `${fromUser} has invited you to collaborate on their wishlist! Click here to join: ${inviteLink} or copy and paste this link into your browser: ${inviteLink} Best, The Wishify Team`,
+        `<p><strong>${fromUser}</strong> has invited to their wishlist! Click <a href="${inviteLink}">here</a> to join. <br> Or copy and paste this link into your browser: ${inviteLink}</p><p>Best, The Wishify Team</p>`);
     }
-    
-    return res.status(200).json({ message: "Invitation sent." }); 
+
+    return res.status(200).json({ message: "Invitation sent." });
   } catch (error) {
     console.error("Error fetching shared wishlist:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
-
-// send the email to user
-async function sendInviteEmail(email, share_token, fromUser) {
-  const transporter = nodemailer.createTransport({
-    service: "gmail", // Use your email provider
-    auth: {
-      user: process.env.EMAIL_USER,  
-      pass: process.env.EMAIL_APPPASSWORD
-    }
-  });
-
-  const inviteLink = `https://wishify.ca/register?wishlist=${share_token}`;
-
-  const mailOptions = {
-    from: "Wishify",
-    to: email,
-    subject: `${fromUser} has invited you to collaborate on their wishlist!`,
-    text: `${fromUser} has invited you to collaborate on their wishlist! Click here to join: ${inviteLink} or copy and paste this link into your browser: ${inviteLink} Best, The Wishify Team`,
-    html: `<p><strong>${fromUser}</strong> has invited to their wishlist! Click <a href="${inviteLink}">here</a> to join. <br> Or copy and paste this link into your browser: ${inviteLink}</p><p>Best, The Wishify Team</p>`
-  };
-
-//  try {
-    await transporter.sendMail(mailOptions);
-    console.log(`Invitation email sent to ${email}`);
-  //} catch (error) {
-  //  console.error("Error sending email:", error);
- // }
-
-}
-
-
 
 
 

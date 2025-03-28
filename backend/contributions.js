@@ -124,10 +124,16 @@ router.post('/', authenticate, async (req, res, next) => {
   try {
     // get user membership from item id
     const wishlistResult = await db.query(
-      `SELECT wm.wishlists_id FROM wishlist_members wm
+      `SELECT wm.wishlists_id, u.displayName AS user_displayName, u.id AS user_id
+      FROM wishlist_members wm
         JOIN items i ON wm.id = i.member_id
+        JOIN users u ON wm.user_id = u.id
         WHERE i.id = $1;`,
       [item_id]);
+
+      if (wishlistResult.rows.length === 0) {
+        return res.status(404).json({ error: "item cannot be found" });
+      }
 
     const wishlistId = wishlistResult.rows[0].wishlists_id;
 
@@ -149,7 +155,12 @@ router.post('/', authenticate, async (req, res, next) => {
         VALUES ($1, $2, $3, COALESCE($4, false), $5, NOW()) RETURNING id, item_id, quantity, purchased, note, dateUpdated, dateCreated;
       `, [item_id, member_id, quantity, purchased, note]);
 
-    res.status(201).json({ message: "contribution created successfully", contribution: result.rows[0] });
+      const contribution_results = result.rows[0];
+      const user_displayname = wishlistResult.rows[0].user_displayName;
+      const user_id = userId;
+
+    //res.status(201).json({ message: "contribution created successfully", contribution: result.rows[0] });
+    res.status(201).json({ message: "contribution created successfully", contribution: {...contribution_results, user_displayname, user_id} });
 
   } catch (error) {
 
