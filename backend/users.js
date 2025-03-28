@@ -104,6 +104,13 @@ router.put('/', authenticate, async (req, res) => {
     res.status(200).json({ message: "Profile updated", user: result.rows[0] });
 
   } catch (error) {
+
+      // Handle duplicate email error
+      // error code 23505 means unique constraint violated.
+      if (error.code === "23505") {
+          return res.status(409).json({ message: "Email is already in use" });
+      }
+
     console.error("Error updating user:", error);
     res.status(500).json({ message: "Error updating user profile" });
   }
