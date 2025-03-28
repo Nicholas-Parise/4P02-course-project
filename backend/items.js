@@ -299,11 +299,11 @@ router.put('/:itemId?', authenticate, async (req, res, next) => {
             name = COALESCE($1, name),
             description = COALESCE($2, description),
             url = COALESCE($3, url),
-            quantity = COALESCE($5, quantity),
-            price = COALESCE($6, price),
-            priority = COALESCE($7, priority),
+            quantity = COALESCE($4, quantity),
+            price = COALESCE($5, price),
+            priority = COALESCE($6, priority),
             dateUpdated = NOW()
-        WHERE id = $8
+        WHERE id = $7
         RETURNING *;
       `, [name, description, url, quantity, price, priority, itemId]);
 
