@@ -91,7 +91,7 @@ router.post('/', authenticate, async (req, res, next) => {
     // Step 1: Insert wishlist
     const wishlistResult = await db.query(
       `INSERT INTO wishlists (event_id, name, description, image, deadline, share_token, dateCreated, dateUpdated) 
-          VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW()) RETURNING id`,
+          VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW()) RETURNING *`,
       [event_id, newName, description, image, deadline, shareToken]
     );
 

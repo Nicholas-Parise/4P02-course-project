@@ -50,7 +50,7 @@ router.post('/', authenticate, async (req, res, next) => {
     // Step 1: Insert events
     const eventResult = await db.query(
         `INSERT INTO events (name, description, url, addr, city, image, deadline, dateCreated, dateUpdated) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW()) RETURNING id`,
+        VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW()) RETURNING *`,
         [name, description, url, addr, city, image, deadline]
     );
 
