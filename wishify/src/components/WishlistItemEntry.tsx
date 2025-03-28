@@ -105,7 +105,6 @@ const WishlistItemEntry = ({ item, editWishlistItem, sortBy, reservations, onRes
         id={id.toString()}
         ref={setNodeRef}
         style={style}
-        id={id.toString()}
         className="bg-white shadow-md p-4 flex items-center space-x-4 cursor-pointer rounded-[25px] border-2 border-[#5651e5]"
         onClick={() => setIsModalOpen(true)}
       >

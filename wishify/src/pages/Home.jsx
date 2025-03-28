@@ -86,71 +86,6 @@ const ItemDisplay = ({ item }) => {
 
 
 const Home = () => {
-  // all the get requests to the backend should be done here
-  const [wishlists, setWishlists] = useState([])
-  const [contributions, setContributions] = useState([])
-
-  const backendLoading = () => {
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-          // First GET request: Fetch wishlists
-          const wishlistUrl = `https://api.wishify.ca/wishlists`;
-          const token = localStorage.getItem('token') || '';
-          const wishlistResponse = await fetch(wishlistUrl, {
-            method: 'get',
-            headers: new Headers({
-              'Authorization': "Bearer " + token,
-            }),
-          });
-  
-          if (!wishlistResponse.ok) {
-            throw new Error(`Error fetching wishlists: ${wishlistResponse.statusText}`);
-          }
-  
-          const wishlistsData = await wishlistResponse.json();
-          setWishlists(wishlistsData);
-          console.log("Wishlists:", wishlistsData);
-  
-          // Second GET request: Fetch contributions
-          const contributionsUrl = `https://api.wishify.ca/contributions`;
-          const contributionsResponse = await fetch(contributionsUrl, {
-            method: 'get',
-            headers: new Headers({
-              'Authorization': "Bearer " + token,
-            }),
-          });
-  
-          if (!contributionsResponse.ok) {
-            throw new Error(`Error fetching contributions: ${contributionsResponse.statusText}`);
-          }
-  
-          const contributionsData = await contributionsResponse.json();
-          console.log("Contributions:", contributionsData);
-  
-          // Process contributions
-          let newContributions = contributionsData;
-          newContributions = newContributions.map((contribution) => ({
-            ...contribution,
-            wishlist_name:
-              contribution.wishlist_name ||
-              wishlistsData.find((wishlist) => wishlist.id === contribution.wishlists_id)?.name ||
-              "Unknown",
-          }));
-          newContributions = newContributions.sort((a, b) => 
-            a.wishlist_name.localeCompare(b.wishlist_name) // Sort alphabetically by wishlist_name
-          );
-  
-          setContributions(newContributions);
-          console.log("Processed Contributions:", newContributions);
-        } catch (error) {
-          console.error("Error in backendLoading:", error);
-        }
-      };
-  
-      fetchData();
-    }, []);
-  };
 
   const [wishlists, setWishlists] = useState([])
 
@@ -203,6 +138,56 @@ const Home = () => {
           })
     }, [])
   }
+
+  const [contributions, setContributions] = useState([])
+
+  const contributionLoading = () => {
+    let token = localStorage.getItem('token') || ''
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+  
+          //GET request: Fetch contributions
+          const contributionsUrl = `https://api.wishify.ca/contributions`;
+          const contributionsResponse = await fetch(contributionsUrl, {
+            method: 'get',
+            headers: new Headers({
+              'Authorization': "Bearer " + token,
+            }),
+          });
+  
+          if (!contributionsResponse.ok) {
+            throw new Error(`Error fetching contributions: ${contributionsResponse.statusText}`);
+          }
+  
+          const contributionsData = await contributionsResponse.json();
+          console.log("Contributions:", contributionsData);
+  
+          // Process contributions
+          let newContributions = contributionsData;
+          console.log("wishlists: ")
+          console.log(wishlists)
+          newContributions = newContributions.map((contribution) => ({
+            ...contribution,
+            wishlist_name:
+              contribution.wishlist_name ||
+              wishlists.find((wishlist) => wishlist.id === contribution.wishlists_id)?.name ||
+              "Unknown",
+          }));
+          newContributions = newContributions.sort((a, b) => 
+            a.wishlist_name.localeCompare(b.wishlist_name) // Sort alphabetically by wishlist_name
+          );
+  
+          setContributions(newContributions);
+          console.log("Processed Contributions:", newContributions);
+        } catch (error) {
+          console.error("Error in backendLoading:", error);
+        }
+      };
+  
+      fetchData();
+    }, [wishlists]);
+  };
 
   const [user, setUser] = React.useState({
       email: '',
@@ -270,9 +255,10 @@ const Home = () => {
   }
       
 
-  backendLoading()
+  
   wishlistLoading()
   eventListLoading()
+  contributionLoading()
   userLoading()
   notificationsLoading()
 
