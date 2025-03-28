@@ -1,8 +1,8 @@
 import React from 'react'
 import { Modal, Button, TextField, Typography, Box, Divider } from '@mui/material'
 
-const EditDisplayNameModal = ({ open, handleClose, value, onSave }) => {
-  const [inputValue, setInputValue] = React.useState("")
+const EditPictureModal = ({ open, handleClose, value, onSave }) => {
+  const [inputValue, setInputValue] = React.useState(value)
 
   React.useEffect(() => {
     if (open) {
@@ -12,7 +12,7 @@ const EditDisplayNameModal = ({ open, handleClose, value, onSave }) => {
 
   const handleSave = () => {
     onSave(inputValue)
-    handleClose();
+    handleClose()
   }
 
   const handleSubmit = (e) => {
@@ -36,28 +36,23 @@ const EditDisplayNameModal = ({ open, handleClose, value, onSave }) => {
   return (
     <Modal open={open} onClose={handleClose}>
       <Box sx={style}>
-        <Typography variant='h6' sx={{ textAlign: 'center', fontWeight: 'bold', color: '#5651e5' }}>Edit Display Name</Typography>
+        <Typography variant='h6' sx={{ textAlign: 'center', fontWeight: 'bold', color: '#5651e5' }}>Edit Picture</Typography>
 
         <Divider sx={{mb: 2}} />
 
-        <Typography variant='body1' mb={2}>
-          Your current display name is <strong>{value}</strong>
-        </Typography>
-
         <Typography variant='body2' mb={2}>
-          Your display name is what other users will see when collaborating on wishlists and events.
+          Choose a profile picture that best represents you! You can upload a picture to your profile buy submitting a link to an image.
         </Typography>
 
         <Divider sx={{mb: 2}} />
 
         <form onSubmit={handleSubmit}>
           <TextField
-            label="Enter new display name"
+            label="Image URL"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             fullWidth
             variant='outlined'
-            slotProps={{ htmlInput: { maxLength: 30 } }}
             sx={{mb: 2}}
           />
 
@@ -88,4 +83,4 @@ const EditDisplayNameModal = ({ open, handleClose, value, onSave }) => {
   )
 }
 
-export default EditDisplayNameModal;
+export default EditPictureModal;

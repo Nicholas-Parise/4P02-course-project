@@ -4,6 +4,7 @@ import { Add, Close } from '@mui/icons-material'
 
 const AddLikesModal = ({ open, handleClose, type, values, onSave }) => {
   const [predefinedItems, setPredefinedItems] = React.useState([])
+  const [unableToFetchCategories, setUnableToFetchMessage] = React.useState(false)
 
   React.useEffect(() => {
     const fetchCategories = async () => {
@@ -15,7 +16,8 @@ const AddLikesModal = ({ open, handleClose, type, values, onSave }) => {
         const data = await response.json()
         setPredefinedItems(data)
       } catch (error) {
-        console.error("Error fetching categories: ", error)
+        console.error("Error fetching categories: ", error.message)
+        setUnableToFetchMessage(true)
       }
     }
 
@@ -63,6 +65,7 @@ const AddLikesModal = ({ open, handleClose, type, values, onSave }) => {
   const handleCancel = () => {
     setItemsToAdd([])
     setItemsLeft(12 - items.length)
+    setSearch('')
     handleClose()
   }
 
@@ -88,6 +91,12 @@ const AddLikesModal = ({ open, handleClose, type, values, onSave }) => {
       <Typography variant="body1">
         You can select {itemsLeft} more {itemsLeft === 1 ? type.toLowerCase().slice(0, -1) : type.toLowerCase()}.
       </Typography>
+
+      {unableToFetchCategories && (
+        <div className={`response-message error`}>
+          There was an error fetching the categories. Please refresh the page and try again later.
+        </div>
+      )}
 
       <TextField
         fullwidth

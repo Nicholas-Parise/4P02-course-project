@@ -4,6 +4,8 @@ import { Modal, Button, TextField, Typography, Box, Divider } from '@mui/materia
 const EditEmailModal = ({ open, handleClose, value, onSave }) => {
   const [inputValue, setInputValue] = React.useState("")
   const [passwordValue, setPasswordValue] = React.useState("")
+  const [responseMessage, setResponseMessage] = React.useState("");
+  const [responseType, setResponseType] = React.useState(""); 
 
   React.useEffect(() => {
     if (open) {
@@ -13,13 +15,29 @@ const EditEmailModal = ({ open, handleClose, value, onSave }) => {
   }, [open])
 
   const handleSave = () => {
+    if (!isValidInput()) {
+      setResponseMessage("Please enter a valid email address and password.")
+      setResponseType("error")
+      return
+    }
     onSave(inputValue)
-    handleClose();
+    handleCancel();
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
     handleSave()
+  }
+
+  const handleCancel = () => {
+    setResponseMessage("")
+    setResponseType("")
+    handleClose()
+  }
+
+  const isValidInput = () => {
+    return (/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(inputValue) &&
+        passwordValue.length >= 8)
   }
 
   const style = {
@@ -36,7 +54,7 @@ const EditEmailModal = ({ open, handleClose, value, onSave }) => {
   }
 
   return (
-    <Modal open={open} onClose={handleClose}>
+    <Modal open={open} onClose={handleCancel}>
       <Box sx={style}>
         <Typography variant='h6' sx={{ textAlign: 'center', fontWeight: 'bold', color: '#5651e5' }}>Edit Email Address</Typography>
 
@@ -60,6 +78,7 @@ const EditEmailModal = ({ open, handleClose, value, onSave }) => {
             onChange={(e) => setInputValue(e.target.value)}
             fullWidth
             variant='outlined'
+            slotProps={{ htmlInput: { maxLength: 256 } }}
             sx={{mb: 2}}
           />
 
@@ -70,8 +89,15 @@ const EditEmailModal = ({ open, handleClose, value, onSave }) => {
             onChange={(e) => setPasswordValue(e.target.value)}
             fullWidth
             variant='outlined'
+            slotProps={{ htmlInput: { maxLength: 64 } }}
             sx={{mb: 2}}
           />
+
+          {responseMessage && (
+            <div style={{ marginBottom: '10px'}} className={`response-message ${responseType}`}>
+              {responseMessage}
+            </div>
+          )}
 
           <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
             <Button
@@ -88,7 +114,7 @@ const EditEmailModal = ({ open, handleClose, value, onSave }) => {
             </Button>
             <Button
               variant="outlined"
-              onClick={handleClose}
+              onClick={handleCancel}
               sx={{ borderRadius: '25px', borderColor: '#5651e5', color: '#5651e5' }}
             >
               Cancel
