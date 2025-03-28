@@ -144,3 +144,47 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO wishify;
 -- Ensure future tables also get permissions
 ALTER DEFAULT PRIVILEGES IN SCHEMA public 
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO wishify;
+
+
+CREATE OR REPLACE FUNCTION delete_empty_wishlist()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Check if the wishlist still has any members
+    IF NOT EXISTS (
+        SELECT 1 FROM wishlist_members WHERE wishlists_id = OLD.wishlists_id
+    ) THEN
+        -- Delete the wishlist if no members are left
+        DELETE FROM wishlists WHERE id = OLD.wishlists_id;
+    END IF;
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER trigger_delete_empty_wishlist
+AFTER DELETE ON wishlist_members
+FOR EACH ROW
+EXECUTE FUNCTION delete_empty_wishlist();
+
+
+
+CREATE OR REPLACE FUNCTION delete_empty_event()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Check if the event still has any members
+    IF NOT EXISTS (
+        SELECT 1 FROM event_members WHERE event_id = OLD.event_id
+    ) THEN
+        -- Delete the event if no members are left
+        DELETE FROM events WHERE id = OLD.event_id;
+    END IF;
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER trigger_delete_empty_event
+AFTER DELETE ON event_members
+FOR EACH ROW
+EXECUTE FUNCTION delete_empty_event();
+

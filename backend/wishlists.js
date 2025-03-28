@@ -160,9 +160,15 @@ router.get('/:wishlistId', authenticate, async (req, res, next) => {
       );
     }
 
+    const memberResult = await db.query(`
+            SELECT u.id, u.displayName, u.email, u.picture, wm.blind, wm.owner
+            FROM users u
+            JOIN wishlist_members wm ON u.id = wm.user_id
+            WHERE wm.wishlists_id = $1;
+        `, [wishlistId]);
 
 
-    res.status(200).json({ wishlist, items: itemsResult.rows, contributions: contributionResult.rows });
+    res.status(200).json({ wishlist, items: itemsResult.rows, contributions: contributionResult.rows, members: memberResult.rows });
   } catch (error) {
     console.error("Error fetching wishlists:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -390,7 +396,7 @@ router.get('/:wishlistId/members', authenticate, async (req, res) => {
 
   try {
     const result = await db.query(`
-          SELECT u.id, u.displayName, u.email, u.picture
+          SELECT u.id, u.displayName, u.email, u.picture, wm.blind, wm.owner
           FROM users u
           JOIN wishlist_members wm ON u.id = wm.user_id
           WHERE wm.wishlists_id = $1;
@@ -488,7 +494,7 @@ router.post('/members', authenticate, async (req, res) => {
   try {
 
     const wishlistCheck = await db.query(`
-      SELECT id FROM wishlists WHERE share_token = $1;
+      SELECT * FROM wishlists WHERE share_token = $1;
     `, [share_token]);
 
     if (wishlistCheck.rows.length === 0) {
@@ -496,6 +502,7 @@ router.post('/members', authenticate, async (req, res) => {
     }
 
     const wishlistId = wishlistCheck.rows[0].id;
+    const eventId = wishlistCheck.rows[0].event_id;
 
     // Check if the user is already a member of the wishlist
     const memberCheck = await db.query(`
@@ -506,19 +513,26 @@ router.post('/members', authenticate, async (req, res) => {
       return res.status(409).json({ message: "user is already a member", id: wishlistId });
     }
 
-    // Add the user to the wishlist
+    // Add the user to the wishlist with 
     /*
     await db.query(`
           INSERT INTO wishlist_members (wishlists_id, user_id, blind, owner, dateCreated)
           VALUES ($1, $2, COALESCE($3, false), COALESCE($4, false), NOW());`, [wishlistId, authUserId, blind, owner]);
     */
 
+    // add the 
     await db.query(`
       INSERT INTO wishlist_members (wishlists_id, user_id, blind, owner, dateCreated)
-      VALUES ($1, $2, false, true, NOW());`, [wishlistId, authUserId]);
+      VALUES ($1, $2, false, false, NOW()) ON CONFLICT DO NOTHING;`, [wishlistId, authUserId]);
 
-
-    res.status(201).json({ message: "User added to the wishlist successfully" });
+      /*
+    // add the event membership
+    await db.query(`
+      INSERT INTO event_members (event_id, user_id, owner, dateCreated)
+      VALUES ($1, $2, false, NOW()) ON CONFLICT DO NOTHING;`, [eventId, authUserId]);
+    */
+      
+    res.status(201).json({ message: "User added to the wishlist successfully", id: wishlistId });
   } catch (error) {
 
     // Handle duplicate membership error
