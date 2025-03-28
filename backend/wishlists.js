@@ -95,7 +95,7 @@ router.post('/', authenticate, async (req, res, next) => {
       [event_id, newName, description, image, deadline, shareToken]
     );
 
-    const wishlist = result.rows[0];
+    const wishlist = wishlistResult.rows[0];
     const wishlist_id = wishlistResult.rows[0].id;
 
     // Step 2: Add the users membership (owner)
