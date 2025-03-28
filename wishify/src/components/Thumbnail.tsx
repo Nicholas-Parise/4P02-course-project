@@ -120,7 +120,7 @@ export const WishlistThumbnail = (props: any) => {
                 <OverlayTitle title={props.title}>{props.title}</OverlayTitle>
                 <MenuButton onClick={openWishlist}>Open</MenuButton>
                 <MenuButton onClick={props.edit}>Edit</MenuButton>
-                <MenuButton>Share</MenuButton>
+                <MenuButton onClick={props.share}>Share</MenuButton>
                 <MenuButton onClick={props.duplicate}>Duplicate</MenuButton>
             </WishlistMenu>
         )

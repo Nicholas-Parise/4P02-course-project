@@ -2,6 +2,7 @@ import React, {useState, useEffect, FormEvent} from 'react'
 import { type Wishlist } from '../types/types'
 import {CreateWishlist} from '../components/CreateButton'
 import {WishlistThumbnail} from '../components/Thumbnail'
+import ShareWishlistModal from '../components/ShareWishlistModal'
 
 import styled from '@emotion/styled'
 import ModalBox from '@mui/material/Box';
@@ -266,7 +267,20 @@ const Wishlists = () => {
           console.log(error)
       })
   }
-    
+
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+
+  const handleShare = () => {
+    if (activeOverlay) {
+      setIsShareModalOpen(true);
+    }
+  };
+
+  const handleShareModalClose = () => {
+    setIsShareModalOpen(false);
+  };
+
+  const activeWishlist = wishlists.find((wishlist) => wishlist.name === activeOverlay);
 
   return (
     <section className='bg-white border-2 border-solid border-[#5651e5] rounded-[25px]'>
@@ -282,10 +296,20 @@ const Wishlists = () => {
             title={wishlist.name}
             edit={handleEditOpen}
             duplicate={handleDuplicate}
+            share={handleShare}
             owner={"Me"}
           />
         ))}
       </WishlistContainer>
+
+      {activeWishlist && activeWishlist.share_token && (
+        <ShareWishlistModal
+        wishlistID={activeWishlist.id}
+        isOwner={activeWishlist.owner} 
+        shareToken={activeWishlist.share_token} 
+        isOpen={isShareModalOpen} 
+        setIsOpen={setIsShareModalOpen}/>
+      )}
       <h1>Shared Wishlists</h1>
       <WishlistContainer>
         <WishlistThumbnail title={"Birthday Blam's Birthday Bash (can view and contribute)"} role={"contributor"} owner={"Birthday Blam"}></WishlistThumbnail>
@@ -375,6 +399,7 @@ const Wishlists = () => {
         </Modal>
       </ModalBox>
       </Modal>
+      
     </section>
   )
 }
