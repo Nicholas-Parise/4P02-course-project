@@ -95,6 +95,7 @@ router.post('/', authenticate, async (req, res, next) => {
       [event_id, newName, description, image, deadline, shareToken]
     );
 
+    const wishlist = result.rows[0];
     const wishlist_id = wishlistResult.rows[0].id;
 
     // Step 2: Add the users membership (owner)
@@ -106,7 +107,7 @@ router.post('/', authenticate, async (req, res, next) => {
 
     await db.query("COMMIT"); // Commit the transaction
 
-    res.status(201).json({ wishlist_id, message: "Wishlist created successfully!" });
+    res.status(201).json({ wishlist, message: "Wishlist created successfully!" });
 
   } catch (error) {
     await db.query("ROLLBACK"); // Rollback if an error occurs
@@ -136,7 +137,7 @@ router.get('/:wishlistId', authenticate, async (req, res, next) => {
       return res.status(404).json({ error: "wishlist not found." });
     }
 
-    const wishlist = result.rows[0]
+    const wishlist = result.rows[0];
 
     // Get all items
     const itemsResult = await db.query(`

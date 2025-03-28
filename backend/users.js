@@ -13,7 +13,7 @@ const uploadPicture = require('./middleware/upload');
 router.get('/', authenticate, async (req, res, next) => {
   try {
     const userId = req.user.userId; // Get user ID from authenticated token
-    const result = await db.query('SELECT id, email, displayName, bio, picture, datecreated, dateupdated FROM users WHERE id = $1', [userId]);
+    const result = await db.query('SELECT id, email, displayName, bio, picture, pro, datecreated, dateupdated FROM users WHERE id = $1', [userId]);
     const result2 = await db.query(
       `SELECT c.*, uc.love FROM categories c
         JOIN user_categories uc ON c.id = uc.category_id
@@ -36,7 +36,7 @@ router.put('/', authenticate, async (req, res) => {
   try {
     const userId = req.user.userId; // Get user ID from authenticated token
     const { email, displayName, password, newPassword, bio, notifications } = req.body;
-    let newhHashedPassword = null;
+    let newHashedPassword;
 
     // Type checking
     if (email !== undefined && typeof email !== "string") {
@@ -58,10 +58,11 @@ router.put('/', authenticate, async (req, res) => {
       return res.status(400).json({ error: "notifications must be a boolean" });
     }
 
+
     // if user sends a new password, make sure they supply their old password and it is correct.
-    if (newPassword) {
+    if (newPassword || email) {
       if (!password) {
-        return res.status(400).json({ message: "Current password is required to change password" });
+        return res.status(400).json({ message: "Current password is required to change password or email" });
       }
 
       // Get the user's stored hashed password
@@ -79,7 +80,9 @@ router.put('/', authenticate, async (req, res) => {
         return res.status(403).json({ message: "Incorrect password" });
       }
 
-      newhHashedPassword = await bcrypt.hash(newPassword, 10);
+      if (newPassword) {
+        newHashedPassword = await bcrypt.hash(newPassword, 10); // make new password
+      }
     }
 
     const result = await db.query(`
@@ -92,7 +95,7 @@ router.put('/', authenticate, async (req, res) => {
               notifications = COALESCE($5, notifications),
               dateupdated = NOW()
           WHERE id = $6
-          RETURNING id, email, displayName, bio, notifications, datecreated, dateupdated`, [displayName, newhHashedPassword, email, bio, notifications, userId]);
+          RETURNING id, email, displayName, bio, notifications, datecreated, dateupdated`, [displayName, newHashedPassword, email, bio, notifications, userId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "User not found" });
@@ -154,7 +157,7 @@ router.delete('/', authenticate, async (req, res) => {
 router.get('/:userId', async (req, res) => {
   try {
     const userId = req.params.userId;
-    const result = await db.query('SELECT id, displayName, bio, picture, notifications, datecreated FROM users WHERE id = $1', [userId]);
+    const result = await db.query('SELECT id, displayName, bio, picture, notifications, pro, datecreated FROM users WHERE id = $1', [userId]);
     const result2 = await db.query(
       `SELECT c.*, uc.love FROM categories c
         JOIN user_categories uc ON c.id = uc.category_id
@@ -447,7 +450,7 @@ router.post('/upload', authenticate, uploadPicture, async (req, res) => {
 
 // Delete the old profile picture off of server
 async function deleteImage(userId) {
-  
+
   //get the file name
   const user = await db.query("SELECT picture FROM users WHERE id = $1", [userId]);
 
