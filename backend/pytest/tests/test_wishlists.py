@@ -23,7 +23,7 @@ def test_create_wishlist(setup_test_account, log_in, cleanup_test_wishlist):
         }
     )
 
-    cleanup_test_wishlist(token, res.json()["wishlist_id"])
+    cleanup_test_wishlist(token, res.json()["wishlist"]["id"])
 
     assert res.status_code == 201
 
