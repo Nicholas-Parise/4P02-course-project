@@ -22,7 +22,7 @@ def test_create_event(setup_test_account, log_in, cleanup_test_account, cleanup_
         json={"name":"Automated Test Event"}
     )
 
-    event_id = res.json()["event_id"]
+    event_id = res.json()["event"]["id"]
     cleanup_test_event(token, event_id)
 
     assert res.status_code == 201

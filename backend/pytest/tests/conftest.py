@@ -106,7 +106,7 @@ def setup_test_event(request):
             "name":"Automated Event",
         }
     )
-    return token, res.json()["event_id"]
+    return token, res.json()["event"]["id"]
 
 @pytest.fixture
 def cleanup_test_event(request):
@@ -156,7 +156,7 @@ def setup_test_wishlist(request):
             "name":"Automated Test Wishlist",
         }
     )
-    return token, res.json()["wishlist_id"]
+    return token, res.json()["wishlist"]["id"]
 
 @pytest.fixture
 def cleanup_test_wishlist(request):
