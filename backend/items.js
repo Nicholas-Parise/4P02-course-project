@@ -173,10 +173,10 @@ router.put('/:itemId?', authenticate, async (req, res, next) => {
         // see if item exists, also get wishlist id
         const itemCheck = await db.query(
           `SELECT i.id, wm.wishlists_id 
-      FROM items i 
-      JOIN wishlist_members wm ON i.member_id = wm.id
-      WHERE i.id = $1;`,
-          [itemId]
+          FROM items i 
+          JOIN wishlist_members wm ON i.member_id = wm.id
+          WHERE i.id = $1;`,
+          [id]
         );
 
         if (itemCheck.rows.length === 0) {
@@ -299,11 +299,11 @@ router.put('/:itemId?', authenticate, async (req, res, next) => {
             name = COALESCE($1, name),
             description = COALESCE($2, description),
             url = COALESCE($3, url),
-            quantity = COALESCE($5, quantity),
-            price = COALESCE($6, price),
-            priority = COALESCE($7, priority),
+            quantity = COALESCE($4, quantity),
+            price = COALESCE($5, price),
+            priority = COALESCE($6, priority),
             dateUpdated = NOW()
-        WHERE id = $8
+        WHERE id = $7
         RETURNING *;
       `, [name, description, url, quantity, price, priority, itemId]);
 

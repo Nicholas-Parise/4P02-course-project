@@ -38,7 +38,7 @@ export interface WishlistItem {
     contributions: Contribution[]
 };
 
-export interface Contribution{
+export interface Contribution {
     id: number,
     item_id: number,
     user_id: number,
@@ -48,4 +48,13 @@ export interface Contribution{
     note: string,
     dateUpdated: string,
     dateCreated: string
+}
+
+export interface Member {
+    blind: boolean,
+    displayname: string,
+    email: string,
+    id: number,
+    owner: boolean,
+    picture: string
 }
