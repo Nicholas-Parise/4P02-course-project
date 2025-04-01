@@ -11,11 +11,9 @@ interface Props {
     setNewItem: (state: Partial<WishlistItem>) => void
     wishlists: Wishlist[]
     token: string,
-    page: string,
-    id: string
 }
 
-const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem, wishlists, token, id }: Props) => {
+const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem, wishlists, token }: Props) => {
 
     const [selectedWishlist, setSelectedWishlist] = useState<string>('')
 
@@ -54,7 +52,10 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
         })
         .then((response) => response.json())
         .then((data) => {
+            let id = localStorage.getItem('id')
             setOpen(false)
+            console.log(data)
+            console.log(id)
             if(id!=undefined && data.item.member_id == id){
                 window.location.reload()
             }

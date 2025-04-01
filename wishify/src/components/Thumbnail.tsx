@@ -42,13 +42,16 @@ const WishlistMenu = styled.div`
 `
 
 const EventButton = styled.button`
-    background:  #FFFFFF;
+    background: #FFFFFF;
     border-radius: 25px;
+    overflow: hidden;
+    text-overflow: ellipsis;
     border: 2px solid #5651e5;
     padding: 20px;
     width: 200px;
     height: 200px;
     position: relative;
+    font-size: clamp(0.5em, 0.75em, 1em);
     @media screen and (max-width: 440px){
         width: 150px;
         height: 150px;
@@ -60,12 +63,12 @@ const EventButton = styled.button`
 `
 
 const EventMenu = styled.div`
-    background:  #FFFFFF;
+    background: #FFFFFF;
     display: grid;
     gap: 0px;
-    grid-template-rows: 37.5% 1fr 1fr 1fr;
+    grid-template-rows: 20% 1fr 1fr 1fr 1fr;
     border-radius: 25px;
-    border-color: #5651e5;
+    border: 2px solid #5651e5;
     width: 200px;
     height: 200px;
     font-size: clamp(0.5em, 0.75em, 1em);
@@ -117,7 +120,7 @@ export const WishlistThumbnail = (props: any) => {
                 <OverlayTitle title={props.title}>{props.title}</OverlayTitle>
                 <MenuButton onClick={openWishlist}>Open</MenuButton>
                 <MenuButton onClick={props.edit}>Edit</MenuButton>
-                <MenuButton>Share</MenuButton>
+                <MenuButton onClick={props.share}>Share</MenuButton>
                 <MenuButton onClick={props.duplicate}>Duplicate</MenuButton>
             </WishlistMenu>
         )
@@ -143,27 +146,27 @@ export const WishlistThumbnail = (props: any) => {
 }
 
 export const EventThumbnail = (props: any) => {
-
     const EventOverlayMenu = () => {
         return (
             <EventMenu onMouseLeave={props.toggleActive}>
-                <button title={props.title} style={{ overflow: 'hidden', fontSize: "initial", textAlign: 'center', borderBottom: '1px solid black' }}>{props.title}</button>
+                <p style={{margin: "4px"}}>Owner: {props.owner}</p>
+                <OverlayTitle title={props.title}>{props.title}</OverlayTitle>
                 <MenuButton onClick={openEvent}>Open</MenuButton>
-                <MenuButton>Edit</MenuButton>
+                <MenuButton onClick={props.edit}>Edit</MenuButton>
                 <MenuButton>Share</MenuButton>
             </EventMenu>
         )
     }
-    let navigate = useNavigate();
+
+    let navigate = useNavigate(); 
     const openEvent = () => {
         let path = "/events/" + props.id;
         navigate(path);
     }
 
-
     if(props.role == "contributor"){
         return(
-            <EventButton onClick={openEvent}><Eye></Eye><OwnerText style={{fontSize: "small"}}>Owner: {props.owner}</OwnerText>{props.title}</EventButton>
+        <EventButton onClick={openEvent}><Eye></Eye><OwnerText style={{fontSize: "small"}}>Owner: {props.owner}</OwnerText>{props.title}</EventButton>
         )
     } else{
         return(

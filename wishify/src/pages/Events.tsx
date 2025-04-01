@@ -1,8 +1,7 @@
 import React, {useState, useEffect, FormEvent} from 'react'
-import { type Wishlist } from '../types/types'
-import {CreateWishlist} from '../components/CreateButton'
-import {WishlistThumbnail} from '../components/Thumbnail'
-import ShareWishlistModal from '../components/ShareWishlistModal'
+import { type Event } from '../types/types'
+import {CreateEvent} from '../components/CreateButton'
+import {EventThumbnail} from '../components/Thumbnail'
 
 import styled from '@emotion/styled'
 import ModalBox from '@mui/material/Box';
@@ -25,24 +24,24 @@ const boxStyle = {
   p: 4,
 };
 
-const WishlistContainer = styled.div`
+const EventContainer = styled.div`
   display: flex;
   gap: 3vw;
   margin: 3vw;
   flex-wrap: wrap;
 `
 
-const Wishlists = () => {
-  const wishlistUrl = `https://api.wishify.ca/wishlists/`
+const Events = () => {
+  const eventUrl = `https://api.wishify.ca/events/`
 
   const [token, setToken] = useState<string>(localStorage.getItem('token') || '')
-  const [wishlists, setWishlists] = useState<Wishlist[]>([])
+  const [events, setEvents] = useState<Event[]>([])
 
   // pulling all wishlists from the backend and storing in wishlists state
   useEffect(() => {
     setToken(localStorage.getItem('token') || '')
     console.log(token)
-    fetch(wishlistUrl, {
+    fetch(eventUrl, {
         method: 'get',
         headers: new Headers({
           'Authorization': "Bearer "+token
@@ -50,8 +49,7 @@ const Wishlists = () => {
       })
         .then((response) => response.json())
         .then((data) => {
-          setWishlists(data);
-          console.log(wishlists);
+          setEvents(data);
           console.log(data);
           //setLoading(false)
         })
@@ -63,7 +61,7 @@ const Wishlists = () => {
         //.finally(() => setLoading(false))
   }, [])
   
-  const [newWishlistTitle, setNewWishlistTitle] = useState('');
+  const [newEventTitle, setNewEventTitle] = useState('');
   const [activeOverlay, setActiveOverlay] = useState<string>("");
   const [modalOpen, setModalOpen] = React.useState(false);
   const handleModalOpen = () => setModalOpen(true);
@@ -74,7 +72,7 @@ const Wishlists = () => {
   const [editOpen, setEditOpen] = React.useState(false);
   const handleEditOpen = () => {
     setEditOpen(true);
-    setNewWishlistTitle(activeOverlay);
+    setNewEventTitle(activeOverlay);
   }
   const handleEditClose = () => {
     setEditOpen(false);
@@ -93,25 +91,25 @@ const Wishlists = () => {
 
   const [delConfirmation, setDelConfirmation] = useState('');
 
-  const handleCreateWishlist = (e: FormEvent) => {
+  const handleCreateEvent = (e: FormEvent) => {
     e.preventDefault();
-    if (newWishlistTitle.trim() === '') {
+    if (newEventTitle.trim() === '') {
       setErrorMessage('Title cannot be empty');
       return;
     } 
     
-    let uniqueTitle = newWishlistTitle;
+    let uniqueTitle = newEventTitle;
     let counter = 1;
-    if (wishlists != undefined){
-      const wishlistNames = wishlists.map(wishlist => wishlist.name);
-      while (wishlistNames.includes(uniqueTitle)) {
-        uniqueTitle = `${newWishlistTitle} (${counter})`;
+    if (events != undefined){
+      const eventNames = events.map(event => event.name);
+      while (eventNames.includes(uniqueTitle)) {
+        uniqueTitle = `${newEventTitle} (${counter})`;
         counter++;
       }
     }
 
     // create wishlist in the backend
-    fetch(wishlistUrl, {
+    fetch(eventUrl, {
       method: 'post',
       headers: new Headers({
           'Authorization': "Bearer "+token,
@@ -119,20 +117,27 @@ const Wishlists = () => {
       }),
       body: JSON.stringify({
           name: uniqueTitle,
-          eventid: "",
-          description: "",
+          description: "Type your description here",
           image: "", 
+          addr: "Type your address here",
+          city: "Type your city here",
       })
       })
       .then((response) => response.json())
       .then((data) => {
-          let newWishlist: Wishlist = 
-          {id: data.wishlist_id,
-            event_id: 0, // TODO add event support
+          let newEvent: Event = 
+          {id: data.event_id,
             name: uniqueTitle,
-            description: "",
-            image: ""} // TODO add descriptions
-          setWishlists([...wishlists, newWishlist])
+            description: "Type your description here",
+            url: "",
+            addr: "Type your address here",
+            city: "Type your city here",
+            deadline: "",
+            image: "",
+            dateCreated: Date.now().toString(),
+            dateUpdated: Date.now().toString()
+          }
+          setEvents([...events, newEvent])
       })
       .catch((error) => {
           console.log(error)
@@ -148,70 +153,64 @@ const Wishlists = () => {
       setActiveOverlay(title)
     }
   }
-  function handleMyself(){
-    console.log("myself")
-  }
-  function handleBehalf(){
-    console.log("behalf")
-  }
-  function handleRenameWishlist(){
-    const wishlistNames = wishlists.map(wishlist => wishlist.name);
+  function handleRenameEvent(){
+    const eventNames = events.map(event => event.name);
 
-    if (newWishlistTitle.trim() === '') {
+    if (newEventTitle.trim() === '') {
       setErrorMessage('Title cannot be empty');
       return;
-    } else if (wishlistNames.includes(newWishlistTitle)) {
+    } else if (eventNames.includes(newEventTitle)) {
       setErrorMessage('Title already exists');
       return;
     }
 
-    const wishlistToRename = wishlists.find(wishlist => wishlist.name === activeOverlay);
+    const eventToRename = events.find(event => event.name === activeOverlay);
     // this condition should never happen but I've left it here just in case
-    if (!wishlistToRename) {
-      console.log("Wishlist not found");
+    if (!eventToRename) {
+      console.log("Event not found");
       return;
     }
-    const wishlistId = wishlistToRename.id;
+    const eventId = eventToRename.id;
 
-    console.log("id " + wishlistId)
+    console.log("id " + eventId)
     console.log("token " + token)
-    console.log("name " + newWishlistTitle)
-    fetch(wishlistUrl + wishlistId, {
+    console.log("name " + newEventTitle)
+    fetch(eventUrl + eventId, {
       method: 'put',
       headers: new Headers({
         'Authorization': "Bearer "+token,
         'Content-Type': 'application/json'
       }),
       body: JSON.stringify({
-        name: newWishlistTitle
+        name: newEventTitle,
       })
       })
       .then((response) => response.json())
       .then((data) => {
           console.log(data)
           // update the wishlists state with the new data
-          const updatedWishlists = wishlists.map(wishlist =>
-            wishlist.id === wishlistId ? data.wishlist : wishlist
+          const updatedEvents = events.map(event =>
+            event.id === eventId ? data.event : event
           );
-          setWishlists(updatedWishlists);
+          setEvents(updatedEvents);
       })
       .catch((error) => {
           console.log(error)
       })
     
-    setNewWishlistTitle('');
+    setNewEventTitle('');
     handleEditClose();
   }
-  function deleteWishlist(){
-    const wishlistToDelete = wishlists.find(wishlist => wishlist.name === activeOverlay);
+  function deleteEvent(){
+    const eventToDelete = events.find(event => event.name === activeOverlay);
     // this condition should never happen but I've left it here just in case
-    if (!wishlistToDelete) {
-      console.log("Wishlist not found");
+    if (!eventToDelete) {
+      console.log("Event not found");
       return;
     }
-    const wishlistId = wishlistToDelete.id;
+    const eventId = eventToDelete.id;
 
-    fetch(wishlistUrl + wishlistId, {
+    fetch(eventUrl + eventId, {
       method: 'delete',
       headers: new Headers({
           'Authorization': "Bearer "+token,
@@ -221,9 +220,9 @@ const Wishlists = () => {
       .then((response) => response.json())
       .then((data) => {
           console.log(data)
-          const updatedWishlists = wishlists.filter(wishlist =>
-            wishlist.id !== wishlistId);
-          setWishlists(updatedWishlists);
+          const updatedEvents = events.filter(event =>
+            event.id !== eventId);
+          setEvents(updatedEvents);
           setActiveOverlay('');
           handleDelConfirmClose();
           handleEditClose();
@@ -234,7 +233,7 @@ const Wishlists = () => {
       })
   }
 
-  const handleDuplicate = () => {
+  /*const handleDuplicate = () => {
     // find the wishlist to duplicate
     const wishlistToDuplicate = wishlists.find(wishlist => wishlist.name === activeOverlay);
     // this condition should never happen but I've left it here just in case
@@ -266,56 +265,32 @@ const Wishlists = () => {
       .catch((error) => {
           console.log(error)
       })
-  }
-
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-
-  const handleShare = () => {
-    if (activeOverlay) {
-      setIsShareModalOpen(true);
-    }
-  };
-
-  const handleShareModalClose = () => {
-    setIsShareModalOpen(false);
-  };
-
-  const activeWishlist = wishlists.find((wishlist) => wishlist.name === activeOverlay);
+  }*/
+    
 
   return (
     <section className='bg-white border-2 border-solid border-[#5651e5] rounded-[25px]'>
-      <h1>My Wishlists</h1>
-      <WishlistContainer>
-        <CreateWishlist addThumbnail={handleModalOpen}>Create a Wishlist</CreateWishlist>
-        {wishlists.map((wishlist, index) => (
-          <WishlistThumbnail 
+      <h1>My Events</h1>
+      <EventContainer>
+        <CreateEvent addThumbnail={handleModalOpen}>Create an Event</CreateEvent>
+        {events.map((event, index) => (
+          <EventThumbnail 
             active={activeOverlay} 
-            toggleActive={() => changeActiveOverlay(wishlist.name)} 
+            toggleActive={() => changeActiveOverlay(event.name)} 
             key={index} 
-            id={wishlist.id}
-            title={wishlist.name}
+            id={event.id}
+            title={event.name}
             edit={handleEditOpen}
-            duplicate={handleDuplicate}
-            share={handleShare}
             owner={"Me"}
           />
         ))}
-      </WishlistContainer>
-
-      {activeWishlist && activeWishlist.share_token && (
-        <ShareWishlistModal
-        wishlistID={activeWishlist.id}
-        isOwner={activeWishlist.owner} 
-        shareToken={activeWishlist.share_token} 
-        isOpen={isShareModalOpen} 
-        setIsOpen={setIsShareModalOpen}/>
-      )}
+      </EventContainer>
       <h1>Shared Wishlists</h1>
-      <WishlistContainer>
-        <WishlistThumbnail title={"Birthday Blam's Birthday Bash (can view and contribute)"} role={"contributor"} owner={"Birthday Blam"}></WishlistThumbnail>
-        <WishlistThumbnail title={"Geoff's Christmas Wishlist"} id={1234} role={"contributor"} owner={"Geoff"}></WishlistThumbnail>
-      </WishlistContainer>
-      {/* Modal for Creating Wishlists */}
+      <EventContainer>
+        <EventThumbnail title={"Birthday Blam's Birthday Bash (can view and contribute)"} role={"contributor"} owner={"Birthday Blam"}></EventThumbnail>
+        <EventThumbnail title={"Geoff's Christmas Wishlist"} id={1234} role={"contributor"} owner={"Geoff"}></EventThumbnail>
+      </EventContainer>
+      {/* Modal for Creating Events */}
       <Modal
         open={modalOpen}
         onClose={handleModalClose}
@@ -323,20 +298,13 @@ const Wishlists = () => {
         aria-describedby="modal-modal-description"
       >
         <ModalBox sx={boxStyle}>
-          <form autoComplete="off" onSubmit={handleCreateWishlist}>
+          <form autoComplete="off" onSubmit={handleCreateEvent}>
             <FormControl sx={{ width: '25ch' }}>
-              <Typography id="modal-modal-title" variant="h6" component="h2">
-                Who is this for?
-              </Typography>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <ModalButton style={{width:"50%"}} onClick={handleMyself}>For Myself</ModalButton>
-                <ModalButton style={{width:"50%"}} onClick={handleBehalf}>On Behalf Of Somebody</ModalButton>
-              </div>
               <TextField
                 fullWidth
-                value={newWishlistTitle}
-                onChange={(e) => setNewWishlistTitle(e.target.value)}
-                label="Wishlist Title"
+                value={newEventTitle}
+                onChange={(e) => setNewEventTitle(e.target.value)}
+                label="Event Title"
                 variant="outlined"
                 margin="normal"
                 error={!!errorMessage}
@@ -355,19 +323,19 @@ const Wishlists = () => {
       >
         <ModalBox sx={boxStyle}>
         <Typography id="modal-modal-title" variant="h6" component="h2">
-            Edit Wishlist
+            Edit Event
         </Typography>
         <TextField
             fullWidth
-            value={newWishlistTitle}
-            onChange={(e) => setNewWishlistTitle(e.target.value)}
-            label="New Wishlist Title"
+            value={newEventTitle}
+            onChange={(e) => setNewEventTitle(e.target.value)}
+            label="New Event Title"
             variant="outlined"
             margin="normal"
             error={!!errorMessage}
             helperText={errorMessage}
         />
-        <ModalButton onClick={handleRenameWishlist}>Rename</ModalButton>
+        <ModalButton onClick={handleRenameEvent}>Rename</ModalButton>
         <ModalButton onClick={handleDelConfirmOpen}>Delete</ModalButton>
         <Modal
           open={delConfirmOpen}
@@ -389,7 +357,7 @@ const Wishlists = () => {
             />
             {delConfirmation == activeOverlay ?
               <div>
-                <ModalButton color='error' onClick={deleteWishlist}>Delete</ModalButton>
+                <ModalButton color='error' onClick={deleteEvent}>Delete</ModalButton>
                 <ModalButton style={{float: 'right'}} onClick={handleDelConfirmClose}>Go Back</ModalButton>
               </div>
               :
@@ -399,9 +367,8 @@ const Wishlists = () => {
         </Modal>
       </ModalBox>
       </Modal>
-      
     </section>
   )
 }
 
-export default Wishlists
+export default Events

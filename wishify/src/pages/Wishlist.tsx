@@ -29,7 +29,13 @@ const Wishlist = () => {
     //const [loading, setLoading] = useState(false)
     const [token] = useState<string>(localStorage.getItem('token') || '')
     const [sortDirection, setSortDirection] = useState<-1 | 1>(1)
+<<<<<<< HEAD
+    
+    // used by navbar to refresh the page
+    localStorage.setItem('id', id || '')
+=======
     const [isMemberDialogOpen, setIsMemberDialogOpen] = useState<boolean>(false)
+>>>>>>> origin/main
 
     const editWishlistItem = (item: WishlistItem) => {
       const index = wishlistItems.findIndex(i => i.id === item.id);
