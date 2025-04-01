@@ -102,7 +102,13 @@ router.get('/trending', async (req, res, next) => {
 
   try {
     const result = await db.query(
-      `SELECT * FROM ideas ORDER BY uses DESC LIMIT 6;`);
+      `SELECT i.*,
+      json_agg(json_build_object('id', c.id, 'name', c.name)) AS categories 
+      FROM ideas i
+      LEFT JOIN idea_categories ic ON i.id = ic.idea_id
+      LEFT JOIN categories c ON ic.category_id = c.id
+      GROUP BY i.id 
+      ORDER BY i.uses DESC LIMIT 10;`);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "No trending items found." });
