@@ -86,6 +86,14 @@ DELETE /contributions/:id → Remove a contribution**
 PUT /notifications/:id → Edit a notifications (ex: is_read)   
 DELETE /notifications/:id → Delete a notifications**  
 
+## ideas
+**GET / → Get all the ideas sorted by how much they relate to each person   
+GET /trending → Get the top 6 most used items    
+POST / → add a new idea (only for admins)    
+POST /:ideaId/categories → add categories to an idea (only for admins)   
+POST /upload/:itemId → upload new idea picture (only for admins)   
+DELETE /notifications/:id → Delete a notifications**  
+
 # Database
 
 ![Screenshot of database UML.](database/4P02-Database-UML.png)

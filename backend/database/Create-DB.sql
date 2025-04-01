@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS idea_categories
+DROP TABLE IF EXISTS ideas
 DROP TABLE IF EXISTS contributions;
 DROP TABLE IF EXISTS items;
 DROP TABLE IF EXISTS wishlist_members;
@@ -10,6 +12,7 @@ DROP TABLE IF EXISTS notifications
 DROP TABLE IF EXISTS sessions;
 DROP TABLE IF EXISTS users;
 
+
 CREATE TABLE users(
 id SERIAL PRIMARY KEY,
 password TEXT NOT NULL,
@@ -19,6 +22,7 @@ bio TEXT,
 picture TEXT,
 notifications BOOLEAN,
 pro BOOLEAN,
+setup BOOLEAN,
 dateupdated TIMESTAMP,
 datecreated TIMESTAMP DEFAULT NOW()
 );
@@ -137,6 +141,27 @@ dateUpdated TIMESTAMP,
 dateCreated TIMESTAMP DEFAULT NOW(),
 UNIQUE (item_id,member_id) --only want one contribution per user per item
 );
+
+
+CREATE TABLE ideas(
+id SERIAL PRIMARY KEY,
+name TEXT NOT NULL,
+description TEXT,
+url TEXT,
+image TEXT,
+price REAL,
+sponsored BOOLEAN DEFAULT FALSE,
+uses INT DEFAULT 0,   -- Track how many times this item is added by users
+created TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE idea_categories (
+idea_id INT REFERENCES ideas(id) ON DELETE CASCADE,
+category_id INT REFERENCES categories(id) ON DELETE CASCADE,
+PRIMARY KEY (idea_id, category_id)
+);
+
+
 
 GRANT CONNECT ON DATABASE wishify TO wishify;
 GRANT USAGE ON SCHEMA public TO wishify;
