@@ -551,6 +551,8 @@ router.post('/members', authenticate, async (req, res) => {
 
 // localhost:3000/wishlists/:id/members?page=1&pageSize=10
 // remove a member from an wishlist
+// must be owner to remove another member
+// but you can remove yourslef 
 router.delete('/:id/members', authenticate, async (req, res) => {
   const wishlistId = parseInt(req.params.id);
   const authUserId = req.user.userId; // Get user ID from the authenticated token
@@ -561,7 +563,6 @@ router.delete('/:id/members', authenticate, async (req, res) => {
   }
 
   try {
-
     const wishlistCheck = await db.query(`
       SELECT id FROM wishlists WHERE id = $1;
     `, [wishlistId]);
@@ -570,25 +571,27 @@ router.delete('/:id/members', authenticate, async (req, res) => {
       return res.status(404).json({ error: "Wishlist not found." });
     }
 
-    // make sure user is the owner of the wishlist before allowing editing of others memberships
-    const ownershipCheck = await db.query(`
-      SELECT m.owner
-      FROM wishlist_members m
-      WHERE m.user_id = $1 AND m.wishlists_id = $2;
-      `, [authUserId, wishlistId]);
+    // if the user is trying to remove themselves then they are allowed to.
+    if(userId !== authUserId){
+      // make sure user is the owner of the wishlist before allowing removing others members
+      const ownershipCheck = await db.query(`
+        SELECT m.owner
+        FROM wishlist_members m
+        WHERE m.user_id = $1 AND m.wishlists_id = $2;
+        `, [authUserId, wishlistId]);
 
-    if (ownershipCheck.rows.length === 0) {
-      return res.status(403).json({ error: "Access denied. You are not a member of this wishlist." });
+      if (ownershipCheck.rows.length === 0) {
+        return res.status(403).json({ error: "Access denied. You are not a member of this wishlist." });
+      }
+
+      if (!ownershipCheck.rows[0].owner) {
+        return res.status(403).json({ error: "Only the owner can edit this wishlist membership." });
+      }
     }
-
-    if (!ownershipCheck.rows[0].owner) {
-      return res.status(403).json({ error: "Only the owner can edit this wishlist membership." });
-    }
-
 
     // Check if the user is a member of the wishlist
     const memberCheck = await db.query(`
-          SELECT * FROM wishlist_members WHERE wishlists_id = $1 AND user_id = $2
+          SELECT 1 FROM wishlist_members WHERE wishlists_id = $1 AND user_id = $2
       `, [wishlistId, userId]);
 
     if (memberCheck.rows.length === 0) {
@@ -760,7 +763,7 @@ router.post('/share', authenticate, async (req, res) => {
 
     // Check if the user exists
     const userCheck = await db.query(`
-      SELECT id FROM users WHERE email = $1;
+      SELECT id, notifications FROM users WHERE email = $1;
     `, [email]);
 
     // get name of person doing inviting:
@@ -781,8 +784,10 @@ router.post('/share', authenticate, async (req, res) => {
         VALUES ($1, $2, false, false, NOW(), NOW()) ON CONFLICT DO NOTHING;
       `, [memberUserId, wishlist_id]);
 
-      // send notification:
-      await createNotification([memberUserId], "You've been invited to a wishlist!", `${fromUser} has invited you to the wishlist: ${wishlistCheck.rows[0].name}`, `/wishlists/${wishlistCheck.rows[0].id}`);
+      // send notification, make sure they allow notifications
+      if(userCheck.rows[0].notifications){
+        await createNotification([memberUserId], "You've been invited to a wishlist!", `${fromUser} has invited you to the wishlist: ${wishlistCheck.rows[0].name}`, `/wishlists/${wishlistCheck.rows[0].id}`);
+      }
 
       return res.status(200).json({ message: "User added to wishlist." });
     } else {

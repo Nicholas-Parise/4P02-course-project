@@ -11,7 +11,7 @@ require("dotenv").config();
 // localhost:3000/auth/register
 // register account
 router.post('/register', async (req, res, next) => {
-    const { email, password, displayName, bio } = req.body;
+    const { email, password, displayName, bio, notifications } = req.body;
 
     if (!email || !password || !displayName) {
         return res.status(400).json({ message: "email, password and displayName are required" });
@@ -37,12 +37,17 @@ router.post('/register', async (req, res, next) => {
     
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
+
         const result = await db.query(
-            "INSERT INTO users (displayName, password, email, picture, bio, notifications, dateCreated) VALUES ($1, $2, $3, $4, $5, true, NOW()) RETURNING id, displayName, email",
-            [displayName, hashedPassword, email, picture, bio]
+            `INSERT INTO users (displayName, password, email, picture, bio, notifications, dateCreated) 
+            VALUES ($1, $2, $3, $4, $5, COALESCE($6, true), NOW()) RETURNING id, displayName, email, notifications`,
+            [displayName, hashedPassword, email, picture, bio, notifications]
         );
 
-        await createNotification([result.rows[0].id], "Welcome to Wishify!", "Hello from the wishify team! we are so excited to welcome you to this platform, if you need any assistance checkout the help page.", "/help");
+        // send notification if allowed 
+        if(result.rows[0].notifications){
+            await createNotification([result.rows[0].id], "Welcome to Wishify!", "Hello from the wishify team! we are so excited to welcome you to this platform, if you need any assistance checkout the help page.", "/help");
+        }
 
         res.status(201).json({ message: "User registered successfully", user: result.rows[0] });
     } catch (error) {
