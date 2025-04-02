@@ -36,7 +36,9 @@ const Wishlists = () => {
   const wishlistUrl = `https://api.wishify.ca/wishlists/`
 
   const [token, setToken] = useState<string>(localStorage.getItem('token') || '')
+  
   const [wishlists, setWishlists] = useState<Wishlist[]>([])
+  const [sharedWishlists, setSharedWishlists] = useState<Wishlist[]>([])
 
   // pulling all wishlists from the backend and storing in wishlists state
   useEffect(() => {
@@ -50,8 +52,10 @@ const Wishlists = () => {
       })
         .then((response) => response.json())
         .then((data) => {
-          setWishlists(data);
-          console.log(wishlists);
+          let ownedWishlists = data.filter((wishlist: Wishlist) => wishlist.owner == true);
+          let sharedWishlists = data.filter((wishlist: Wishlist) => wishlist.owner == false);
+          setWishlists(ownedWishlists);
+          setSharedWishlists(sharedWishlists);
           console.log(data);
           //setLoading(false)
         })
@@ -312,8 +316,19 @@ const Wishlists = () => {
       )}
       <h1>Shared Wishlists</h1>
       <WishlistContainer>
-        <WishlistThumbnail title={"Birthday Blam's Birthday Bash (can view and contribute)"} role={"contributor"} owner={"Birthday Blam"}></WishlistThumbnail>
-        <WishlistThumbnail title={"Geoff's Christmas Wishlist"} id={1234} role={"contributor"} owner={"Geoff"}></WishlistThumbnail>
+        {sharedWishlists.map((wishlist, index) => (
+          <WishlistThumbnail 
+            active={activeOverlay} 
+            toggleActive={() => changeActiveOverlay(wishlist.name)} 
+            key={index} 
+            id={wishlist.id}
+            title={wishlist.name}
+            edit={handleEditOpen}
+            duplicate={handleDuplicate}
+            share={handleShare}
+            owner={"Shared"}
+          />
+        ))}
       </WishlistContainer>
       {/* Modal for Creating Wishlists */}
       <Modal
