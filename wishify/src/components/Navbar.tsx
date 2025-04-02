@@ -16,7 +16,8 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
 
   const [listNav] = useState<NavItem[]>([
     { label: 'Wishlist', href: '/wishlists' },
-    { label: 'Events', href: '/events' }
+    { label: 'Events', href: '/events' },
+    { label: 'Ideas', href: '/ideas' },
   ]);
 
   const [token, setToken] = useState<string>(localStorage.getItem('token') || '');

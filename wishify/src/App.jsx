@@ -18,6 +18,7 @@ import PublicProfile from "./pages/PublicProfile";
 import Index from "./pages/Index";
 import Status from "./pages/Status";
 import Share from"./pages/Share";
+import Ideas from "./pages/Ideas";
 
 import Navbar from "./components/Navbar";
 
@@ -47,6 +48,8 @@ function App() {
   
               <Route path="wishlists" element={<Wishlists />} />
               <Route path="wishlists/:id" element={<Wishlist />} />
+
+              <Route path="ideas" element={<Ideas />} />
 
               <Route path="profile" element={<Profile />} />
               

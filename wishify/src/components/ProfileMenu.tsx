@@ -3,6 +3,7 @@ import { AiOutlineUser, AiOutlineLogout, AiFillGift, AiOutlineCloseCircle, AiOut
 import { NavLink, useNavigate } from "react-router-dom";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from "@mui/material";
 import "./ProfileMenu.css";
+import React from "react";
 
 interface Props {
   closeMenu: () => void,
@@ -11,9 +12,12 @@ interface Props {
 
 const ProfileMenu = ({ closeMenu, logOut }: Props) => {
   const [isClosing, setIsClosing] = useState(false);
+  const [token, setToken] = useState<string>(localStorage.getItem('token') || '')
   const [showLogOutModal, setShowLogOutModal] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const [displayName, setDisplayName] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
   const navigate = useNavigate();
 
   const handleClose = () => {
@@ -35,6 +39,30 @@ const ProfileMenu = ({ closeMenu, logOut }: Props) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [closeMenu]);
+
+  useEffect(() => {
+      setToken(localStorage.getItem('token') || '')
+      console.log(token)
+      fetch("https://api.wishify.ca/users/", {
+          method: 'get',
+          headers: new Headers({
+            'Authorization': "Bearer "+token
+          })
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            setDisplayName(data.user.displayname)
+            setEmail(data.user.email)
+            console.log(data)
+            //setLoading(false)
+          })
+          .catch((error) => {
+            //setError(error)
+            //setLoading(false)
+            console.log(error)
+          })
+          //.finally(() => setLoading(false))
+    }, [])
 
   const handleAccountSettings = () => {
     navigate("/profile");
@@ -81,8 +109,8 @@ const ProfileMenu = ({ closeMenu, logOut }: Props) => {
             <AiOutlineUser className="user-icon" />
           </div>
           <div className="profile-text">
-            <p className="user-name">Justin Bijoy</p>
-            <p className="user-email">justinbijoy@gmail.com</p>
+            <p className="user-name">{displayName}</p>
+            <p className="user-email">{email}</p>
           </div>
         </div>
 
