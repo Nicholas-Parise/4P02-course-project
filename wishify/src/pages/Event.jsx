@@ -124,6 +124,19 @@ const Event = () => {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [event, originalEvent]);
 
+  const handleChange = (e) => {
+    const localDate = new Date(e.target.value);
+    setEvent({ ...event, deadline: localDate.toISOString() });
+  };
+
+  const formatDateForInput = (date) => {
+    if (!date) return "";
+    const localDateTime = new Date(date);
+    if (isNaN(localDateTime)) return "";
+    const offset = localDateTime.getTimezoneOffset() * 60000;
+    return new Date(localDateTime - offset).toISOString().slice(0, 16);
+  };
+
   return (
     <>
       <EventSection>
@@ -153,8 +166,8 @@ const Event = () => {
             <input
               aria-label="Date and time"
               type="datetime-local"
-              value={event.deadline ? new Date(event.deadline).toISOString().slice(0, 16) : ''}
-              onChange={(e) => setEvent({ ...event, deadline: e.target.value })} // Update event.date on change
+              value={formatDateForInput(event.deadline)}
+              onChange={handleChange} // Update event.date on change
               onBlur={saveEvent} // Save on blur
             />
           </div>

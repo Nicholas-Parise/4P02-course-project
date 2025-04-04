@@ -7,6 +7,7 @@ import CreateItemDialog from './CreateItemDialog';
 import ProfileMenu from './ProfileMenu';
 import HelpMenu from './HelpMenu';
 import '../components/landingheader.css';
+import React, {useEffect} from 'react';
 
 const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLoggedIn: (val: boolean)=>void, page: string }) => {
   interface NavItem {
@@ -56,6 +57,34 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
 
     return { wishlists, loading, error };
   };
+
+  const [displayName, setDisplayName] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  useEffect(() => {
+    setToken(localStorage.getItem('token') || '')
+    console.log(token)
+    fetch("https://api.wishify.ca/users/", {
+        method: 'get',
+        headers: new Headers({
+          'Authorization': "Bearer "+token
+        })
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setDisplayName(data.user.displayname)
+          setEmail(data.user.email)
+          console.log(data)
+          //setLoading(false)
+        })
+        .catch((error) => {
+          //setError(error)
+          //setLoading(false)
+          console.log(error)
+        })
+        //.finally(() => setLoading(false))
+  }, [])
+
+  
 
   const openModal = () => {
     setNewItem({});
@@ -109,7 +138,10 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
                   {/* Profile Menu Component */}
                   {isProfileMenuOpen && <ProfileMenu 
                     logOut={() => {setIsLoggedIn(false), localStorage.removeItem("token")}}
-                    closeMenu={() => setIsProfileMenuOpen(false)} />}
+                    closeMenu={() => setIsProfileMenuOpen(false)} 
+                    profile={{displayName, email}}
+                    />
+      }
                 </div>
               </div>
             </div>
