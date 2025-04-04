@@ -67,6 +67,7 @@ UNIQUE (user_id,category_id) -- only need one entry per category per user
 
 CREATE TABLE events(
 id SERIAL PRIMARY KEY, 
+creator_id INTEGER REFERENCES users (id) ON DELETE SET NULL,
 name TEXT,
 description TEXT,
 url TEXT,
@@ -74,6 +75,7 @@ addr TEXT,
 city TEXT,
 image TEXT,
 deadline TIMESTAMP,
+share_token TEXT UNIQUE,
 dateUpdated TIMESTAMP,
 dateCreated TIMESTAMP DEFAULT NOW()
 );
@@ -82,6 +84,7 @@ dateCreated TIMESTAMP DEFAULT NOW()
 CREATE TABLE wishlists(
 id SERIAL PRIMARY KEY,   
 event_id INTEGER REFERENCES events (id) ON DELETE SET NULL,
+creator_id INTEGER REFERENCES users (id) ON DELETE SET NULL,
 name TEXT,
 description TEXT,
 image TEXT,
@@ -96,6 +99,7 @@ CREATE TABLE wishlist_members(
 id SERIAL PRIMARY KEY,   
 user_id INTEGER REFERENCES users (id) ON DELETE CASCADE,
 wishlists_id INTEGER REFERENCES wishlists (id) ON DELETE CASCADE,
+notifications BOOLEAN,
 blind BOOLEAN,
 owner BOOLEAN,
 dateUpdated TIMESTAMP,
@@ -108,6 +112,7 @@ id SERIAL PRIMARY KEY,
 user_id INTEGER REFERENCES users (id) ON DELETE CASCADE,
 event_id INTEGER REFERENCES events (id) ON DELETE CASCADE,
 owner BOOLEAN,
+notifications BOOLEAN,
 dateUpdated TIMESTAMP,
 dateCreated TIMESTAMP DEFAULT NOW(),
 UNIQUE (user_id,event_id) --only want one membership per user per event
@@ -118,6 +123,7 @@ UNIQUE (user_id,event_id) --only want one membership per user per event
 CREATE TABLE items(
 id SERIAL PRIMARY KEY, 
 member_id INTEGER REFERENCES wishlist_members (id) ON DELETE CASCADE,
+idea_id INTEGER REFERENCES ideas(id) ON DELETE SET NULL,
 name TEXT,
 description TEXT,
 url TEXT,
@@ -150,6 +156,7 @@ description TEXT,
 url TEXT,
 image TEXT,
 price REAL,
+rating REAL,
 sponsored BOOLEAN DEFAULT FALSE,
 uses INT DEFAULT 0,   -- Track how many times this item is added by users
 created TIMESTAMP DEFAULT NOW()
