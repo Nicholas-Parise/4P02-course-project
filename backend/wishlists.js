@@ -17,9 +17,10 @@ router.get('/', authenticate, async (req, res, next) => {
     const userId = req.user.userId; // Get user ID from authenticated token
 
     const result = await db.query(`
-          SELECT w.*, m.blind, m.owner
+          SELECT w.*, u.displayname AS creator_displayName, m.blind, m.owner
           FROM wishlists w
           JOIN wishlist_members m ON w.id = m.wishlists_id
+          LEFT JOIN users u ON w.creator_id = u.id
           WHERE m.user_id = $1;`, [userId]);
 
     res.status(200).json(result.rows);
@@ -41,7 +42,7 @@ router.post('/', authenticate, async (req, res, next) => {
   try {
     const user_id = req.user.userId; // Get user ID from authenticated request
 
-    const { event_id, name, description, image, deadline } = req.body;
+    const { event_id, name, description, image, deadline, notifications } = req.body;
 
     if (!name) {
       return res.status(400).json({ error: "name is required" });
@@ -90,9 +91,9 @@ router.post('/', authenticate, async (req, res, next) => {
 
     // Step 1: Insert wishlist
     const wishlistResult = await db.query(
-      `INSERT INTO wishlists (event_id, name, description, image, deadline, share_token, dateCreated, dateUpdated) 
-          VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW()) RETURNING *`,
-      [event_id, newName, description, image, deadline, shareToken]
+      `INSERT INTO wishlists (event_id, name, description, image, deadline, share_token, creator_id, dateCreated) 
+          VALUES ($1, $2, $3, $4, $5, $6, $7, NOW()) RETURNING *`,
+      [event_id, newName, description, image, deadline, shareToken, user_id]
     );
 
     const wishlist = wishlistResult.rows[0];
@@ -100,9 +101,9 @@ router.post('/', authenticate, async (req, res, next) => {
 
     // Step 2: Add the users membership (owner)
     await db.query(
-      `INSERT INTO wishlist_members (user_id, wishlists_id, blind, owner, dateCreated, dateUpdated)
-          VALUES ($1, $2, FALSE, TRUE, NOW(), NOW())`,
-      [user_id, wishlist_id]
+      `INSERT INTO wishlist_members (user_id, wishlists_id, notifications, blind, owner, dateCreated)
+          VALUES ($1, $2, COALESCE($3, true), FALSE, TRUE, NOW())`,
+      [user_id, wishlist_id, notifications]
     );
 
     await db.query("COMMIT"); // Commit the transaction
@@ -127,11 +128,11 @@ router.get('/:wishlistId', authenticate, async (req, res, next) => {
     const userId = req.user.userId; // Get user ID from authenticated token
 
     const result = await db.query(`
-        SELECT w.*, m.blind, m.owner
-        FROM wishlists w
-        JOIN wishlist_members m ON w.id = m.wishlists_id
-        WHERE m.user_id = $1 AND w.id = $2;`, [userId, wishlistId]);
-
+      SELECT w.*, u.displayname AS creator_displayName, m.blind, m.owner
+      FROM wishlists w
+      JOIN wishlist_members m ON w.id = m.wishlists_id
+      LEFT JOIN users u ON w.creator_id = u.id
+      WHERE m.user_id = $1 AND w.id = $2;`, [userId, wishlistId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "wishlist not found." });
@@ -162,7 +163,7 @@ router.get('/:wishlistId', authenticate, async (req, res, next) => {
     }
 
     const memberResult = await db.query(`
-            SELECT u.id, u.displayName, u.email, u.picture, wm.blind, wm.owner
+            SELECT u.id, u.displayName, u.email, u.picture, u.pro, wm.blind, wm.owner
             FROM users u
             JOIN wishlist_members wm ON u.id = wm.user_id
             WHERE wm.wishlists_id = $1;
@@ -339,9 +340,9 @@ router.post('/:wishlistId/duplicate', authenticate, async (req, res, next) => {
 
     // Create the duplicated wishlist
     const newWishlistResult = await db.query(
-      `INSERT INTO wishlists (event_id, name, description, image, deadline, share_token, dateCreated) 
-       VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING *;`,
-      [event_id, newName, description, image, deadline, shareToken]
+      `INSERT INTO wishlists (event_id, name, description, image, deadline, share_token, creator_id, dateCreated) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW()) RETURNING *;`,
+      [event_id, newName, description, image, deadline, shareToken, user_id]
     );
 
     const newWishlist = newWishlistResult.rows[0];
@@ -349,8 +350,8 @@ router.post('/:wishlistId/duplicate', authenticate, async (req, res, next) => {
 
     // make creator owner
     const membersResult = await db.query(
-      `INSERT INTO wishlist_members (user_id, wishlists_id, blind, owner, dateCreated)
-       VALUES ($1, $2, false, true, NOW()) RETURNING id;`,
+      `INSERT INTO wishlist_members (user_id, wishlists_id, blind, owner, notifications, dateCreated)
+       VALUES ($1, $2, false, true, true, NOW()) RETURNING id;`,
       [user_id, newWishlistId]
     );
 
@@ -464,8 +465,8 @@ router.post('/:id/members', authenticate, async (req, res) => {
 
     // Add the user to the wishlist
     await db.query(`
-          INSERT INTO wishlist_members (wishlists_id, user_id, blind, owner, dateCreated)
-          VALUES ($1, $2, COALESCE($3, false), COALESCE($4, false), NOW());`, [wishlistId, userId, blind, owner]);
+          INSERT INTO wishlist_members (wishlists_id, user_id, blind, owner, notifications, dateCreated)
+          VALUES ($1, $2, COALESCE($3, false), COALESCE($4, false), true, NOW());`, [wishlistId, userId, blind, owner]);
 
     res.status(201).json({ message: "User added to the wishlist successfully" });
   } catch (error) {
@@ -523,16 +524,16 @@ router.post('/members', authenticate, async (req, res) => {
 
     // add the 
     await db.query(`
-      INSERT INTO wishlist_members (wishlists_id, user_id, blind, owner, dateCreated)
-      VALUES ($1, $2, false, false, NOW()) ON CONFLICT DO NOTHING;`, [wishlistId, authUserId]);
+      INSERT INTO wishlist_members (wishlists_id, user_id, blind, owner, notifications, dateCreated)
+      VALUES ($1, $2, false, false, true, NOW()) ON CONFLICT DO NOTHING;`, [wishlistId, authUserId]);
 
-      /*
-    // add the event membership
-    await db.query(`
-      INSERT INTO event_members (event_id, user_id, owner, dateCreated)
-      VALUES ($1, $2, false, NOW()) ON CONFLICT DO NOTHING;`, [eventId, authUserId]);
-    */
-      
+    /*
+  // add the event membership
+  await db.query(`
+    INSERT INTO event_members (event_id, user_id, owner, dateCreated)
+    VALUES ($1, $2, false, NOW()) ON CONFLICT DO NOTHING;`, [eventId, authUserId]);
+  */
+
     res.status(201).json({ message: "User added to the wishlist successfully", id: wishlistId });
   } catch (error) {
 
@@ -572,7 +573,7 @@ router.delete('/:id/members', authenticate, async (req, res) => {
     }
 
     // if the user is trying to remove themselves then they are allowed to.
-    if(userId !== authUserId){
+    if (userId !== authUserId) {
       // make sure user is the owner of the wishlist before allowing removing others members
       const ownershipCheck = await db.query(`
         SELECT m.owner
@@ -617,7 +618,7 @@ router.delete('/:id/members', authenticate, async (req, res) => {
 router.put('/:id/members', authenticate, async (req, res) => {
   const wishlistId = parseInt(req.params.id);
   const authUserId = req.user.userId; // Get user ID from the authenticated token
-  const { userId, blind, owner } = req.body;  // the user provides the userId of the member to add
+  const { userId, blind, owner, notifications } = req.body;  // the user provides the userId of the member to add
 
   if (!userId) {
     return res.status(400).json({ message: "User ID is required" });
@@ -633,41 +634,78 @@ router.put('/:id/members', authenticate, async (req, res) => {
       return res.status(404).json({ error: "Wishlist not found." });
     }
 
-    // make sure user is the owner of the wishlist before allowing editing of others memberships
-    const ownershipCheck = await db.query(`
-        SELECT m.owner
-        FROM wishlist_members m
-        WHERE m.user_id = $1 AND m.wishlists_id = $2;
-        `, [authUserId, wishlistId]);
-
-    if (ownershipCheck.rows.length === 0) {
-      return res.status(403).json({ error: "Access denied. You are not a member of this wishlist." });
-    }
-
-    if (!ownershipCheck.rows[0].owner) {
-      return res.status(403).json({ error: "Only the owner can edit this wishlist membership." });
-    }
-
     // Get the membership ID
     const memberCheck = await db.query(`
-          SELECT * FROM wishlist_members WHERE wishlists_id = $1 AND user_id = $2
-      `, [wishlistId, userId]);
+      SELECT * FROM wishlist_members WHERE wishlists_id = $1 AND user_id = $2
+    `, [wishlistId, userId]);
 
 
     if (memberCheck.rows.length === 0) {
       return res.status(404).json({ message: "User is not a member of this wishlist" });
     }
 
-    // edit a users membership
-    const result = await db.query(`
+
+    // make sure user is the owner of the wishlist before allowing editing of others memberships
+    const ownershipCheck = await db.query(`
+      SELECT m.owner
+      FROM wishlist_members m
+      WHERE m.user_id = $1 AND m.wishlists_id = $2;
+      `, [authUserId, wishlistId]);
+
+
+    if (ownershipCheck.rows.length === 0) {
+      return res.status(403).json({ error: "Access denied. You are not a member of this wishlist." });
+    }
+
+
+    // if it is another user trying to edit someone elses membership
+    if (userId !== authUserId) {
+
+      if (!ownershipCheck.rows[0].owner) {
+        return res.status(403).json({ error: "Only the owner can edit this wishlist membership." });
+      }
+
+      // edit a users membership
+      let result = await db.query(`
         UPDATE wishlist_members
         SET 
             blind = COALESCE($1, blind),
             owner = COALESCE($2, owner),
+            notifications = COALESCE($3, notifications),
             dateUpdated = NOW()
-        WHERE id = $7
+        WHERE id = $4
         RETURNING *;
-      `, [blind, owner, memberCheck.rows[0].id]);
+      `, [blind, owner, notifications, memberCheck.rows[0].id]);
+
+    } else {
+      // if the user is trying to edit their notifications
+      // edit your own membership
+
+      if (ownershipCheck.rows[0].owner) {
+        // you are the owner so you can change anything
+        let result = await db.query(`
+        UPDATE wishlist_members
+        SET 
+            blind = COALESCE($1, blind),
+            owner = COALESCE($2, owner),
+            notifications = COALESCE($3, notifications),
+            dateUpdated = NOW()
+        WHERE id = $4
+        RETURNING *;
+      `, [blind, owner, notifications, memberCheck.rows[0].id]);
+
+      } else {
+        // you are not an owner so you can only change your notifications
+        let result = await db.query(`
+        UPDATE wishlist_members
+        SET 
+            notifications = COALESCE($1, notifications),
+            dateUpdated = NOW()
+        WHERE id = $2
+        RETURNING *;
+      `, [notifications, memberCheck.rows[0].id]);
+      }
+    }
 
     res.status(201).json({ message: "membership updated successfully.", membership: result.rows[0] });
   } catch (error) {
@@ -780,12 +818,12 @@ router.post('/share', authenticate, async (req, res) => {
       const memberUserId = userCheck.rows[0].id;
 
       await db.query(`
-        INSERT INTO wishlist_members (user_id, wishlists_id, owner, blind, dateCreated, dateUpdated)
-        VALUES ($1, $2, false, false, NOW(), NOW()) ON CONFLICT DO NOTHING;
+        INSERT INTO wishlist_members (user_id, wishlists_id, owner, blind, notifications, dateCreated, dateUpdated)
+        VALUES ($1, $2, false, false, true, NOW(), NOW()) ON CONFLICT DO NOTHING;
       `, [memberUserId, wishlist_id]);
 
       // send notification, make sure they allow notifications
-      if(userCheck.rows[0].notifications){
+      if (userCheck.rows[0].notifications) {
         await createNotification([memberUserId], "You've been invited to a wishlist!", `${fromUser} has invited you to the wishlist: ${wishlistCheck.rows[0].name}`, `/wishlists/${wishlistCheck.rows[0].id}`);
       }
 

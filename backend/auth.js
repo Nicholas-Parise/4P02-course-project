@@ -27,25 +27,25 @@ router.post('/register', async (req, res, next) => {
     if (displayName !== undefined && typeof displayName !== "string") {
         return res.status(400).json({ error: "displayName must be a string" });
     }
-    
+
     if (bio !== undefined && typeof bio !== "string") {
         return res.status(400).json({ error: "bio must be a string" });
     }
 
     // default picture
     const picture = "/assets/placeholder-avatar.png";
-    
+
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const result = await db.query(
-            `INSERT INTO users (displayName, password, email, picture, bio, notifications, dateCreated) 
-            VALUES ($1, $2, $3, $4, $5, COALESCE($6, true), NOW()) RETURNING id, displayName, email, notifications`,
+            `INSERT INTO users (displayName, password, email, picture, bio, notifications, pro, dateCreated) 
+            VALUES ($1, $2, $3, $4, $5, COALESCE($6, true), false, NOW()) RETURNING id, displayName, email, notifications`,
             [displayName, hashedPassword, email, picture, bio, notifications]
         );
 
         // send notification if allowed 
-        if(result.rows[0].notifications){
+        if (result.rows[0].notifications) {
             await createNotification([result.rows[0].id], "Welcome to Wishify!", "Hello from the wishify team! we are so excited to welcome you to this platform, if you need any assistance checkout the help page.", "/help");
         }
 
