@@ -23,6 +23,8 @@ picture TEXT,
 notifications BOOLEAN,
 pro BOOLEAN,
 setup BOOLEAN,
+google_id TEXT UNIQUE,
+provider TEXT,
 dateupdated TIMESTAMP,
 datecreated TIMESTAMP DEFAULT NOW()
 );
