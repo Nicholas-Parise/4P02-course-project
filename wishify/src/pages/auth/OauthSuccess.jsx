@@ -2,8 +2,7 @@ import {useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useSearchParams } from 'react-router-dom'
 
-
-const OauthSuccess = () => {
+const OauthSuccess = ({setIsLoggedIn}) => {
   // Put session token in sessionStorage if it's in the URL query string
   const [searchParams, setSearchParams] = useSearchParams();
   const token = searchParams.get("token");
