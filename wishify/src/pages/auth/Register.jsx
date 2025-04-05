@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { useSearchParams } from 'react-router-dom'
 import '../../register.css'
+import google from "../../assets/Google.svg";
 
 const Register = () => {
   // Put share_token in sessionStorage if it's in the URL query string
@@ -160,6 +161,12 @@ const Register = () => {
     setShowPassword(prevState => !prevState)
   }
 
+
+  const handleGoogleLogin = () => {
+    window.location.href = 'https://api.wishify.ca/auth/google';
+  };
+
+
   return (
     <>
       <section className="register-container">
@@ -262,7 +269,13 @@ const Register = () => {
         <div className="register-signup">
           Already have an account? <Link to="/login">Sign in here</Link>
         </div>
+        <br></br>
+        <hr></hr>
+        <button onClick={handleGoogleLogin}>
+                <img align="left" src={google} alt="G" />
+                  Login with Google</button>
       </section>
+      
     </>
   )
 }
