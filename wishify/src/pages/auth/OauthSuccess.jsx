@@ -1,8 +1,11 @@
 import {useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useSearchParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 const OauthSuccess = ({setIsLoggedIn}) => {
+
+  const navigate = useNavigate();
   // Put session token in sessionStorage if it's in the URL query string
   const [searchParams, setSearchParams] = useSearchParams();
   const token = searchParams.get("token");
@@ -18,7 +21,6 @@ const OauthSuccess = ({setIsLoggedIn}) => {
       </>
     );
     setIsLoggedIn(true);
-    setResponseType("success");
     navigate("/home");
   }else{
     console.error("No token found");
