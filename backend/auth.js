@@ -4,8 +4,10 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const router = express.Router();
 const db = require('./db');
+const passport = require('passport');
 const createNotification = require("./middleware/createNotification");
 const sendEmail = require("./middleware/sendEmail");
+require('./middleware/oauth');
 require("dotenv").config();
 
 // localhost:3000/auth/register
@@ -89,7 +91,7 @@ router.post('/login', async (req, res, next) => {
         const token = jwt.sign(
             { userId: user.rows[0].id, email: user.rows[0].email, displayName: user.rows[0].displayname },
             process.env.SECRET_KEY,
-            { expiresIn: "24h" });
+            { expiresIn: "7d" });
 
         await db.query("INSERT INTO sessions (user_id, token, created) VALUES ($1, $2, NOW())", [user.rows[0].id, token]);
 
@@ -266,6 +268,35 @@ router.post("/reset-password", async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
+
+
+// Route to start Google OAuth
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+
+// Callback route Google redirects to after auth, returns token
+router.get('/google/callback', passport.authenticate('google', { session: false }), async(req, res) => {
+  const user = req.user;
+
+
+  const token = jwt.sign(
+    { userId: user.id, email: user.email, displayName: user.displayname },
+    process.env.SECRET_KEY,
+    { expiresIn: "7d" });
+
+    await db.query("INSERT INTO sessions (user_id, token, created) VALUES ($1, $2, NOW())", [user.id, token]);
+
+    return res.status(200).json({ message: "oauth successful", token });
+
+
+  // Create JWT token
+  const token2 = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+  // Redirect back to frontend with the token
+  res.redirect(`${process.env.FRONTEND_URL}/oauth-success?token=${token2}`);
+});
+
 
 
 module.exports = router;
