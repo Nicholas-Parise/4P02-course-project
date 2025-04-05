@@ -287,16 +287,8 @@ router.get('/google/callback', passport.authenticate('google', { session: false 
 
     await db.query("INSERT INTO sessions (user_id, token, created) VALUES ($1, $2, NOW())", [user.id, token]);
 
-    return res.status(200).json({ message: "oauth successful", token });
-
-
-  // Create JWT token
-  const token2 = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-
-  // Redirect back to frontend with the token
-  res.redirect(`${process.env.FRONTEND_URL}/oauth-success?token=${token2}`);
+//    res.status(200).json({ message: "oauth successful", token });
+    return res.redirect(`${process.env.FRONTEND_URL}/auth/oauth-success?token=${token}`);
 });
-
-
 
 module.exports = router;

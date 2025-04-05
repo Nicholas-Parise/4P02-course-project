@@ -8,6 +8,7 @@ import HomePage from "./pages/Home";
 import NoPage from "./pages/NoPage";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import OauthSuccess from "./pages/auth/OauthSuccess";
 import Events from "./pages/Events";
 import Event from "./pages/Event";
 import Wishlists from "./pages/Wishlists";
@@ -36,6 +37,7 @@ function App() {
             <Route index element={<Index />} />
             <Route path="landing" element={<Landing />} />
             <Route path="login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+            <Route path="oauth-success" element={<OauthSuccess setIsLoggedIn={setIsLoggedIn} />} />
             <Route path="register" element={<Register />} />
             <Route path="status" element={<Status />} />
             <Route path="profile/:userId" element={<PublicProfile />} />
