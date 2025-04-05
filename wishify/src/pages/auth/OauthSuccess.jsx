@@ -34,4 +34,4 @@ const OauthSuccess = () => {
   )
 }
 
-export default Register
+export default OauthSuccess
