@@ -14,7 +14,7 @@ const OauthSuccess = ({setIsLoggedIn}) => {
 
   useEffect(() => {
   if (token) {
-    sessionStorage.setItem("token", token);
+    localStorage.setItem('token', token)
     setResponseMessage(
       <>
         Successfully authenticated. Redirecting to your <Link to="/home" className="home-link">home page</Link>...
