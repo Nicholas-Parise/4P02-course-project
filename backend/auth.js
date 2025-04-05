@@ -288,7 +288,7 @@ router.get('/google/callback', passport.authenticate('google', { session: false 
     await db.query("INSERT INTO sessions (user_id, token, created) VALUES ($1, $2, NOW())", [user.id, token]);
 
 //    res.status(200).json({ message: "oauth successful", token });
-    return res.redirect(`${process.env.FRONTEND_URL}/auth/oauth-success?token=${token}`);
+    return res.redirect(`${process.env.FRONTEND_URL}/oauth-success?token=${token}`);
 });
 
 module.exports = router;
