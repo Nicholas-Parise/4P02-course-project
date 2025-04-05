@@ -1,4 +1,4 @@
-import React from 'react'
+import {useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useSearchParams } from 'react-router-dom'
 
@@ -7,9 +7,10 @@ const OauthSuccess = () => {
   // Put session token in sessionStorage if it's in the URL query string
   const [searchParams, setSearchParams] = useSearchParams();
   const token = searchParams.get("token");
+  const [responseMessage, setResponseMessage] = useState("");
 
-  const [responseMessage, setResponseMessage] = React.useState("");
 
+  useEffect(() => {
   if (token) {
     sessionStorage.setItem("token", token);
     setResponseMessage(
@@ -20,16 +21,21 @@ const OauthSuccess = () => {
     setIsLoggedIn(true);
     setResponseType("success");
     navigate("/home");
+  }else{
+    console.error("No token found");
+    setResponseMessage(
+      <>
+        No token given...
+      </>
+    );
   }
-
+}, []);
 
   return (
     <>
       <section>
-        Redirecting
         {responseMessage}
       </section>
-
     </>
   )
 }
