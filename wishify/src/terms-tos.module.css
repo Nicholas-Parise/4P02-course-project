@@ -1,3 +1,57 @@
+
+.container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 40px;
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.heading {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #4f46e5;
+  text-align: center;
+}
+
+.subheading {
+  font-size: 1.5rem;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 4px;
+}
+
+.paragraph {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.list {
+  margin-left: 1.5rem;
+  padding-left: 0;
+  list-style: disc;
+}
+
+.listItem {
+  margin-bottom: 0.25rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.link {
+  color: #4f46e5!important;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+
+/*
 body {
   font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   line-height: 1.7;
@@ -19,7 +73,7 @@ section {
 h1 {
   font-size: 2.5rem;
   margin-bottom: 1rem;
-  color: #4f46e5; /* Wishify purple */
+  color: #4f46e5; 
   text-align: center;
 }
 
@@ -75,3 +129,4 @@ a:hover {
     font-size: 1.25rem;
   }
 }
+*/
