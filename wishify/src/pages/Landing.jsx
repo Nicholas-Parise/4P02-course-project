@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { FaGithub, FaGoogleDrive, FaArrowDown } from "react-icons/fa";
+import { FaGithub, FaGoogleDrive, FaArrowDown, FaStar } from "react-icons/fa";
 import { SiJira } from "react-icons/si";
 import "../Landing.css";
+import PopularItems from "../components/PopularItems.jsx";
 
 const Landing = () => {
   const [activeIndex, setActiveIndex] = useState(null);
@@ -14,8 +15,8 @@ const Landing = () => {
   // Auto-rotate features in hero section
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentFeature((prev) => (prev + 1) % features.length);
-    }, 4000);
+      setCurrentFeature((prev) => (prev + 1) % herohighlights.length);
+    }, 6000);
     return () => clearInterval(interval);
   }, []);
 
@@ -50,22 +51,118 @@ const Landing = () => {
     },
   ];
 
-  const faqs = [
+  // Autorotate feature highlights for hero section
+  const herohighlights = [
     {
-      question: "How do I create a wishlist?",
-      answer: "Click on the 'Create New Wishlist' button and fill in the required details. You can then add items to your wishlist."
+      title: "Create Wishlists",
+      description: "Easily create and manage wishlists for any occasion, from birthdays to weddings.",
+      highlight: "Real-time collaboration"
     },
     {
-      question: "Can I collaborate with others on a wishlist?",
-      answer: "Yes! You can invite friends or family members to collaborate on your wishlist by sharing a link or sending an invitation."
+      title: "Create Events",
+      description: "Organize events and link wishlists to them, making gift-giving for birthdays, weddings, or holidays effortless.",
+      highlight: "Seamless event planning"
+    },
+    {
+      title: "Collaboration",
+      description: "Invite friends and family to contribute to your wishlist, making it a collaborative experience.",
+      highlight: "Teamwork made easy"
+    },
+    {
+      title: "ALL-IN-ONE APPLICATION",
+      description: "Get all these features in one application, making it the ultimate gift-giving tool.",
+      highlight: "All-in-one solution"
+    },
+  ];
+
+  // Popular items data - placeholder until API is ready
+  const popularItems = [
+    {
+      id: 1,
+      name: "Nintendo Switch",
+      image: "/assets/popular/nintendoswitch.jpg",
+      price: "$399.99",
+      rating: 4.8,
+      wishlistCount: 10
+    },
+    {
+      id: 2,
+      name: "Smart Water Bottle",
+      image: "/assets/popular/smartwaterbottle.jpg",
+      price: "$109.95",
+      rating: 4.5,
+      wishlistCount: 6
+    },
+    {
+      id: 3,
+      name: "Cozy Blanket",
+      image: "/assets/popular/blankets.jpg",
+      price: "$49.99",
+      rating: 4.9,
+      wishlistCount: 20
+    },
+    {
+      id: 4,
+      name: "Gourmet Coffee Set",
+      image: "/assets/popular/coffeeset.jpg",
+      price: "$29.99",
+      rating: 4.7,
+      wishlistCount: 8
+    },
+    {
+      id: 5,
+      name: "Portable Charger",
+      image: "/assets/popular/portablecharger.jpg",
+      price: "$24.99",
+      rating: 4.6,
+      wishlistCount: 15
+    },
+    {
+      id: 6,
+      name: "PS5 Console",
+      image: "/assets/popular/ps5.jpg",
+      price: "$499.99",
+      rating: 4.8,
+      wishlistCount: 30
+    },
+    {
+      id: 7,
+      name: "Xbox Series X Console",
+      image: "/assets/popular/xbox.jpg",
+      price: "$399.99",
+      rating: 4.8,
+      wishlistCount: 24
+    },
+    {
+      id: 8,
+      name: "Asus ROG Ally X",
+      image: "/assets/popular/rogally.png",
+      price: "$1299.99",
+      rating: 4.8,
+      wishlistCount: 4
+    }
+  ];
+
+  const faqs = [
+    {
+      question: "I want to create a wishlist, how do I do that for my son christmas?",
+      answer: "Click on Create New Wishlist and then click on 'On behalf of' to create a wishlist for your son. You can then add items and share the wishlist with family and friends."
+    },
+    {
+      question: "How can I add my dad into my wishlist?",
+      answer: "Go to the wishlist settings and click on 'Add Collaborator'. Enter your dad's email address, and he will receive an invitation to join your wishlist."
+    },
+    {
+      question: "How do I delete a wishlist?",
+      answer: "Go to your wishlist page and click on 'Edit Wishlist' and within the edit wishlist dialog box you have an option to delete the page and carefully following the instructions given. Please note this action cannot be undone."
+    },
+    {
+      question: "How to share my wishlist with my friends?",
+      answer: "You can share your wishlist by clicking on the 'Share' button on the wishlist page. You can copy the link or send it directly via email or social media."
     },
     {
       question: "Is there a mobile app available?",
       answer: "Currently we only have a web application, but a mobile app is in development and will be released soon."
-    },
-    {
-      question: "How do I delete a wishlist?",
-      answer: "Go to your wishlist settings and click on 'Delete Wishlist'. Please note this action cannot be undone."
     }
   ];
 
@@ -85,13 +182,11 @@ const Landing = () => {
     },
     {
       name: "Pro",
-      price: "$9.99",
+      price: "$0.99",
       period: "per month",
       features: [
         "Unlimited wishlists",
         "Priority support",
-        "Advanced collaboration tools",
-        "Custom themes",
         "Analytics dashboard",
         "Early access to new features"
       ],
@@ -110,9 +205,9 @@ const Landing = () => {
             <p className="hero-tagline">The ultimate collaborative wishlist platform that makes gift-giving effortless. Create, share, and manage wishlists for any occasion while keeping surprises intact with our unique blind contribution feature. Perfect for holidays, birthdays, weddings, and more.</p>
             
             <div className="feature-highlight">
-              <div className="highlight-badge">{features[currentFeature].highlight}</div>
-              <h2>{features[currentFeature].title}</h2>
-              <p>{features[currentFeature].description}</p>
+              <div className="highlight-badge">{herohighlights[currentFeature].highlight}</div>
+              <h2>{herohighlights[currentFeature].title}</h2>
+              <p>{herohighlights[currentFeature].description}</p>
             </div>
             
             <div className="cta-buttons">
@@ -144,6 +239,13 @@ const Landing = () => {
           ))}
         </div>
       </div>
+
+      {/* Popular Items Section */}
+      <PopularItems 
+        items={popularItems} 
+        title="Most Wishlisted Items" 
+        subtitle="Discover what people are loving right now"
+      />
 
       {/* Use Cases Section */}
       <div className="use-cases">
