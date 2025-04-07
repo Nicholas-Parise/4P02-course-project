@@ -2,6 +2,7 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import '../../login.css'
+import google from "../../assets/Google.svg";
 
 const Login = ({setIsLoggedIn}) => {
   const [isAuthenticating, setIsAuthenticating] = React.useState(false)
@@ -121,6 +122,11 @@ const Login = ({setIsLoggedIn}) => {
     setShowPassword(prevState => !prevState)
   }
 
+
+  const handleGoogleLogin = () => {
+    window.location.href = 'https://api.wishify.ca/auth/google';
+  };
+
   return (
     <>
       <section className="login-container">
@@ -169,7 +175,13 @@ const Login = ({setIsLoggedIn}) => {
         <div className="login-signup">
           Don't have an account? <Link to="/register">Sign up here</Link>
         </div>
+        <br></br>
+        <hr></hr>
+        <button onClick={handleGoogleLogin}>
+        <img src={google} align="left" alt="G" />
+          Login with Google</button>
       </section>
+      
     </>
   )
 }

@@ -36,17 +36,23 @@ router.get('/:itemId', authenticate, async (req, res, next) => {
 // create an item (given wishlists id)
 router.post('/', authenticate, uploadPicture, async (req, res, next) => {
 
-  const { name, description, url, wishlists_id } = req.body;
+  const { name, description, url, wishlists_id, idea_id } = req.body;
   const userId = req.user.userId; // Get user ID from authenticated token
 
   const quantity = req.body.quantity ? parseInt(req.body.quantity, 10) : undefined;
   const price = req.body.price ? parseFloat(req.body.price) : undefined;
 
 
-  if (!wishlists_id || !name || !quantity) {
+  if (!wishlists_id || !quantity) {
     deleteUploadedFile(req);
-    return res.status(400).json({ message: "wishlists_id, name and quantity are required" });
+    return res.status(400).json({ message: "wishlists_id and quantity are required" });
   }
+
+  if (!name && !idea_id) {
+    deleteUploadedFile(req);
+    return res.status(400).json({ message: "name or idea_id is required" });
+  }
+
 
   // Type checking
   if (name !== undefined && typeof name !== "string") {
@@ -102,21 +108,58 @@ router.post('/', authenticate, uploadPicture, async (req, res, next) => {
 
     // make this be the bottom of the list using the amount of items in a wishlist
     const priority = priorityResult.rows[0].next_priority;
+    let ideaData = null;
+    let image = null;
 
-    // Determine image path 
-    let image = "/assets/placeholder-item.png"; // Default image
-    if (req.file) {
-      image = `/uploads/items/${req.file.filename}`; // Use uploaded image path
-    }
+    // if the source idea is provided we want to copy 
+    if (idea_id) {
+      deleteUploadedFile(req);
 
-    // insert the item
-    const result = await db.query(`
-        INSERT INTO items 
-        (member_id, name, description, url, image, quantity, price, priority, dateCreated)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW()) RETURNING *;
+      const ideaResult = await db.query(`
+      SELECT name, description, url, image, price 
+      FROM ideas 
+      WHERE id = $1;
+      `, [idea_id]);
+
+      if (ideaResult.rows.length === 0) {
+        return res.status(404).json({ error: "The provided idea_id does not exist" });
+      }
+
+      ideaData = ideaResult.rows[0];
+
+      await db.query(`
+      UPDATE ideas 
+      SET uses = uses + 1 
+      WHERE id = $1;
+      `, [idea_id]);
+
+
+      // insert the item
+      const result = await db.query(`
+      INSERT INTO items 
+      (member_id, name, description, url, image, quantity, price, priority, dateCreated)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW()) RETURNING *;
+      `, [member_id, ideaData.name, ideaData.description, ideaData.url, ideaData.image, quantity, ideaData.price, priority]);
+
+      res.status(201).json({ message: "Item created successfully", item: result.rows[0] });
+
+    } else {
+      // Determine image path 
+      if (req.file) {
+        image = `/uploads/items/${req.file.filename}`; // Use uploaded image path
+      } else {
+        image = "/assets/placeholder-item.png";
+      }
+
+      // insert the item
+      const result = await db.query(`
+      INSERT INTO items 
+      (member_id, name, description, url, image, quantity, price, priority, dateCreated)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW()) RETURNING *;
       `, [member_id, name, description, url, image, quantity, price, priority]);
 
-    res.status(201).json({ message: "Item created successfully", item: result.rows[0] });
+      return res.status(201).json({ message: "Item created successfully", item: result.rows[0] });
+    }
 
   } catch (error) {
     console.error("Error adding item:", error);
@@ -189,8 +232,8 @@ router.put('/:itemId?', authenticate, async (req, res, next) => {
         // determine if user is an owner of the wishlist
         const ownershipCheck = await db.query(
           `SELECT owner 
-        FROM wishlist_members wm
-        WHERE wishlists_id = $1 AND user_id = $2`,
+          FROM wishlist_members wm
+          WHERE wishlists_id = $1 AND user_id = $2`,
           [wishlist_id, userId]
         );
 
@@ -394,7 +437,7 @@ router.post('/upload/:itemId', authenticate, uploadPicture, async (req, res) => 
   try {
     // make sure owner has permission to do this
     const ownershipCheck = await db.query(
-      `SELECT i.id 
+       `SELECT i.id, i.idea_id 
         FROM items i
         JOIN wishlist_members wm ON i.member_id = wm.id
         WHERE i.id = $1 AND wm.user_id = $2`,
@@ -405,6 +448,12 @@ router.post('/upload/:itemId', authenticate, uploadPicture, async (req, res) => 
       deleteUploadedFile(req);
       return res.status(403).json({ error: "You do not have permission to edit this item" });
     }
+
+    if (ownershipCheck.rows[0].idea_id) {
+      deleteUploadedFile(req);
+      return res.status(403).json({ error: "Cannot change the image of a predefined idea item" });
+    }
+
 
     // Delete the old image off of server
     await deleteImage(itemId);
@@ -425,9 +474,9 @@ async function deleteImage(itemId) {
   const item = await db.query("SELECT image FROM items WHERE id = $1", [itemId]);
 
   const filePath = item.rows[0].image;
-
-  // if the file is not null and is different that default
-  if (filePath && filePath !== "/assets/placeholder-item.png") {
+  
+  // if the file is not null and is different that default, and is not an idea
+  if (filePath && filePath !== "/assets/placeholder-item.png" && !filePath.includes("idea")) {
     const oldPicPath = path.join(__dirname, '.', filePath);
     if (fs.existsSync(oldPicPath)) {
       console.log("deleting this file: " + oldPicPath);

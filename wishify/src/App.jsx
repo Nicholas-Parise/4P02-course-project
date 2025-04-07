@@ -8,6 +8,7 @@ import HomePage from "./pages/Home";
 import NoPage from "./pages/NoPage";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import OauthSuccess from "./pages/auth/OauthSuccess";
 import Events from "./pages/Events";
 import Event from "./pages/Event";
 import Wishlists from "./pages/Wishlists";
@@ -19,6 +20,9 @@ import Index from "./pages/Index";
 import Status from "./pages/Status";
 import Share from"./pages/Share";
 import Ideas from "./pages/Ideas";
+
+import Privacy from "./pages/Privacy";
+import TOS from "./pages/TOS";
 
 import Navbar from "./components/Navbar";
 
@@ -36,10 +40,14 @@ function App() {
             <Route index element={<Index />} />
             <Route path="landing" element={<Landing />} />
             <Route path="login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+            <Route path="oauth-success" element={<OauthSuccess setIsLoggedIn={setIsLoggedIn} />} />
             <Route path="register" element={<Register />} />
             <Route path="status" element={<Status />} />
             <Route path="profile/:userId" element={<PublicProfile />} />
             <Route path="wishlists/share/:share_token" element={<Share isLoggedIn={isLoggedIn} />} />
+
+            <Route path="privacy-policy" element={<Privacy />} />
+            <Route path="terms-of-service" element={<TOS />} />
 
             <Route element={<ProtectedRoutes />}>
               <Route path="home" element={<HomePage />} />

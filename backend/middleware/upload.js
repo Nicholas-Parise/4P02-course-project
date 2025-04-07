@@ -18,7 +18,9 @@ const storage = multer.diskStorage({
             uploadDir = path.join(__dirname, '../uploads/items');
         } else if (req.baseUrl.includes('/users')) {
             uploadDir = path.join(__dirname, '../uploads/users');
-        } else {
+        } else if (req.baseUrl.includes('/ideas')) {
+            uploadDir = path.join(__dirname, '../uploads/ideas');
+        }else {
             uploadDir = path.join(__dirname, '../uploads/misc'); // Fallback for other uploads
         }
 
