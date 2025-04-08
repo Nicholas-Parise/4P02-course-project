@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink } from "react-router-dom";
-import { AiFillGift, AiOutlinePlus, AiOutlineUser, AiFillQuestionCircle } from 'react-icons/ai';
+import { AiFillGift, AiOutlinePlus, AiOutlineUser, AiFillQuestionCircle, AiOutlineMenu, AiOutlineClose } from 'react-icons/ai';
 import { Wishlist } from '../types/types';
 import { WishlistItem } from '../types/types';
 import CreateItemDialog from './CreateItemDialog';
@@ -30,6 +30,8 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isHelpMenuOpen, setIsHelpMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth > 900);
 
   const fetchWishlists = () => {
     const token = localStorage.getItem('token') || '';
@@ -92,59 +94,93 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
     setIsModalOpen(true);
   };
 
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
+  useEffect(() => {
+    const handleResize = () => {
+      const desktop = window.innerWidth > 900;
+      setIsDesktop(desktop);
+      if (desktop) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <>
       {isLoggedIn ? (
         <>
           <nav className='navbar'>
             <div className='container1'>
-              <NavLink to="/" className='logo'>
+              <NavLink to="/" className='logo' onClick={closeMobileMenu}>
                 <h1><span><AiFillGift />Wish</span>ify</h1>
               </NavLink>
 
-              <div className='nav-menu'>
+              {/* Mobile menu button and persistent icons */}
+              <div className="mobile-header-icons">
+                <AiFillQuestionCircle className="text-2xl cursor-pointer" onClick={() => setIsHelpMenuOpen(!isHelpMenuOpen)} />
+                  
+                {isHelpMenuOpen && <HelpMenu closeMenu={() => setIsHelpMenuOpen(false)} />}
+                
+                <AiOutlineUser className="text-2xl cursor-pointer" onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)} />
+                {isProfileMenuOpen && <ProfileMenu 
+                  logOut={() => {setIsLoggedIn(false); localStorage.removeItem("token")}}
+                  closeMenu={() => setIsProfileMenuOpen(false)} />}
+
+                <div className='mobile-menu-button' onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                  {isMobileMenuOpen ? <AiOutlineClose size={24} /> : <AiOutlineMenu size={24} />}
+                </div>
+              </div>
+
+              <div className={`nav-menu ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
                 {listNav.map((item, index) => (
-                  <NavLink key={index} to={item.href} className='nav-link'>
+                  <NavLink key={index} to={item.href} className='nav-link' onClick={closeMobileMenu}>
                     {item.label}
                   </NavLink>
                 ))}
               </div>
 
-              <div className='actions'>
-                <button onClick={() => (fetchWishlists(), openModal())} className='btn'>
-                  <AiOutlinePlus /> Add Wish
-                </button>
-                
-                {/* Help Icon with Click Event */}
-                <div className="relative">
-                  <AiFillQuestionCircle
-                    className="text-2xl cursor-pointer"
-                    onClick={() => setIsHelpMenuOpen(!isHelpMenuOpen)}
-                  />
+              {/* Only show actions on desktop */}
+              {isDesktop && (
+                <div className='actions'>
+                  <button onClick={() => { fetchWishlists(); openModal(); closeMobileMenu(); }} className='btn desktop-add-wish'> <AiOutlinePlus /> Add Wish </button>
                   
-                  {/* Help Menu Component */}
-                  {isHelpMenuOpen && <HelpMenu
-                    closeMenu={() => setIsHelpMenuOpen(false)} />}
-                  
-                </div>
+                  {/* Help Button */}
+                  <div className="relative desktop-help-icon">
+                    <AiFillQuestionCircle className="text-2xl cursor-pointer" onClick={() => setIsHelpMenuOpen(!isHelpMenuOpen)} />
+                    {isHelpMenuOpen && <HelpMenu closeMenu={() => setIsHelpMenuOpen(false)} />}
+                  </div>
 
-                {/* Profile Icon with Click Event */}
-                <div className="relative">
-                  <AiOutlineUser
-                    className="text-2xl cursor-pointer"
-                    onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                  />
+
+                  {/* Profile Button */}
+                  <div className="relative desktop-profile-icon">
+                    <AiOutlineUser className="text-2xl cursor-pointer" onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)} />
+                    
+                    {isProfileMenuOpen && <ProfileMenu 
+                      logOut={() => {setIsLoggedIn(false); localStorage.removeItem("token")}}
+                      closeMenu={() => setIsProfileMenuOpen(false)} 
+                      profile={{displayName, email}}
+                      />}
+                  </div>
                   
-                  {/* Profile Menu Component */}
-                  {isProfileMenuOpen && <ProfileMenu 
-                    logOut={() => {setIsLoggedIn(false), localStorage.removeItem("token")}}
-                    closeMenu={() => setIsProfileMenuOpen(false)} 
-                    profile={{displayName, email}}
-                    />
-      }
                 </div>
-              </div>
+              )}
             </div>
+
+            {/* Floating action button for mobile */}
+            {!isDesktop && (
+              <button 
+                onClick={() => { fetchWishlists(); openModal(); }} 
+                className='mobile-add-wish-btn'
+              >
+                <AiOutlinePlus size={24} />
+              </button>
+            )}
           </nav>
 
           <CreateItemDialog 
@@ -164,11 +200,36 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
             <NavLink to="/landing" className='logo'>
               <h1><span><AiFillGift />Wish</span>ify</h1>
             </NavLink>
-            <div className='container2'>
-              <a href='/Register'><button className='btn'>Sign Up</button></a>
-              &nbsp;
-              <a href='/Login'><button className='btn'>Log In</button></a>
-            </div>
+            
+            {/* Mobile menu button for logged out state - only show on mobile */}
+            {!isDesktop && (
+              <div className="mobile-header-icons">
+                <div className='mobile-menu-button' onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                  {isMobileMenuOpen ? <AiOutlineClose size={24} /> : <AiOutlineMenu size={24} />}
+                </div>
+              </div>
+            )}
+
+            {/* Mobile menu for logged out state - only show on mobile when open */}
+            {!isDesktop && (
+              <div className={`nav-menu ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
+                <a href='/Register' className='nav-link' onClick={closeMobileMenu}>
+                  Sign Up
+                </a>
+                <a href='/Login' className='nav-link' onClick={closeMobileMenu}>
+                  Log In
+                </a>
+              </div>
+            )}
+
+            {/* Desktop buttons for logged out state - only show on desktop */}
+            {isDesktop && (
+              <div className='container2'>
+                <a href='/Register'><button className='btn'>Sign Up</button></a>
+                &nbsp;
+                <a href='/Login'><button className='btn'>Log In</button></a>
+              </div>
+            )}
           </div>
         </div>
       )}
