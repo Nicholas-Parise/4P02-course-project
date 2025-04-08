@@ -7,7 +7,6 @@ import CreateItemDialog from './CreateItemDialog';
 import ProfileMenu from './ProfileMenu';
 import HelpMenu from './HelpMenu';
 import '../components/landingheader.css';
-import React, {useEffect} from 'react';
 
 const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLoggedIn: (val: boolean)=>void, page: string }) => {
   interface NavItem {
@@ -130,7 +129,9 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
                 <AiOutlineUser className="text-2xl cursor-pointer" onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)} />
                 {isProfileMenuOpen && <ProfileMenu 
                   logOut={() => {setIsLoggedIn(false); localStorage.removeItem("token")}}
-                  closeMenu={() => setIsProfileMenuOpen(false)} />}
+                  closeMenu={() => setIsProfileMenuOpen(false)} 
+                  profile={{displayName, email}}
+                  />}
 
                 <div className='mobile-menu-button' onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
                   {isMobileMenuOpen ? <AiOutlineClose size={24} /> : <AiOutlineMenu size={24} />}
