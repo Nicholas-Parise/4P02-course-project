@@ -5,7 +5,6 @@
     border-bottom: 1px solid #eee;
     display: flex;
     align-items: center;
-    padding: 1rem 2rem;
     position: sticky; /* Make the navbar sticky */
     top: 0; /* Stick to the top of the viewport */
     z-index: 1000; /* Ensure the navbar stays above other content */
@@ -100,5 +99,118 @@
 }
 
 .navbar .profile-icon:hover {
-    background: rgba(86, 81, 229, 0.2); /* Slightly darker on hover */
+    background: rgba(86, 81, 229, 0.2);
+}
+
+/* Mobile-specific styles */
+.mobile-header-icons {
+    display: none;
+    align-items: center;
+    gap: 1rem;
+    z-index: 1001;
+}
+
+.mobile-menu-button {
+    display: none;
+    cursor: pointer;
+}
+
+.mobile-add-wish-btn {
+    display: none;
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8d8aee, #5651e5);
+    color: white;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+@media (max-width: 900px) {
+    .mobile-header-icons {
+        display: flex;
+    }
+
+    .mobile-menu-button {
+        display: block;
+    }
+
+    .mobile-add-wish-btn {
+        display: flex;
+    }
+
+    /* Hide desktop elements on mobile */
+    .desktop-add-wish,
+    .desktop-help-icon,
+    .desktop-profile-icon {
+        display: none !important;
+    }
+
+    /* Mobile menu styles */
+    .nav-menu {
+        position: fixed;
+        top: 80px;
+        left: 0;
+        width: 100%;
+        background-color: white;
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem 0;
+        gap: 1rem;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        transform: translateY(-150%);
+        transition: transform 0.3s ease-in-out;
+        z-index: 1000;
+        border-bottom: 1px solid #eee;
+    }
+
+    .nav-menu.mobile-open {
+        transform: translateY(0);
+    }
+
+    .nav-link {
+        width: 100%;
+        text-align: center;
+        padding: 1rem 0;
+    }
+
+    /* Hide the regular actions div completely on mobile */
+    .actions {
+        display: none;
+    }
+}
+
+.navbar .container2 {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+@media (max-width: 900px) {
+    /* Hide desktop buttons on mobile */
+    .navbar .container2 {
+        display: none; 
+    }
+
+    /* Style for mobile menu links in logged out state */
+    .navbar .nav-menu a.nav-link {
+        width: 100%;
+        text-align: center;
+        padding: 1rem 0;
+        color: black;
+        text-decoration: none;
+        display: block;
+    }
+
+    /* Add hover effect for mobile menu links */
+    .navbar .nav-menu a.nav-link:hover {
+        background-color: rgba(86, 81, 229, 0.1);
+    }
 }
