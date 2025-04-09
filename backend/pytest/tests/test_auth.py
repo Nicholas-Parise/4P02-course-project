@@ -21,7 +21,8 @@ def test_create_account(reset_test_account_state, cleanup_test_account):
         json={
             "email":email,
             "password":password,
-            "displayName":"Automated Test Account"
+            "displayName":"Automated Test Account",
+            "notifications": False
         }
     )
 
@@ -34,7 +35,8 @@ def test_create_account_duplicate_email(setup_test_account, cleanup_test_account
         json={
             "email":email,
             "password":password,
-            "displayName":"Automated Test Account"
+            "displayName":"Automated Test Account",
+            "notifications": False
         }
     )
 
@@ -48,7 +50,8 @@ def test_create_account_missing_data():
         json={
             # Missing email
             "password":password,
-            "displayName":"Automated Test Account"
+            "displayName":"Automated Test Account",
+            "notifications": False
         }
     )
 
@@ -61,7 +64,8 @@ def test_create_account_missing_data():
         json={
             "email":email,
             # missing password
-            "displayName":"Automated Test Account"
+            "displayName":"Automated Test Account",
+            "notifications": False
         }
     )
 
@@ -75,6 +79,7 @@ def test_create_account_missing_data():
             "email":email,
             "password":password,
             # missing displayName
+            "notifications": False
         }
     )
 
