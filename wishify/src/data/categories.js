@@ -37,7 +37,14 @@ const wishlistCategories = [
 
   // Travel & Experiences
   "Solo Travel", "Cruises", "Theme Parks", "Historical Sites", "Backpacking",
-  "Food Tourism", "Festivals", "Skiing", "Scuba Diving", "Roadside Attractions"
+  "Food Tourism", "Festivals", "Skiing", "Scuba Diving", "Roadside Attractions",
+
+// newly added
+"Office supplies", "Home essentials", "Kitchen supplies", "winter-wear","Luxury Clothing",
+"Exercise", "Toys"
+
 ];
+
+
 
 export default wishlistCategories

@@ -257,6 +257,28 @@ router.put('/:wishlistId', authenticate, async (req, res, next) => {
       return res.status(403).json({ error: "Only the owner can edit this wishlist." });
     }
 
+    // if event id is something and is a string
+    if (event_id && typeof event_id === "string") {
+      if (event_id.toLowerCase() === "null") {
+
+        // Update the wishlist with provided values (only update fields that are passed)
+        const result = await db.query(`
+          UPDATE wishlists
+          SET 
+              event_id = null,
+              name = COALESCE($1, name),
+              description = COALESCE($2, description),
+              image = COALESCE($3, image),
+              deadline = COALESCE($4, deadline),
+              dateUpdated = NOW()
+          WHERE id = $5
+          RETURNING *;
+        `, [name, description, image, deadline, wishlistId]);
+
+        res.status(200).json({ message: "Wishlist updated successfully.", wishlist: result.rows[0] });
+      }
+    }
+
     // Update the wishlist with provided values (only update fields that are passed)
     const result = await db.query(`
       UPDATE wishlists
