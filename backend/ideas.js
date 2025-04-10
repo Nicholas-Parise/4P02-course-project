@@ -194,19 +194,26 @@ router.post('/', authenticate, uploadPicture, async (req, res, next) => {
         const errors = [];
 
         for (const category of categories) {
-          const { id } = category;
+          const { id, name } = category;
 
-          if (!id) {
+          if (!id && !name) {
             errors.push({ id, message: "id is a required fields" });
             continue;
           }
 
           try {
+            let tempCatId = id;
+            if(name){
+              tempCatId = await db.query(
+                `SELECT id FROM categories WHERE name = $1;`,
+                [name]);
+            }
+
             await db.query(
               `INSERT INTO idea_categories 
               (idea_id, category_id)
               VALUES ($1, $2);`,
-              [ideaId, id]
+              [ideaId, tempCatId]
             );
 
           } catch (error) {

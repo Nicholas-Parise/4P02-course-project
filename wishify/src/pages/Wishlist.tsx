@@ -16,6 +16,7 @@ import { IconButton } from '@mui/material';
 import Alert from "@mui/material/Alert";
 import { FaPeopleGroup } from 'react-icons/fa6';
 import MemberDialog from '../components/MemberDialog';
+import React from 'react';
 
 const Wishlist = () => {
     const navigate = useNavigate();

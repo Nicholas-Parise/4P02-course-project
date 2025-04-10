@@ -52,31 +52,23 @@ const PublicProfile = () => {
             }
             alt="User profile picture"
           />
-          <button style={{color: "#5651e5"}}>Update Picture</button>
         </div>
 
         <div className="profile-header-fields">
           <div className="profile-settings-item">
-            <div className='profile-setting-label'>
-              Name:
-            </div>
 
-            <div className='profile-setting-value'>
+            <div className='profile-setting-displayname'>
               {user.user.displayname}
             </div>
 
           </div>
           <hr />
 
-          <div className="profile-settings-item">
-            <div className='profile-setting-label'>
-              Biography:
-            </div>
-
+          {/* <div className="profile-settings-item"> */}
             <div className='profile-setting-value'>
               {user.user.bio}
             </div>
-          </div>
+          {/* </div> */}
         </div>
       </div>
 

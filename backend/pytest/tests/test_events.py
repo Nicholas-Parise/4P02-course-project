@@ -5,8 +5,6 @@ import os
 import json
 
 domain = "https://api.wishify.ca"
-email = "testAccount287232@wishify.ca"
-password = "$eCur3Pa$$w0rD!1"
 
 sleepTime = 0.8
 
@@ -53,7 +51,7 @@ def test_get_event_by_id(setup_test_account, setup_test_event, cleanup_test_acco
     )
 
     assert res.status_code == 200
-    assert res.json()["id"] == event_id
+    assert res.json()["event"]["id"] == event_id
 
 
 def test_put_event(setup_test_account, setup_test_event, cleanup_test_account, cleanup_test_event):
@@ -79,8 +77,7 @@ def test_put_event(setup_test_account, setup_test_event, cleanup_test_account, c
         headers={"Authorization": f"Bearer {token}"},
     )
 
-    print(res.json())
-    assert res.json()["name"] == rename
+    assert res.json()["event"]["name"] == rename
 
 def test_delete_event(setup_test_account, setup_test_event, cleanup_test_account):
     token, event_id = setup_test_event
@@ -101,3 +98,45 @@ def test_delete_event(setup_test_account, setup_test_event, cleanup_test_account
     )
 
     assert res.status_code == 404
+
+def test_delete_event_no_token(setup_test_account, setup_test_event, cleanup_test_account, cleanup_test_event):
+    token, event_id = setup_test_event
+    cleanup_test_event(token, event_id)
+
+    sleep(sleepTime)
+    res = req.delete(
+        domain+f"/events/{event_id}",
+        # headers={"Authorization": f"Bearer {token}"}, no token
+    )
+
+    assert res.status_code == 401
+
+    # check that the event still exists
+    sleep(sleepTime)
+    res = req.get(
+        domain+f"/events/{event_id}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert res.status_code == 200
+
+def test_delete_event_invalid_token(setup_test_account, setup_test_event, cleanup_test_account, cleanup_test_event):
+    token, event_id = setup_test_event
+    cleanup_test_event(token, event_id)
+
+    sleep(sleepTime)
+    res = req.delete(
+        domain+f"/events/{event_id}",
+        headers={"Authorization": f"Bearer 101968319someRandom4148Token128"},
+    )
+
+    assert res.status_code == 401
+
+    # check that the event still exists
+    sleep(sleepTime)
+    res = req.get(
+        domain+f"/events/{event_id}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert res.status_code == 200

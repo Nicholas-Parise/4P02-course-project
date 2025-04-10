@@ -67,11 +67,17 @@
   color: black;
 }
 
+.profile-setting-displayname {
+  font-weight: bold;
+  font-size: 30px;
+  color: black;
+  text-overflow: ellipsis;
+}
+
 .profile-setting-value {
   flex: 1;
   padding-right: 25px;
   font-size: 20px;
-  overflow: hidden;
   text-overflow: ellipsis;
 }
 

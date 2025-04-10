@@ -28,6 +28,22 @@ const ProfileMenu = ({ closeMenu, logOut, profile }: Props) => {
     }, 250);
   };
 
+<<<<<<< HEAD
+=======
+  /*useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        handleClose();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [closeMenu]);*/
+
+>>>>>>> origin/main
 
   const handleAccountSettings = () => {
     navigate("/profile");

@@ -5,3 +5,4 @@ export { default as EditEmailModal } from './EditEmailModal';
 export { default as EditPasswordModal } from './EditPasswordModal';
 export { default as DeleteAccountModal } from './DeleteAccountModal';
 export { default as AddLikesModal } from './AddLikesModal';
+export { default as FirstSetupModal } from './FirstSetupModal';

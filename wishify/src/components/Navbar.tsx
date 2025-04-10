@@ -7,6 +7,10 @@ import CreateItemDialog from './CreateItemDialog';
 import ProfileMenu from './ProfileMenu';
 import HelpMenu from './HelpMenu';
 import '../components/landingheader.css';
+<<<<<<< HEAD
+=======
+import React from 'react';
+>>>>>>> origin/main
 
 const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLoggedIn: (val: boolean)=>void, page: string }) => {
   interface NavItem {
