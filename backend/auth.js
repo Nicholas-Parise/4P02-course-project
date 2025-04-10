@@ -41,8 +41,8 @@ router.post('/register', async (req, res, next) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const result = await db.query(
-            `INSERT INTO users (displayName, password, email, picture, bio, notifications, pro, dateCreated) 
-            VALUES ($1, $2, $3, $4, $5, COALESCE($6, true), false, NOW()) RETURNING id, displayName, email, notifications`,
+            `INSERT INTO users (displayName, password, email, picture, bio, notifications, pro, setup, dateCreated) 
+            VALUES ($1, $2, $3, $4, $5, COALESCE($6, true), false, true, NOW()) RETURNING id, displayName, email, notifications`,
             [displayName, hashedPassword, email, picture, bio, notifications]
         );
 
@@ -140,7 +140,7 @@ router.get('/me', async (req, res, next) => {
             return res.status(401).json({ message: "Invalid token" });
         }
 
-        const user = await db.query("SELECT id, displayName, email, picture, bio FROM users WHERE id = $1", [session.rows[0].user_id]);
+        const user = await db.query("SELECT id, displayName, email, picture, bio, setup FROM users WHERE id = $1", [session.rows[0].user_id]);
 
         if (user.rows.length === 0) { // If a user gets removed but the token is still active 
             return res.status(404).json({ message: "User not found" });

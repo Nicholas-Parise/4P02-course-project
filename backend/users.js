@@ -13,7 +13,7 @@ const uploadPicture = require('./middleware/upload');
 router.get('/', authenticate, async (req, res, next) => {
   try {
     const userId = req.user.userId; // Get user ID from authenticated token
-    const result = await db.query('SELECT id, email, displayName, bio, picture, pro, datecreated, dateupdated FROM users WHERE id = $1', [userId]);
+    const result = await db.query('SELECT id, email, displayName, bio, picture, pro, setup, datecreated, dateupdated FROM users WHERE id = $1', [userId]);
     const result2 = await db.query(
       `SELECT c.*, uc.love FROM categories c
         JOIN user_categories uc ON c.id = uc.category_id
@@ -35,7 +35,7 @@ router.get('/', authenticate, async (req, res, next) => {
 router.put('/', authenticate, async (req, res) => {
   try {
     const userId = req.user.userId; // Get user ID from authenticated token
-    const { email, displayName, password, newPassword, bio, notifications } = req.body;
+    const { email, displayName, password, newPassword, bio, notifications, setup } = req.body;
     let newHashedPassword;
 
     // Type checking
@@ -57,7 +57,9 @@ router.put('/', authenticate, async (req, res) => {
     if (notifications !== undefined && typeof notifications !== "boolean") {
       return res.status(400).json({ error: "notifications must be a boolean" });
     }
-
+    if (setup !== undefined && typeof setup !== "boolean") {
+      return res.status(400).json({ error: "setup must be a boolean" });
+    }
 
     // if user sends a new password, make sure they supply their old password and it is correct.
     if (newPassword || email) {
@@ -93,9 +95,10 @@ router.put('/', authenticate, async (req, res) => {
               email = COALESCE($3, email),
               bio = COALESCE($4, bio),
               notifications = COALESCE($5, notifications),
+              setup = COALESCE($6, setup),
               dateupdated = NOW()
-          WHERE id = $6
-          RETURNING id, email, displayName, bio, notifications, datecreated, dateupdated`, [displayName, newHashedPassword, email, bio, notifications, userId]);
+          WHERE id = $7
+          RETURNING id, email, displayName, bio, notifications, datecreated, dateupdated`, [displayName, newHashedPassword, email, bio, notifications, setup, userId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "User not found" });
