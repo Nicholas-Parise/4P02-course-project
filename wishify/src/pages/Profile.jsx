@@ -275,8 +275,6 @@ const Profile = () => {
       love: type === 'likes' // true if likes, false if dislikes
     }))
 
-    console.log("HI", categories)
-
     try {
       const response = await fetch('https://api.wishify.ca/users/categories', {
         method: 'POST',
