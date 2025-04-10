@@ -21,6 +21,8 @@ import Status from "./pages/Status";
 import Share from"./pages/Share";
 import Ideas from "./pages/Ideas";
 
+import About from "./pages/About";
+
 import Privacy from "./pages/Privacy";
 import TOS from "./pages/TOS";
 
@@ -48,6 +50,7 @@ function App() {
 
             <Route path="privacy-policy" element={<Privacy />} />
             <Route path="terms-of-service" element={<TOS />} />
+            <Route path="about" element={<About />} />
 
             <Route element={<ProtectedRoutes />}>
               <Route path="home" element={<HomePage />} />
