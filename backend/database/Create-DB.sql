@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS idea_categories
-DROP TABLE IF EXISTS ideas
+DROP TABLE IF EXISTS idea_categories;
+DROP TABLE IF EXISTS ideas;
 DROP TABLE IF EXISTS contributions;
 DROP TABLE IF EXISTS items;
 DROP TABLE IF EXISTS wishlist_members;
