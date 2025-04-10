@@ -206,7 +206,7 @@ router.post('/', authenticate, uploadPicture, async (req, res, next) => {
             if(name){
               tempCatId = await db.query(
                 `SELECT id FROM categories WHERE name = $1;`,
-                [id]);
+                [name]);
             }
 
             await db.query(
