@@ -3,6 +3,7 @@ import { IdeaItem, Tag } from "../types/types";
 import React from "react";
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
+import PopularItems from "../components/PopularItems";
 
 const Ideas = () => {
 
@@ -102,7 +103,9 @@ const Ideas = () => {
             name: "Pheonix Wooden Coaster T-Shirt",
             tags: [shirt, rollerCoaster],
             image: "https://ih1.redbubble.net/image.1830814849.1212/ssrco,slim_fit_t_shirt,flatlay,101010:01c5ca27c6,front,wide_portrait,750x1000-bg,f8f8f8.jpg",
-            sponsor: "Knoebels Amusement Resort"
+            sponsor: true,
+            price: "$" + (Math.random() * 100).toFixed(2), // Random price between 0 and 100
+            rating: (Math.random() * 5).toFixed(1) // Random rating between 0 and 5
         },
         {
             id: 2,
@@ -110,7 +113,9 @@ const Ideas = () => {
             name: "Cyberpunk LED Keyboard",
             tags: [electronics, keyboards, gaming],
             image: "",
-            sponsor: "Illogitech"
+            sponsor: true,
+            price: "$" + (Math.random() * 100).toFixed(2),
+            rating: (Math.random() * 5).toFixed(1)
         },
         {
             id: 3,
@@ -118,15 +123,19 @@ const Ideas = () => {
             name: "Minimalist Leather Wallet",
             tags: [accessories, wallets],
             image: "",
-            sponsor: "The Edge Wallet"
+            sponsor: true,
+            price: "$" + (Math.random() * 100).toFixed(2),
+            rating: (Math.random() * 5).toFixed(1)
         },
         {
             id: 4,
             match_rating: 1,
             name: "Vintage Vinyl Record Player",
             tags: [music, vinyl, electronics],
-            image: "",
-            sponsor: null
+            image: "https://i.ebayimg.com/images/g/D2kAAOSwAuRfNgmE/s-l1200.jpg",
+            sponsor: false,
+            price: "$" + (Math.random() * 100).toFixed(2),
+            rating: (Math.random() * 5).toFixed(1)
         },
         {
             id: 5,
@@ -134,7 +143,9 @@ const Ideas = () => {
             name: "NASA Logo Hoodie",
             tags: [space, hoodies],
             image: "",
-            sponsor: "NASA"
+            sponsor: true,
+            price: "$" + (Math.random() * 100).toFixed(2),
+            rating: (Math.random() * 5).toFixed(1)
         },
         {
             id: 6,
@@ -142,7 +153,9 @@ const Ideas = () => {
             name: "Mechanical Gaming Mouse",
             tags: [electronics, gaming],
             image: "",
-            sponsor: null
+            sponsor: false,
+            price: "$" + (Math.random() * 100).toFixed(2),
+            rating: (Math.random() * 5).toFixed(1)
         },
         {
             id: 7,
@@ -150,7 +163,9 @@ const Ideas = () => {
             name: "Handmade Ceramic Coffee Mug",
             tags: [mugs, handmade],
             image: "",
-            sponsor: null
+            sponsor: false,
+            price: "$" + (Math.random() * 100).toFixed(2),
+            rating: (Math.random() * 5).toFixed(1)
         },
         {
             id: 8,
@@ -158,7 +173,9 @@ const Ideas = () => {
             name: "The Art of Computer Programming (Book Set)",
             tags: [books, programming, computerScience],
             image: "",
-            sponsor: null
+            sponsor: false,
+            price: "$" + (Math.random() * 100).toFixed(2),
+            rating: (Math.random() * 5).toFixed(1)
         },
         {
             id: 9,
@@ -166,7 +183,9 @@ const Ideas = () => {
             name: "Portable Solar Power Bank",
             tags: [electronics, charging, outdoor],
             image: "",
-            sponsor: null
+            sponsor: false,
+            price: "$" + (Math.random() * 100).toFixed(2),
+            rating: (Math.random() * 5).toFixed(1)
         },
         {
             id: 10,
@@ -174,7 +193,9 @@ const Ideas = () => {
             name: "Racism",
             tags: [toxic, hate],
             image: "",
-            sponsor: "Racism Inc."
+            sponsor: true,
+            price: "$" + (Math.random() * 100).toFixed(2),
+            rating: (Math.random() * 5).toFixed(1)
         },
         {
             id: 11,
@@ -182,7 +203,9 @@ const Ideas = () => {
             name: "War",
             tags: [toxic, hate],
             image: "",
-            sponsor: null
+            sponsor: false,
+            price: "$" + (Math.random() * 100).toFixed(2),
+            rating: (Math.random() * 5).toFixed(1)
         },
         {
             id: 12,
@@ -190,7 +213,9 @@ const Ideas = () => {
             name: "Peace and Love",
             tags: [good, love],
             image: "",
-            sponsor: "Ringo Starr"
+            sponsor: true,
+            price: "$" + (Math.random() * 100).toFixed(2),
+            rating: (Math.random() * 5).toFixed(1)
         },
     ];
 
@@ -201,8 +226,22 @@ const Ideas = () => {
             name: "PS5 Console",
             tags: [gaming, electronics],
             image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTdHG_9JDYt5Xr8gaLDchcGIhjjdAkE5m8U5A&s",
-            sponsor: null
+            sponsor: false,
+            price: "$" + (Math.random() * 100).toFixed(2),
+            rating: (Math.random() * 5).toFixed(2),
+            wishlistCount: 5
         },
+        { 
+            id: 2,
+            match_rating: 0.9,
+            name: "Gaming Chair",
+            tags: [gaming, electronics],
+            image: "https://m.media-amazon.com/images/I/61eLrSo6bYL.jpg",
+            sponsor: false,
+            price: "$" + (Math.random() * 100).toFixed(2),
+            rating: (Math.random() * 5).toFixed(2),
+            wishlistCount: 3
+        }
     ]
 
     const getColor = (love: boolean | null) => {
@@ -219,11 +258,9 @@ const Ideas = () => {
     return (
         <section className="bg-white border-2 border-solid border-[#5651e5] rounded-[25px]">
             <h1 className="text-3xl font-bold text-center text-[#5651e5]">Ideas</h1>
-            <h1>
-                Trending
-            </h1>
+            <PopularItems title={"Trending"} items={trending} tagsEnabled={false} wishlistCountEnabled={true}/>
             <div className="grid md:grid-cols-4 gap-4 p-4">
-                {trending.map((item) => (
+                {/*trending.map((item) => (
                     <div key={item.id} className="bg-white border rounded-lg shadow-md p-4 text-center">
                         <div className="flex flex-col h-full flex-grow relative">
                             <img src={item.image || "/assets/placeholder-item.png"} alt={item.name} className="mx-auto max-w-32 max-h-32 rounded-lg mb-4" />
@@ -234,13 +271,11 @@ const Ideas = () => {
                             </Fab>
                         </div>
                     </div>
-                ))}
+                ))*/}
             </div>
-            <h1>
-                AI Recommended Gifts For You
-            </h1>
+            <PopularItems title="AI Recommended For You" items={sortedIdeas} tagsEnabled={true} wishlistCountEnabled={false}/>
             <div className="grid md:grid-cols-4 gap-4 p-4">
-                {ideas.map((item) => (
+                {/*ideas.map((item) => (
                     <div key={item.id} className="bg-white border rounded-lg shadow-md p-4 text-center">
                         <div className="flex flex-col h-full flex-grow relative">
                             <img src={item.image || "/assets/placeholder-item.png"} alt={item.name} className="mx-auto max-w-32 max-h-32 rounded-lg mb-4" />
@@ -263,7 +298,8 @@ const Ideas = () => {
                             </Fab>
                         </div>
                     </div>
-                ))}
+                ))*/}
+                
             </div>
         </section>
     );

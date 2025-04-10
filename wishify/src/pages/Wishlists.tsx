@@ -123,7 +123,6 @@ const Wishlists = () => {
       }),
       body: JSON.stringify({
           name: uniqueTitle,
-          eventid: "",
           description: "",
           image: "", 
       })
@@ -151,12 +150,6 @@ const Wishlists = () => {
     } else{
       setActiveOverlay(title)
     }
-  }
-  function handleMyself(){
-    console.log("myself")
-  }
-  function handleBehalf(){
-    console.log("behalf")
   }
   function handleRenameWishlist(){
     const wishlistNames = wishlists.map(wishlist => wishlist.name);
@@ -340,13 +333,6 @@ const Wishlists = () => {
         <ModalBox sx={boxStyle}>
           <form autoComplete="off" onSubmit={handleCreateWishlist}>
             <FormControl sx={{ width: '25ch' }}>
-              <Typography id="modal-modal-title" variant="h6" component="h2">
-                Who is this for?
-              </Typography>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <ModalButton style={{width:"50%"}} onClick={handleMyself}>For Myself</ModalButton>
-                <ModalButton style={{width:"50%"}} onClick={handleBehalf}>On Behalf Of Somebody</ModalButton>
-              </div>
               <TextField
                 fullWidth
                 value={newWishlistTitle}

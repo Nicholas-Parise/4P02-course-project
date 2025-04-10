@@ -25,21 +25,8 @@ const ProfileMenu = ({ closeMenu, logOut, profile }: Props) => {
     setIsClosing(true);
     setTimeout(() => {
       closeMenu();
-    }, 300);
+    }, 250);
   };
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        handleClose();
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [closeMenu]);
 
 
   const handleAccountSettings = () => {
