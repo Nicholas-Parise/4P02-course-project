@@ -9,6 +9,7 @@ export interface Wishlist {
     share_token?: string,
     deadline?: string,
     creator_displayname?: string,
+    creator_id?: number
 };
 
 export interface Event {

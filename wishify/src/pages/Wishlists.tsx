@@ -41,7 +41,7 @@ const Wishlists = () => {
   
   const [wishlists, setWishlists] = useState<Wishlist[]>([])
   const [sharedWishlists, setSharedWishlists] = useState<Wishlist[]>([])
-  const [username, setUsername] = useState<string>('')
+  const [userId, setUserId] = useState<number>()
 
   // pulling all wishlists from the backend and storing in wishlists state
   useEffect(() => {
@@ -55,8 +55,8 @@ const Wishlists = () => {
       })
         .then((response) => response.json())
         .then((data) => {
-          let ownedWishlists = data.filter((wishlist: Wishlist) => wishlist.creator_displayname == username);
-          let sharedWishlists = data.filter((wishlist: Wishlist) => wishlist.creator_displayname != username);
+          let ownedWishlists = data.filter((wishlist: Wishlist) => wishlist.creator_id == userId);
+          let sharedWishlists = data.filter((wishlist: Wishlist) => wishlist.creator_id != userId);
           setWishlists(ownedWishlists);
           setSharedWishlists(sharedWishlists);
           console.log(data);
@@ -68,7 +68,7 @@ const Wishlists = () => {
           console.log(error)
         })
         //.finally(() => setLoading(false))
-  }, [username])
+  }, [userId])
 
   useEffect(() => {
     setToken(localStorage.getItem('token') || '')
@@ -81,8 +81,8 @@ const Wishlists = () => {
       })
         .then((response) => response.json())
         .then((data) => {
-          let username = data.user.displayname
-          setUsername(username);
+          let userId = data.user.id
+          setUserId(userId);
           console.log(data);
           //setLoading(false)
         })
