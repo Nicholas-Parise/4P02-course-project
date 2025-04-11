@@ -160,6 +160,7 @@ router.get('/:wishlistId', authenticate, async (req, res, next) => {
         WHERE wm.wishlists_id = $1;`,
         [wishlistId]
       );
+      contributionResult = contributionResult.rows;
     }
 
     const memberResult = await db.query(`
@@ -170,7 +171,7 @@ router.get('/:wishlistId', authenticate, async (req, res, next) => {
         `, [wishlistId]);
 
 
-    res.status(200).json({ wishlist, items: itemsResult.rows, contributions: contributionResult.rows, members: memberResult.rows });
+    res.status(200).json({ wishlist, items: itemsResult.rows, contributions: contributionResult, members: memberResult.rows });
   } catch (error) {
     console.error("Error fetching wishlists:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -642,6 +643,8 @@ router.put('/:id/members', authenticate, async (req, res) => {
   const authUserId = req.user.userId; // Get user ID from the authenticated token
   const { userId, blind, owner, notifications } = req.body;  // the user provides the userId of the member to add
 
+  let result;
+
   if (!userId) {
     return res.status(400).json({ message: "User ID is required" });
   }
@@ -688,7 +691,7 @@ router.put('/:id/members', authenticate, async (req, res) => {
       }
 
       // edit a users membership
-      let result = await db.query(`
+      result = await db.query(`
         UPDATE wishlist_members
         SET 
             blind = COALESCE($1, blind),
@@ -696,7 +699,7 @@ router.put('/:id/members', authenticate, async (req, res) => {
             notifications = COALESCE($3, notifications),
             dateUpdated = NOW()
         WHERE id = $4
-        RETURNING *;
+        RETURNING blind,owner,notifications,dateUpdated;
       `, [blind, owner, notifications, memberCheck.rows[0].id]);
 
     } else {
@@ -705,7 +708,7 @@ router.put('/:id/members', authenticate, async (req, res) => {
 
       if (ownershipCheck.rows[0].owner) {
         // you are the owner so you can change anything
-        let result = await db.query(`
+        result = await db.query(`
         UPDATE wishlist_members
         SET 
             blind = COALESCE($1, blind),
@@ -713,18 +716,18 @@ router.put('/:id/members', authenticate, async (req, res) => {
             notifications = COALESCE($3, notifications),
             dateUpdated = NOW()
         WHERE id = $4
-        RETURNING *;
+        RETURNING blind,owner,notifications,dateUpdated;
       `, [blind, owner, notifications, memberCheck.rows[0].id]);
 
       } else {
         // you are not an owner so you can only change your notifications
-        let result = await db.query(`
+        result = await db.query(`
         UPDATE wishlist_members
         SET 
             notifications = COALESCE($1, notifications),
             dateUpdated = NOW()
         WHERE id = $2
-        RETURNING *;
+        RETURNING blind,owner,notifications,dateUpdated;
       `, [notifications, memberCheck.rows[0].id]);
       }
     }

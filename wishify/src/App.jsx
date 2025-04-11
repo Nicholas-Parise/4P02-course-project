@@ -30,6 +30,8 @@ import TOS from "./pages/TOS";
 
 import Navbar from "./components/Navbar";
 
+import Footer from "./components/Footer";
+
 import isLoggedInCheck from "./utils/isLoggedIn";
 
 function App() {
@@ -72,6 +74,7 @@ function App() {
             <Route path="*" element={<NoPage />} />
         </Routes>
       </BrowserRouter>
+      <Footer></Footer>
       </>
     );
 }
