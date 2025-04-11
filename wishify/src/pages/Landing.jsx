@@ -182,7 +182,7 @@ const Landing = () => {
     },
     {
       name: "Pro",
-      price: "$0.99",
+      price: "$1.99",
       period: "per month",
       features: [
         "Unlimited wishlists",
@@ -317,7 +317,7 @@ const Landing = () => {
                   </li>
                 ))}
               </ul>
-              <a href={plan.featured ? "/Login" : "/Register"}>
+              <a href={plan.featured ? "/upgrade-redirect" : "/Register"}>
                 <button className={`plan-button ${plan.featured ? 'featured-button' : ''}`}>
                   {plan.cta}
                 </button>

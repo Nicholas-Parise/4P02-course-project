@@ -22,6 +22,8 @@ import Index from "./pages/Index";
 import Status from "./pages/Status";
 import Share from"./pages/Share";
 import Ideas from "./pages/Ideas";
+import UpgradePage from "./pages/UpgradePage";
+import UpgradeRedirect from "./components/UpgradeRedirect"; // Add this import
 
 import About from "./pages/About";
 
@@ -41,6 +43,7 @@ function App() {
   return (
     <>
       <BrowserRouter>
+
         <div className="relative min-h-screen">
           <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} page={window.location.pathname}/>
           <div className="pb-[200px]">
@@ -67,7 +70,7 @@ function App() {
       
                   <Route path="wishlists" element={<Wishlists />} />
                   <Route path="wishlists/:id" element={<Wishlist />} />
-
+                     <Route path="upgrade" element={<UpgradePage/>} />
                   <Route path="ideas" element={<Ideas />} />
 
                   <Route path="profile" element={<Profile />} />
