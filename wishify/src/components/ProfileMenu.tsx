@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { AiOutlineUser, AiOutlineLogout, AiFillGift, AiOutlineCloseCircle, AiOutlineBell, AiFillBell } from "react-icons/ai";
+import { FaCrown } from "react-icons/fa";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from "@mui/material";
 import "./ProfileMenu.css";
@@ -28,22 +29,13 @@ const ProfileMenu = ({ closeMenu, logOut, profile }: Props) => {
     }, 250);
   };
 
-  /*useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        handleClose();
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [closeMenu]);*/
-
-
   const handleAccountSettings = () => {
     navigate("/profile");
+    handleClose();
+  };
+
+  const handleUpgrade = () => {
+    navigate("/upgrade");
     handleClose();
   };
 
@@ -92,6 +84,14 @@ const ProfileMenu = ({ closeMenu, logOut, profile }: Props) => {
           </div>
         </div>
 
+        <div className="upgrade-pro cursor-pointer" onClick={handleUpgrade}>
+          <FaCrown className="crown-icon" />
+          <div>
+            <p className="upgrade-title">Upgrade to Pro</p>
+            <p className="upgrade-subtitle">Unlock premium features</p>
+          </div>
+        </div>
+
         <div className="notification-toggle-container cursor-pointer" onClick={toggleNotifications}>
           <div className="notification-toggle">
             {notificationsEnabled ? (
@@ -105,6 +105,30 @@ const ProfileMenu = ({ closeMenu, logOut, profile }: Props) => {
         
         <div className="notifications-placeholder">
           <p>Your notifications will appear here.</p>
+        </div>
+
+        <div className="horizontal-buttons-container">
+          <NavLink 
+            to="/privacy-policy" 
+            className="horizontal-button" 
+            onClick={handleClose}
+          >
+            Privacy Policy
+          </NavLink>
+          <NavLink 
+            to="/terms-of-service" 
+            className="horizontal-button" 
+            onClick={handleClose}
+          >
+            Terms of Service
+          </NavLink>
+          <NavLink 
+            to="/about" 
+            className="horizontal-button" 
+            onClick={handleClose}
+          >
+            About
+          </NavLink>
         </div>
 
         <div className="menu-options-bottom">

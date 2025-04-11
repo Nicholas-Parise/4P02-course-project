@@ -65,6 +65,16 @@ const Login = ({setIsLoggedIn}) => {
         );
         setIsLoggedIn(true);
         setResponseType("success");
+        
+        // Check for upgrade redirect first
+        const upgradeRedirect = sessionStorage.getItem("upgrade_redirect");
+        if (upgradeRedirect === "true") {
+          sessionStorage.removeItem("upgrade_redirect");
+          navigate("/upgrade");
+          return;
+        }
+        
+        // Then check for share token (existing functionality)
         const share_token = sessionStorage.getItem("share_token")
         if(share_token) {
           fetch(`https://api.wishify.ca/wishlists/members`, {

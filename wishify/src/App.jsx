@@ -20,6 +20,8 @@ import Index from "./pages/Index";
 import Status from "./pages/Status";
 import Share from"./pages/Share";
 import Ideas from "./pages/Ideas";
+import UpgradePage from "./pages/UpgradePage";
+import UpgradeRedirect from "./components/UpgradeRedirect"; // Add this import
 
 import About from "./pages/About";
 
@@ -47,10 +49,10 @@ function App() {
             <Route path="status" element={<Status />} />
             <Route path="profile/:userId" element={<PublicProfile />} />
             <Route path="wishlists/share/:share_token" element={<Share isLoggedIn={isLoggedIn} />} />
-
             <Route path="privacy-policy" element={<Privacy />} />
             <Route path="terms-of-service" element={<TOS />} />
             <Route path="about" element={<About />} />
+            <Route path="upgrade-redirect" element={<UpgradeRedirect isLoggedIn={isLoggedIn} />} /> {/* New route */}
 
             <Route element={<ProtectedRoutes />}>
               <Route path="home" element={<HomePage />} />
@@ -59,6 +61,7 @@ function App() {
   
               <Route path="wishlists" element={<Wishlists />} />
               <Route path="wishlists/:id" element={<Wishlist />} />
+              <Route path="upgrade" element={<UpgradePage/>} />
 
               <Route path="ideas" element={<Ideas />} />
 
