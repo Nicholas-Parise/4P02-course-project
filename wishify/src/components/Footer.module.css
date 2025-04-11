@@ -1,10 +1,12 @@
 .footer {
-  margin-top: 1rem;
   padding: 2rem 1rem;
   background-color: #f6f6fa;
   border-top: 1px solid #d0d7de;
   font-size: 14px;
   color: #57606a;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
 }
 
 .inner {
