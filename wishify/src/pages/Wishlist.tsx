@@ -27,6 +27,7 @@ const Wishlist = () => {
     const [wishlistMembers, setWishlistMembers] = useState<Member[]>([])
     const [owner, setOwner] = useState<boolean>(false)
     const [blind, setBlind] = useState<boolean>(true)
+    const [notifications, setNotifications] = useState<boolean>(false)
     //const [error, setError] = useState(null)
     //const [loading, setLoading] = useState(false)
     const [token] = useState<string>(localStorage.getItem('token') || '')
@@ -45,6 +46,36 @@ const Wishlist = () => {
       const newArray = [...wishlistMembers] 
       newArray[index] = member
       setWishlistMembers(newArray)
+    }
+
+    const toggleNotifications = () => {
+      let status_code = -1
+      let url = `https://api.wishify.ca/wishlists/${id}/members`
+      // update blind status
+      fetch(url, {
+          method: 'put',
+          headers: new Headers({
+              'Authorization': "Bearer "+token,
+              'Content-Type': 'application/json'
+          }),
+          body: JSON.stringify({
+              "userId":userID,
+              "notifications": !notifications,
+          })
+      })
+      .then((response) => {
+          status_code = response.status
+          return response.json();
+      })
+      .then(() => {
+          if(status_code != 200 && status_code != 201){
+            return
+          }
+          setNotifications(!notifications)
+      })
+      .catch((error) => {
+          console.log(error)
+      })
     }
 
     // Fetch page data onload
@@ -70,6 +101,7 @@ const Wishlist = () => {
           setWishlist(data.wishlist)
           setOwner(data.wishlist.owner)
           setBlind(data.wishlist.blind)
+          setNotifications(data.wishlist.notifications)
           setWishlistItems(data.items)
           setWishlistContributions(data.contributions)
           setEventID(data.wishlist?.event_id)
@@ -132,7 +164,7 @@ const Wishlist = () => {
     }, [location]);
 
     const [wishlist, setWishlist] = useState<Wishlist | undefined>()
-    const [eventID, setEventID] = useState()
+    const [eventID, setEventID] = useState<number>()
     const [event, setEvent] = useState<Event | undefined>()
 
 
@@ -355,7 +387,17 @@ const Wishlist = () => {
   return (
     <>
       <section className='pt-5'>
-          <WishlistHeader wishlist={wishlist} event={event} />
+          <WishlistHeader 
+            wishlist={wishlist} 
+            setWishlist={setWishlist}
+            event={event} 
+            setEventID={setEventID}
+            owner={owner}
+            blind={blind}
+            token={token}
+            notifications={notifications}
+            toggleNotifications={toggleNotifications}
+          />
           <div className="mt-8 mb-4 flex gap-1 items-center justify-between">
             <div className='flex'>
               <FormControl fullWidth>

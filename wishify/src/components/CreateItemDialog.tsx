@@ -179,7 +179,19 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
                 />
 
 
-                <Button sx={{mt: 3}} type="submit" variant="contained">Create</Button>
+                <Button 
+                  sx={{
+                    mt: 3,
+                    background: 'linear-gradient(to right, #8d8aee, #5651e5)',
+                    color: 'white',
+                    borderRadius: '25px',
+                    '&:hover': { background: 'linear-gradient(to right, #5651e5, #343188)' }
+                  }} 
+                  type="submit" 
+                  variant="contained"
+                >
+                  Create
+                </Button>
 
               </FormControl>
             </form>
