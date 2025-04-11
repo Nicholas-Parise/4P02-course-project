@@ -50,7 +50,10 @@ export interface IdeaItem {
     name: string,
     tags: Tag[]
     image: string,
-    sponsor: string | null,
+    sponsor: boolean,
+    price: string,
+    rating?: string,
+    wishlistCount?: number
 }
 
 export interface Contribution {

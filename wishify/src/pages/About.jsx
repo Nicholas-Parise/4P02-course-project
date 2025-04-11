@@ -51,6 +51,15 @@ const teamMembers = [
       "Implemented the user profile pages",
       "Contributed to category-related UI features"
     ]
+  },
+  {
+    name: "Ethan Brennan",
+    role: "Developer",
+    image: "assets/about/ethan.jpg",
+    contributions: [
+      "Developed the Home page and Help page",
+      "Helped in filling up the database with sample data",
+    ]
   }
 ];
 

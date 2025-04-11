@@ -83,7 +83,7 @@ const Landing = () => {
       image: "/assets/popular/nintendoswitch.jpg",
       price: "$399.99",
       rating: 4.8,
-      wishlistCount: 10
+      uses: 10
     },
     {
       id: 2,
@@ -91,7 +91,7 @@ const Landing = () => {
       image: "/assets/popular/smartwaterbottle.jpg",
       price: "$109.95",
       rating: 4.5,
-      wishlistCount: 6
+      uses: 6
     },
     {
       id: 3,
@@ -99,7 +99,7 @@ const Landing = () => {
       image: "/assets/popular/blankets.jpg",
       price: "$49.99",
       rating: 4.9,
-      wishlistCount: 20
+      uses: 20
     },
     {
       id: 4,
@@ -107,7 +107,7 @@ const Landing = () => {
       image: "/assets/popular/coffeeset.jpg",
       price: "$29.99",
       rating: 4.7,
-      wishlistCount: 8
+      uses: 8
     },
     {
       id: 5,
@@ -115,7 +115,7 @@ const Landing = () => {
       image: "/assets/popular/portablecharger.jpg",
       price: "$24.99",
       rating: 4.6,
-      wishlistCount: 15
+      uses: 15
     },
     {
       id: 6,
@@ -123,7 +123,7 @@ const Landing = () => {
       image: "/assets/popular/ps5.jpg",
       price: "$499.99",
       rating: 4.8,
-      wishlistCount: 30
+      uses: 30
     },
     {
       id: 7,
@@ -131,7 +131,7 @@ const Landing = () => {
       image: "/assets/popular/xbox.jpg",
       price: "$399.99",
       rating: 4.8,
-      wishlistCount: 24
+      uses: 24
     },
     {
       id: 8,
@@ -139,7 +139,7 @@ const Landing = () => {
       image: "/assets/popular/rogally.png",
       price: "$1299.99",
       rating: 4.8,
-      wishlistCount: 4
+      uses: 4
     }
   ];
 
@@ -182,7 +182,7 @@ const Landing = () => {
     },
     {
       name: "Pro",
-      price: "$0.99",
+      price: "$1.99",
       period: "per month",
       features: [
         "Unlimited wishlists",
@@ -245,6 +245,7 @@ const Landing = () => {
         items={popularItems} 
         title="Most Wishlisted Items" 
         subtitle="Discover what people are loving right now"
+        wishlistCountEnabled={true}
       />
 
       {/* Use Cases Section */}
@@ -316,7 +317,7 @@ const Landing = () => {
                   </li>
                 ))}
               </ul>
-              <a href={plan.featured ? "/Login" : "/Register"}>
+              <a href={plan.featured ? "/upgrade-redirect" : "/Register"}>
                 <button className={`plan-button ${plan.featured ? 'featured-button' : ''}`}>
                   {plan.cta}
                 </button>

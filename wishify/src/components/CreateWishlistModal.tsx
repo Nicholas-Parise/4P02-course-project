@@ -131,7 +131,7 @@ const CreateWishlistModal = ({ open, setOpen, wishlists, setWishlists, token }: 
                   <DatePicker
                     label="Due Date"
                     value={date}
-                    onChange={(newValue) => setDate(newValue)}
+                    onChange={(newValue: any) => setDate(newValue)}
                   />
                 </div>
               </LocalizationProvider>
