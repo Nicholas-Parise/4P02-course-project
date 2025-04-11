@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { IdeaItem, Tag } from "../types/types";
 import React from "react";
 import Fab from '@mui/material/Fab';
@@ -6,243 +6,57 @@ import AddIcon from '@mui/icons-material/Add';
 import PopularItems from "../components/PopularItems";
 
 const Ideas = () => {
-
-    const shirt: Tag = {
-        name: "Shirts",
-        love: true
-    };
-    const rollerCoaster: Tag = {
-        name: "Roller Coasters",
-        love: true
-    };
-    const electronics: Tag = {
-        name: "Electronics",
-        love: true
-    };
-    const keyboards: Tag = {
-        name: "Keyboards",
-        love: true
-    };
-    const gaming: Tag = {
-        name: "Gaming",
-        love: true
-    };
-    const accessories: Tag = {
-        name: "Accessories",
-        love: null
-    };
-    const wallets: Tag = {
-        name: "Wallets",
-        love: false
-    };
-    const music: Tag = {
-        name: "Music",
-        love: true
-    };
-    const vinyl: Tag = {
-        name: "Vinyl",
-        love: true
-    };
-    const outdoor: Tag = {
-        name: "Outdoor",
-        love: false
-    };
-    const charging: Tag = {
-        name: "Charging",
-        love: null
-    };
-    const handmade: Tag = {
-        name: "Handmade",
-        love: null
-    };
-    const mugs: Tag = {
-        name: "Mugs",
-        love: null
-    };
-    const books: Tag = {
-        name: "Books",
-        love: true
-    };
-    const programming: Tag = {
-        name: "Programming",
-        love: true
-    };
-    const computerScience: Tag = {
-        name: "Computer Science",
-        love: true
-    };
-    const space: Tag = {
-        name: "Space",
-        love: true
-    };
-    const hoodies: Tag = {
-        name: "Hoodies",
-        love: null
-    };
-    const toxic: Tag = {
-        name: "Toxic",
-        love: false
-    };
-    const hate: Tag = {
-        name: "Hate",
-        love: false
-    };
-    const good: Tag = {
-        name: "Good",
-        love: true
-    };
-    const love: Tag = {
-        name: "Love",
-        love: true
-    };
-    // delete when API is ready
-    const ideas: IdeaItem[] = [
-        {
-            id: 1,
-            match_rating: 1,
-            name: "Pheonix Wooden Coaster T-Shirt",
-            tags: [shirt, rollerCoaster],
-            image: "https://ih1.redbubble.net/image.1830814849.1212/ssrco,slim_fit_t_shirt,flatlay,101010:01c5ca27c6,front,wide_portrait,750x1000-bg,f8f8f8.jpg",
-            sponsor: true,
-            price: "$" + (Math.random() * 100).toFixed(2), // Random price between 0 and 100
-            rating: (Math.random() * 5).toFixed(1) // Random rating between 0 and 5
-        },
-        {
-            id: 2,
-            match_rating: 0.9,
-            name: "Cyberpunk LED Keyboard",
-            tags: [electronics, keyboards, gaming],
-            image: "",
-            sponsor: true,
-            price: "$" + (Math.random() * 100).toFixed(2),
-            rating: (Math.random() * 5).toFixed(1)
-        },
-        {
-            id: 3,
-            match_rating: 0.7,
-            name: "Minimalist Leather Wallet",
-            tags: [accessories, wallets],
-            image: "",
-            sponsor: true,
-            price: "$" + (Math.random() * 100).toFixed(2),
-            rating: (Math.random() * 5).toFixed(1)
-        },
-        {
-            id: 4,
-            match_rating: 1,
-            name: "Vintage Vinyl Record Player",
-            tags: [music, vinyl, electronics],
-            image: "https://i.ebayimg.com/images/g/D2kAAOSwAuRfNgmE/s-l1200.jpg",
-            sponsor: false,
-            price: "$" + (Math.random() * 100).toFixed(2),
-            rating: (Math.random() * 5).toFixed(1)
-        },
-        {
-            id: 5,
-            match_rating: 0.85,
-            name: "NASA Logo Hoodie",
-            tags: [space, hoodies],
-            image: "",
-            sponsor: true,
-            price: "$" + (Math.random() * 100).toFixed(2),
-            rating: (Math.random() * 5).toFixed(1)
-        },
-        {
-            id: 6,
-            match_rating: 0.95,
-            name: "Mechanical Gaming Mouse",
-            tags: [electronics, gaming],
-            image: "",
-            sponsor: false,
-            price: "$" + (Math.random() * 100).toFixed(2),
-            rating: (Math.random() * 5).toFixed(1)
-        },
-        {
-            id: 7,
-            match_rating: 0.75,
-            name: "Handmade Ceramic Coffee Mug",
-            tags: [mugs, handmade],
-            image: "",
-            sponsor: false,
-            price: "$" + (Math.random() * 100).toFixed(2),
-            rating: (Math.random() * 5).toFixed(1)
-        },
-        {
-            id: 8,
-            match_rating: 1,
-            name: "The Art of Computer Programming (Book Set)",
-            tags: [books, programming, computerScience],
-            image: "",
-            sponsor: false,
-            price: "$" + (Math.random() * 100).toFixed(2),
-            rating: (Math.random() * 5).toFixed(1)
-        },
-        {
-            id: 9,
-            match_rating: 0.8,
-            name: "Portable Solar Power Bank",
-            tags: [electronics, charging, outdoor],
-            image: "",
-            sponsor: false,
-            price: "$" + (Math.random() * 100).toFixed(2),
-            rating: (Math.random() * 5).toFixed(1)
-        },
-        {
-            id: 10,
-            match_rating: 0.2,
-            name: "Racism",
-            tags: [toxic, hate],
-            image: "",
-            sponsor: true,
-            price: "$" + (Math.random() * 100).toFixed(2),
-            rating: (Math.random() * 5).toFixed(1)
-        },
-        {
-            id: 11,
-            match_rating: 0.1,
-            name: "War",
-            tags: [toxic, hate],
-            image: "",
-            sponsor: false,
-            price: "$" + (Math.random() * 100).toFixed(2),
-            rating: (Math.random() * 5).toFixed(1)
-        },
-        {
-            id: 12,
-            match_rating: 0.89,
-            name: "Peace and Love",
-            tags: [good, love],
-            image: "",
-            sponsor: true,
-            price: "$" + (Math.random() * 100).toFixed(2),
-            rating: (Math.random() * 5).toFixed(1)
-        },
-    ];
-
-    const trending: IdeaItem[] = [
-        {
-            id: 1,
-            match_rating: 1,
-            name: "PS5 Console",
-            tags: [gaming, electronics],
-            image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTdHG_9JDYt5Xr8gaLDchcGIhjjdAkE5m8U5A&s",
-            sponsor: false,
-            price: "$" + (Math.random() * 100).toFixed(2),
-            rating: (Math.random() * 5).toFixed(2),
-            wishlistCount: 5
-        },
-        { 
-            id: 2,
-            match_rating: 0.9,
-            name: "Gaming Chair",
-            tags: [gaming, electronics],
-            image: "https://m.media-amazon.com/images/I/61eLrSo6bYL.jpg",
-            sponsor: false,
-            price: "$" + (Math.random() * 100).toFixed(2),
-            rating: (Math.random() * 5).toFixed(2),
-            wishlistCount: 3
-        }
-    ]
+    const [token, setToken] = useState<string>(localStorage.getItem('token') || '')
+    const [ideas, setIdeas] = useState<IdeaItem[]>([]);
+    // fetch ideas data from API
+    const ideaUrl = "https://api.wishify.ca/ideas";
+    useEffect(() => {
+        setToken(localStorage.getItem('token') || '')
+        console.log(token)
+        fetch(ideaUrl, {
+            method: 'get',
+            headers: new Headers({
+              'Authorization': "Bearer "+token
+            })
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              let ideas = data.ideas;
+              setIdeas(ideas);
+              //setLoading(false)
+            })
+            .catch((error) => {
+              //setError(error)
+              //setLoading(false)
+              console.log(error)
+            })
+            //.finally(() => setLoading(false))
+    }, []);
+    // fetch trending data from API
+    const trendingUrl = "https://api.wishify.ca/ideas/trending";
+    const [trending, setTrending] = useState<IdeaItem[]>([]);
+    useEffect(() => {
+        setToken(localStorage.getItem('token') || '')
+        console.log(token)
+        fetch(trendingUrl, {
+            method: 'get',
+            headers: new Headers({
+              'Authorization': "Bearer "+token
+            })
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              let trending = data.trending;
+              setTrending(trending);
+              //setLoading(false)
+            })
+            .catch((error) => {
+              //setError(error)
+              //setLoading(false)
+              console.log(error)
+            })
+            //.finally(() => setLoading(false))
+    }, []);
 
     const getColor = (love: boolean | null) => {
         if (love === null) {
@@ -254,7 +68,6 @@ const Ideas = () => {
         }
     };
 
-    var sortedIdeas = ideas.sort((a, b) => b.match_rating - a.match_rating);
     return (
         <section className="bg-white border-2 border-solid border-[#5651e5] rounded-[25px]">
             <h1 className="text-3xl font-bold text-center text-[#5651e5]">Ideas</h1>
@@ -273,7 +86,7 @@ const Ideas = () => {
                     </div>
                 ))*/}
             </div>
-            <PopularItems title="AI Recommended For You" items={sortedIdeas} tagsEnabled={true} wishlistCountEnabled={false}/>
+            <PopularItems title="AI Recommended For You" items={ideas} tagsEnabled={true} wishlistCountEnabled={false}/>
             <div className="grid md:grid-cols-4 gap-4 p-4">
                 {/*ideas.map((item) => (
                     <div key={item.id} className="bg-white border rounded-lg shadow-md p-4 text-center">

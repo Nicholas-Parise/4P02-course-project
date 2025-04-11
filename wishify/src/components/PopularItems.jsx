@@ -32,7 +32,7 @@ const PopularItems = ({ items, title="", subtitle="", maxItems=0, tagsEnabled, w
               {wishlistCountEnabled ?
                 <div className="wishlist-count">
                   <FaStar className="star-icon" />
-                  <span>{item.wishlistCount.toLocaleString()}+</span>
+                  <span>{item.uses.toLocaleString()}+</span>
                 </div>
                 : null}
             </div>
@@ -46,14 +46,14 @@ const PopularItems = ({ items, title="", subtitle="", maxItems=0, tagsEnabled, w
                 </span>
               </div>
             </div>
-            {tagsEnabled && item.tags && item.tags.length > 0 && (
+            {tagsEnabled && item.categories && item.categories.length > 0 && (
               <ul className="flex flex-wrap items-start absolute bottom-0 left-0">
-              {item.tags.map((tag, index) => (
+              {item.categories.map((tag, index) => (
                   <li
                       key={index}
                       className="text-white text-xs font-medium py-1 px-2 rounded-md mb-1 mr-1"
                       //style={{ backgroundColor: item.gradients[index % item.gradients.length] }}
-                      style={{ backgroundColor: getColor(item.tags[index % item.tags.length].love) }}
+                      style={{ backgroundColor: getColor(item.categories[index % item.categories.length].love) }}
                   >
                       {tag.name}
                   </li>
