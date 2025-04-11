@@ -20,7 +20,7 @@ import { Close } from "@mui/icons-material";
 
 
 
-const FirstSetupModal = ({ open, handleClose }) => {
+const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
   const [predefinedItems, setPredefinedItems] = useState([])
   const [unableToFetchCategories, setUnableToFetchMessage] = useState(false)
 
@@ -44,19 +44,35 @@ const FirstSetupModal = ({ open, handleClose }) => {
     fetchCategories()
   }, [])
 
+  React.useEffect(() => {
+    if (bioValue) {
+      setBio(bioValue)
+    }
+    if (likesValues) {
+      setLikes(likesValues.filter((item) => item.love))
+      setDislikes(likesValues.filter((item) => !item.love))
+    }
+  }, [bioValue, likesValues])
+
   const [step, setStep] = useState(1)
   const [bio, setBio] = useState('')
 
-  const [likesLeft, setLikesLeft] = useState(12)
+  const [likesLeft, setLikesLeft] = useState(0)
   const [likes, setLikes] = useState([])
   const [likesToAdd, setLikesToAdd] = useState([])
 
-  const [dislikesLeft, setDislikesLeft] = useState(12)
+  const [dislikesLeft, setDislikesLeft] = useState(0)
   const [dislikes, setDislikes] = useState([])
   const [dislikesToAdd, setDislikesToAdd] = useState([])
 
   const [search, setSearch] = useState('')
 
+  React.useEffect(() => {
+    const filteredLikes = likes.filter(item => item.love)
+    const filteredDislikes = dislikes.filter(item => !item.love)
+    setLikesLeft(12 - filteredLikes.length)
+    setDislikesLeft(12 - filteredDislikes.length)
+  }, [likesValues])
 
   const handleNext = () => {
     setSearch('')
@@ -68,11 +84,10 @@ const FirstSetupModal = ({ open, handleClose }) => {
     setStep(prev => prev - 1)
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!bio && likesToAdd.length === 0 && dislikesToAdd.length === 0) {
       setSuccessMessage("Thanks for signing up! You can always update your profile later in profile settings. We hope you enjoy using Wishify!")
       handleNext()
-      // change firstSetup to false.
       return
     }
 
@@ -80,8 +95,7 @@ const FirstSetupModal = ({ open, handleClose }) => {
     let likesError = false
     
     if (bio) {
-      // bioError = handleSaveBio()
-      bioError = true
+      bioError = await handleSaveBio()
     }
 
     if (likesToAdd.length > 0 || dislikesToAdd.length > 0) {
@@ -95,19 +109,16 @@ const FirstSetupModal = ({ open, handleClose }) => {
           love: false
         }))
       ]
-      // likesError = handleSaveLikes(categories)
-      likesError = true
+      likesError = await handleSaveLikes(categories)
     }
 
     if (bioError || likesError) {
       setSuccessMessage('Uh oh! There was an error saving your profile. Please try again later in profile settings.')
       handleNext()
-      // change firstSetup to false.
       return
     } else {
       setSuccessMessage('Profile updated successfully! You can now start using Wishify.')
       handleNext()
-      // change firstSetup to false.
       return
     }
   };
@@ -164,7 +175,7 @@ const FirstSetupModal = ({ open, handleClose }) => {
           'Authorization': `Bearer ${localStorage.getItem("token")}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ firstSetup })
+        body: JSON.stringify({ setup: firstSetup })
       })
       if (!response.ok) {
         throw new Error('Failed to change first setup')
@@ -201,6 +212,11 @@ const FirstSetupModal = ({ open, handleClose }) => {
   const handleRemoveDislike = (item) => {
     setDislikesToAdd((prev) => prev.filter((i) => i !== item))
     setDislikesLeft((prev) => prev + 1)
+  }
+
+  const handleClose = () => {
+    changeFirstSetup(false)
+    onClose()
   }
 
   return (
@@ -264,6 +280,10 @@ const FirstSetupModal = ({ open, handleClose }) => {
                 <Paper sx={{ height: 200, overflowY: 'auto', p: 1, width: 200, minWidth: 200 }}>
                   <List sx={{ width: '100%' }}>
                     {predefinedItems
+                      .filter((item) =>
+                        !likes.some((value) => value.name === item.name))
+                      .filter((item) =>
+                        !dislikes.some((value) => value.name === item.name))
                       .filter((item) => 
                         !likesToAdd.some((value) => value.name === item.name))
                       .filter((item) =>
@@ -343,6 +363,10 @@ const FirstSetupModal = ({ open, handleClose }) => {
                 <Paper sx={{ height: 200, overflowY: 'auto', p: 1, width: 200, minWidth: 200 }}>
                   <List sx={{ width: '100%' }}>
                     {predefinedItems
+                      .filter((item) =>
+                        !likes.some((value) => value.name === item.name))
+                      .filter((item) =>
+                        !dislikes.some((value) => value.name === item.name))
                       .filter((item) => 
                         !likesToAdd.some((value) => value.name === item.name))
                       .filter((item) =>
