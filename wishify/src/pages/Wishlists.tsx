@@ -105,12 +105,6 @@ const Wishlists = () => {
       setActiveOverlay(title)
     }
   }
-  function handleMyself(){
-    console.log("myself")
-  }
-  function handleBehalf(){
-    console.log("behalf")
-  }
   function handleRenameWishlist(){
     const wishlistNames = wishlists.map(wishlist => wishlist.name);
 

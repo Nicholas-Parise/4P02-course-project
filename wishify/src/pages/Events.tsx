@@ -126,7 +126,7 @@ const Events = () => {
       .then((response) => response.json())
       .then((data) => {
           let newEvent: Event = 
-          {id: data.event_id,
+          {id: data.event.id,
             name: uniqueTitle,
             description: "Type your description here",
             url: "",
