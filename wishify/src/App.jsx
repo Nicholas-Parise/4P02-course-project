@@ -9,6 +9,8 @@ import NoPage from "./pages/NoPage";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import OauthSuccess from "./pages/auth/OauthSuccess";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 import Events from "./pages/Events";
 import Event from "./pages/Event";
 import Wishlists from "./pages/Wishlists";
@@ -28,6 +30,8 @@ import TOS from "./pages/TOS";
 
 import Navbar from "./components/Navbar";
 
+import Footer from "./components/Footer";
+
 import isLoggedInCheck from "./utils/isLoggedIn";
 
 function App() {
@@ -37,37 +41,44 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} page={window.location.pathname}/>
-        <Routes>
-            <Route index element={<Index />} />
-            <Route path="landing" element={<Landing />} />
-            <Route path="login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
-            <Route path="oauth-success" element={<OauthSuccess setIsLoggedIn={setIsLoggedIn} />} />
-            <Route path="register" element={<Register />} />
-            <Route path="status" element={<Status />} />
-            <Route path="profile/:userId" element={<PublicProfile />} />
-            <Route path="wishlists/share/:share_token" element={<Share isLoggedIn={isLoggedIn} />} />
+        <div className="relative min-h-screen">
+          <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} page={window.location.pathname}/>
+          <div className="pb-[200px]">
+            <Routes>
+                <Route index element={<Index />} />
+                <Route path="landing" element={<Landing />} />
+                <Route path="login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+                <Route path="oauth-success" element={<OauthSuccess setIsLoggedIn={setIsLoggedIn} />} />
+                <Route path="register" element={<Register />} />
+                <Route path="forgot-password" element={<ForgotPassword />} />
+                <Route path="forgot" element={<ResetPassword />} />
+                <Route path="status" element={<Status />} />
+                <Route path="profile/:userId" element={<PublicProfile />} />
+                <Route path="wishlists/share/:share_token" element={<Share isLoggedIn={isLoggedIn} />} />
 
-            <Route path="privacy-policy" element={<Privacy />} />
-            <Route path="terms-of-service" element={<TOS />} />
-            <Route path="about" element={<About />} />
+                <Route path="privacy-policy" element={<Privacy />} />
+                <Route path="terms-of-service" element={<TOS />} />
+                <Route path="about" element={<About />} />
 
-            <Route element={<ProtectedRoutes />}>
-              <Route path="home" element={<HomePage />} />
-              <Route path="events" element={<Events />} />
-              <Route path="events/:id" element={<Event/>}/>
-  
-              <Route path="wishlists" element={<Wishlists />} />
-              <Route path="wishlists/:id" element={<Wishlist />} />
+                <Route element={<ProtectedRoutes />}>
+                  <Route path="home" element={<HomePage />} />
+                  <Route path="events" element={<Events />} />
+                  <Route path="events/:id" element={<Event/>}/>
+      
+                  <Route path="wishlists" element={<Wishlists />} />
+                  <Route path="wishlists/:id" element={<Wishlist />} />
 
-              <Route path="ideas" element={<Ideas />} />
+                  <Route path="ideas" element={<Ideas />} />
 
-              <Route path="profile" element={<Profile />} />
-              
-            </Route>
-            <Route path="*" element={<NoPage />} />
-        </Routes>
-      </BrowserRouter>
+                  <Route path="profile" element={<Profile />} />
+                  
+                </Route>
+                <Route path="*" element={<NoPage />} />
+              </Routes>
+            </div>
+            <Footer />
+          </div>
+        </BrowserRouter>
       </>
     );
 }

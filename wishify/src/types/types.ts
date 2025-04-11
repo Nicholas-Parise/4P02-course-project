@@ -73,5 +73,6 @@ export interface Member {
     email: string,
     id: number,
     owner: boolean,
+    pro: boolean,
     picture: string
 }

@@ -4,6 +4,7 @@ import styled from '@emotion/styled'
 import { NavLink } from 'react-router-dom';
 import {WishlistThumbnail} from '../components/Thumbnail'
 import {EventThumbnail} from '../components/Thumbnail'
+import FirstSetupModal from '../components/ProfileSettingModals/FirstSetupModal';
 
 const WishlistContainer = styled.div`
       display: flex;
@@ -194,7 +195,8 @@ const Home = () => {
       displayName: '',
       bio: '',
       picture: '',
-      likes: []
+      likes: [],
+      setup: false
     })
 
   const userLoading = () => {
@@ -216,7 +218,8 @@ const Home = () => {
               displayName: data.user.displayname,
               bio: data.user.bio === null ? '' : data.user.bio,
               picture: data.user.picture,
-              likes: data.categories
+              likes: data.categories,
+              setup: data.user.setup
             })
             console.log(user);
             console.log(data);
@@ -261,6 +264,20 @@ const Home = () => {
   contributionLoading()
   userLoading()
   notificationsLoading()
+
+  // CODE FOR FIRST SETUP MODAL
+  const [openFirstSetupModal, setOpenFirstSetupModal] = useState(false)
+  useEffect(() => {
+    if (user?.setup) {
+      setOpenFirstSetupModal(true)
+    }
+  }, [user])
+
+  const handleCloseFirstSetupModal = () => {
+    setOpenFirstSetupModal(false)
+    userLoading()
+  }
+  // END CODE FOR FIRST SETUP MODAL
 
   return (
     <>
@@ -333,6 +350,13 @@ const Home = () => {
           </ContributionContainer>
         </div>
       </section>
+
+      <FirstSetupModal
+        open={openFirstSetupModal}
+        bioValue={user.bio}
+        likesValues={user.likes}
+        onClose={handleCloseFirstSetupModal}
+      />
     </>
   )
 }
