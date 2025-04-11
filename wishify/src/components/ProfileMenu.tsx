@@ -108,9 +108,9 @@ const ProfileMenu = ({ closeMenu, logOut, profile }: Props) => {
         </div>
 
         <div className="menu-options-bottom">
-          <div className="menu-item logout" onClick={() => setShowLogOutModal(true)}>
+          <button className="menu-item logout" onClick={() => setShowLogOutModal(true)}>
             <AiOutlineLogout className="menu-icon" /> Log Out
-          </div>
+          </button>
         </div>
 
         <Dialog

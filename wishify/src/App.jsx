@@ -9,6 +9,8 @@ import NoPage from "./pages/NoPage";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import OauthSuccess from "./pages/auth/OauthSuccess";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 import Events from "./pages/Events";
 import Event from "./pages/Event";
 import Wishlists from "./pages/Wishlists";
@@ -48,6 +50,8 @@ function App() {
                 <Route path="login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
                 <Route path="oauth-success" element={<OauthSuccess setIsLoggedIn={setIsLoggedIn} />} />
                 <Route path="register" element={<Register />} />
+                <Route path="forgot-password" element={<ForgotPassword />} />
+                <Route path="forgot" element={<ResetPassword />} />
                 <Route path="status" element={<Status />} />
                 <Route path="profile/:userId" element={<PublicProfile />} />
                 <Route path="wishlists/share/:share_token" element={<Share isLoggedIn={isLoggedIn} />} />
@@ -70,11 +74,11 @@ function App() {
                   
                 </Route>
                 <Route path="*" element={<NoPage />} />
-            </Routes>
+              </Routes>
+            </div>
+            <Footer />
           </div>
-          <Footer />
-        </div>
-      </BrowserRouter>
+        </BrowserRouter>
       </>
     );
 }
