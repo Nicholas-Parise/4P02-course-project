@@ -8,25 +8,96 @@ interface Props {
     open: boolean, 
     setOpen: (state: boolean) => void,
     members: Member[],
+    userID: number, 
+    isOwner: boolean,
+    setBlind: (state: boolean) => void,
+    setOwner: (state: boolean) => void,
     editMember: (item: Member) => void,
+    wishlistID: number,
+    token: string,
 }
 
-const MemberDialog = ({ open, setOpen, members, editMember, }: Props) => {
+const MemberDialog = ({ open, setOpen, members, userID, isOwner, setBlind, setOwner, editMember, wishlistID, token }: Props) => {
 
     const toggleBlind = (member: Member) => {
+        if (!isOwner) return
+
         const newMember = {
             ...member,
             blind: !member.blind
         }
-        editMember(newMember)
+
+        let status_code = -1
+        let url = `https://api.wishify.ca/wishlists/${wishlistID}/members`
+        // update blind status
+        fetch(url, {
+            method: 'put',
+            headers: new Headers({
+                'Authorization': "Bearer "+token,
+                'Content-Type': 'application/json'
+            }),
+            body: JSON.stringify({
+                "userId":member.id,
+                "blind": !member.blind,
+            })
+        })
+        .then((response) => {
+            status_code = response.status
+            return response.json();
+        })
+        .then(() => {
+            if(status_code != 200 && status_code != 201){
+              return
+            }
+            editMember(newMember)
+            if(newMember.id == userID){
+                setBlind(!member.blind)
+            }
+        })
+        .catch((error) => {
+            console.log(error)
+        })
+        
     }
 
     const toggleOwner = (member: Member) => {
+        if (!isOwner) return
+
         const newMember = {
             ...member,
             owner: !member.owner
         }
-        editMember(newMember)
+
+        let status_code = -1
+        let url = `https://api.wishify.ca/wishlists/${wishlistID}/members`
+        // update blind status
+        fetch(url, {
+            method: 'put',
+            headers: new Headers({
+                'Authorization': "Bearer "+token,
+                'Content-Type': 'application/json'
+            }),
+            body: JSON.stringify({
+                "userId":member.id,
+                "owner": !member.owner,
+            })
+        })
+        .then((response) => {
+            status_code = response.status
+            return response.json();
+        })
+        .then(() => {
+            if(status_code != 200 && status_code != 201){
+              return
+            }
+            editMember(newMember)
+            if(newMember.id == userID){
+                setOwner(!member.owner)
+            }
+        })
+        .catch((error) => {
+            console.log(error)
+        })
     }
 
     return (
@@ -55,15 +126,17 @@ const MemberDialog = ({ open, setOpen, members, editMember, }: Props) => {
             <TableContainer>
                 <Table>
                     <TableHead>
-                        <TableCell>Name</TableCell>
-                        <TableCell align="center">Owner</TableCell>
-                        <TableCell align="center">Blind</TableCell>
+                        <TableRow>
+                            <TableCell>Name</TableCell>
+                            <TableCell align="center">Owner</TableCell>
+                            <TableCell align="center">Blind</TableCell>
+                        </TableRow>
                     </TableHead>
 
                     <TableBody>
                         {members.map(member => {
                             return(
-                                <TableRow>
+                                <TableRow key={member.id}>
                                     <TableCell>{member.displayname}</TableCell>
                                     <TableCell className="text-center">
                                         <span 
