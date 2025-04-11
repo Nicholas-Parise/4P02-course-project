@@ -35,11 +35,13 @@ const WishlistContainer = styled.div`
 
 const Wishlists = () => {
   const wishlistUrl = `https://api.wishify.ca/wishlists/`
+  const userUrl = `https://api.wishify.ca/users/`
 
   const [token, setToken] = useState<string>(localStorage.getItem('token') || '')
   
   const [wishlists, setWishlists] = useState<Wishlist[]>([])
   const [sharedWishlists, setSharedWishlists] = useState<Wishlist[]>([])
+  const [userId, setUserId] = useState<number>()
 
   // pulling all wishlists from the backend and storing in wishlists state
   useEffect(() => {
@@ -53,8 +55,8 @@ const Wishlists = () => {
       })
         .then((response) => response.json())
         .then((data) => {
-          let ownedWishlists = data.filter((wishlist: Wishlist) => wishlist.owner == true);
-          let sharedWishlists = data.filter((wishlist: Wishlist) => wishlist.owner == false);
+          let ownedWishlists = data.filter((wishlist: Wishlist) => wishlist.creator_id == userId);
+          let sharedWishlists = data.filter((wishlist: Wishlist) => wishlist.creator_id != userId);
           setWishlists(ownedWishlists);
           setSharedWishlists(sharedWishlists);
           console.log(data);
@@ -66,7 +68,32 @@ const Wishlists = () => {
           console.log(error)
         })
         //.finally(() => setLoading(false))
+  }, [userId])
+
+  useEffect(() => {
+    setToken(localStorage.getItem('token') || '')
+    console.log(token)
+    fetch(userUrl, {
+        method: 'get',
+        headers: new Headers({
+          'Authorization': "Bearer "+token
+        })
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          let userId = data.user.id
+          setUserId(userId);
+          console.log(data);
+          //setLoading(false)
+        })
+        .catch((error) => {
+          //setError(error)
+          //setLoading(false)
+          console.log(error)
+        })
+        //.finally(() => setLoading(false))
   }, [])
+
   
   const [newWishlistTitle, setNewWishlistTitle] = useState('');
   const [activeOverlay, setActiveOverlay] = useState<string>("");
@@ -248,7 +275,7 @@ const Wishlists = () => {
             edit={handleEditOpen}
             duplicate={handleDuplicate}
             share={handleShare}
-            owner={"Me"}
+            owner={wishlist.creator_displayname || "None"}
           />
         ))}
       </WishlistContainer>
@@ -273,7 +300,8 @@ const Wishlists = () => {
             edit={handleEditOpen}
             duplicate={handleDuplicate}
             share={handleShare}
-            owner={"Shared"}
+            owner={wishlist.creator_displayname || "None"}
+            isOwner = {wishlist.owner}
           />
         ))}
       </WishlistContainer>

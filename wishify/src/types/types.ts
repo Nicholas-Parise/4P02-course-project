@@ -7,7 +7,9 @@ export interface Wishlist {
     blind?: boolean,
     owner?: boolean,
     share_token?: string,
-    deadline?: string
+    deadline?: string,
+    creator_displayname?: string,
+    creator_id?: number
 };
 
 export interface Event {
