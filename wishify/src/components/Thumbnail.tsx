@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import styled from "@emotion/styled";
-import {FaEye} from 'react-icons/fa';
+import {FaCrown} from 'react-icons/fa';
 
 
 const WishlistButton = styled.button`
@@ -91,7 +91,7 @@ const OwnerText = styled.p`
     top: 10px;
 `
 
-const Eye = createStyledIcon(FaEye);
+const Crown = createStyledIcon(FaCrown);
 
 const MenuButton = styled.button`
     &:hover{
@@ -116,7 +116,7 @@ export const WishlistThumbnail = (props: any) => {
     const WishlistOverlayMenu = () => {
         return (
             <WishlistMenu onMouseLeave={props.toggleActive}>
-                <p style={{margin: "4px"}}>Owner: {props.owner}</p>
+                <p style={{margin: "4px"}}>Creator: {props.owner}</p>
                 <OverlayTitle title={props.title}>{props.title}</OverlayTitle>
                 <MenuButton onClick={openWishlist}>Open</MenuButton>
                 <MenuButton onClick={props.edit}>Edit</MenuButton>
@@ -134,12 +134,12 @@ export const WishlistThumbnail = (props: any) => {
 
     if(props.role == "contributor"){
         return(
-        <WishlistButton onClick={openWishlist}><Eye></Eye><OwnerText style={{fontSize: "small"}}>Owner: {props.owner}</OwnerText>{props.title}</WishlistButton>
+        <WishlistButton onClick={openWishlist}><OwnerText style={{fontSize: "small"}}>Owner: {props.owner}</OwnerText>{props.title}</WishlistButton>
         )
     } else{
         return(
             <>
-                {props.active == props.title ? <WishlistOverlayMenu></WishlistOverlayMenu> : <WishlistButton onMouseEnter={props.toggleActive}>{props.title}</WishlistButton>}
+                {props.active == props.title ? <WishlistOverlayMenu></WishlistOverlayMenu> : <WishlistButton onMouseEnter={props.toggleActive}>{props.title}{props.isOwner? <Crown></Crown> : null}</WishlistButton>}
             </>
         )
     }
@@ -149,7 +149,7 @@ export const EventThumbnail = (props: any) => {
     const EventOverlayMenu = () => {
         return (
             <EventMenu onMouseLeave={props.toggleActive}>
-                <p style={{margin: "4px"}}>Owner: {props.owner}</p>
+                <p style={{margin: "4px"}}>Creator: {props.owner}</p>
                 <OverlayTitle title={props.title}>{props.title}</OverlayTitle>
                 <MenuButton onClick={openEvent}>Open</MenuButton>
                 <MenuButton onClick={props.edit}>Edit</MenuButton>
@@ -166,7 +166,7 @@ export const EventThumbnail = (props: any) => {
 
     if(props.role == "contributor"){
         return(
-        <EventButton onClick={openEvent}><Eye></Eye><OwnerText style={{fontSize: "small"}}>Owner: {props.owner}</OwnerText>{props.title}</EventButton>
+        <EventButton onClick={openEvent}><OwnerText style={{fontSize: "small"}}>Owner: {props.owner}</OwnerText>{props.title}</EventButton>
         )
     } else{
         return(
