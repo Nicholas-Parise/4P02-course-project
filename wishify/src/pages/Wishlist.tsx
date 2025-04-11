@@ -16,7 +16,6 @@ import { IconButton } from '@mui/material';
 import Alert from "@mui/material/Alert";
 import { FaPeopleGroup } from 'react-icons/fa6';
 import MemberDialog from '../components/MemberDialog';
-import React from 'react';
 
 const Wishlist = () => {
     const navigate = useNavigate();
@@ -26,6 +25,9 @@ const Wishlist = () => {
     const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([])
     const [wishlistContributions, setWishlistContributions] = useState<Contribution[]>([])
     const [wishlistMembers, setWishlistMembers] = useState<Member[]>([])
+    const [owner, setOwner] = useState<boolean>(false)
+    const [blind, setBlind] = useState<boolean>(true)
+    const [notifications, setNotifications] = useState<boolean>(false)
     //const [error, setError] = useState(null)
     //const [loading, setLoading] = useState(false)
     const [token] = useState<string>(localStorage.getItem('token') || '')
@@ -44,6 +46,36 @@ const Wishlist = () => {
       const newArray = [...wishlistMembers] 
       newArray[index] = member
       setWishlistMembers(newArray)
+    }
+
+    const toggleNotifications = () => {
+      let status_code = -1
+      let url = `https://api.wishify.ca/wishlists/${id}/members`
+      // update blind status
+      fetch(url, {
+          method: 'put',
+          headers: new Headers({
+              'Authorization': "Bearer "+token,
+              'Content-Type': 'application/json'
+          }),
+          body: JSON.stringify({
+              "userId":userID,
+              "notifications": !notifications,
+          })
+      })
+      .then((response) => {
+          status_code = response.status
+          return response.json();
+      })
+      .then(() => {
+          if(status_code != 200 && status_code != 201){
+            return
+          }
+          setNotifications(!notifications)
+      })
+      .catch((error) => {
+          console.log(error)
+      })
     }
 
     // Fetch page data onload
@@ -67,6 +99,9 @@ const Wishlist = () => {
             return
           }
           setWishlist(data.wishlist)
+          setOwner(data.wishlist.owner)
+          setBlind(data.wishlist.blind)
+          setNotifications(data.wishlist.notifications)
           setWishlistItems(data.items)
           setWishlistContributions(data.contributions)
           setEventID(data.wishlist?.event_id)
@@ -76,10 +111,31 @@ const Wishlist = () => {
           console.log(error)
           navigate("/404")
         })
-    }, [])
+    }, [blind])
+
+    const [userID, setUserID] = useState<number>()
+
+    // fetch user id on page load
+    useEffect(() => {
+        fetch(`https://api.wishify.ca/auth/me`, {
+          method: 'get',
+          headers: new Headers({
+              'Authorization': "Bearer "+localStorage.getItem("token"),
+              'Content-Type': 'application/json'
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+              setUserID(data.id)
+          })
+          .catch((error) => {
+              console.log(error)
+          })
+      }, [])
 
     // Count the quantity supplied of each item
     useEffect(() => {
+      if (wishlistContributions == null) return
       const map = new Map();
       wishlistItems.map(item => map.set(item.id, 0))
       wishlistContributions.map(contribution => map.set(contribution.item_id, map.get(contribution.item_id) + contribution.quantity))
@@ -108,7 +164,7 @@ const Wishlist = () => {
     }, [location]);
 
     const [wishlist, setWishlist] = useState<Wishlist | undefined>()
-    const [eventID, setEventID] = useState()
+    const [eventID, setEventID] = useState<number>()
     const [event, setEvent] = useState<Event | undefined>()
 
 
@@ -130,7 +186,7 @@ const Wishlist = () => {
         })
         .then((data) => {
           if(statusCode == 200){
-            setEvent(data)
+            setEvent(data.event)
           }          
         })
         .catch((error) => {
@@ -287,6 +343,7 @@ const Wishlist = () => {
   }
 
   const getItemReservations = (itemId: number) => {
+    if(wishlistContributions == null) return
     const itemReservations = wishlistContributions.filter((c) => c.item_id === itemId)
     return itemReservations
   }
@@ -330,7 +387,17 @@ const Wishlist = () => {
   return (
     <>
       <section className='pt-5'>
-          <WishlistHeader wishlist={wishlist} event={event} />
+          <WishlistHeader 
+            wishlist={wishlist} 
+            setWishlist={setWishlist}
+            event={event} 
+            setEventID={setEventID}
+            owner={owner}
+            blind={blind}
+            token={token}
+            notifications={notifications}
+            toggleNotifications={toggleNotifications}
+          />
           <div className="mt-8 mb-4 flex gap-1 items-center justify-between">
             <div className='flex'>
               <FormControl fullWidth>
@@ -376,6 +443,9 @@ const Wishlist = () => {
                         onReserve={handleReserveItem}
                         onDelete={deleteItem}
                         editWishlistItem={editWishlistItem}
+                        userID={userID || -1}
+                        owner={owner}
+                        blind={blind}
                       />
                   ))}
                   </ul>
@@ -383,7 +453,7 @@ const Wishlist = () => {
           </DndContext>
           }
       </section>   
-      <Alert severity="success" sx={{ position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)', zIndex: 1000, opacity: contributeAlert ? 1 : 0, transition: contributeAlert ? "none" : "opacity 1s ease-out"}}>
+      <Alert severity="success" sx={{ position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)', zIndex: 900, opacity: contributeAlert ? 1 : 0, transition: contributeAlert ? "none" : "opacity 1s ease-out"}}>
         Reservation successfully added.
       </Alert>
 
@@ -391,7 +461,13 @@ const Wishlist = () => {
         open={isMemberDialogOpen}
         setOpen={setIsMemberDialogOpen}
         members={wishlistMembers}
+        userID={userID || -1}
+        isOwner={owner}
+        setBlind={setBlind}
+        setOwner={setOwner}
         editMember={editMember}
+        wishlistID={wishlist?.id || -1}
+        token={token}
       />
 
     </>

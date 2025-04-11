@@ -41,7 +41,7 @@ const EditPictureModal = ({ open, handleClose, value, onSave }) => {
         <Divider sx={{mb: 2}} />
 
         <Typography variant='body2' mb={2}>
-          Choose a profile picture that best represents you! You can upload a picture to your profile buy submitting a link to an image.
+          Choose a profile picture that best represents you! You can upload a picture to your profile by submitting a link to an image.
         </Typography>
 
         <Divider sx={{mb: 2}} />
