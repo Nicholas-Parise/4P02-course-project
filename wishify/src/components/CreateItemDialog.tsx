@@ -103,7 +103,7 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
                   required
                   onChange={(event: SelectChangeEvent) => setSelectedWishlist(event.target.value)}
                 >
-                  {wishlists.length > 0 && wishlists.map(wishlist => {
+                  {wishlists.length > 0 && wishlists.filter(w => w.owner).map(wishlist => {
                     return <MenuItem key={wishlist.id} value={wishlist.id}>{wishlist.name}</MenuItem>
                   })}
                 </Select>
@@ -179,7 +179,19 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
                 />
 
 
-                <Button sx={{mt: 3}} type="submit" variant="contained">Create</Button>
+                <Button 
+                  sx={{
+                    mt: 3,
+                    background: 'linear-gradient(to right, #8d8aee, #5651e5)',
+                    color: 'white',
+                    borderRadius: '25px',
+                    '&:hover': { background: 'linear-gradient(to right, #5651e5, #343188)' }
+                  }} 
+                  type="submit" 
+                  variant="contained"
+                >
+                  Create
+                </Button>
 
               </FormControl>
             </form>
