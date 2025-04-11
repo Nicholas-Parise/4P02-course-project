@@ -128,7 +128,7 @@ router.get('/:wishlistId', authenticate, async (req, res, next) => {
     const userId = req.user.userId; // Get user ID from authenticated token
 
     const result = await db.query(`
-      SELECT w.*, u.displayname AS creator_displayName, m.blind, m.owner
+      SELECT w.*, u.displayname AS creator_displayName, m.blind, m.owner, m.notifications
       FROM wishlists w
       JOIN wishlist_members m ON w.id = m.wishlists_id
       LEFT JOIN users u ON w.creator_id = u.id
