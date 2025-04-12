@@ -40,16 +40,10 @@ export interface WishlistItem {
     contributions: Contribution[]
 };
 
-export interface Tag {
-    name: string,
-    love: boolean | null
-}
-
 export interface IdeaItem {
     id: number,
     match_rating: number,
     name: string,
-    tags: Tag[]
     image: string,
     sponsor: boolean,
     price: string,

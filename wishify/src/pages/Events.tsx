@@ -2,6 +2,7 @@ import React, {useState, useEffect, FormEvent} from 'react'
 import { type Event } from '../types/types'
 import {CreateEvent} from '../components/CreateButton'
 import {EventThumbnail} from '../components/Thumbnail'
+import Loading from '../components/Loading'
 
 import styled from '@emotion/styled'
 import ModalBox from '@mui/material/Box';
@@ -36,8 +37,9 @@ const Events = () => {
 
   const [token, setToken] = useState<string>(localStorage.getItem('token') || '')
   const [events, setEvents] = useState<Event[]>([])
+  const [loading, setLoading] = useState(true)
 
-  // pulling all wishlists from the backend and storing in wishlists state
+  // pulling all events from the backend and storing in events state
   useEffect(() => {
     setToken(localStorage.getItem('token') || '')
     console.log(token)
@@ -51,14 +53,12 @@ const Events = () => {
         .then((data) => {
           setEvents(data);
           console.log(data);
-          //setLoading(false)
         })
         .catch((error) => {
           //setError(error)
-          //setLoading(false)
           console.log(error)
         })
-        //.finally(() => setLoading(false))
+        .finally(() => setLoading(false))
   }, [])
   
   const [newEventTitle, setNewEventTitle] = useState('');
@@ -273,17 +273,19 @@ const Events = () => {
       <h1>My Events</h1>
       <EventContainer>
         <CreateEvent addThumbnail={handleModalOpen}>Create an Event</CreateEvent>
-        {events.map((event, index) => (
-          <EventThumbnail 
-            active={activeOverlay} 
-            toggleActive={() => changeActiveOverlay(event.name)} 
-            key={index} 
-            id={event.id}
-            title={event.name}
-            edit={handleEditOpen}
-            owner={"Me"}
-          />
-        ))}
+        {loading ? <Loading /> : 
+          events.map((event, index) => (
+            <EventThumbnail 
+              active={activeOverlay} 
+              toggleActive={() => changeActiveOverlay(event.name)} 
+              key={index} 
+              id={event.id}
+              title={event.name}
+              edit={handleEditOpen}
+              owner={"Me"}
+            />
+          ))
+        }
       </EventContainer>
       <h1>Shared Wishlists</h1>
       <EventContainer>

@@ -17,6 +17,7 @@ import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import Divider from '@mui/material/Divider';
 
 const EventSection = styled.section`
   margin-top: 20px;
@@ -535,9 +536,7 @@ const Event = () => {
               <ModalButton type="submit">Choose</ModalButton>
             </FormControl>
           </form>
-          <Typography className='text-center py-4' id="modal-modal-subtitle" variant="subtitle1" component="h4">
-            Or
-          </Typography>
+          <Divider sx={{mb: 2, mt:2}}>OR</Divider>
           <form autoComplete="off" onSubmit={handleCreateWishlist}>
             <Typography id="modal-modal-title" variant="h6" component="h2">
               Create a new Wishlist
