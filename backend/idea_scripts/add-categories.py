@@ -19,7 +19,7 @@ def generate_sql():
             for category in categories:
                 category_name = category.strip() 
                 # Create the INSERT statement for the idea_categories relationship
-                idea_categories_sql.append(f"INSERT INTO idea_categories (idea_id, category_id) SELECT {row_num},c.id FROM categories c WHERE c.name = '{category_name}';")
+                idea_categories_sql.append(f"INSERT INTO idea_categories (idea_id, category_id) SELECT {row_num},c.id FROM categories c WHERE c.name ilike '{category_name}';")
     
     # Write SQL statements to a .sql file
     with open(OUTPUT_FILE, 'w') as output_file:
