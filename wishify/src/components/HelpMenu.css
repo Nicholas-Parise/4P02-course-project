@@ -7,7 +7,6 @@
     background: rgba(0, 0, 0, 0.5);
     z-index: 999;
 }
-  
 
 .help-menu {
   position: fixed;
@@ -81,29 +80,6 @@
   background: none;
   color: #000;
 }
-  
-.help-header {
-  display: flex;
-  align-items: center;
-  margin-top: 20px;
-  width: 100%;
-  background: #FFFFFF;
-  padding: 15px;
-  border-radius: 25px;
-  border: 2px solid #5651e5;
-}
-  
-.header-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-  
-.header-text {
-  font-size: 25px;
-  font-weight: bold;
-  margin: 0;
-}
 
 .help-text-container-outter {
   flex-grow: 1; 
@@ -153,12 +129,6 @@
 
 .help-text-container::-webkit-scrollbar-track {
   border-radius: 10px;
-}
-
-.help-topic-header {
-  font-size: 20px;
-  font-weight: bold;
-  margin: 0;
 }
 
 .help-topic-text {
