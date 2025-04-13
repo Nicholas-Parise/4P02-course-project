@@ -4,17 +4,17 @@ import styles from "../about.module.css";
 const teamMembers = [
   {
     name: "Nicholas Parise",
-    role: "Product Owner",
+    role: "Product Owner & Backend Developer",
     image: "assets/about/nick.jpg",
     contributions: [
-      "Led backend API development",
+      "Entire backend API development",
       "Managed deployment and server infrastructure",
       "Oversaw overall system architecture"
     ]
   },
   {
     name: "Geoffrey Jensen",
-    role: "Scrum Master",
+    role: "Scrum Master & Frontend Developer",
     image: "assets/about/geoff.jpg",
     contributions: [
       "Developed the Wishlist page",
@@ -55,10 +55,9 @@ const teamMembers = [
   {
     name: "Ethan Brennan",
     role: "Developer",
-    image: "assets/about/ethan.jpg",
+    image: "assets/placehold-avatar.png",
     contributions: [
-      "Developed the Home page and Help page",
-      "Helped in filling up the database with sample data",
+      "Edited the Home page and created Help menu",
     ]
   }
 ];
