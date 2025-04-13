@@ -123,9 +123,9 @@
         </div>
         
         <div class="content">
-            <h1>You've been added to a {{list_type}}</h1>
+            <h1>You've been invited to join wishify!</h1>
             
-            <p>Hello {{recipient_name}},</p>
+            <p>Hello!</p>
             
             <p><strong>{{sender_name}}</strong> is inviting you to collaborate on their Wishify {{list_type}}:</p>
             
@@ -134,11 +134,15 @@
                 {{#list_description}}<p style="margin:8px 0 0 0;">Description: {{list_description}}</p>{{/list_description}}
                 {{#event_date}}<p style="margin:8px 0 0 0;">Event Date: {{event_date}}</p>{{/event_date}}
             </div>
-                
-            <p align="center">
-                <a href="{{view_link}}" class="button">View {{list_type}}</a>
-            </p>
             
+            <p align="center">
+                <a href="{{register_link}}" class="button">View {{list_type}}</a>
+            </p>
+
+            <p style="text-align: center;">or</p>
+
+            <p>copy and paste the link into your browser: <a href="{{register_link}}">{{register_link}}</a></p>
+
             <p>If this was unexpected or you have questions, please contact <a href="mailto:support@wishify.ca">support@wishify.ca</a>.</p>
             
             <p>Happy wishing!<br>The Wishify Team</p>

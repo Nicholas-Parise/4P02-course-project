@@ -41,7 +41,7 @@ const wishlistCategories = [
 
   // newly added
   "Office supplies", "Home essentials", "Kitchen supplies", "winter-wear", "Luxury Clothing",
-  "Exercise", "Toys"
+  "Exercise", "Toys", "Beauty", "Sports"
 
 ];
 

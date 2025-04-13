@@ -20,29 +20,7 @@ router.get('/', authenticate, async (req, res, next) => {
     // false = -5 points (user dislikes the category)
     // null = 0 points (user has no opinion)
 
-    // Get all categories the user has preferences for (both loved and disliked)
-    const userCategoriesResult = await db.query(`
-        SELECT c.id, uc.love
-        FROM categories c
-        JOIN user_categories uc ON c.id = uc.category_id
-        WHERE uc.user_id = $1;
-    `, [userId]);
-
-    const userCategories = userCategoriesResult.rows;
-
-    if (userCategories.length === 0) {
-      return res.status(200).json({ suggestedItems: [] }); // No preferences set, return nothing
-    }
-
-    const lovedCategoryIds = userCategories
-      .filter(cat => cat.love === true)
-      .map(cat => cat.id);
-
-    const dislikedCategoryIds = userCategories
-      .filter(cat => cat.love === false)
-      .map(cat => cat.id);
-
-    /*
+    
     // query explanation:
     // for each idea we want to calculate the score by:
     // getting each category associated with the idea
@@ -53,23 +31,6 @@ router.get('/', authenticate, async (req, res, next) => {
     // ---- 
     // note if we only want ideas where score is above 0 we have to use a sub query instead: 
     // SELECT * FROM (....)sub WHERE sub.score > -1 ORDER BY sub.score DESC, sub.created DESC;
-    const result = await db.query(`
-        SELECT i.*, 
-        json_agg(json_build_object('id', c.id, 'name', c.name)) AS categories,
-               SUM(CASE 
-                   WHEN ic.category_id = ANY($1::int[]) THEN 10  -- Loved category
-                   WHEN ic.category_id = ANY($2::int[]) THEN -5  -- Disliked category
-                   ELSE 0
-               END) AS score
-        FROM ideas i
-        LEFT JOIN idea_categories ic ON i.id = ic.idea_id
-        LEFT JOIN categories c ON ic.category_id = c.id
-        GROUP BY i.id
-        ORDER BY score DESC, i.uses DESC;
-    `, [lovedCategoryIds, dislikedCategoryIds]);
-  */
-
-
     const result = await db.query(`
       SELECT i.*, 
           json_agg(json_build_object('id', c.id, 'name', c.name, 'love', uc.love)) AS categories,

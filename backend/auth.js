@@ -2,6 +2,8 @@ const express = require('express');
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
+const fs = require('fs/promises');
+const path = require('path');
 const router = express.Router();
 const db = require('./db');
 const passport = require('passport');
@@ -49,6 +51,7 @@ router.post('/register', async (req, res, next) => {
         // send notification if allowed 
         if (result.rows[0].notifications) {
             await createNotification([result.rows[0].id], "Welcome to Wishify!", "Hello from the wishify team! we are so excited to welcome you to this platform, if you need any assistance checkout the help page.", "/help");
+            await welcomeEmail(email, displayName);
         }
 
         res.status(201).json({ message: "User registered successfully", user: result.rows[0] });
@@ -185,27 +188,31 @@ router.post('/forgot-password', async (req, res, next) => {
 
     try {
         // Check if user exists
-        const userCheck = await db.query("SELECT id FROM users WHERE email = $1", [email]);
+        const userCheck = await db.query("SELECT id, displayName FROM users WHERE email = $1", [email]);
 
         if (userCheck.rows.length === 0) {
             return res.status(404).json({ message: "No account with that email exists." });
         }
 
         const userId = userCheck.rows[0].id;
+        const user_displayName = userCheck.rows[0].displayname;
         const resetToken = await generateUniqueToken(); // need to ensure a unique token, don't want a crash
 
         await db.query("BEGIN"); // Start a transaction
 
         await db.query("INSERT INTO sessions (user_id, token, created) VALUES ($1, $2, NOW())", [userId, resetToken]);
 
-        const resetLink = `https://www.wishify.ca/auth/forgot?token=${resetToken}`;
+        const resetLink = `https://www.wishify.ca/forgot?token=${resetToken}`;
 
+/*
         await sendEmail(email,
             "Password Reset Request",
             `Your one time code is: ${resetToken} or click the link to reset your password: ${resetLink}`)
+*/
+        await forgotEmail(email,user_displayName,resetLink,resetToken,1);
 
         await db.query("COMMIT"); // Commit the transaction
-
+        
         return res.status(200).json({ message: "email sent successfully" });
     } catch (error) {
         await db.query("ROLLBACK"); // if we can't send an email we want to Rollback
@@ -290,5 +297,36 @@ router.get('/google/callback', passport.authenticate('google', { session: false 
 //    res.status(200).json({ message: "oauth successful", token });
     return res.redirect(`${process.env.FRONTEND_URL}/oauth-success?token=${token}`);
 });
+
+
+async function forgotEmail(to, first_name, reset_link, resetToken, expiry_time){
+
+    let htmlTemplate = await fs.readFile(path.join(__dirname, './emailtemplates/ForgetPassword.html'), 'utf8');
+
+    htmlTemplate = htmlTemplate
+    .replace(/{{first_name}}/g, first_name)
+    .replace(/{{reset_link}}/g, reset_link)
+    .replace(/{{reset_token}}/g, resetToken)
+    .replace(/{{expiry_time}}/g, expiry_time)
+    .replace(/{{current_year}}/g, new Date().getFullYear());    
+
+    await sendEmail(to,"Password Reset Request",null,htmlTemplate);
+}
+
+
+async function welcomeEmail(to, first_name){
+
+    let htmlTemplate = await fs.readFile(path.join(__dirname, './emailtemplates/CreateAccount.html'), 'utf8');
+
+    htmlTemplate = htmlTemplate
+    .replace(/{{first_name}}/g, first_name)
+    .replace(/{{email}}/g, to)
+    .replace(/{{creation_date}}/g, new Date().toISOString().split('T')[0])
+    .replace(/{{current_year}}/g, new Date().getFullYear());    
+
+    await sendEmail(to,"Welcome to Wishify!",null,htmlTemplate);
+}
+
+
 
 module.exports = router;
