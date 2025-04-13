@@ -104,7 +104,11 @@ const Home = () => {
         })
           .then((response) => response.json())
           .then((data) => {
+            data.sort((a, b) => new Date(b.datecreated) - new Date(a.datecreated))
+            data = data.slice(0,3);
+
             setWishlists(data);
+            console.log("Wishlists:")
             console.log(wishlists);
             console.log(data);
           })
@@ -130,7 +134,11 @@ const Home = () => {
         })
           .then((response) => response.json())
           .then((data) => {
+            data.sort((a, b) => new Date(b.datecreated) - new Date(a.datecreated))
+            data = data.slice(0,3);
+
             setEventList(data);
+            console.log("Events:")
             console.log(eventList);
             console.log(data);
           })
