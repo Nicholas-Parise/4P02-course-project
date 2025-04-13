@@ -1,18 +1,23 @@
 export interface Wishlist {
     id: number,
     name: string,
-    eventID: number,
-    desc: string,
+    event_id: number,
+    description: string,
     image: string
+    blind?: boolean,
+    owner?: boolean,
+    share_token?: string,
+    deadline?: string
 };
 
 export interface Event {
     id: number,
     name: string,
-    desc: string,
+    description: string,
     url: string,
     addr: string,
     city: string,
+    deadline: string,
     image: string,
     dateUpdated: string,
     dateCreated: string
@@ -33,7 +38,24 @@ export interface WishlistItem {
     contributions: Contribution[]
 };
 
-export interface Contribution{
+export interface Tag {
+    name: string,
+    love: boolean | null
+}
+
+export interface IdeaItem {
+    id: number,
+    match_rating: number,
+    name: string,
+    tags: Tag[]
+    image: string,
+    sponsor: boolean,
+    price: string,
+    rating?: string,
+    wishlistCount?: number
+}
+
+export interface Contribution {
     id: number,
     item_id: number,
     user_id: number,
@@ -43,4 +65,14 @@ export interface Contribution{
     note: string,
     dateUpdated: string,
     dateCreated: string
+}
+
+export interface Member {
+    blind: boolean,
+    displayname: string,
+    email: string,
+    id: number,
+    owner: boolean,
+    pro: boolean,
+    picture: string
 }

@@ -82,18 +82,6 @@ def test_put_users(setup_test_account, log_in, cleanup_test_account):
 
     assert res.json()["user"]["displayname"] == displayName
 
-def test_delete_user(setup_test_account, log_in):
-    token = log_in
-
-    sleep(sleepTime)
-    res = req.delete(
-        domain+f"/users",
-        headers={"Authorization": f"Bearer {token}"},
-        json={"password":password}
-    )
-
-    assert res.status_code == 200
-
 def test_change_password(setup_test_account, log_in, cleanup_test_account):
     token = log_in
 
@@ -148,6 +136,41 @@ def test_change_password_error(setup_test_account, log_in, cleanup_test_account)
         domain+f"/users",
         headers={"Authorization": f"Bearer {token}"},
         json={"newPassword":newPassword, "password":"wrongPassword342fes"}
+    )
+
+    assert res.status_code == 403
+
+def test_delete_user(setup_test_account, log_in):
+    token = log_in
+
+    sleep(sleepTime)
+    res = req.delete(
+        domain+f"/users",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"password":password}
+    )
+
+    assert res.status_code == 200
+
+def test_delete_user_no_password(setup_test_account, log_in):
+    token = log_in
+
+    sleep(sleepTime)
+    res = req.delete(
+        domain+f"/users",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert res.status_code == 400
+
+def test_delete_user_incorrect_password(setup_test_account, log_in):
+    token = log_in
+
+    sleep(sleepTime)
+    res = req.delete(
+        domain+f"/users",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"password":"SomeRandomWrongPassword142149725"}
     )
 
     assert res.status_code == 403

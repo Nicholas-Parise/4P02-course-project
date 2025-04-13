@@ -10,6 +10,7 @@ const categoriesRoutes = require('./categories');
 const contributionsRoutes = require('./contributions');
 const statusRoutes = require('./status');
 const notificationsRoutes = require('./notifications');
+const ideasRoutes = require('./ideas');
 
 const app = express();
 
@@ -35,6 +36,9 @@ app.use('/categories', categoriesRoutes);
 app.use('/contributions', contributionsRoutes);
 app.use('/status', statusRoutes);
 app.use('/notifications', notificationsRoutes);
+app.use('/ideas', ideasRoutes);
 
+// static Routes
+app.use('/uploads', express.static('uploads'));
 
 module.exports = app;

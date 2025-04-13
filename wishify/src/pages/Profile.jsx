@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import '../profile.css'
 import SettingsItem from '../components/SettingsItem.jsx'
 import LikesSettingsItem from '../components/LikesSettingsItem.jsx'
-import { EditDisplayNameModal, EditBioModal, EditEmailModal, EditPasswordModal, DeleteAccountModal, AddLikesModal } from '../components/ProfileSettingModals'
+import { EditPictureModal, EditDisplayNameModal, EditBioModal, EditEmailModal, EditPasswordModal, DeleteAccountModal, AddLikesModal } from '../components/ProfileSettingModals'
 import { CircularProgress, Typography, Snackbar, Alert } from '@mui/material'
 
 const Profile = () => {
@@ -21,6 +21,7 @@ const Profile = () => {
   const [error, setError] = React.useState(null)
   const [openSuccessMessage, setOpenSuccessMessage] = React.useState(false)
   const [successMessage, setSuccessMessage] = React.useState('')
+  const [severity, setSeverity] = React.useState('')
 
   const fetchUserData = async () => {
     const token = localStorage.getItem("token")
@@ -41,7 +42,7 @@ const Profile = () => {
 
       if (response.status === 200) {
         const data = await response.json()
-
+        console.log(data)
         setUser({
           email: data.user.email,
           displayName: data.user.displayname,
@@ -72,6 +73,7 @@ const Profile = () => {
 
   // Modal setup
   const [openModals, setOpenModals] = React.useState({
+    picture: false,
     displayName: false,
     bio: false,
     email: false,
@@ -121,16 +123,19 @@ const Profile = () => {
         body: JSON.stringify({ [currentField]: value })
       })
 
-      if (response.status === 400) {
+      if (response.status === 400) { // type checking error, old pw not supplied when changing new pw
+        if (response.error) console.log(response.error)
         throw new Error(response.message)
-      } else if (response.status === 403) {
-        throw new Error(response.message)
+      } else if (response.status === 403) { // incorrect password
+        setSuccessMessage("Incorrect password. Please try again.")
+        setSeverity('error')
+        setOpenSuccessMessage(true)
       } else if (response.status === 404) {
-        throw new Error(response.message)
+        throw new Error(response.error)
       } else if (response.status === 500) {
         throw new Error("Internal server error. Please try again later.")
       } else if (!response.ok) {
-        throw new Error(`An unexpected error occurred: ${response.status}`)
+        throw new Error(`Unexpected error occurred: ${response.statusText}`)
       }
 
       const data = await response.json()
@@ -138,14 +143,56 @@ const Profile = () => {
       setUser(prevUser => ({
         ...prevUser, [currentField]: data.user[currentField.toLowerCase()]
       }))
+      setSuccessMessage("Profile updated successfully.")
+      setSeverity('success')
+      setOpenSuccessMessage(true)
+    } catch (err) {
+      setError(`An error occurred: ${err.message}`)
+    }
+  }
+
+  const handleSavePicture = async (file) => {
+    // to be implemented
+    console.log(file)
+  }
+
+  const handleSaveEmail = async (email, password) => {
+    try {
+      const response = await fetch('https://api.wishify.ca/users', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ['email']: email, ['password']: password })
+      })
+      if (response.status === 400) { // type checking error, old pw not supplied when changing new pw
+        if (response.error) console.log(response.error)
+        throw new Error(response.message)
+      } else if (response.status === 403) { // incorrect password
+        setSuccessMessage("Failed to update your email address. Incorrect password provided. Please try again.")
+        setSeverity('error')
+        setOpenSuccessMessage(true)
+      } else if (response.status === 404) { // user not found
+        throw new Error("User not found.")
+      } else if (response.status === 500) {
+        throw new Error("Internal server error. Please try again later.")
+      } else if (!response.ok) {
+        throw new Error(`Unexpected error occurred: ${response.statusText}`)
+      }
+      const data = await response.json()
+      setUser(prevUser => ({
+        ...prevUser, email: data.user.email
+      }))
+      setSuccessMessage("Email updated successfully.")
+      setSeverity('success')
+      setOpenSuccessMessage(true)
     } catch (err) {
       setError(`An error occurred: ${err.message}`)
     }
   }
 
   const handleChangePassword = async (oldPassword, newPassword) => {
-    console.log(oldPassword, newPassword)
-
     try {
       const response = await fetch('https://api.wishify.ca/users', {
         method: 'PUT',
@@ -158,18 +205,21 @@ const Profile = () => {
 
       if (response.status === 200) {
         setSuccessMessage("Password updated successfully.")
+        setSeverity('success')
         setOpenSuccessMessage(true)
-        console.log(response)
       } else if (response.status === 400) {
-        throw new Error(response.statusText)
-      } else if (response.status === 403) {
-        throw new Error(response.statusText)
+        if (response.error) console.log(response.error)
+        throw new Error(response.message)
+      } else if (response.status === 403) { // incorrect password
+        setSuccessMessage("Failed to set new password. Incorrect password provided. Please try again.")
+        setSeverity('error')
+        setOpenSuccessMessage(true)
       } else if (response.status === 404) {
-        throw new Error(response.statusText)
+        throw new Error("User not found.")
       } else if (response.status === 500) {
         throw new Error("Internal server error. Please try again later.")
       } else if (!response.ok) {
-        throw new Error(`An unexpected error occurred: ${response.statusText}`)
+        throw new Error(`Unexpected error occurred: ${response.statusText}`)
       }
     } catch (err) {
       setError(`An error occurred: ${err.message}`)
@@ -189,23 +239,29 @@ const Profile = () => {
 
       if (response.status === 200) {
         setSuccessMessage("Account deleted. Redirecting to home page...")
+        setSeverity('success')
         setOpenSuccessMessage(true)
         setTimeout(() => {
           localStorage.removeItem("token")
           navigate('/')
         }, 3000)
-      } else if (response.status === 400) {
-        throw new Error(response.statusText)
-      } else if (response.status === 403) {
-        throw new Error(response.statusText)
-      } else if (response.status === 404) {
-        throw new Error(response.statusText)
+      } else if (response.status === 400) { // password not provided (handled on frontend)
+        setSuccessMessage("Failed to delete account. Please provide your password.")
+        setSeverity('error')
+        setOpenSuccessMessage(true)
+      } else if (response.status === 403) { // incorrect password
+        setSuccessMessage("Failed to delete account. Incorrect password provided. Please try again.")
+        setSeverity('error')
+        setOpenSuccessMessage(true)
+      } else if (response.status === 404) { // user not found
+        throw new Error("User not found.")
       } else if (response.status === 500) {
         throw new Error("Internal server error. Please try again later.")
       } else if (!response.ok) {
         throw new Error(`An unexpected error occurred: ${response.statusText}`)
       }
     } catch (err) {
+      console.log(err.message)
       setError(`An error occurred: ${err.message}`)
     }
   }
@@ -219,8 +275,6 @@ const Profile = () => {
       love: type === 'likes' // true if likes, false if dislikes
     }))
 
-    console.log("HI", categories)
-
     try {
       const response = await fetch('https://api.wishify.ca/users/categories', {
         method: 'POST',
@@ -233,11 +287,13 @@ const Profile = () => {
 
 
       if (response.status === 400) {
-        throw new Error(response.message)
+        setSuccessMessage("Some categories could not be added.")
+        setSeverity('info')
+        setOpenSuccessMessage(true)
       } else if (response.status === 500) {
         throw new Error("Internal server error. Please try again later.")
       } else if (!response.ok) {
-        throw new Error(`An unexpected error occurred: ${response.status}`)
+        throw new Error(`Unexpected error occurred: ${response.statusText}`)
       }} catch (err) {
         setError(`An error occurred: ${err.message}`)
       }
@@ -258,11 +314,13 @@ const Profile = () => {
       })
 
       if (response.status === 400) {
-        throw new Error(response.message)
+        setSuccessMessage("Some categories could not be deleted.")
+        setSeverity('error')
+        setOpenSuccessMessage(true)
       } else if (response.status === 500) {
         throw new Error("Internal server error. Please try again later.")
       } else if (!response.ok) {
-        throw new Error(`An unexpected error occurred: ${response.status}`)
+        throw new Error(`An unexpected error occurred: ${response.statusText}`)
       }
     } catch (err) {
       setError(`An error occurred: ${err.message}`)
@@ -284,7 +342,7 @@ const Profile = () => {
         onClose={() => setOpenSuccessMessage(false)}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <Alert onClose={() => setOpenSuccessMessage(false)} severity="success" variant="filled">
+        <Alert onClose={() => setOpenSuccessMessage(false)} severity={severity} variant="filled">
           {successMessage}
         </Alert>
       </Snackbar>
@@ -299,7 +357,7 @@ const Profile = () => {
             }
             alt="User profile picture"
           />
-          <button style={{color: "#5651e5"}}>Update Picture</button>
+          <button style={{color: "#5651e5"}} onClick={() => handleOpenModal('picture')}>Update Picture</button>
         </div>
 
         <div className="profile-header-fields">
@@ -381,6 +439,13 @@ const Profile = () => {
         </div>
       </div>
 
+      <EditPictureModal
+        open={openModals.picture}
+        value={currentValue}
+        onSave={handleSavePicture}
+        handleClose={handleClose}
+      />
+
       <EditDisplayNameModal
         open={openModals.displayName}
         value={currentValue}
@@ -414,7 +479,7 @@ const Profile = () => {
       <EditEmailModal
         open={openModals.email}
         value={currentValue}
-        onSave={handleSave}
+        onSave={handleSaveEmail}
         handleClose={handleClose}
       />
 

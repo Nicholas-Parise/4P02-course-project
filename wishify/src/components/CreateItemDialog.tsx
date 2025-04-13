@@ -11,11 +11,9 @@ interface Props {
     setNewItem: (state: Partial<WishlistItem>) => void
     wishlists: Wishlist[]
     token: string,
-    page: string,
-    id: string
 }
 
-const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem, wishlists, token, id }: Props) => {
+const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem, wishlists, token }: Props) => {
 
     const [selectedWishlist, setSelectedWishlist] = useState<string>('')
 
@@ -54,7 +52,10 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
         })
         .then((response) => response.json())
         .then((data) => {
+            let id = localStorage.getItem('id')
             setOpen(false)
+            console.log(data)
+            console.log(id)
             if(id!=undefined && data.item.member_id == id){
                 window.location.reload()
             }
@@ -102,11 +103,18 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
                   required
                   onChange={(event: SelectChangeEvent) => setSelectedWishlist(event.target.value)}
                 >
-                  {wishlists.length > 0 && wishlists.map(wishlist => {
+                  {wishlists.length > 0 && wishlists.filter(w => w.owner).map(wishlist => {
                     return <MenuItem key={wishlist.id} value={wishlist.id}>{wishlist.name}</MenuItem>
                   })}
                 </Select>
 
+                <TextField 
+                  sx={{mt: 3}}
+                  label="Name" 
+                  value={newItem.name || ""} 
+                  onChange={e => setNewItem({ ...newItem, name: e.target.value})}
+                  required
+                />
                 
                 <TextField
                   sx={{mt: 3}}
@@ -126,14 +134,6 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
                 </div>
                 )}
                 
-
-                <TextField 
-                  sx={{mt: 3}}
-                  label="Name" 
-                  value={newItem.name || ""} 
-                  onChange={e => setNewItem({ ...newItem, name: e.target.value})}
-                  required
-                />
 
                 <TextField 
                   sx={{mt: 3}}
@@ -179,7 +179,19 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
                 />
 
 
-                <Button sx={{mt: 3}} type="submit" variant="contained">Create</Button>
+                <Button 
+                  sx={{
+                    mt: 3,
+                    background: 'linear-gradient(to right, #8d8aee, #5651e5)',
+                    color: 'white',
+                    borderRadius: '25px',
+                    '&:hover': { background: 'linear-gradient(to right, #5651e5, #343188)' }
+                  }} 
+                  type="submit" 
+                  variant="contained"
+                >
+                  Create
+                </Button>
 
               </FormControl>
             </form>

@@ -2,6 +2,7 @@ import React, {useState, useEffect, FormEvent} from 'react'
 import { type Wishlist } from '../types/types'
 import {CreateWishlist} from '../components/CreateButton'
 import {WishlistThumbnail} from '../components/Thumbnail'
+import ShareWishlistModal from '../components/ShareWishlistModal'
 
 import styled from '@emotion/styled'
 import ModalBox from '@mui/material/Box';
@@ -10,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Modal from '@mui/material/Modal';
 import FormControl from "@mui/material/FormControl";
+import CreateWishlistModal from '../components/CreateWishlistModal'
 
 const boxStyle = {
   position: 'absolute',
@@ -35,7 +37,9 @@ const Wishlists = () => {
   const wishlistUrl = `https://api.wishify.ca/wishlists/`
 
   const [token, setToken] = useState<string>(localStorage.getItem('token') || '')
+  
   const [wishlists, setWishlists] = useState<Wishlist[]>([])
+  const [sharedWishlists, setSharedWishlists] = useState<Wishlist[]>([])
 
   // pulling all wishlists from the backend and storing in wishlists state
   useEffect(() => {
@@ -49,8 +53,10 @@ const Wishlists = () => {
       })
         .then((response) => response.json())
         .then((data) => {
-          setWishlists(data);
-          console.log(wishlists);
+          let ownedWishlists = data.filter((wishlist: Wishlist) => wishlist.owner == true);
+          let sharedWishlists = data.filter((wishlist: Wishlist) => wishlist.owner == false);
+          setWishlists(ownedWishlists);
+          setSharedWishlists(sharedWishlists);
           console.log(data);
           //setLoading(false)
         })
@@ -64,10 +70,10 @@ const Wishlists = () => {
   
   const [newWishlistTitle, setNewWishlistTitle] = useState('');
   const [activeOverlay, setActiveOverlay] = useState<string>("");
-  const [modalOpen, setModalOpen] = React.useState(false);
-  const handleModalOpen = () => setModalOpen(true);
+  const [createWishlistModalOpen, setCreateWishlistModalOpen] = React.useState(false);
+  const handleModalOpen = () => setCreateWishlistModalOpen(true);
   const handleModalClose = () => {
-    setModalOpen(false);
+    setCreateWishlistModalOpen(false);
     setErrorMessage('');
   }
   const [editOpen, setEditOpen] = React.useState(false);
@@ -92,66 +98,12 @@ const Wishlists = () => {
 
   const [delConfirmation, setDelConfirmation] = useState('');
 
-  const handleCreateWishlist = (e: FormEvent) => {
-    e.preventDefault();
-    if (newWishlistTitle.trim() === '') {
-      setErrorMessage('Title cannot be empty');
-      return;
-    } 
-    
-    let uniqueTitle = newWishlistTitle;
-    let counter = 1;
-    if (wishlists != undefined){
-      const wishlistNames = wishlists.map(wishlist => wishlist.name);
-      while (wishlistNames.includes(uniqueTitle)) {
-        uniqueTitle = `${newWishlistTitle} (${counter})`;
-        counter++;
-      }
-    }
-
-    // create wishlist in the backend
-    fetch(wishlistUrl, {
-      method: 'post',
-      headers: new Headers({
-          'Authorization': "Bearer "+token,
-          'Content-Type': 'application/json'
-      }),
-      body: JSON.stringify({
-          name: uniqueTitle,
-          eventid: "",
-          description: "",
-          image: "", 
-      })
-      })
-      .then((response) => response.json())
-      .then((data) => {
-          let newWishlist: Wishlist = 
-          {id: data.wishlist_id,
-            eventID: 0, // TODO add event support
-            name: uniqueTitle,
-            desc: "",
-            image: ""} // TODO add descriptions
-          setWishlists([...wishlists, newWishlist])
-      })
-      .catch((error) => {
-          console.log(error)
-      })
-
-    handleModalClose();
-  }
-
   const changeActiveOverlay = (title: string) => {
     if(activeOverlay == title){
       setActiveOverlay("")
     } else{
       setActiveOverlay(title)
     }
-  }
-  function handleMyself(){
-    console.log("myself")
-  }
-  function handleBehalf(){
-    console.log("behalf")
   }
   function handleRenameWishlist(){
     const wishlistNames = wishlists.map(wishlist => wishlist.name);
@@ -257,10 +209,8 @@ const Wishlists = () => {
           console.log(data)
           // update the wishlists state with the new data
           let duplicatedWishlist: Wishlist = structuredClone(wishlistToDuplicate);
-          console.log(wishlistToDuplicate)
-          duplicatedWishlist.id = data.wishlist_id;
-          duplicatedWishlist.name = wishlistToDuplicate.name + " (Copy)";
-          console.log(wishlistToDuplicate)
+          duplicatedWishlist.id = data.wishlist.id;
+          duplicatedWishlist.name = data.wishlist.name;
           const updatedWishlists = [...wishlists, duplicatedWishlist];
           setWishlists(updatedWishlists);
       })
@@ -268,7 +218,20 @@ const Wishlists = () => {
           console.log(error)
       })
   }
-    
+
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+
+  const handleShare = () => {
+    if (activeOverlay) {
+      setIsShareModalOpen(true);
+    }
+  };
+
+  const handleShareModalClose = () => {
+    setIsShareModalOpen(false);
+  };
+
+  const activeWishlist = wishlists.find((wishlist) => wishlist.name === activeOverlay);
 
   return (
     <section className='bg-white border-2 border-solid border-[#5651e5] rounded-[25px]'>
@@ -284,47 +247,45 @@ const Wishlists = () => {
             title={wishlist.name}
             edit={handleEditOpen}
             duplicate={handleDuplicate}
+            share={handleShare}
             owner={"Me"}
           />
         ))}
       </WishlistContainer>
+
+      {activeWishlist && activeWishlist.share_token && (
+        <ShareWishlistModal
+        wishlistID={activeWishlist.id}
+        isOwner={activeWishlist.owner} 
+        shareToken={activeWishlist.share_token} 
+        isOpen={isShareModalOpen} 
+        setIsOpen={setIsShareModalOpen}/>
+      )}
       <h1>Shared Wishlists</h1>
       <WishlistContainer>
-        <WishlistThumbnail title={"Birthday Blam's Birthday Bash (can view and contribute)"} role={"contributor"} owner={"Birthday Blam"}></WishlistThumbnail>
-        <WishlistThumbnail title={"Geoff's Christmas Wishlist"} id={1234} role={"contributor"} owner={"Geoff"}></WishlistThumbnail>
+        {sharedWishlists.map((wishlist, index) => (
+          <WishlistThumbnail 
+            active={activeOverlay} 
+            toggleActive={() => changeActiveOverlay(wishlist.name)} 
+            key={index} 
+            id={wishlist.id}
+            title={wishlist.name}
+            edit={handleEditOpen}
+            duplicate={handleDuplicate}
+            share={handleShare}
+            owner={"Shared"}
+          />
+        ))}
       </WishlistContainer>
-      {/* Modal for Creating Wishlists */}
-      <Modal
-        open={modalOpen}
-        onClose={handleModalClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <ModalBox sx={boxStyle}>
-          <form autoComplete="off" onSubmit={handleCreateWishlist}>
-            <FormControl sx={{ width: '25ch' }}>
-              <Typography id="modal-modal-title" variant="h6" component="h2">
-                Who is this for?
-              </Typography>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <ModalButton style={{width:"50%"}} onClick={handleMyself}>For Myself</ModalButton>
-                <ModalButton style={{width:"50%"}} onClick={handleBehalf}>On Behalf Of Somebody</ModalButton>
-              </div>
-              <TextField
-                fullWidth
-                value={newWishlistTitle}
-                onChange={(e) => setNewWishlistTitle(e.target.value)}
-                label="Wishlist Title"
-                variant="outlined"
-                margin="normal"
-                error={!!errorMessage}
-                helperText={errorMessage}
-              />
-              <ModalButton type="submit">Create</ModalButton>
-            </FormControl>
-          </form>
-        </ModalBox>
-      </Modal>
+
+      <CreateWishlistModal 
+        open={createWishlistModalOpen}
+        setOpen={setCreateWishlistModalOpen}
+        wishlists={wishlists}
+        setWishlists={setWishlists}
+        token={token}
+      />
+
       <Modal
           open={editOpen}
           onClose={handleEditClose}
@@ -377,6 +338,7 @@ const Wishlists = () => {
         </Modal>
       </ModalBox>
       </Modal>
+      
     </section>
   )
 }

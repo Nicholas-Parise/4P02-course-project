@@ -28,6 +28,7 @@ const authenticate = async (req, res, next) => {
         
         const decoded = jwt.verify(token, process.env.SECRET_KEY); // Remove "Bearer " prefix if present
         req.user = decoded; // Attach user info to the request
+        
         next(); // Continue to the next middleware or route handler
     } catch (error) {
 

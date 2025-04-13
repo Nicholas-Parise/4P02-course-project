@@ -17,7 +17,8 @@ POST /auth/reset-password → reset password with one time code**
 **GET /users → Get logged in user profile and categories   
 PUT /users → Update logged in user profile  
 DELETE /users → Delete logged in user account  
-GET /users/:id → Get specific user profile**  
+GET /users/:id → Get specific user profile  
+POST /users/upload → upload a profile picture**
 
 **POST /users/categories/:categoryId → Assign a category to logged in user  
 POST /users/categories → Assign an array of categories to logged in user  
@@ -69,8 +70,9 @@ PUT /events/:id/members → Update a members status (blind/owner)**
 PUT /items/:id → Update a single item  
 PUT /items → Update an array of items  
 DELETE /items/:id → Remove an item  
-POST /items -> create an item (given wishlists_id)**
-  
+POST /items -> create an item (given wishlists_id)  
+POST /items/upload → upload a picture**
+
 ## Contributions
 **GET /contributions → Get all contributions from logged in user  
 GET /contributions/wishlists/:id → Get all contributions from wishlist  
@@ -82,6 +84,14 @@ DELETE /contributions/:id → Remove a contribution**
 ## Notifications
 **GET /notifications → Get all notifications from logged in user  
 PUT /notifications/:id → Edit a notifications (ex: is_read)   
+DELETE /notifications/:id → Delete a notifications**  
+
+## ideas
+**GET / → Get all the ideas sorted by how much they relate to each person   
+GET /trending → Get the top 6 most used items    
+POST / → add a new idea (only for admins)    
+POST /:ideaId/categories → add categories to an idea (only for admins)   
+POST /upload/:itemId → upload new idea picture (only for admins)   
 DELETE /notifications/:id → Delete a notifications**  
 
 # Database

@@ -1,30 +1,33 @@
 const express = require('express');
 const router = express.Router();
 const db = require('./db');
+const { v4: uuidv4 } = require('uuid');
 const authenticate = require('./middleware/authenticate');
-
+const createNotification = require("./middleware/createNotification");
+const sendEmail = require("./middleware/sendEmail");
 
 // localhost:3000/events?page=1&pageSize=10
 // get list of events accesible to user
-router.get('/', authenticate, async(req,res,next)=>{
-    
+router.get('/', authenticate, async (req, res, next) => {
+
   const page = parseInt(req.query.page) || 1;
   const pageSize = parseInt(req.query.pageSize) || 10;
-  
+
   try {
     const userId = req.user.userId; // Get user ID from authenticated token
-    
+
     const result = await db.query(`
-        SELECT e.*
+        SELECT e.*, u.displayname AS creator_displayName
         FROM events e
         JOIN event_members m ON e.id = m.event_id
+        LEFT JOIN users u ON e.creator_id = u.id
         WHERE m.user_id = $1;`, [userId]);
 
     res.status(200).json(result.rows);
-} catch (error) {
+  } catch (error) {
     console.error("Error fetching events:", error);
     res.status(500).json({ error: "Internal Server Error" });
-}
+  }
 
 });
 
@@ -36,38 +39,41 @@ router.get('/', authenticate, async(req,res,next)=>{
  */
 router.post('/', authenticate, async (req, res, next) => {
 
-  try{
+  try {
     const user_id = req.user.userId; // Get user ID from authenticated request
 
-    const {name, description, url, addr, city, image, deadline } = req.body;
+    const { name, description, url, addr, city, image, deadline } = req.body;
 
     if (!name) {
       return res.status(400).json({ error: "name is required" });
     }
 
+    const shareToken = uuidv4();
+
     await db.query("BEGIN"); // Start a transaction since we want to go all or nothing
 
     // Step 1: Insert events
     const eventResult = await db.query(
-        `INSERT INTO events (name, description, url, addr, city, image, deadline, dateCreated, dateUpdated) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW()) RETURNING id`,
-        [name, description, url, addr, city, image, deadline]
+      `INSERT INTO events (name, description, url, addr, city, image, deadline, share_token, creator_id,dateCreated) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW()) RETURNING *`,
+      [name, description, url, addr, city, image, deadline, shareToken, user_id]
     );
 
     const event_id = eventResult.rows[0].id;
+    const event = eventResult.rows[0];
 
     // Step 2: Add the users membership (owner)
     await db.query(
-        `INSERT INTO event_members (user_id, event_id, owner, dateCreated, dateUpdated)
-        VALUES ($1, $2, TRUE, NOW(), NOW())`,
-        [user_id, event_id]
+      `INSERT INTO event_members (user_id, event_id, owner, notifications, dateCreated)
+        VALUES ($1, $2, TRUE, TRUE, NOW())`,
+      [user_id, event_id]
     );
 
     await db.query("COMMIT"); // Commit the transaction
-    
-    res.status(201).json({ event_id, message: "Event created successfully!" });
-  
-  }catch (error) {
+
+    res.status(201).json({ event, message: "Event created successfully!" });
+
+  } catch (error) {
     await db.query("ROLLBACK"); // Rollback if an error occurs
     res.status(500).json({ error: error.message });
   }
@@ -78,61 +84,79 @@ router.post('/', authenticate, async (req, res, next) => {
 
 // localhost:3000/events/0
 // get the contents of a single event
-router.get('/:eventId', authenticate, async(req,res,next)=>{
-  
-const eventId = parseInt(req.params.eventId);
-const page = parseInt(req.query.page) || 1;
-const pageSize = parseInt(req.query.pageSize) || 10;
+router.get('/:eventId', authenticate, async (req, res, next) => {
 
-try {
-  const userId = req.user.userId; // Get user ID from authenticated token
+  const eventId = parseInt(req.params.eventId);
+  const page = parseInt(req.query.page) || 1;
+  const pageSize = parseInt(req.query.pageSize) || 10;
 
-  const result = await db.query(`
-      SELECT e.*
+  try {
+    const userId = req.user.userId; // Get user ID from authenticated token
+
+    const result = await db.query(`
+      SELECT e.*, u.displayname AS creator_displayName
       FROM events e
       JOIN event_members m ON e.id = m.event_id
-      WHERE m.user_id = $1 AND e.id = $2;`, [userId,eventId]);
+      LEFT JOIN users u ON e.creator_id = u.id
+      WHERE m.user_id = $1 AND e.id = $2;`, [userId, eventId]);
 
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: "event not found." });
-      }
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "event not found." });
+    }
 
 
-  res.status(200).json(result.rows[0]);
-} catch (error) {
-  console.error("Error fetching event:", error);
-  res.status(500).json({ error: "Internal Server Error" });
-}
+    const wishlistResult = await db.query(`
+      SELECT w.*, u.displayname AS creator_displayName
+      FROM wishlists w
+      JOIN events e ON w.event_id = e.id
+      LEFT JOIN users u ON w.creator_id = u.id
+      WHERE e.id = $1;`, [eventId]);
+
+
+    const memberResult = await db.query(`
+      SELECT u.id, u.displayName, u.email, u.picture, u.pro, em.owner
+      FROM users u
+      JOIN event_members em ON u.id = em.user_id
+      WHERE em.event_id = $1;
+    `, [eventId]);
+
+    const event = result.rows[0];
+
+    res.status(200).json({ event, wishlists: wishlistResult.rows, members: memberResult.rows });
+  } catch (error) {
+    console.error("Error fetching event:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 
 });
 
 // localhost:3000/events/0
 // edit an event, but only if user is a member and is the owner.
-router.put('/:eventId', authenticate, async(req,res,next)=>{
-  
-const eventId = parseInt(req.params.eventId);
-const userId = req.user.userId; // Get user ID from the authenticated token
-const {name, description, url, addr, city, image, deadline } = req.body;
+router.put('/:eventId', authenticate, async (req, res, next) => {
+
+  const eventId = parseInt(req.params.eventId);
+  const userId = req.user.userId; // Get user ID from the authenticated token
+  const { name, description, url, addr, city, image, deadline } = req.body;
 
 
-// make sure user is the owner of the event before allowing editing
-try {
-  const ownershipCheck = await db.query(`
+  // make sure user is the owner of the event before allowing editing
+  try {
+    const ownershipCheck = await db.query(`
     SELECT m.owner
     FROM event_members m
     WHERE m.user_id = $1 AND m.event_id = $2;
     `, [userId, eventId]);
 
-  if (ownershipCheck.rows.length === 0) {
-    return res.status(403).json({ error: "Access denied. You are not a member of this event." });
-  }
+    if (ownershipCheck.rows.length === 0) {
+      return res.status(403).json({ error: "Access denied. You are not a member of this event." });
+    }
 
-  if (!ownershipCheck.rows[0].owner) {
-    return res.status(403).json({ error: "Only the owner can edit this event." });
-  }
+    if (!ownershipCheck.rows[0].owner) {
+      return res.status(403).json({ error: "Only the owner can edit this event." });
+    }
 
-  // Update the event with provided values (only update fields that are passed)
-  const result = await db.query(`
+    // Update the event with provided values (only update fields that are passed)
+    const result = await db.query(`
     UPDATE events
     SET 
         name = COALESCE($1, name),
@@ -148,17 +172,17 @@ try {
   `, [name, description, url, addr, city, image, deadline, eventId]);
 
 
-  if (result.rows.length === 0) {
-    return res.status(404).json({ error: "Event not found." });
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Event not found." });
+    }
+
+    res.status(200).json({ message: "Event updated successfully.", event: result.rows[0] });
+
+
+  } catch (error) {
+    console.error("Error editing event:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
-
-  res.status(200).json({ message: "Event updated successfully.", event: result.rows[0] });
-
-
-} catch (error) {
-  console.error("Error editing event:", error);
-  res.status(500).json({ error: "Internal Server Error" });
-}
 
 });
 
@@ -166,11 +190,11 @@ try {
 
 // localhost:3000/events/0
 // delete a event, but only if user is a member and is the owner.
-router.delete('/:eventId', authenticate, async(req,res,next)=>{
-  
+router.delete('/:eventId', authenticate, async (req, res, next) => {
+
   const eventId = parseInt(req.params.eventId);
   const userId = req.user.userId; // Get user ID from the authenticated token
-  
+
   // make sure user is the owner of the event before allowing deletion
   try {
     const ownershipCheck = await db.query(`
@@ -178,54 +202,54 @@ router.delete('/:eventId', authenticate, async(req,res,next)=>{
       FROM event_members m
       WHERE m.user_id = $1 AND m.event_id = $2;
       `, [userId, eventId]);
-  
+
     if (ownershipCheck.rows.length === 0) {
       return res.status(403).json({ error: "Access denied. You are not a member of this event." });
     }
-  
+
     if (!ownershipCheck.rows[0].owner) {
       return res.status(403).json({ error: "Only the owner can delete this event." });
     }
-  
+
     // Delete the event
     await db.query(`DELETE FROM events WHERE id = $1;`, [eventId]);
-  
+
     res.status(200).json({ message: "event deleted successfully." });
   } catch (error) {
     console.error("Error deleting event:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
-  
-  });
+
+});
 
 
 
 
 // localhost:3000/events/:eventId/wishlists?page=1&pageSize=10
 // get list of wishlists under an event
-router.get('/:eventId/wishlists', authenticate, async(req,res,next)=>{
-   
-const eventId = parseInt(req.params.eventId);
-const page = parseInt(req.query.page) || 1;
-const pageSize = parseInt(req.query.pageSize) || 10;
+router.get('/:eventId/wishlists', authenticate, async (req, res, next) => {
 
-try {
-  const result = await db.query(`
+  const eventId = parseInt(req.params.eventId);
+  const page = parseInt(req.query.page) || 1;
+  const pageSize = parseInt(req.query.pageSize) || 10;
+
+  try {
+    const result = await db.query(`
       SELECT w.id, w.name, w.description, w.dateCreated
-            FROM wishlists w
-            JOIN events e ON w.event_id = e.id
-            WHERE e.id = $1;`, [eventId]);
+      FROM wishlists w
+      JOIN events e ON w.event_id = e.id
+      WHERE e.id = $1;`, [eventId]);
 
-        if (result.rows.length === 0) {
-            return res.status(404).json({ message: "No wishlists found for this event" });
-        }
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "No wishlists found for this event" });
+    }
 
 
-      res.status(200).json({ wishlists: result.rows });
-} catch (error) {
-  console.error("Error fetching wishlists for event:", error);
-  res.status(500).json({ error: "Internal Server Error" });
-}
+    res.status(200).json({ wishlists: result.rows });
+  } catch (error) {
+    console.error("Error fetching wishlists for event:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 
 });
 
@@ -236,21 +260,21 @@ router.get('/:id/members', authenticate, async (req, res) => {
   const eventId = parseInt(req.params.id);
 
   try {
-      const result = await db.query(`
+    const result = await db.query(`
           SELECT u.id, u.displayName, u.email, u.picture
           FROM users u
           JOIN event_members em ON u.id = em.user_id
           WHERE em.event_id = $1;
       `, [eventId]);
 
-      if (result.rows.length === 0) {
-          return res.status(404).json({ message: "No members found for this event" });
-      }
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "No members found for this event" });
+    }
 
-      res.status(200).json({ members: result.rows });
+    res.status(200).json({ members: result.rows });
   } catch (error) {
-      console.error("Error fetching members for event:", error);
-      res.status(500).json({ message: "Error fetching members" });
+    console.error("Error fetching members for event:", error);
+    res.status(500).json({ message: "Error fetching members" });
   }
 });
 
@@ -264,45 +288,45 @@ router.post('/:id/members', authenticate, async (req, res) => {
   const { userId, owner } = req.body;  // the user provides the userId of the member to add
 
   if (!userId) {
-      return res.status(400).json({ message: "User ID is required" });
+    return res.status(400).json({ message: "User ID is required" });
   }
 
   try {
     // make sure user is the owner of the event before allowing editing of others memberships
-        const ownershipCheck = await db.query(`
+    const ownershipCheck = await db.query(`
           SELECT m.owner
           FROM event_members m
           WHERE m.user_id = $1 AND m.event_id = $2;
           `, [authUserId, wishlistId]);
-  
-        if (ownershipCheck.rows.length === 0) {
-          return res.status(403).json({ error: "Access denied. You are not a member of this event." });
-        }
-  
-        if (!ownershipCheck.rows[0].owner) {
-          return res.status(403).json({ error: "Only the owner can add a member to this event." });
-        }
+
+    if (ownershipCheck.rows.length === 0) {
+      return res.status(403).json({ error: "Access denied. You are not a member of this event." });
+    }
+
+    if (!ownershipCheck.rows[0].owner) {
+      return res.status(403).json({ error: "Only the owner can add a member to this event." });
+    }
 
 
-      // Check if the user is already a member of the event
-      const memberCheck = await db.query(`
+    // Check if the user is already a member of the event
+    const memberCheck = await db.query(`
           SELECT * FROM event_members WHERE event_id = $1 AND user_id = $2
       `, [eventId, userId]);
 
-      if (memberCheck.rows.length > 0) {
-          return res.status(400).json({ message: "User is already a member of this event" });
-      }
-      
-      // Add the user to the event
-      await db.query(`
+    if (memberCheck.rows.length > 0) {
+      return res.status(400).json({ message: "User is already a member of this event" });
+    }
+
+    // Add the user to the event
+    await db.query(`
           INSERT INTO event_members (event_id, user_id, owner, dateCreated)
           VALUES ($1, $2, COALESCE($3, false), NOW());`, [eventId, userId, owner]);
 
-      res.status(201).json({ message: "User added to the event successfully" });
+    res.status(201).json({ message: "User added to the event successfully" });
   } catch (error) {
 
     // Handle duplicate membership error
-    if (error.code === "23505") { 
+    if (error.code === "23505") {
       return res.status(409).json({ message: "user is already a member" });
     }
 
@@ -321,44 +345,44 @@ router.delete('/:id/members', authenticate, async (req, res) => {
   const { userId } = req.body;  // Expecting the user to provide the userId of the member to remove
 
   if (!userId) {
-      return res.status(400).json({ message: "User ID is required" });
+    return res.status(400).json({ message: "User ID is required" });
   }
 
   try {
-      // make sure user is the owner of the event before allowing editing of others memberships
-      const ownershipCheck = await db.query(`
+    // make sure user is the owner of the event before allowing editing of others memberships
+    const ownershipCheck = await db.query(`
         SELECT m.owner
         FROM event_members m
         WHERE m.user_id = $1 AND m.event_id = $2;
         `, [authUserId, wishlistId]);
 
-      if (ownershipCheck.rows.length === 0) {
-        return res.status(403).json({ error: "Access denied. You are not a member of this event." });
-      }
+    if (ownershipCheck.rows.length === 0) {
+      return res.status(403).json({ error: "Access denied. You are not a member of this event." });
+    }
 
-      if (!ownershipCheck.rows[0].owner) {
-        return res.status(403).json({ error: "Only the owner can remove a member to this event." });
-      }
+    if (!ownershipCheck.rows[0].owner) {
+      return res.status(403).json({ error: "Only the owner can remove a member to this event." });
+    }
 
 
-      // Check if the user is a member of the event
-      const memberCheck = await db.query(`
+    // Check if the user is a member of the event
+    const memberCheck = await db.query(`
           SELECT * FROM event_members WHERE event_id = $1 AND user_id = $2
       `, [eventId, userId]);
 
-      if (memberCheck.rows.length === 0) {
-          return res.status(404).json({ message: "User is not a member of this event" });
-      }
+    if (memberCheck.rows.length === 0) {
+      return res.status(404).json({ message: "User is not a member of this event" });
+    }
 
-      // Remove the user from the event
-      await db.query(`
+    // Remove the user from the event
+    await db.query(`
           DELETE FROM event_members WHERE event_id = $1 AND user_id = $2
       `, [eventId, userId]);
 
-      res.status(200).json({ message: "User removed from the event successfully" });
+    res.status(200).json({ message: "User removed from the event successfully" });
   } catch (error) {
-      console.error("Error removing member from event:", error);
-      res.status(500).json({ message: "Error removing member from event" });
+    console.error("Error removing member from event:", error);
+    res.status(500).json({ message: "Error removing member from event" });
   }
 });
 
@@ -369,57 +393,192 @@ router.delete('/:id/members', authenticate, async (req, res) => {
 router.put('/:id/members', authenticate, async (req, res) => {
   const eventId = parseInt(req.params.id);
   const authUserId = req.user.userId; // Get user ID from the authenticated token
-  const { userId, owner } = req.body;  // the user provides the userId of the member to add
+  const { userId, owner, notifications } = req.body;  // the user provides the userId of the member to add
 
   if (!userId) {
-      return res.status(400).json({ message: "User ID is required" });
+    return res.status(400).json({ message: "User ID is required" });
   }
 
   try {
     // make sure user is the owner of the event before allowing editing of others memberships
-        const ownershipCheck = await db.query(`
+    const ownershipCheck = await db.query(`
           SELECT m.owner
           FROM event_members m
           WHERE m.user_id = $1 AND m.event_id = $2;
           `, [authUserId, wishlistId]);
-  
-        if (ownershipCheck.rows.length === 0) {
-          return res.status(403).json({ error: "Access denied. You are not a member of this event." });
-        }
-  
-        if (!ownershipCheck.rows[0].owner) {
-          return res.status(403).json({ error: "Only the owner can edit a member to this event." });
-        }
+
+    if (ownershipCheck.rows.length === 0) {
+      return res.status(403).json({ error: "Access denied. You are not a member of this event." });
+    }
+
+    if (!ownershipCheck.rows[0].owner) {
+      return res.status(403).json({ error: "Only the owner can edit a member to this event." });
+    }
 
 
-      // Check if the user is already a member of the event
-      const memberCheck = await db.query(`
+    // Check if the user is already a member of the event
+    const memberCheck = await db.query(`
           SELECT * FROM event_members WHERE event_id = $1 AND user_id = $2
       `, [eventId, userId]);
 
-      if (memberCheck.rows.length === 0) {
-        return res.status(404).json({ message: "User is not a member of this event" });
-      }
+    if (memberCheck.rows.length === 0) {
+      return res.status(404).json({ message: "User is not a member of this event" });
+    }
 
-      
-      // edit a users membership
-          const result = await db.query(`
+
+    // edit a users membership
+    const result = await db.query(`
             UPDATE event_members
             SET 
-                owner = COALESCE($2, owner),
+                owner = COALESCE($1, owner),
+                notifications = COALESCE($2, notifications),
                 dateUpdated = NOW()
-            WHERE id = $7
+            WHERE id = $3
             RETURNING *;
-          `, [owner, memberCheck.rows[0].id]);
-      
-          res.status(200).json({ message: "membership updated successfully.", membership: result.rows[0] });
+          `, [owner, notifications, memberCheck.rows[0].id]);
+
+    res.status(200).json({ message: "membership updated successfully.", membership: result.rows[0] });
   } catch (error) {
-      console.error("Error adding member to event:", error);
-      res.status(500).json({ message: "Error adding member to event" });
+    console.error("Error adding member to event:", error);
+    res.status(500).json({ message: "Error adding member to event" });
+  }
+});
+
+
+
+// add a member to an event with the share token
+// /events/members
+router.post('/members', authenticate, async (req, res) => {
+
+  const authUserId = req.user.userId; // Get user ID from the authenticated token
+  const { share_token, owner } = req.body;  // the user provides the share_token of the event to add
+
+  if (!share_token) {
+    return res.status(400).json({ message: "share_token is required" });
+  }
+
+  try {
+
+    const eventsCheck = await db.query(`
+      SELECT * FROM events WHERE share_token = $1;
+    `, [share_token]);
+
+    if (eventsCheck.rows.length === 0) {
+      return res.status(404).json({ error: "event not found." });
+    }
+
+    const eventId = eventsCheck.rows[0].id;
+
+    // Check if the user is already a member of the event
+    const memberCheck = await db.query(`
+          SELECT * FROM event_members WHERE event_id = $1 AND user_id = $2
+      `, [eventId, authUserId]);
+
+    if (memberCheck.rows.length > 0) {
+      return res.status(409).json({ message: "user is already a member", id: eventId });
+    }
+
+    // add user to the event
+    await db.query(`
+      INSERT INTO event_members (event_id, user_id, owner, notifications, dateCreated)
+      VALUES ($1, $2, false, true, NOW()) ON CONFLICT DO NOTHING;`, [eventId, authUserId]);
+
+
+    res.status(201).json({ message: "User added to the event successfully", id: eventId });
+  } catch (error) {
+
+    // Handle duplicate membership error
+    if (error.code === "23505") {
+      return res.status(409).json({ message: "user is already a member", id: eventId });
+    }
+
+    console.error("Error adding member to event:", error);
+    res.status(500).json({ message: "Error adding member to event" });
   }
 });
 
 
 
 
-  module.exports = router;
+
+
+
+
+
+
+
+
+
+
+// localhost:3000/events/share
+// send emails to share the event 
+router.post('/share', authenticate, async (req, res) => {
+
+  const userId = req.user.userId; // Get user ID from authenticated token
+  const { event_id, email } = req.body;
+
+  if (!event_id || !email) {
+    return res.status(400).json({ message: "event_id and email are required" });
+  }
+
+  try {
+    const eventCheck = await db.query(`
+      SELECT id, share_token,name FROM events WHERE id = $1;
+    `, [event_id]);
+
+    if (eventCheck.rows.length === 0) {
+      return res.status(404).json({ error: "Event not found." });
+    }
+
+    // Check if the user exists
+    const userCheck = await db.query(`
+      SELECT id, notifications FROM users WHERE email = $1;
+    `, [email]);
+
+    // get name of person doing inviting:
+    const fromUserResult = await db.query(`
+        SELECT displayName FROM users WHERE id = $1;
+      `, [userId]);
+
+    const fromUser = fromUserResult.rows[0].displayname;
+
+    // if the user has an account add them as a member
+    if (userCheck.rows.length > 0) {
+      // User exists, add them to the event
+
+      const memberUserId = userCheck.rows[0].id;
+
+      await db.query(`
+        INSERT INTO event_members (user_id, event_id, owner, notifications, dateCreated)
+        VALUES ($1, $2, false, true, NOW()) ON CONFLICT DO NOTHING;
+      `, [memberUserId, event_id]);
+
+      // send notification, make sure they allow notifications
+      if (userCheck.rows[0].notifications) {
+        await createNotification([memberUserId], "You've been invited to a event!", `${fromUser} has invited you to the event: ${eventCheck.rows[0].name}`, `/events/${eventCheck.rows[0].id}`);
+      }
+
+      return res.status(200).json({ message: "User added to event." });
+    } else {
+      // else send an email to that user with an invite link 
+
+      const inviteLink = `https://wishify.ca/register?event=${eventCheck.rows[0].share_token}`;
+
+      await sendEmail(email,
+        `${fromUser} has invited you to collaborate on their event!`,
+        `${fromUser} has invited you to collaborate on their event! Click here to join: ${inviteLink} or copy and paste this link into your browser: ${inviteLink} Best, The Wishify Team`,
+        `<p><strong>${fromUser}</strong> has invited to their event! Click <a href="${inviteLink}">here</a> to join. <br> Or copy and paste this link into your browser: ${inviteLink}</p><p>Best, The Wishify Team</p>`);
+    }
+
+    return res.status(200).json({ message: "Invitation sent." });
+  } catch (error) {
+    console.error("Error fetching shared event:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+
+
+
+module.exports = router;

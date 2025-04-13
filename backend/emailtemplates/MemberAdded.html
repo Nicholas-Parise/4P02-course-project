@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>You've been added to a Wishify {{list_type}}</title>
+    <style type="text/css">
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        
+        body { margin: 0 !important; padding: 0 !important; width: 100% !important; }
+        
+        a[x-apple-data-detectors] {
+            color: inherit !important;
+            text-decoration: none !important;
+            font-size: inherit !important;
+            font-family: inherit !important;
+            font-weight: inherit !important;
+            line-height: inherit !important;
+        }
+        
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            color: #444444;
+            background-color: #f7f7f7;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        .logo {
+            max-width: 180px;
+        }
+        
+        .content {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid #5651E5;
+        }
+        
+        h1 {
+            color: #5651E5;
+            font-size: 24px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        p {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        
+        .button {
+            background: linear-gradient(90deg, #8d8aee, #5651E5);
+            border-radius: 8px;
+            color: #ffffff !important;
+            display: inline-block;
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 1.5;
+            padding: 12px 24px;
+            text-decoration: none;
+            margin: 20px 0;
+            transition: 0.3s ease;
+        }
+        
+        .button:hover {
+            background: linear-gradient(90deg, #8d8aee, #343188);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px 0;
+            font-size: 12px;
+            color: #999999;
+        }
+        
+        .highlight {
+            background-color: #f8f9ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #5651E5;
+        }
+        
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #8d8aee, transparent);
+            margin: 25px 0;
+        }
+        
+        @media screen and (max-width: 600px) {
+            .container {
+                width: 100% !important;
+                padding: 10px !important;
+            }
+            .content {
+                padding: 20px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="https://www.wishify.ca" style="text-decoration: none;">
+                <h1 style="display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: bold; margin: 0;">
+                    <span style="display: flex; align-items: center; color: #5651E5;">Wish</span><span style="color: #000000;">ify</span>
+                </h1>
+            </a>
+        </div>
+        
+        <div class="content">
+            <h1>You've been added to a {{list_type}}</h1>
+            
+            <p>Hello {{recipient_name}},</p>
+            
+            <p><strong>{{sender_name}}</strong> has added you as a <strong>{{role}}</strong> to their Wishify {{list_type}}:</p>
+            
+            <div style="background-color: #f8f9ff; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #5651E5;">
+                <p style="margin:0; font-weight:bold;">{{list_name}}</p>
+                {{#if event_date}}<p style="margin:8px 0 0 0;">Event Date: {{event_date}}</p>{{/if}}
+            </div>
+            
+            <p>As a {{role}}, you can:</p>
+            <ul>
+                {{#if is_owner}}<li>Manage the {{list_type}} settings</li>{{/if}}
+                <li>View all items</li>
+                <li>{{#if is_contributor}}Reserve and purchase items{{else}}Add and modify items{{/if}}</li>
+                {{#if has_deadline}}<li>See the deadline: {{deadline}}</li>{{/if}}
+            </ul>
+            
+            <p align="center">
+                <a href="{{view_link}}" class="button">View {{list_type}}</a>
+            </p>
+            
+            <p>If this was unexpected or you have questions, please contact <a href="mailto:{{sender_email}}">{{sender_name}}</a>.</p>
+            
+            <p>Happy wishing!<br>The Wishify Team</p>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; {{current_year}} Wishify. All rights reserved.</p>
+            <p>
+                Wishify<br />
+                1812 Sir Issac Brock Way,<br />
+                St. Catharines, ON, Canada<br />
+            </p>
+        </div>
+    </div>
+</body>
+</html>

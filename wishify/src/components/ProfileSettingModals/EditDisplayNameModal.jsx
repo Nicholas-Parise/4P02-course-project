@@ -57,6 +57,7 @@ const EditDisplayNameModal = ({ open, handleClose, value, onSave }) => {
             onChange={(e) => setInputValue(e.target.value)}
             fullWidth
             variant='outlined'
+            slotProps={{ htmlInput: { maxLength: 30 } }}
             sx={{mb: 2}}
           />
 

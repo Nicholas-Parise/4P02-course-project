@@ -4,6 +4,7 @@ import styled from '@emotion/styled'
 import { NavLink } from 'react-router-dom';
 import {WishlistThumbnail} from '../components/Thumbnail'
 import {EventThumbnail} from '../components/Thumbnail'
+import FirstSetupModal from '../components/ProfileSettingModals/FirstSetupModal';
 
 const WishlistContainer = styled.div`
       display: flex;
@@ -57,8 +58,8 @@ const CreateEventButton = styled.button`
 const ContributionContainer = styled.div`
   display: grid;
   margin: 3vw;
+  gap: 3vw;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
   @media screen and (max-width: 768px){
     grid-template-columns: repeat(3, 1fr);
   }
@@ -68,14 +69,12 @@ const ContributionContainer = styled.div`
 `
 
 const ItemDisplay = ({ item }) => {
-  let item_name = "Temporarily Unavailable" // will be replaced with item.name when backend is ready
-  let wishlist_id = "562" // will be replaced with item.wishlist_id when backend is ready
 
   return (
-    <div className="p-1 border rounded-lg shadow-lg max-w-sm bg-white">
-      <h2 className="text-xl font-bold mb-2">Wishlist Title</h2>
+    <div className="p-1 border rounded-lg shadow-lg bg-white" style={{maxWidth: "200px"}}>
+      <h2 className="text-xl font-bold mb-2">{item.wishlist_name}</h2>
       <ul className="list-disc list-inside text-base">
-        <li><strong>Item:</strong> <a href={`/wishlists/${wishlist_id}#${item.item_id}`}>{item_name}</a></li>
+        <li><strong>Item:</strong> <a href={`/wishlists/${item.wishlists_id}#${item.item_id}`} className={"font-medium text-blue-600 dark:text-blue-500 hover:underline"}>{item.name}</a></li>
         <li><strong>Note:</strong> {item.note? item.note: <span className='text-red-400'>None</span>}</li>
         <li><strong>Quantity:</strong> {item.quantity}</li>
         <li><strong>Purchased:</strong> {item.purchased ? "Yes" : "No"}</li>
@@ -88,31 +87,6 @@ const ItemDisplay = ({ item }) => {
 
 
 const Home = () => {
-  // all the get requests to the backend should be done here
-  const [contributions, setContributions] = useState([])
-
-  const backendLoading = () => {
-    let url = `https://api.wishify.ca/contributions`
-    useEffect(() => {
-      let token = localStorage.getItem('token') || ''
-      fetch(url, {
-          method: 'get',
-          headers: new Headers({
-            'Authorization': "Bearer "+token
-          })
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            let newContributions = data;
-            newContributions.sort((a, b) => b.wishlist_id - new Date(a.wishlist_id));
-            setContributions(newContributions);
-            console.log(data);
-          })
-          .catch((error) => {
-            console.log(error)
-          })
-    }, [])
-  }
 
   const [wishlists, setWishlists] = useState([])
 
@@ -166,12 +140,63 @@ const Home = () => {
     }, [])
   }
 
+  const [contributions, setContributions] = useState([])
+
+  const contributionLoading = () => {
+    let token = localStorage.getItem('token') || ''
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+  
+          //GET request: Fetch contributions
+          const contributionsUrl = `https://api.wishify.ca/contributions`;
+          const contributionsResponse = await fetch(contributionsUrl, {
+            method: 'get',
+            headers: new Headers({
+              'Authorization': "Bearer " + token,
+            }),
+          });
+  
+          if (!contributionsResponse.ok) {
+            throw new Error(`Error fetching contributions: ${contributionsResponse.statusText}`);
+          }
+  
+          const contributionsData = await contributionsResponse.json();
+          console.log("Contributions:", contributionsData);
+  
+          // Process contributions
+          let newContributions = contributionsData;
+          console.log("wishlists: ")
+          console.log(wishlists)
+          newContributions = newContributions.map((contribution) => ({
+            ...contribution,
+            wishlist_name:
+              contribution.wishlist_name ||
+              wishlists.find((wishlist) => wishlist.id === contribution.wishlists_id)?.name ||
+              "Unknown",
+          }));
+          newContributions = newContributions.sort((a, b) => 
+            a.wishlist_name.localeCompare(b.wishlist_name) // Sort alphabetically by wishlist_name
+          );
+  
+          setContributions(newContributions);
+          console.log("Processed Contributions:", newContributions);
+        } catch (error) {
+          console.error("Error in backendLoading:", error);
+        }
+      };
+  
+      fetchData();
+    }, [wishlists]);
+  };
+
   const [user, setUser] = React.useState({
       email: '',
       displayName: '',
       bio: '',
       picture: '',
-      likes: []
+      likes: [],
+      setup: false
     })
 
   const userLoading = () => {
@@ -193,7 +218,8 @@ const Home = () => {
               displayName: data.user.displayname,
               bio: data.user.bio === null ? '' : data.user.bio,
               picture: data.user.picture,
-              likes: data.categories
+              likes: data.categories,
+              setup: data.user.setup
             })
             console.log(user);
             console.log(data);
@@ -232,11 +258,26 @@ const Home = () => {
   }
       
 
-  backendLoading()
+  
   wishlistLoading()
   eventListLoading()
+  contributionLoading()
   userLoading()
   notificationsLoading()
+
+  // CODE FOR FIRST SETUP MODAL
+  const [openFirstSetupModal, setOpenFirstSetupModal] = useState(false)
+  useEffect(() => {
+    if (user?.setup) {
+      setOpenFirstSetupModal(true)
+    }
+  }, [user])
+
+  const handleCloseFirstSetupModal = () => {
+    setOpenFirstSetupModal(false)
+    userLoading()
+  }
+  // END CODE FOR FIRST SETUP MODAL
 
   return (
     <>
@@ -301,7 +342,7 @@ const Home = () => {
         <br/>
 
         <h1>Contributions</h1>
-        <div className="home-wishlist-top">
+        <div className="home-wishlist-top" w>
           <ContributionContainer>
             {contributions.map((contribution) => (
               <ItemDisplay key={contribution.id} item={contribution} />
@@ -309,6 +350,13 @@ const Home = () => {
           </ContributionContainer>
         </div>
       </section>
+
+      <FirstSetupModal
+        open={openFirstSetupModal}
+        bioValue={user.bio}
+        likesValues={user.likes}
+        onClose={handleCloseFirstSetupModal}
+      />
     </>
   )
 }

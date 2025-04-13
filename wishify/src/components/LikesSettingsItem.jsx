@@ -13,6 +13,11 @@ const LikesSettingsItem = ({ label, values, onEdit, onDelete }) => {
 
   const toggleEditing = () => setEditing(!editing)
 
+  const displayAddButton = () => {
+    const itemsLeft = 12 - items.filter(item => (label === "Likes:" ? item.love : !item.love)).length
+    return itemsLeft > 0 && editing
+  }
+
   return (
     <>
       <div className="profile-settings-item">
@@ -64,7 +69,7 @@ const LikesSettingsItem = ({ label, values, onEdit, onDelete }) => {
                 )}
               </li>
             ))}
-            {items.length < 12 && editing ? (
+            {displayAddButton() ? (
               <li>
                 <button id={label === "Likes:" ? "add-likes-button" : "add-dislikes-button"} onClick={onEdit}>{<Add />}</button>
               </li>

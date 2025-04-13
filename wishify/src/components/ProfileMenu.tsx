@@ -1,15 +1,21 @@
 import { useState, useEffect, useRef } from "react";
 import { AiOutlineUser, AiOutlineLogout, AiFillGift, AiOutlineCloseCircle, AiOutlineBell, AiFillBell } from "react-icons/ai";
+import { FaCrown } from "react-icons/fa";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from "@mui/material";
 import "./ProfileMenu.css";
+import React from "react";
 
 interface Props {
   closeMenu: () => void,
-  logOut: () => void
+  logOut: () => void,
+  profile:{
+    displayName: string,
+    email: string
+  };
 }
 
-const ProfileMenu = ({ closeMenu, logOut }: Props) => {
+const ProfileMenu = ({ closeMenu, logOut, profile }: Props) => {
   const [isClosing, setIsClosing] = useState(false);
   const [showLogOutModal, setShowLogOutModal] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
@@ -20,24 +26,16 @@ const ProfileMenu = ({ closeMenu, logOut }: Props) => {
     setIsClosing(true);
     setTimeout(() => {
       closeMenu();
-    }, 300);
+    }, 250);
   };
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        handleClose();
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [closeMenu]);
 
   const handleAccountSettings = () => {
     navigate("/profile");
+    handleClose();
+  };
+
+  const handleUpgrade = () => {
+    navigate("/upgrade");
     handleClose();
   };
 
@@ -81,8 +79,16 @@ const ProfileMenu = ({ closeMenu, logOut }: Props) => {
             <AiOutlineUser className="user-icon" />
           </div>
           <div className="profile-text">
-            <p className="user-name">Justin Bijoy</p>
-            <p className="user-email">justinbijoy@gmail.com</p>
+            <p className="user-name">{profile.displayName}</p>
+            <p className="user-email">{profile.email}</p>
+          </div>
+        </div>
+
+        <div className="upgrade-pro cursor-pointer" onClick={handleUpgrade}>
+          <FaCrown className="crown-icon" />
+          <div>
+            <p className="upgrade-title">Upgrade to Pro</p>
+            <p className="upgrade-subtitle">Unlock premium features</p>
           </div>
         </div>
 
@@ -101,10 +107,34 @@ const ProfileMenu = ({ closeMenu, logOut }: Props) => {
           <p>Your notifications will appear here.</p>
         </div>
 
+        <div className="horizontal-buttons-container">
+          <NavLink 
+            to="/privacy-policy" 
+            className="horizontal-button" 
+            onClick={handleClose}
+          >
+            Privacy Policy
+          </NavLink>
+          <NavLink 
+            to="/terms-of-service" 
+            className="horizontal-button" 
+            onClick={handleClose}
+          >
+            Terms of Service
+          </NavLink>
+          <NavLink 
+            to="/about" 
+            className="horizontal-button" 
+            onClick={handleClose}
+          >
+            About
+          </NavLink>
+        </div>
+
         <div className="menu-options-bottom">
-          <div className="menu-item logout" onClick={() => setShowLogOutModal(true)}>
+          <button className="menu-item logout" onClick={() => setShowLogOutModal(true)}>
             <AiOutlineLogout className="menu-icon" /> Log Out
-          </div>
+          </button>
         </div>
 
         <Dialog

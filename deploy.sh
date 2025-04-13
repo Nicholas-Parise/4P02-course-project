@@ -19,6 +19,9 @@ cd $FRONTEND_DIR || exit
 npm install
 npm run build
 
+echo "creating sym link..."
+ln -s /var/www/4P02-course-project/backend/uploads /var/www/4P02-course-project/wishify/dist/uploads
+
 # Step 3: Install backend dependencies
 echo "Installing backend dependencies..."
 cd $BACKEND_DIR || exit

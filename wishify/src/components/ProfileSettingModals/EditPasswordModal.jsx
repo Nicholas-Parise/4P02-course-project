@@ -5,7 +5,8 @@ const EditPasswordModal = ({ open, handleClose, onSave }) => {
   const [newPasswordValue, setNewPasswordValue] = React.useState("")
   const [confirmPasswordValue, setConfirmPasswordValue] = React.useState("")
   const [oldPasswordValue, setOldPasswordValue] = React.useState("")
-  const [error, setError] = React.useState("")
+  const [responseMessage, setResponseMessage] = React.useState("")
+  const [responseType, setResponseType] = React.useState("")
 
   React.useEffect(() => {
     if (open) {
@@ -16,16 +17,23 @@ const EditPasswordModal = ({ open, handleClose, onSave }) => {
   }, [open])
 
   const handleSave = () => {
-    if (newPasswordValue !== confirmPasswordValue) {
-      setError("Passwords do not match")
+    if (oldPasswordValue.length < 8) {
+      setResponseMessage("Please ensure your old password is valid.")
+      setResponseType("error")
+      return
+    } else if (newPasswordValue !== confirmPasswordValue) {
+      setResponseMessage("Passwords do not match.")
+      setResponseType("error")
       return
     } else if (/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,64}$/.test(newPasswordValue) === false) {
-      setError("Password must contain at least 8 characters, including one uppercase letter, one lowercase letter, one number, and one special character")
+      setResponseMessage("Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.")
+      setResponseType("error")
       return
     }
 
     onSave(oldPasswordValue, newPasswordValue)
-    setError('')
+    setResponseMessage('')
+    setResponseType('')
     handleClose();
   }
 
@@ -35,7 +43,8 @@ const EditPasswordModal = ({ open, handleClose, onSave }) => {
   }
 
   const handleCancel = () => {
-    setError('')
+    setResponseMessage('')
+    setResponseType('')
     handleClose()
   }
 
@@ -73,6 +82,7 @@ const EditPasswordModal = ({ open, handleClose, onSave }) => {
             onChange={(e) => setOldPasswordValue(e.target.value)}
             fullWidth
             variant='outlined'
+            slotProps={{ htmlInput: { maxLength: 64 } }}
             sx={{mb: 2}}
           />
 
@@ -85,6 +95,7 @@ const EditPasswordModal = ({ open, handleClose, onSave }) => {
             onChange={(e) => setNewPasswordValue(e.target.value)}
             fullWidth
             variant='outlined'
+            slotProps={{ htmlInput: { maxLength: 64 } }}
             sx={{mb: 2}}
           />
 
@@ -95,10 +106,15 @@ const EditPasswordModal = ({ open, handleClose, onSave }) => {
             onChange={(e) => setConfirmPasswordValue(e.target.value)}
             fullWidth
             variant='outlined'
+            slotProps={{ htmlInput: { maxLength: 64 } }}
             sx={{mb: 2}}
           />
 
-          {error && <Typography sx={{ fontSize: '0.875rem'}}  color='error'>{error}</Typography>}
+          {responseMessage && (
+            <div style={{ marginBottom: '10px'}} className={`response-message ${responseType}`}>
+              {responseMessage}
+            </div>
+          )}
 
           <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
             <Button

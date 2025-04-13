@@ -4,14 +4,16 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const router = express.Router();
 const db = require('./db');
+const passport = require('passport');
 const createNotification = require("./middleware/createNotification");
 const sendEmail = require("./middleware/sendEmail");
+require('./middleware/oauth');
 require("dotenv").config();
 
 // localhost:3000/auth/register
 // register account
 router.post('/register', async (req, res, next) => {
-    const { email, password, displayName, picture, bio } = req.body;
+    const { email, password, displayName, bio, notifications } = req.body;
 
     if (!email || !password || !displayName) {
         return res.status(400).json({ message: "email, password and displayName are required" });
@@ -27,29 +29,27 @@ router.post('/register', async (req, res, next) => {
     if (displayName !== undefined && typeof displayName !== "string") {
         return res.status(400).json({ error: "displayName must be a string" });
     }
-    if (picture !== undefined && typeof picture !== "string") {
-        return res.status(400).json({ error: "picture must be a string" });
-    }
+
     if (bio !== undefined && typeof bio !== "string") {
         return res.status(400).json({ error: "bio must be a string" });
     }
 
-    // I don't know how to do images rn so its always gonna be the placeholder
-    let tempPicture;
-    if (!picture) {
-        tempPicture = "/assets/placeholder-avatar.png";
-    } else {
-        tempPicture = picture;
-    }
+    // default picture
+    const picture = "/assets/placeholder-avatar.png";
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
+
         const result = await db.query(
-            "INSERT INTO users (displayName, password, email, picture, bio, notifications, dateCreated) VALUES ($1, $2, $3, $4, $5, true, NOW()) RETURNING id, displayName, email",
-            [displayName, hashedPassword, email, tempPicture, bio]
+            `INSERT INTO users (displayName, password, email, picture, bio, notifications, pro, setup, dateCreated) 
+            VALUES ($1, $2, $3, $4, $5, COALESCE($6, true), false, true, NOW()) RETURNING id, displayName, email, notifications`,
+            [displayName, hashedPassword, email, picture, bio, notifications]
         );
 
-        await createNotification([result.rows[0].id], "Welcome to Wishify!", "Hello from the wishify team! we are so excited to welcome you to this platform, if you need any assistance checkout the help page.", "/help");
+        // send notification if allowed 
+        if (result.rows[0].notifications) {
+            await createNotification([result.rows[0].id], "Welcome to Wishify!", "Hello from the wishify team! we are so excited to welcome you to this platform, if you need any assistance checkout the help page.", "/help");
+        }
 
         res.status(201).json({ message: "User registered successfully", user: result.rows[0] });
     } catch (error) {
@@ -89,9 +89,9 @@ router.post('/login', async (req, res, next) => {
         }
 
         const token = jwt.sign(
-            { userId: user.rows[0].id, email: user.rows[0].email },
+            { userId: user.rows[0].id, email: user.rows[0].email, displayName: user.rows[0].displayname },
             process.env.SECRET_KEY,
-            { expiresIn: "24h" });
+            { expiresIn: "7d" });
 
         await db.query("INSERT INTO sessions (user_id, token, created) VALUES ($1, $2, NOW())", [user.rows[0].id, token]);
 
@@ -140,7 +140,7 @@ router.get('/me', async (req, res, next) => {
             return res.status(401).json({ message: "Invalid token" });
         }
 
-        const user = await db.query("SELECT id, displayName, email, picture, bio FROM users WHERE id = $1", [session.rows[0].user_id]);
+        const user = await db.query("SELECT id, displayName, email, picture, bio, setup FROM users WHERE id = $1", [session.rows[0].user_id]);
 
         if (user.rows.length === 0) { // If a user gets removed but the token is still active 
             return res.status(404).json({ message: "User not found" });
@@ -269,5 +269,26 @@ router.post("/reset-password", async (req, res) => {
     }
 });
 
+
+
+// Route to start Google OAuth
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+
+// Callback route Google redirects to after auth, returns token
+router.get('/google/callback', passport.authenticate('google', { session: false }), async(req, res) => {
+  const user = req.user;
+
+
+  const token = jwt.sign(
+    { userId: user.id, email: user.email, displayName: user.displayname },
+    process.env.SECRET_KEY,
+    { expiresIn: "7d" });
+
+    await db.query("INSERT INTO sessions (user_id, token, created) VALUES ($1, $2, NOW())", [user.id, token]);
+
+//    res.status(200).json({ message: "oauth successful", token });
+    return res.redirect(`${process.env.FRONTEND_URL}/oauth-success?token=${token}`);
+});
 
 module.exports = router;

@@ -5,14 +5,12 @@ import os
 import json
 
 domain = "https://api.wishify.ca"
-email = "testAccount287232@wishify.ca"
-password = "$eCur3Pa$$w0rD!1"
 
 sleepTime = 0.8
 
 ##################  /wishlists  #########################
 
-def test_create_wishlist(setup_test_account, log_in, cleanup_test_wishlist):
+def test_create_wishlist(setup_test_account, log_in, cleanup_test_account, cleanup_test_wishlist):
     sleep(sleepTime)
     token = log_in
     res = req.post(
@@ -23,7 +21,7 @@ def test_create_wishlist(setup_test_account, log_in, cleanup_test_wishlist):
         }
     )
 
-    cleanup_test_wishlist(token, res.json()["wishlist_id"])
+    cleanup_test_wishlist(token, res.json()["wishlist"]["id"])
 
     assert res.status_code == 201
 
@@ -41,7 +39,7 @@ def test_create_wishlist_missing_name(setup_test_account, log_in, cleanup_test_a
 
     assert res.status_code == 400
 
-def test_get_all_wishlists(setup_test_account, setup_test_wishlist, cleanup_test_wishlist, cleanup_test_account):
+def test_get_all_wishlists(setup_test_account, setup_test_wishlist, cleanup_test_account, cleanup_test_wishlist):
     token, wishlist_id = setup_test_wishlist
 
     sleep(sleepTime)
@@ -55,7 +53,7 @@ def test_get_all_wishlists(setup_test_account, setup_test_wishlist, cleanup_test
     assert res.status_code == 200
     assert res.json()[0]["id"] == wishlist_id
 
-def test_get_wishlists_token_errors(setup_test_account, setup_test_wishlist, cleanup_test_wishlist, cleanup_test_account):
+def test_get_wishlists_token_errors(setup_test_account, setup_test_wishlist, cleanup_test_account, cleanup_test_wishlist ):
     token, wishlist_id = setup_test_wishlist
 
     sleep(sleepTime)
@@ -76,7 +74,7 @@ def test_get_wishlists_token_errors(setup_test_account, setup_test_wishlist, cle
 
     assert res.status_code == 401
 
-def test_get_wishlist_by_id(setup_test_account, setup_test_wishlist, cleanup_test_wishlist, cleanup_test_account):
+def test_get_wishlist_by_id(setup_test_account, setup_test_wishlist, cleanup_test_account, cleanup_test_wishlist):
     token, wishlist_id = setup_test_wishlist
 
     sleep(sleepTime)
@@ -92,7 +90,7 @@ def test_get_wishlist_by_id(setup_test_account, setup_test_wishlist, cleanup_tes
     assert res.status_code == 200
     assert res.json()["wishlist"]["id"] == wishlist_id
 
-def test_get_wishlist_by_id_token_errors(setup_test_account, setup_test_wishlist, cleanup_test_wishlist, cleanup_test_account):
+def test_get_wishlist_by_id_token_errors(setup_test_account, setup_test_wishlist, cleanup_test_account, cleanup_test_wishlist):
     token, wishlist_id = setup_test_wishlist
 
     sleep(sleepTime)
@@ -113,27 +111,7 @@ def test_get_wishlist_by_id_token_errors(setup_test_account, setup_test_wishlist
 
     assert res.status_code == 401
 
-def test_delete_wishlist(setup_test_account, setup_test_wishlist, cleanup_test_account):
-    token, wishlist_id = setup_test_wishlist
-
-    sleep(sleepTime)
-    res = req.delete(
-        domain+f"/wishlists/{wishlist_id}",
-        headers={"Authorization": f"Bearer {token}"},
-    )
-
-    assert res.status_code == 200
-
-    # confirm wishlist has been deleted
-    sleep(sleepTime)
-    res = req.get(
-        domain+f"/wishlists/{wishlist_id}",
-        headers={"Authorization": f"Bearer {token}"},
-    )
-
-    assert res.status_code == 404
-
-def test_put_wishlist(setup_test_account, setup_test_wishlist, cleanup_test_wishlist, cleanup_test_account):
+def test_put_wishlist(setup_test_account, setup_test_wishlist, cleanup_test_account, cleanup_test_wishlist):
     token, wishlist_id = setup_test_wishlist
 
     rename = "My renamed Wishlist"
@@ -170,3 +148,65 @@ def test_put_wishlist_not_found(setup_test_account, log_in, cleanup_test_account
     )
 
     assert res.status_code == 404
+
+def test_delete_wishlist(setup_test_account, setup_test_wishlist, cleanup_test_account):
+    token, wishlist_id = setup_test_wishlist
+
+    sleep(sleepTime)
+    res = req.delete(
+        domain+f"/wishlists/{wishlist_id}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert res.status_code == 200
+
+    # confirm wishlist has been deleted
+    sleep(sleepTime)
+    res = req.get(
+        domain+f"/wishlists/{wishlist_id}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert res.status_code == 404
+
+def test_delete_wishlist_no_token(setup_test_account, setup_test_wishlist, cleanup_test_account, cleanup_test_wishlist):
+    token, wishlist_id = setup_test_wishlist
+    cleanup_test_wishlist(token, wishlist_id)
+
+    sleep(sleepTime)
+    res = req.delete(
+        domain+f"/wishlists/{wishlist_id}",
+        # headers={"Authorization": f"Bearer {token}"}, no token
+    )
+
+    assert res.status_code == 401
+
+    # check the wishlist still exists
+    sleep(sleepTime)
+    res = req.get(
+        domain+f"/wishlists/{wishlist_id}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert res.status_code == 200
+
+def test_delete_wishlist_invalid_token(setup_test_account, setup_test_wishlist, cleanup_test_account, cleanup_test_wishlist):
+    token, wishlist_id = setup_test_wishlist
+    cleanup_test_wishlist(token, wishlist_id)
+
+    sleep(sleepTime)
+    res = req.delete(
+        domain+f"/wishlists/{wishlist_id}",
+        headers={"Authorization": f"Bearer 1776119someRandom41648Token12303"},
+    )
+
+    assert res.status_code == 401
+
+    # check the wishlist still exists
+    sleep(sleepTime)
+    res = req.get(
+        domain+f"/wishlists/{wishlist_id}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert res.status_code == 200

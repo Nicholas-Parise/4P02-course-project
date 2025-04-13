@@ -5,6 +5,8 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
   const [password, setPassword] = React.useState("")
   const [confirmOpen, setConfirmOpen] = React.useState(false)
   const [input, setInput] = React.useState('')
+  const [responseMessage, setResponseMessage] = React.useState("")
+  const [responseType, setResponseType] = React.useState("")
 
   React.useEffect(() => {
     if (open) {
@@ -20,7 +22,24 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    if (password.length < 8) {
+      setResponseMessage("Please ensure your password is valid.")
+      setResponseType("error")
+      return
+    }
     setConfirmOpen(true)
+  }
+
+  const handleCancel = () => {
+    setResponseMessage('')
+    setResponseType('')
+    handleClose()
+  }
+
+  const handleCancelConfirm = () => {
+    setConfirmOpen(false)
+    setInput('')
+    handleCancel()
   }
 
   const style = {
@@ -38,7 +57,7 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
 
   return (
     <>
-    <Modal open={open} onClose={handleClose}>
+    <Modal open={open} onClose={handleCancel}>
       <Box sx={style}>
         <Typography variant='h6' color="error" sx={{ textAlign: 'center', fontWeight: 'bold', color: '#5651e5' }}>Delete Account</Typography>
 
@@ -62,13 +81,20 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
             onChange={(e) => setPassword(e.target.value)}
             fullWidth
             variant='outlined'
+            slotProps={{ htmlInput: { maxLength: 64 } }}
             sx={{mb: 2}}
           />
+
+          {responseMessage && (
+            <div style={{ marginBottom: '10px'}} className={`response-message ${responseType}`}>
+              {responseMessage}
+            </div>
+          )}
 
           <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
             <Button
               variant="outlined"
-              onClick={handleClose}
+              onClick={handleCancel}
               sx={{ borderRadius: '25px', borderColor: '#5651e5', color: '#5651e5', mr: '8px' }}>
               Cancel
             </Button>
@@ -92,7 +118,7 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
 
     {/* Child modal for confirmation */}
 
-    <Modal open={confirmOpen} onClose={() => {setConfirmOpen(false); setInput('')}}>
+    <Modal open={confirmOpen} onClose={handleCancelConfirm}>
         <Box
           sx={{
             position: 'absolute',
@@ -130,7 +156,7 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
 
           {/* Buttons */}
           <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
-            <Button variant="outlined" onClick={() => setConfirmOpen(false)} sx={{ borderRadius: '25px', borderColor: '#5651e5', color: '#5651e5', mr: '8px' }}>
+            <Button variant="outlined" onClick={handleCancelConfirm} sx={{ borderRadius: '25px', borderColor: '#5651e5', color: '#5651e5', mr: '8px' }}>
               Cancel
             </Button>
             <Button 

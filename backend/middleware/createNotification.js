@@ -11,8 +11,8 @@ const createNotification = async (userIDs, title, body, url) => {
 
     // Generate placeholders only for user_id dynamically ($1, $n+1, $n+2, $n+3, false), ($2, $n+1, $n+2, $n+3, false), ...
     const values = userIDs
-    .map((_, index) => `($${index + 1}, $${userIDs.length + 1}, $${userIDs.length + 2}, $${userIDs.length + 3}, false)`)
-    .join(", ");
+        .map((_, index) => `($${index + 1}, $${userIDs.length + 1}, $${userIDs.length + 2}, $${userIDs.length + 3}, false)`)
+        .join(", ");
 
     // now convert the array input from [[userID1,userID2], title, body, url], -> [userID1, userID2, title, body, url]
     const params = [...userIDs, title, body, url];
