@@ -9,7 +9,7 @@ const UpgradePage = () => {
 
   // this is the public key, so it doesn't have to be in the .env file
   const stripePromise = loadStripe('pk_test_51RDYNcRAn3aH2VOgUOLi7IWb1xIGEC4ab6dMBztTnka81mO0k7wpUct6qbcLpIJ4yCMqGabdnvP2XVE6k3NmPa6600DpD8aTgu');
-  const [token, setToken] = useState(localStorage.getItem('token') || '');
+  const [token] = useState(localStorage.getItem('token') || '');
 
   const [activeFaqIndex, setActiveFaqIndex] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -22,12 +22,8 @@ const UpgradePage = () => {
   });
   const [processing, setProcessing] = useState(false);
 
-  useEffect(() => {
-    setToken(localStorage.getItem('token') || '')
-    console.log(token)
-  }, []);
-
   const handleSubscribe = async () => {
+    console.log(token);
     const res = await fetch('https://api.wishify.ca/payments/create-subscription-session', {
       method: 'POST',
       headers: {
