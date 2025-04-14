@@ -23,7 +23,8 @@ router.post('/create-subscription-session', express.json(), authenticate, async 
             cancel_url: `${process.env.FRONTEND_URL}/cancel`,
         });
 
-        return res.redirect(session.url);
+        return res.json({ url: session.url });
+        //return res.redirect(session.url);
     } catch (error) {
         console.error('Error creating Stripe session:', error);
         res.status(500).json({ error: 'Unable to create checkout session' });
