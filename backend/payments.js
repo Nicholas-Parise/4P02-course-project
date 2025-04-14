@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('./db');
+const bodyParser = require('body-parser');
 const authenticate = require('./middleware/authenticate');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 require("dotenv").config();
@@ -26,7 +27,7 @@ router.post('/create-subscription-session', authenticate, async (req, res) => {
 });
 
 
-router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+router.post('/webhook', bodyParser.raw({ type: 'application/json' }), async (req, res) => {
     let event;
 
     try {
