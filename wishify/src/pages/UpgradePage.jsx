@@ -183,7 +183,7 @@ const UpgradePage = () => {
             </ul>
             <button
               className="plan-button featured-button"
-              onClick={() => handleSubscribe}
+              onClick={() => handleSubscribe()}
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
               <span>Upgrade to Pro</span>
