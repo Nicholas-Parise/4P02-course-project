@@ -23,10 +23,12 @@ const UpgradePage = () => {
 
 
   const handleSubscribe = async () => {
+    const [token] = useState<string>(localStorage.getItem('token') || '');
     const res = await fetch('https://api.wishify.ca/payments/create-subscription-session', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Authorization': "Bearer "+token,
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({ priceId: 'price_1RDYS9RAn3aH2VOg7t2vQ7N5' }), // actual Stripe Price ID
     });
