@@ -31,34 +31,37 @@ router.post('/webhook', bodyParser.raw({ type: 'application/json' }), async (req
     let event;
 
     try {
-        event = stripe.webhooks.constructEvent(req.body, req.headers['stripe-signature'], process.env.STRIPE_WEBHOOK_SECRET);
+        event = stripe.webhooks.constructEvent(
+            req.body,
+            req.headers['stripe-signature'],
+            process.env.STRIPE_WEBHOOK_SECRET);
     } catch (err) {
         console.error('Webhook Error:', err.message);
         return res.sendStatus(400);
     }
 
-    const email = session.customer_email;
 
     // Handle different event types
     switch (event.type) {
         case 'checkout.session.completed':
             // Handle getting subscription 
-            const session = event.data.object;
-            const customerId = session.customer;
-            const subscriptionId = session.subscription;
-            
-            const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+      
+            try {
+                const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
-            console.log(`Subscription successful for email: ${email}`);
+                const session = event.data.object;   
+                const email = session.customer_email;
+                const customerId = session.customer;
+                const subscriptionId = session.subscription;
 
-            await db.query(`
+                await db.query(`
                 UPDATE users
                 SET 
                     stripe_customer_id = $1,
                     stripe_subscription_id = $2,
                     status = $3,
                     current_period_end = to_timestamp($4),
-                    plan = $5
+                    plan = $5,
                     dateUpdated = NOW(),
                     pro = TRUE
                 WHERE email = $6
@@ -70,21 +73,34 @@ router.post('/webhook', bodyParser.raw({ type: 'application/json' }), async (req
                     subscription.items.data[0].price.id,
                     email]);
 
+                console.log(`Subscription completed and updated for email: ${email}`);
+            } catch (err) {
+                console.error('Failed to update user after checkout.session.completed:', err.message);
+            }
+
             break;
         case 'customer.subscription.deleted':
             // Handle subscription cancellation
-            await db.query(`
+            const subscription = event.data.object;
+            const stripecustomerId = subscription.customer;
+
+            try {
+                await db.query(`
                 UPDATE users
                 SET 
                     subscription_status = 'canceled',
                     subscription_ends = NOW(),
                     pro = FALSE,
                     dateUpdated = NOW()
-                WHERE email = $1
-                RETURNING *;
-                `, [email]);
-            break;
+                WHERE stripe_customer_id  = $1;
+                `, [stripecustomerId]);
 
+                console.log(`Subscription canceled for customer: ${stripecustomerId}`);
+            } catch (err) {
+                console.error('Failed to update user after subscription.deleted:', err.message);
+            }
+
+            break;
     }
 
     res.json({ received: true });
@@ -131,40 +147,40 @@ router.post('/cancel-subscription', authenticate, async (req, res) => {
 
 async function getSubscriptionForUser(userId) {
     try {
-      const result = await db.query(
-        `
+        const result = await db.query(
+            `
         SELECT 
           stripe_customer_id, 
           stripe_subscription_id,
           subscription_status
         FROM users
         WHERE id = $1;`,
-        [userId]
-      );
-  
-      if (result.rows.length === 0) {
-        throw new Error("User not found");
-      }
-  
-      const user = result.rows[0];
-  
-      if (!user.stripe_customer_id || !user.stripe_subscription_id) {
+            [userId]
+        );
+
+        if (result.rows.length === 0) {
+            throw new Error("User not found");
+        }
+
+        const user = result.rows[0];
+
+        if (!user.stripe_customer_id || !user.stripe_subscription_id) {
+            return {
+                subscribed: false,
+                reason: 'No Stripe subscription linked to this account',
+            };
+        }
+
         return {
-          subscribed: false,
-          reason: 'No Stripe subscription linked to this account',
+            subscribed: user.subscription_status === 'active',
+            subscriptionId: user.stripe_subscription_id,
+            status: user.subscription_status,
         };
-      }
-  
-      return {
-        subscribed: user.subscription_status === 'active',
-        subscriptionId: user.stripe_subscription_id,
-        status: user.subscription_status,
-      };
     } catch (error) {
-      console.error('Error fetching subscription info:', error);
-      throw new Error("Failed to retrieve subscription status.");
+        console.error('Error fetching subscription info:', error);
+        throw new Error("Failed to retrieve subscription status.");
     }
-  }
+}
 
 
 module.exports = router;
