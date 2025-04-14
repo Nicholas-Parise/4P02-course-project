@@ -25,8 +25,10 @@ import Ideas from "./pages/Ideas";
 import UpgradePage from "./pages/UpgradePage";
 import UpgradeRedirect from "./components/UpgradeRedirect"; // Add this import
 
-import About from "./pages/About";
+import Success from './pages/Success';
+import Cancel from './pages/Cancel';
 
+import About from "./pages/About";
 import Privacy from "./pages/Privacy";
 import TOS from "./pages/TOS";
 
@@ -62,6 +64,9 @@ function App() {
                 <Route path="privacy-policy" element={<Privacy />} />
                 <Route path="terms-of-service" element={<TOS />} />
                 <Route path="about" element={<About />} />
+
+                <Route path="/success" element={<Success />} />
+                <Route path="/cancel" element={<Cancel />} />
 
                 <Route element={<ProtectedRoutes />}>
                   <Route path="home" element={<HomePage />} />

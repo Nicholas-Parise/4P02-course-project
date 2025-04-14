@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { FaStar, FaCheck, FaArrowRight, FaCopy, FaAward, FaInfinity, FaCreditCard, FaTimes } from 'react-icons/fa';
-import {CheckoutProvider} from '@stripe/react-stripe-js';
-import {loadStripe} from '@stripe/stripe-js';
+import { CheckoutProvider } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 import '../Landing.css';
 
-const stripePromise = loadStripe('');
 
 const UpgradePage = () => {
+
+  // this is the public key, so it doesn't have to be in the .env file
+  const stripePromise = loadStripe('pk_test_51RDYNcRAn3aH2VOgUOLi7IWb1xIGEC4ab6dMBztTnka81mO0k7wpUct6qbcLpIJ4yCMqGabdnvP2XVE6k3NmPa6600DpD8aTgu');
+
   const [activeFaqIndex, setActiveFaqIndex] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -17,6 +20,24 @@ const UpgradePage = () => {
     name: ''
   });
   const [processing, setProcessing] = useState(false);
+
+
+  const handleSubscribe = async () => {
+    const res = await fetch('https://api.wishify.ca/payments/create-subscription-session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ priceId: 'price_1RDYS9RAn3aH2VOg7t2vQ7N5' }), // actual Stripe Price ID
+    });
+  
+    const data = await res.json();
+  
+    const stripe = await stripePromise;
+    stripe.redirectToCheckout({ url: data.url });
+  };
+
+
 
   const toggleFAQ = (index) => {
     setActiveFaqIndex(activeFaqIndex === index ? null : index);
@@ -48,7 +69,7 @@ const UpgradePage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     setProcessing(true);
-    
+
     // Simulate payment processing
     setTimeout(() => {
       setProcessing(false);
@@ -86,7 +107,7 @@ const UpgradePage = () => {
             <p className="hero-tagline">
               Elevate your wishlist experience with premium features designed to make gift-giving even more magical.
             </p>
-            
+
             <div className="feature-highlight" style={{ maxWidth: '600px', margin: '2rem auto' }}>
               <div className="highlight-badge">Premium Features</div>
               <h2>Get More With Pro</h2>
@@ -100,7 +121,7 @@ const UpgradePage = () => {
       <div className="pricing-section">
         <h2 className="pricing-title">Simple, Transparent Pricing</h2>
         <p className="pricing-subtitle">Choose the plan that's right for you</p>
-        
+
         <div className="pricing-container">
           {/* Free Plan Card */}
           <div className="pricing-card">
@@ -160,9 +181,9 @@ const UpgradePage = () => {
                 Early access to new features
               </li>
             </ul>
-            <button 
+            <button
               className="plan-button featured-button"
-              onClick={() => handleUpgrade('monthly')}
+              onClick={() => handleSubscribe}
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
               <span>Upgrade to Pro</span>
@@ -212,7 +233,7 @@ const UpgradePage = () => {
             </div>
             <h2 className="card-title">Duplicate Wishlists</h2>
             <p className="card-description">
-                Able to duplicate wishlists to save time and effort when creating similar lists for different occasions with just a simple click.
+              Able to duplicate wishlists to save time and effort when creating similar lists for different occasions with just a simple click.
             </p>
           </div>
 
@@ -259,7 +280,7 @@ const UpgradePage = () => {
       </div>
 
       {/* FAQ Section */}
-{/*      <div className="faq-section">
+      {/*      <div className="faq-section">
         <h2 className="faq-title">Frequently Asked Questions</h2>
         <div className="faq-container">
           {faqs.map((faq, index) => (
@@ -288,13 +309,13 @@ const UpgradePage = () => {
       <div className="pricing-section" style={{ paddingBottom: '6rem' }}>
         <h2 className="pricing-title">Ready to Upgrade?</h2>
         <p className="pricing-subtitle">Join thousands of happy Pro users today</p>
-        
-        <div style={{ 
+
+        <div style={{
           maxWidth: '400px',
           margin: '0 auto',
           textAlign: 'center'
         }}>
-          <button 
+          <button
             className="plan-button featured-button"
             onClick={() => handleUpgrade('monthly')}
             style={{
@@ -326,7 +347,7 @@ const UpgradePage = () => {
                 <FaTimes />
               </button>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="payment-form">
               <div className="form-group">
                 <label>Card Number</label>
@@ -339,7 +360,7 @@ const UpgradePage = () => {
                   maxLength="16"
                 />
               </div>
-              
+
               <div className="form-row">
                 <div className="form-group">
                   <label>Expiry Date</label>
@@ -352,7 +373,7 @@ const UpgradePage = () => {
                     maxLength="5"
                   />
                 </div>
-                
+
                 <div className="form-group">
                   <label>CVC</label>
                   <input
@@ -365,7 +386,7 @@ const UpgradePage = () => {
                   />
                 </div>
               </div>
-              
+
               <div className="form-group">
                 <label>Cardholder Name</label>
                 <input
@@ -376,7 +397,7 @@ const UpgradePage = () => {
                   placeholder="Name on card"
                 />
               </div>
-              
+
               <div className="payment-actions">
                 <button
                   type="button"
