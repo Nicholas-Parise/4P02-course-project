@@ -36,7 +36,8 @@ const UpgradePage = () => {
     const data = await res.json();
   
     const stripe = await stripePromise;
-    stripe.redirectToCheckout({ url: data.url });
+    //stripe.redirectToCheckout({ url: data.url });
+    stripe.redirectToCheckout({ sessionId: data.sessionId });
   };
 
 

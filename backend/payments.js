@@ -23,7 +23,7 @@ router.post('/create-subscription-session', express.json(), authenticate, async 
             cancel_url: `${process.env.FRONTEND_URL}/cancel`,
         });
 
-        return res.json({ url: session.url });
+        return res.json({ url: session.url, sessionId: session.id });
         //return res.redirect(session.url);
     } catch (error) {
         console.error('Error creating Stripe session:', error);
