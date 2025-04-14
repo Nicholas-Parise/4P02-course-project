@@ -6,9 +6,13 @@ const authenticate = require('./middleware/authenticate');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 require("dotenv").config();
 
-router.post('/create-subscription-session', authenticate, async (req, res) => {
+router.post('/create-subscription-session', express.json(), authenticate, async (req, res) => {
     try {
         const { priceId } = req.body;
+
+        if (!priceId) {
+            return res.status(400).json({ error: 'priceId is required' });
+        }
 
         const session = await stripe.checkout.sessions.create({
             mode: 'subscription',
@@ -44,9 +48,9 @@ router.post('/webhook', bodyParser.raw({ type: 'application/json' }), async (req
     switch (event.type) {
         case 'checkout.session.completed':
             // Handle getting subscription 
-      
+
             try {
-                const session = event.data.object;   
+                const session = event.data.object;
 
                 if (!session.customer_email || !session.customer || !session.subscription) {
                     console.error("Missing required session fields:", {

@@ -30,7 +30,7 @@ const UpgradePage = () => {
         'Authorization': "Bearer "+token,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ priceId: 'price_1RDYS9RAn3aH2VOg7t2vQ7N5' }), // actual Stripe Price ID
+      body: JSON.stringify({ priceId: 'price_1RDYS9RAn3aH2VOg7t2vQ7N5' }) // actual Stripe Price ID
     });
   
     const data = await res.json();
