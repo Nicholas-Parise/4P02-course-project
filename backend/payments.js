@@ -48,6 +48,16 @@ router.post('/webhook', bodyParser.raw({ type: 'application/json' }), async (req
       
             try {
                 const session = event.data.object;   
+
+                if (!session.customer_email || !session.customer || !session.subscription) {
+                    console.error("Missing required session fields:", {
+                        email: session.customer_email,
+                        customer: session.customer,
+                        subscription: session.subscription,
+                    });
+                    return res.status(400).send("Missing required session fields.");
+                }
+
                 const email = session.customer_email;
                 const customerId = session.customer;
                 const subscriptionId = session.subscription;
