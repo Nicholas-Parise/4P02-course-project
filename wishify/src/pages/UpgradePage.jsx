@@ -22,8 +22,12 @@ const UpgradePage = () => {
   });
   const [processing, setProcessing] = useState(false);
 
+  useEffect(() => {
+    setToken(localStorage.getItem('token') || '')
+    console.log(token)
+  }, []);
+
   const handleSubscribe = async () => {
-    setToken(localStorage.getItem('token') || '');
     const res = await fetch('https://api.wishify.ca/payments/create-subscription-session', {
       method: 'POST',
       headers: {
