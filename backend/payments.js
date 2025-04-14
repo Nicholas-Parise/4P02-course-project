@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('./db');
 const authenticate = require('./middleware/authenticate');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+require("dotenv").config();
 
 router.post('/create-subscription-session', authenticate, async (req, res) => {
     try {
