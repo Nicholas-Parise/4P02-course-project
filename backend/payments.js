@@ -47,12 +47,12 @@ router.post('/webhook', bodyParser.raw({ type: 'application/json' }), async (req
             // Handle getting subscription 
       
             try {
-                const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-
                 const session = event.data.object;   
                 const email = session.customer_email;
                 const customerId = session.customer;
                 const subscriptionId = session.subscription;
+
+                const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
                 await db.query(`
                 UPDATE users
