@@ -25,6 +25,11 @@ pro BOOLEAN,
 setup BOOLEAN,
 google_id TEXT UNIQUE,
 provider TEXT,
+stripe_customer_id TEXT,
+stripe_subscription_id TEXT,
+subscription_status TEXT,
+subscription_plan TEXT,
+subscription_ends TIMESTAMP,
 dateupdated TIMESTAMP,
 datecreated TIMESTAMP DEFAULT NOW()
 );

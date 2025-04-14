@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { FaStar, FaCheck, FaArrowRight, FaCopy, FaAward, FaInfinity, FaCreditCard, FaTimes } from 'react-icons/fa';
+import {CheckoutProvider} from '@stripe/react-stripe-js';
+import {loadStripe} from '@stripe/stripe-js';
 import '../Landing.css';
+
+const stripePromise = loadStripe('');
 
 const UpgradePage = () => {
   const [activeFaqIndex, setActiveFaqIndex] = useState(null);

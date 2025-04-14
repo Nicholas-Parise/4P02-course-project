@@ -11,6 +11,7 @@ const contributionsRoutes = require('./contributions');
 const statusRoutes = require('./status');
 const notificationsRoutes = require('./notifications');
 const ideasRoutes = require('./ideas');
+const paymentsRoutes = require('./payments');
 
 const app = express();
 
@@ -37,6 +38,8 @@ app.use('/contributions', contributionsRoutes);
 app.use('/status', statusRoutes);
 app.use('/notifications', notificationsRoutes);
 app.use('/ideas', ideasRoutes);
+app.use('/payments', paymentsRoutes);
+
 
 // static Routes
 app.use('/uploads', express.static('uploads'));
