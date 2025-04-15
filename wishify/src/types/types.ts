@@ -53,7 +53,8 @@ export interface IdeaItem {
     sponsor: boolean,
     price: string,
     rating?: string,
-    wishlistCount?: number
+    wishlistCount?: number,
+    uses: number
 }
 
 export interface Contribution {

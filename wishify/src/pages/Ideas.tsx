@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { IdeaItem, Wishlist } from "../types/types";
-import React from "react";
 import PopularItems from "../components/PopularItems";
 import AddIdeaModal from "../components/AddIdeaModal";
 import {Alert} from '@mui/material/';
@@ -52,7 +51,7 @@ const Ideas = () => {
                 const trendingData = await trendingResponse.json();
                 // randomly choose 4 items from trendingData sorted by uses
                 let randomTrending = trendingData.trending.sort(() => 0.5 - Math.random()).slice(0, 4);
-                randomTrending = randomTrending.sort((a, b) => (b.uses || 0) - (a.uses || 0));
+                randomTrending = randomTrending.sort((a: IdeaItem, b: IdeaItem) => (b.uses || 0) - (a.uses || 0));
 
                 // Update state with fetched data
                 setWishlists(wishlistData.filter((wishlist: Wishlist) => wishlist.owner));
