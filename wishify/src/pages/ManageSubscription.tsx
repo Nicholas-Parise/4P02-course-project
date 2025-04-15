@@ -3,9 +3,14 @@ import { useEffect, useState } from 'react';
 type SubStatus = {
   status: string;
   cancelAt: string | null;
+  since: string;
   currentPeriodEnd: string;
   planName: string;
-  price: string;
+  price: {
+    amount: string;
+    currency: string;
+    interval: string;
+  };
 };
 
 export default function ManageSubscription() {
@@ -108,7 +113,7 @@ export default function ManageSubscription() {
       </div>
 
       <div className="mb-2">
-        <span className="font-semibold text-gray-700">Price:</span> {status.price}
+        <span className="font-semibold text-gray-700">Price:</span> {status.price.amount} {status.price.currency} / {status.price.interval}
       </div>
 
       <div className="mb-2">
@@ -123,6 +128,11 @@ export default function ManageSubscription() {
         >
           {status.status}
         </span>
+      </div>
+
+      <div className="mb-2">
+        <span className="font-semibold text-gray-700">Member since:</span>{' '}
+        {new Date(status.since).toLocaleDateString()}
       </div>
 
       <div className="mb-2">

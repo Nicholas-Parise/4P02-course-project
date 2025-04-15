@@ -197,6 +197,7 @@ router.get('/subscription', authenticate, async (req, res) => {
             status: subscription.status,
             cancelAt: subscription.cancel_at ? new Date(subscription.cancel_at * 1000) : null,
             currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+            since: new Date(subscription.current_period_start * 1000),
             plan: product.name,
             price: {
                 amount: (price.unit_amount / 100).toFixed(2),
