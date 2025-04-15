@@ -183,11 +183,10 @@ router.get('/subscription', authenticate, async (req, res) => {
         });
 */
         const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
-            status: 'all',
             expand: ['default_payment_method'],
           });
 
-        const activeSub = subscriptions.data[0];
+        const activeSub = subscription.data[0];
 
         if (!activeSub) {
             return res.json({ status: 'none' });
