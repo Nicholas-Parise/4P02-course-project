@@ -74,7 +74,7 @@ router.post('/webhook', bodyParser.raw({ type: 'application/json' }), async (req
                     stripe_customer_id = $1,
                     stripe_subscription_id = $2,
                     subscription_status = $3,
-                    current_period_end = to_timestamp($4),
+                    subscription_ends = to_timestamp($4),
                     subscription_plan = $5,
                     dateUpdated = NOW(),
                     pro = TRUE
