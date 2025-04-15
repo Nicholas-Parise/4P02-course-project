@@ -156,6 +156,7 @@ router.post('/webhook', bodyParser.raw({ type: 'application/json' }), async (req
                 UPDATE users
                 SET 
                     subscription_status = 'canceled',
+                    stripe_subscription_id = NULL,
                     subscription_ends = NOW(),
                     pro = FALSE,
                     dateUpdated = NOW()
@@ -200,8 +201,8 @@ router.get('/subscription', authenticate, async (req, res) => {
         res.json({
             status: subscription.status,
             cancelAt: subscription.cancel_at ? new Date(subscription.cancel_at * 1000) : null,
-            currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-            since: new Date(subscription.current_period_start * 1000),
+            currentPeriodEnd: new Date(subscription.items.data[0].current_period_end * 1000),
+            since: new Date(subscription.items.data[0].current_period_start * 1000),
             plan: product.name,
             price: {
                 amount: (price.unit_amount / 100).toFixed(2),
