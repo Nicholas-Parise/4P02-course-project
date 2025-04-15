@@ -71,7 +71,8 @@ def setup_test_account(request):
         json={
             "email":email,
             "password":password,
-            "displayName":"Automated Test Account"
+            "displayName":"Automated Test Account",
+            "notifications":False
         }
     )
 

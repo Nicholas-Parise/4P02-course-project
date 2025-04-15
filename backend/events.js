@@ -5,6 +5,9 @@ const { v4: uuidv4 } = require('uuid');
 const authenticate = require('./middleware/authenticate');
 const createNotification = require("./middleware/createNotification");
 const sendEmail = require("./middleware/sendEmail");
+const mustache = require('mustache');
+const fs = require('fs/promises');
+const path = require('path');
 
 // localhost:3000/events?page=1&pageSize=10
 // get list of events accesible to user
@@ -498,18 +501,6 @@ router.post('/members', authenticate, async (req, res) => {
 });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 // localhost:3000/events/share
 // send emails to share the event 
 router.post('/share', authenticate, async (req, res) => {
@@ -523,30 +514,35 @@ router.post('/share', authenticate, async (req, res) => {
 
   try {
     const eventCheck = await db.query(`
-      SELECT id, share_token,name FROM events WHERE id = $1;
+      SELECT id, share_token,name, deadline, description FROM events WHERE id = $1;
     `, [event_id]);
 
     if (eventCheck.rows.length === 0) {
       return res.status(404).json({ error: "Event not found." });
     }
 
+    const list_name = eventCheck.rows[0].name;
+    const event_date = eventCheck.rows[0].deadline;
+    const list_description = eventCheck.rows[0].description;
+
     // Check if the user exists
-    const userCheck = await db.query(`
-      SELECT id, notifications FROM users WHERE email = $1;
-    `, [email]);
-
-    // get name of person doing inviting:
-    const fromUserResult = await db.query(`
-        SELECT displayName FROM users WHERE id = $1;
-      `, [userId]);
-
-    const fromUser = fromUserResult.rows[0].displayname;
-
+        const userCheck = await db.query(`
+          SELECT id,displayName,notifications FROM users WHERE email = $1;
+        `, [email]);
+    
+        // get name of person doing inviting:
+        const fromUserResult = await db.query(`
+            SELECT displayName FROM users WHERE id = $1;
+          `, [userId]);
+    
+        const fromUser = fromUserResult.rows[0].displayname;
+       
     // if the user has an account add them as a member
     if (userCheck.rows.length > 0) {
       // User exists, add them to the event
 
       const memberUserId = userCheck.rows[0].id;
+      const toUser = userCheck.rows[0].displayname;
 
       await db.query(`
         INSERT INTO event_members (user_id, event_id, owner, notifications, dateCreated)
@@ -556,6 +552,7 @@ router.post('/share', authenticate, async (req, res) => {
       // send notification, make sure they allow notifications
       if (userCheck.rows[0].notifications) {
         await createNotification([memberUserId], "You've been invited to a event!", `${fromUser} has invited you to the event: ${eventCheck.rows[0].name}`, `/events/${eventCheck.rows[0].id}`);
+        await memberAdded(email, toUser, fromUser, list_name, event_date, list_description, `https://wishify.ca/events/${eventCheck.rows[0].id}`);
       }
 
       return res.status(200).json({ message: "User added to event." });
@@ -564,10 +561,7 @@ router.post('/share', authenticate, async (req, res) => {
 
       const inviteLink = `https://wishify.ca/register?event=${eventCheck.rows[0].share_token}`;
 
-      await sendEmail(email,
-        `${fromUser} has invited you to collaborate on their event!`,
-        `${fromUser} has invited you to collaborate on their event! Click here to join: ${inviteLink} or copy and paste this link into your browser: ${inviteLink} Best, The Wishify Team`,
-        `<p><strong>${fromUser}</strong> has invited to their event! Click <a href="${inviteLink}">here</a> to join. <br> Or copy and paste this link into your browser: ${inviteLink}</p><p>Best, The Wishify Team</p>`);
+      await memberInvite(email, fromUser, list_name, event_date, list_description, inviteLink);
     }
 
     return res.status(200).json({ message: "Invitation sent." });
@@ -576,6 +570,50 @@ router.post('/share', authenticate, async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+
+
+async function memberInvite(to, sender_name, list_name, event_date, list_description, register_link) {
+  try {
+    let htmlTemplate = await fs.readFile(path.join(__dirname, './emailtemplates/MemberInvite.html'), 'utf8');
+
+    const renderedHtml = mustache.render(htmlTemplate, {
+      sender_name,
+      list_type: 'Event',
+      list_name,
+      event_date,
+      list_description,
+      register_link,
+      current_year: new Date().getFullYear()
+    });
+
+    await sendEmail(to, `${sender_name} has invited you to collaborate on their Event!`, null, renderedHtml);
+  } catch (error) {
+    console.error("Error sending email:", error);
+  }
+}
+
+
+async function memberAdded(to, recipient_name, sender_name, list_name, event_date, list_description, view_link) {
+  try {
+    let htmlTemplate = await fs.readFile(path.join(__dirname, './emailtemplates/MemberAdded.html'), 'utf8');
+
+    const renderedHtml = mustache.render(htmlTemplate, {
+      recipient_name,
+      sender_name,
+      list_type: 'Event',
+      list_name,
+      event_date,
+      list_description,
+      view_link,
+      current_year: new Date().getFullYear()
+    });
+
+    await sendEmail(to, `${sender_name} has invited you to collaborate on their Event!`, null, renderedHtml);
+  } catch (error) {
+    console.error("Error sending email:", error);
+  }
+}
 
 
 

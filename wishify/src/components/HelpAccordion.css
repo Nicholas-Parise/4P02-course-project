@@ -1,0 +1,20 @@
+.accordion {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0;
+  }
+  
+  .accordion:hover {
+    background-color: #ddd;
+  }
+  
+  .panel {
+    padding: 10px 15px;
+    background-color: white;
+    border: 0px solid #ccc;
+  }
+  
+  .accordion-item + .accordion-item {
+    font-size: 16px;
+  margin: 0;
+  }

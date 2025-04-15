@@ -16,7 +16,7 @@ const sendEmail = async (to, subject, text, html = null) => {
     html: html || text,
   };
 
-  console.log(data);
+  //console.log(data);
   await mg.messages().send(data);
 
   // if it doesn't send it will throw error
