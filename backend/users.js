@@ -166,7 +166,12 @@ router.delete('/', authenticate, async (req, res) => {
 // get specific user
 router.get('/:userId', async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const userId = parseInt(req.params.userId);
+
+    if (!userId) {
+      return res.status(400).json({ message: "userId is required to get account" });
+    }
+
     const result = await db.query('SELECT id, displayName, bio, picture, notifications, pro, datecreated FROM users WHERE id = $1', [userId]);
     const result2 = await db.query(
       `SELECT c.*, uc.love FROM categories c
