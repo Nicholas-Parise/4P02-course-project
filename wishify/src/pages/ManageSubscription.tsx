@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { loadStripe } from '@stripe/stripe-js';
 
 type SubStatus = {
   status: string;
@@ -14,6 +15,8 @@ type SubStatus = {
 };
 
 export default function ManageSubscription() {
+
+  const stripePromise = loadStripe('pk_test_51RDYNcRAn3aH2VOgUOLi7IWb1xIGEC4ab6dMBztTnka81mO0k7wpUct6qbcLpIJ4yCMqGabdnvP2XVE6k3NmPa6600DpD8aTgu');
   const [status, setStatus] = useState<SubStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem('token') || '';
@@ -56,8 +59,10 @@ export default function ManageSubscription() {
     });
 
     const data = await res.json();
-
+    const stripe = await stripePromise;
+   // stripe?.redirectToCheckout(data.url);
     window.location.href = data.url;
+   
   };
 
 
@@ -74,10 +79,13 @@ export default function ManageSubscription() {
 
     const data = await res.json();
 
-   // const stripe = await stripePromise;
+    const stripe = await stripePromise;
+    //stripe?.redirectToCheckout(data.url);
+
     //stripe.redirectToCheckout({ url: data.url });
     //stripe.redirectToCheckout({ sessionId: data.sessionId });
     window.location.href = data.url;
+    
   };
 
 
