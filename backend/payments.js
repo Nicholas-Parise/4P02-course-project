@@ -41,7 +41,9 @@ router.post('/create-portal-session', authenticate, async (req, res) => {
             `SELECT stripe_customer_id FROM users WHERE id = $1;`, [userId]
         );
 
-        if (user.rows.length === 0 || !user.rows[0].stripe_customer_id) {
+        console.log(user.rows[0].stripe_customer_id);
+
+        if (user.rows.length === 0) { // || !user.rows[0].stripe_customer_id
             return res.status(400).json({ error: 'No Stripe customer ID found for user.' });
         }
 
@@ -59,26 +61,28 @@ router.post('/create-portal-session', authenticate, async (req, res) => {
 
 router.post('/reactivate-subscription', authenticate, async (req, res) => {
     try {
-      const userId = req.user.userId;
-  
-      const user = await db.query(
-        `SELECT stripe_subscription_id FROM users WHERE id = $1;`, [userId]
-    );
-  
-      if (user.rows.length === 0 || !user.rows[0].stripe_subscription_id) {
-        return res.status(400).json({ error: 'No active subscription found.' });
-      }
-  
-      const subscription = await stripe.subscriptions.update(user.rows[0].stripe_subscription_id, {
-        cancel_at_period_end: false,
-      });
-  
-      res.json({ message: 'Subscription reactivated.', subscription });
+        const userId = req.user.userId;
+
+        const user = await db.query(
+            `SELECT stripe_subscription_id FROM users WHERE id = $1;`, [userId]
+        );
+
+        console.log(user.rows[0].stripe_subscription_id);
+
+        if (user.rows.length === 0) { // || !user.rows[0].stripe_subscription_id
+            return res.status(400).json({ error: 'No active subscription found.' });
+        }
+
+        const subscription = await stripe.subscriptions.update(user.rows[0].stripe_subscription_id, {
+            cancel_at_period_end: false,
+        });
+
+        res.json({ message: 'Subscription reactivated.', subscription });
     } catch (err) {
-      console.error('Error reactivating subscription:', err);
-      res.status(500).json({ error: 'Internal server error' });
+        console.error('Error reactivating subscription:', err);
+        res.status(500).json({ error: 'Internal server error' });
     }
-  });
+});
 
 
 router.post('/webhook', bodyParser.raw({ type: 'application/json' }), async (req, res) => {
@@ -175,18 +179,18 @@ router.get('/subscription', authenticate, async (req, res) => {
         // Assume you stored the subscription ID for the user
         const { subscriptionId } = await getSubscriptionForUser(req.user.userId);
         //const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-/*
-        const subscription = await stripe.subscriptions.list({
-            subscription: subscriptionId,
-            status: 'all',
-            expand: ['data.default_payment_method'],
-        });
-*/
+        /*
+                const subscription = await stripe.subscriptions.list({
+                    subscription: subscriptionId,
+                    status: 'all',
+                    expand: ['data.default_payment_method'],
+                });
+        */
         const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
             expand: ['default_payment_method']
-          });
+        });
 
-          if (!subscription) {
+        if (!subscription) {
             return res.json({ status: 'none' });
         }
 
