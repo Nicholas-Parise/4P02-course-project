@@ -3,10 +3,13 @@ import styled from 'styled-components';
 import { EditText, EditTextarea } from 'react-edit-text';
 import { useParams } from 'react-router-dom';
 import 'react-edit-text/dist/index.css';
+import { FaPeopleGroup } from 'react-icons/fa6';
 import banner from "../assets/bday-banner.jpg";
 import {WishlistThumbnail} from '../components/Thumbnail';
 import {CreateWishlist} from '../components/CreateButton';
 import ShareWishlistModal from '../components/ShareWishlistModal';
+import ShareEventModal from '../components/ShareEventModal';
+import MemberDialog from '../components/MemberDialog';
 
 import ModalBox from '@mui/material/Box';
 import ModalButton from '@mui/material/Button';
@@ -17,6 +20,8 @@ import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import Divider from '@mui/material/Divider';
+import Alert from '@mui/material/Alert';
 
 const EventSection = styled.section`
   margin-top: 20px;
@@ -85,7 +90,9 @@ const Event = () => {
   const [wishlists, setWishlists] = useState([]);
   const [ownedWishlists, setOwnedWishlists] = useState([]);
   const [originalEvent, setOriginalEvent] = useState(null);
+  const [eventMembers, setEventMembers] = useState([])
   const [saving, setSaving] = useState(false);
+  const [rsvpAlert, setRsvpAlert] = useState(false);
 
   const [activeOverlay, setActiveOverlay] = useState("");
   const [modalOpen, setModalOpen] = React.useState(false);
@@ -104,6 +111,16 @@ const Event = () => {
     setErrorMessage('');
     setActiveOverlay('');
   }
+
+  const [isMemberDialogOpen, setIsMemberDialogOpen] = useState(false)
+
+  const editMember = (member) => {
+    const index = eventMembers.findIndex(i => i.id === member.id);
+    const newArray = [...eventMembers] 
+    newArray[index] = member
+    setEventMembers(newArray)
+  }
+
   const [errorMessage, setErrorMessage] = useState('');
   const [newWishlistTitle, setNewWishlistTitle] = useState('');
   const wishlistUrl = `https://api.wishify.ca/wishlists/`;
@@ -126,11 +143,13 @@ const Event = () => {
           description: eventData.description || '',
           deadline: eventData.deadline || '',
           addr: eventData.addr || '',
-          city: eventData.city || ''
+          city: eventData.city || '',
+          share_token: eventData.share_token || '',
         };
         setEvent(fetchedEvent);
         setOriginalEvent(fetchedEvent);
         setWishlists(data.wishlists || []);
+        setEventMembers(data.members)
       } catch (error) {
         console.error('Error fetching event:', error);
       }
@@ -161,6 +180,26 @@ const Event = () => {
 
     fetchEvent();
   }, [wishlistUrl, token]);
+
+  // Fetch user data on component mount
+  const [userID, setUserID] = useState()
+
+  useEffect(() => {
+      fetch(`https://api.wishify.ca/auth/me`, {
+        method: 'get',
+        headers: new Headers({
+            'Authorization': "Bearer "+localStorage.getItem("token"),
+            'Content-Type': 'application/json'
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+            setUserID(data.id)
+        })
+        .catch((error) => {
+            console.log(error)
+        })
+    }, [])
 
   // Save event data to the backend
   const saveEvent = async () => {
@@ -387,9 +426,8 @@ const Event = () => {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const handleShare = () => {
-    if (activeOverlay) {
-      setIsShareModalOpen(true);
-    }
+    console.log(event)
+    setIsShareModalOpen(true);
   };
 
   const handleShareModalClose = () => {
@@ -422,6 +460,13 @@ const Event = () => {
     handleModalClose();
   }
 
+  const handleRSVP = () => {
+    // just alert user for now
+    setRsvpAlert(true);
+    setTimeout(() => setRsvpAlert(false), 3000)
+  }
+    
+
   const activeWishlist = wishlists.find((wishlist) => wishlist.name === activeOverlay);
   const [selectedWishlist, setSelectedWishlist] = useState('')
 
@@ -440,16 +485,38 @@ const Event = () => {
           <EditTextarea
             value={event.description}
             onChange={(e) => setEvent({ ...event, description: e.target.value })}
-            onBlur={saveEvent} // Save on blur
+        // Save on blur
             style={{
               resize: 'none',
             }}
             rows={12}
-          />
-        </Content>
-        <Sidebar>
-          <RSVP>RSVP Now</RSVP>
-          <div>
+            />
+          </Content>
+          <Sidebar>
+            <RSVP onClick={handleRSVP}>RSVP Now</RSVP>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '10px',
+                width: '100%',
+              }}
+            >
+              <div
+                onClick={() => setIsMemberDialogOpen(true)}
+                className="items-center flex gap-2 cursor-pointer select-none text-xs hover:bg-gray-200 bg-gray-100 p-4 rounded-[25px] border-2 border-[#5651e5]"
+              >
+                View Members
+                <FaPeopleGroup className="text-2xl text-[#5651e5]" />
+              </div>
+              <div
+                onClick={handleShare}
+                className="items-center justify-center flex gap-2 cursor-pointer select-none text-xs hover:bg-gray-200 bg-gray-100 p-4 rounded-[25px] border-2 border-[#5651e5]"
+              >
+                Share Event
+              </div>
+            </div>
+            <div>
             <p style={{ fontWeight: 'bold' }}>Date:</p>
             <input
               aria-label="Date and time"
@@ -582,8 +649,32 @@ const Event = () => {
         <ModalButton onClick={handleRemoveWishlist}>Remove From Event</ModalButton>
       </ModalBox>
       </Modal>
+      <Alert severity="success" sx={{ position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)', zIndex: 900, opacity: rsvpAlert ? 1 : 0, transition: rsvpAlert ? "none" : "opacity 1s ease-out"}}>
+        RSVP successfully added.
+      </Alert>
+      <MemberDialog 
+        open={isMemberDialogOpen}
+        setOpen={setIsMemberDialogOpen}
+        members={eventMembers}
+        userID={userID || -1}
+        isOwner={true}
+        setBlind={() => {}}
+        setOwner={() => {}}
+        editMember={editMember}
+        wishlistID={event?.id || -1}
+        token={token}
+      />
+      { event.share_token && (
+          <ShareEventModal
+          eventID={id}
+          shareToken={event.share_token} 
+          isOpen={isShareModalOpen} 
+          setIsOpen={setIsShareModalOpen}/>
+        )
+      }
     </>
   );
-};
+;
+}
 
 export default Event;
