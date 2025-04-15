@@ -5,7 +5,7 @@ import AddIcon from '@mui/icons-material/Add';
 import "./PopularItems.css";
 import Loading from "./Loading";
 
-const PopularItems = ({ loading, items, title="", subtitle="", maxItems=0, tagsEnabled, wishlistCountEnabled, onAdd = () => {} }) => {
+const PopularItems = ({ loading, items, bgColor="#f7f7f7", title="", subtitle="", maxItems=0, tagsEnabled, wishlistCountEnabled, addButtonsEnabled, onAdd = () => {} }) => {
   // If maxItems is specified, slice the array
   const displayedItems = maxItems ? items.slice(0, maxItems) : items;
 
@@ -20,7 +20,7 @@ const PopularItems = ({ loading, items, title="", subtitle="", maxItems=0, tagsE
   };
 
   return (
-    <div className="popular-items-section">
+    <div className="popular-items-section" style={{ backgroundColor: bgColor }}>
       {title && <h2>{title}</h2>}
       {subtitle && <p className="section-subtitle">{subtitle}</p>}
       {loading ? (
@@ -65,9 +65,11 @@ const PopularItems = ({ loading, items, title="", subtitle="", maxItems=0, tagsE
                 ))}
                 </ul>
               )}
+              {addButtonsEnabled && (
               <Fab className="-top-2 -right-2" sx={{top: -2, right: -2, zIndex: 500, position: "absolute", width: "40px", height: "40px"}} onClick={() => onAdd(item)} color="primary" aria-label="add">
                   <AddIcon />
-              </Fab>            
+              </Fab>
+              )}            
             </div>
           ))}
       </div>}

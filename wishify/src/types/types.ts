@@ -17,6 +17,7 @@ export interface Event {
     name: string,
     description: string,
     url: string,
+    owner?: boolean,
     addr: string,
     city: string,
     deadline: string,
