@@ -183,19 +183,17 @@ router.get('/subscription', authenticate, async (req, res) => {
         });
 */
         const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
-            expand: ['default_payment_method'],
+            expand: ['default_payment_method']
           });
 
-        const activeSub = subscription.data[0];
-
-        if (!activeSub) {
+          if (!subscription) {
             return res.json({ status: 'none' });
         }
 
         res.json({
-            status: activeSub.status,
-            cancelAt: activeSub.cancel_at ? new Date(activeSub.cancel_at * 1000) : null,
-            currentPeriodEnd: new Date(activeSub.current_period_end * 1000),
+            tatus: subscription.status,
+            cancelAt: subscription.cancel_at ? new Date(subscription.cancel_at * 1000) : null,
+            currentPeriodEnd: new Date(subscription.current_period_end * 1000)
         });
     } catch (error) {
         console.error('Error fetching subscription:', error);
