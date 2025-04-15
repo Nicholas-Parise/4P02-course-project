@@ -61,6 +61,8 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
 
   const [displayName, setDisplayName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
+  const [pro, setPro] = useState<boolean>(false);
+  
   useEffect(() => {
     setToken(localStorage.getItem('token') || '')
     console.log(token)
@@ -74,6 +76,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
         .then((data) => {
           setDisplayName(data.user.displayname)
           setEmail(data.user.email)
+          setPro(data.user.pro)
           console.log(data)
           //setLoading(false)
         })
@@ -130,7 +133,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
                 {isProfileMenuOpen && <ProfileMenu 
                       logOut={() => {setIsLoggedIn(false); localStorage.removeItem("token")}}
                       closeMenu={() => setIsProfileMenuOpen(false)} 
-                      profile={{displayName, email}}
+                      profile={{displayName, email,pro}}
                       />}
 
                 <div className='mobile-menu-button' onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
@@ -165,7 +168,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
                     {isProfileMenuOpen && <ProfileMenu 
                       logOut={() => {setIsLoggedIn(false); localStorage.removeItem("token")}}
                       closeMenu={() => setIsProfileMenuOpen(false)} 
-                      profile={{displayName, email}}
+                      profile={{displayName, email,pro}}
                       />}
                   </div>
                   

@@ -136,7 +136,7 @@ router.post('/webhook', bodyParser.raw({ type: 'application/json' }), async (req
                 `, [customerId,
                     subscriptionId,
                     subscription.status,
-                    subscription.current_period_end,
+                    subscription.items.data[0].current_period_end,
                     subscription.items.data[0].price.id,
                     email]);
 
@@ -230,12 +230,14 @@ router.post('/cancel-subscription', authenticate, async (req, res) => {
                 dateUpdated = NOW()
             WHERE id = $2
             RETURNING *;
-            `, [Math.floor(new Date(updatedSub.current_period_end * 1000).getTime() / 1000),req.user.userId]);
+            `, [Math.floor(new Date(updatedSub.items.data[0].current_period_end * 1000).getTime() / 1000),req.user.userId]);
 
+
+            
         //const deleted = await stripe.subscriptions.cancel(subscriptionId);
 
         await db.query(`COMMIT;`);
-        res.json({ canceled: true, status: updatedSub.status, cancel_at: updatedSub.current_period_end });
+        res.json({ canceled: true, status: updatedSub.status, cancel_at: updatedSub.items.data[0].current_period_end });
     } catch (error) {
         await db.query(`ROLLBACK;`);
         console.error('Error canceling subscription:', error);

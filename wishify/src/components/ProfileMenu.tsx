@@ -11,7 +11,8 @@ interface Props {
   logOut: () => void,
   profile:{
     displayName: string,
-    email: string
+    email: string,
+    pro: boolean
   };
 }
 
@@ -36,6 +37,11 @@ const ProfileMenu = ({ closeMenu, logOut, profile }: Props) => {
 
   const handleUpgrade = () => {
     navigate("/upgrade");
+    handleClose();
+  };
+
+  const handleManage = () => {
+    navigate("/manage-subscription");
     handleClose();
   };
 
@@ -79,11 +85,16 @@ const ProfileMenu = ({ closeMenu, logOut, profile }: Props) => {
             <AiOutlineUser className="user-icon" />
           </div>
           <div className="profile-text">
-            <p className="user-name">{profile.displayName}</p>
+            <p className="user-name">{profile.displayName} &nbsp; { profile.pro ? (
+            <span className="pro-badge">PRO</span>
+            ):( <span></span>)}</p>
+            
             <p className="user-email">{profile.email}</p>
           </div>
         </div>
 
+
+        { !profile.pro ? (
         <div className="upgrade-pro cursor-pointer" onClick={handleUpgrade}>
           <FaCrown className="crown-icon" />
           <div>
@@ -91,6 +102,15 @@ const ProfileMenu = ({ closeMenu, logOut, profile }: Props) => {
             <p className="upgrade-subtitle">Unlock premium features</p>
           </div>
         </div>
+            ):( 
+              <div className="upgrade-pro cursor-pointer" onClick={handleManage}>
+              <FaCrown className="crown-icon" />
+              <div>
+                <p className="upgrade-title">Manage subscription</p>
+                <p className="upgrade-subtitle">Manage premium features</p>
+              </div>
+            </div>
+            )}
 
         <div className="notification-toggle-container cursor-pointer" onClick={toggleNotifications}>
           <div className="notification-toggle">
