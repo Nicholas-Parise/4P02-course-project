@@ -36,17 +36,24 @@ const EditPictureModal = ({ onClose }) => {
     }
 
     const formData = new FormData()
-    formData.append('image', selectedImage)
+    formData.append('picture', selectedImage)
+
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ', ' + pair[1]);
+    }
+
 
     try {
       const response = await fetch('https://api.wishify.ca/users/upload/', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem("token")}`,
-          'Accept': 'application/json',
         },
         body: formData
       })
+
+      const result = await response.json()
+      console.log(result)
 
       if (response.ok) {
         alert('Image uploaded successfully!')
