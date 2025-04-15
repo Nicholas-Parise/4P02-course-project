@@ -59,9 +59,12 @@ export default function ManageSubscription() {
     });
 
     const data = await res.json();
+
+    console.log(data);
+
     const stripe = await stripePromise;
-   // stripe?.redirectToCheckout(data.url);
-    window.location.href = data.url;
+    stripe?.redirectToCheckout(data.url);
+    //window.location.href = data.url;
    
   };
 
@@ -80,11 +83,11 @@ export default function ManageSubscription() {
     const data = await res.json();
 
     const stripe = await stripePromise;
-    //stripe?.redirectToCheckout(data.url);
+    stripe?.redirectToCheckout(data.url);
 
     //stripe.redirectToCheckout({ url: data.url });
     //stripe.redirectToCheckout({ sessionId: data.sessionId });
-    window.location.href = data.url;
+   // window.location.href = data.url;
     
   };
 

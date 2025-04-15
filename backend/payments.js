@@ -35,7 +35,7 @@ router.post('/create-subscription-session', express.json(), authenticate, async 
 
 router.post('/create-portal-session', authenticate, async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = req.user.userid;
 
         const user = await db.query(
             `SELECT stripe_customer_id FROM users WHERE id = $1;`, [userId]
@@ -59,7 +59,7 @@ router.post('/create-portal-session', authenticate, async (req, res) => {
 
 router.post('/reactivate-subscription', authenticate, async (req, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user.userid;
   
       const user = await db.query(
         `SELECT stripe_subscription_id FROM users WHERE id = $1;`, [userId]
