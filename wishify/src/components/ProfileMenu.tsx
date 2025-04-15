@@ -133,7 +133,11 @@ const ProfileMenu = ({ closeMenu, logOut, profile, token, notifications, deleteN
             />
           </div>
           <div className="profile-text">
-            <p className="user-name">{profile.displayname}</p>
+
+            <p className="user-name">{profile.displayname} &nbsp; { profile.pro ? (
+            <span className="pro-badge">PRO</span>
+            ):( <span></span>)}</p>
+            
             <p className="user-email">{profile.email}</p>
           </div>
         </div>
@@ -153,6 +157,7 @@ const ProfileMenu = ({ closeMenu, logOut, profile, token, notifications, deleteN
               <p className="upgrade-title">Manage subscription</p>
               <p className="upgrade-subtitle">Manage premium features</p>
             </div>
+
           </div>
         )
         }

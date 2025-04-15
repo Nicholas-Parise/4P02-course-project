@@ -6,7 +6,7 @@ type SubStatus = {
   cancelAt: string | null;
   since: string;
   currentPeriodEnd: string;
-  planName: string;
+  plan: string;
   price: {
     amount: string;
     currency: string;
@@ -20,6 +20,27 @@ export default function ManageSubscription() {
   const [status, setStatus] = useState<SubStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem('token') || '';
+
+
+
+  const handleSubscribe = async () => {
+    console.log(token);
+    const res = await fetch('https://api.wishify.ca/payments/create-subscription-session', {
+      method: 'POST',
+      headers: {
+        'Authorization': "Bearer " + token,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ priceId: 'price_1RDYS9RAn3aH2VOg7t2vQ7N5' }) // actual Stripe Price ID
+    });
+
+    const data = await res.json();
+
+    const stripe = await stripePromise;
+    //stripe.redirectToCheckout({ url: data.url });
+    stripe?.redirectToCheckout({ sessionId: data.sessionId });
+  };
+
 
   const fetchStatus = async () => {
     const res = await fetch('https://api.wishify.ca/payments/subscription', {
@@ -43,12 +64,13 @@ export default function ManageSubscription() {
     });
 
     const data = await res.json();
-    alert('Subscription cancellation scheduled.');
+    //alert('Subscription cancellation scheduled.');
     fetchStatus();
   };
 
 
   const ChangePayment = async () => {
+
     console.log(token);
     const res = await fetch('https://api.wishify.ca/payments/create-portal-session', {
       method: 'POST',
@@ -65,7 +87,7 @@ export default function ManageSubscription() {
     //const stripe = await stripePromise;
     //stripe?.redirectToCheckout(data.url);
     window.location.href = data.url;
-   
+    fetchStatus();
   };
 
 
@@ -82,13 +104,9 @@ export default function ManageSubscription() {
 
     const data = await res.json();
 
-    //const stripe = await stripePromise;
-    //stripe?.redirectToCheckout(data.url);
-
-    //stripe.redirectToCheckout({ url: data.url });
-    //stripe.redirectToCheckout({ sessionId: data.sessionId });
-    window.location.href = data.url;
-    
+    console.log(data);
+    //window.location.href = data.url;
+    fetchStatus();
   };
 
 
@@ -120,7 +138,7 @@ export default function ManageSubscription() {
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Subscription Details</h2>
 
       <div className="mb-2">
-        <span className="font-semibold text-gray-700">Plan:</span> {status.planName}
+        <span className="font-semibold text-gray-700">Plan:</span> Wishify Pro
       </div>
 
       <div className="mb-2">
@@ -131,10 +149,10 @@ export default function ManageSubscription() {
         <span className="font-semibold text-gray-700">Status:</span>{' '}
         <span
           className={`inline-block px-2 py-1 rounded text-white text-sm ${status.status === 'active'
-              ? 'bg-green-500'
-              : status.status === 'trialing'
-                ? 'bg-blue-500'
-                : 'bg-red-500'
+            ? 'bg-green-500'
+            : status.status === 'trialing'
+              ? 'bg-blue-500'
+              : 'bg-red-500'
             }`}
         >
           {status.status}
@@ -158,26 +176,37 @@ export default function ManageSubscription() {
         </div>
       )}
 
-      {status.status === 'active' ? (
-        <button
-          onClick={cancelSubscription}
-          className="mt-4 w-full px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition"
-        >
-          Cancel Subscription
-        </button>
-      ) : (
-        <button
-          onClick={reactivateSub}
 
-          className="mt-4 w-full px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md transition"
+      {status.status === "canceled" ? (
+
+        <button
+          onClick={handleSubscribe}
+          className=" cursor-pointer mt-4 w-full px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md transition"
         >
-          Reactivate Subscription
+          Subscribe
         </button>
+
+      ) : !status.cancelAt ? (
+      <button
+        onClick={cancelSubscription}
+        className="cursor-pointer mt-4 w-full px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition"
+      >
+        Cancel Subscription
+      </button>
+      ) : (
+      <button
+        onClick={reactivateSub}
+
+        className=" cursor-pointer mt-4 w-full px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md transition"
+      >
+        Reactivate Subscription
+      </button>
       )}
+
 
       <button
         onClick={ChangePayment}
-        className="mt-4 w-full px-4 py-2 bg-gray-800 hover:bg-gray-900 text-white rounded-md transition"
+        className="cursor-pointer mt-4 w-full px-4 py-2 bg-gray-800 hover:bg-gray-900 text-white rounded-md transition"
       >
 
         Update Payment Method

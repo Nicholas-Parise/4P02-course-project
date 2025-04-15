@@ -3,8 +3,24 @@ import { useNavigate } from 'react-router-dom'
 import '../profile.css'
 import SettingsItem from '../components/SettingsItem.jsx'
 import LikesSettingsItem from '../components/LikesSettingsItem.jsx'
-import { EditPictureModal, EditDisplayNameModal, EditBioModal, EditEmailModal, EditPasswordModal, DeleteAccountModal, AddLikesModal } from '../components/ProfileSettingModals'
-import { CircularProgress, Typography, Snackbar, Alert } from '@mui/material'
+import { 
+  EditPictureModal, 
+  EditDisplayNameModal, 
+  EditBioModal, 
+  EditEmailModal, 
+  EditPasswordModal, 
+  DeleteAccountModal, 
+  AddLikesModal 
+} from '../components/ProfileSettingModals'
+import { 
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  CircularProgress, 
+  Typography, 
+  Snackbar, 
+  Alert 
+} from '@mui/material'
 
 const Profile = () => {
   const navigate = useNavigate()
@@ -439,12 +455,24 @@ const Profile = () => {
         </div>
       </div>
 
-      <EditPictureModal
-        open={openModals.picture}
-        value={currentValue}
-        onSave={handleSavePicture}
-        handleClose={handleClose}
-      />
+      <Dialog 
+        open={openModals.picture} 
+        onClose={handleClose}
+        PaperProps={{
+          sx: {
+            borderRadius: 4,
+            border: '2px solid #5651e5',
+          },
+        }}
+      >
+        <DialogTitle>Update Profile Picture</DialogTitle>
+        <DialogContent>
+          <EditPictureModal
+            onSave={handleSavePicture}
+            onClose={handleClose}
+          />
+        </DialogContent>
+      </Dialog>
 
       <EditDisplayNameModal
         open={openModals.displayName}

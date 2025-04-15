@@ -1,8 +1,11 @@
 import React from "react";
 import { FaStar } from "react-icons/fa";
+import Fab from '@mui/material/Fab';
+import AddIcon from '@mui/icons-material/Add';
 import "./PopularItems.css";
+import Loading from "./Loading";
 
-const PopularItems = ({ items, title="", subtitle="", maxItems=0, tagsEnabled, wishlistCountEnabled }) => {
+const PopularItems = ({ loading, items, bgColor="#f7f7f7", title="", subtitle="", maxItems=0, tagsEnabled, wishlistCountEnabled, addButtonsEnabled, onAdd = () => {} }) => {
   // If maxItems is specified, slice the array
   const displayedItems = maxItems ? items.slice(0, maxItems) : items;
 
@@ -17,52 +20,59 @@ const PopularItems = ({ items, title="", subtitle="", maxItems=0, tagsEnabled, w
   };
 
   return (
-    <div className="popular-items-section">
+    <div className="popular-items-section" style={{ backgroundColor: bgColor }}>
       {title && <h2>{title}</h2>}
       {subtitle && <p className="section-subtitle">{subtitle}</p>}
-      
+      {loading ? (
+          <Loading />
+        ) :
       <div className="popular-items-grid">
         {displayedItems.map((item) => (
-          <div key={item.id} className={`popular-item-card  ${tagsEnabled ? "min-h-[400px]" : ""}`}> {/* Make room for tags if enabled */}
-            {item.sponsor ? (
-                <div className="text-left pl-2 pt-1 pb-2 text-gray-600 text-sm">Sponsored</div>
-            ) : <div className="text-left pl-2 pt-1 pb-2 text-gray-600 text-sm">&nbsp;</div>}
-            <div className="item-image-container ">
-              <img src={item.image} alt={item.name} className="item-image" />
-              {wishlistCountEnabled ?
-                <div className="wishlist-count">
-                  <FaStar className="star-icon" />
-                  <span>{item.uses.toLocaleString()}+</span>
-                </div>
-                : null}
-            </div>
-            <div className="item-details">
-              <h3 className="item-name">{item.name}</h3>
-              <div className="item-price-rating">
-                <span className="item-price">{item.price}</span>
-                <span className="item-rating">
-                  <FaStar className="star-icon" />
-                  {item.rating}
-                </span>
+            <div key={item.id} className={`popular-item-card  ${tagsEnabled ? "min-h-[400px]" : ""}`}> {/* Make room for tags if enabled */}
+              {item.sponsor ? (
+                  <div className="text-left pl-2 pt-1 pb-2 text-gray-600 text-sm">Sponsored</div>
+              ) : <div className="text-left pl-2 pt-1 pb-2 text-gray-600 text-sm">&nbsp;</div>}
+              <div className="item-image-container ">
+                <img src={item.image} alt={item.name} className="item-image" />
+                {wishlistCountEnabled ?
+                  <div className="wishlist-count">
+                    <FaStar className="star-icon" />
+                    <span>{item.uses.toLocaleString()}+</span>
+                  </div>
+                  : null}
               </div>
+              <div className="item-details">
+                <h3 className="item-name">{item.name}</h3>
+                <div className="item-price-rating">
+                  <span className="item-price">{item.price}</span>
+                  <span className="item-rating">
+                    <FaStar className="star-icon" />
+                    {item.rating}
+                  </span>
+                </div>
+              </div>
+              {tagsEnabled && item.categories && item.categories.length > 0 && (
+                <ul className="flex flex-wrap items-start absolute bottom-0 left-0">
+                {item.categories.map((tag, index) => (
+                    <li
+                        key={index}
+                        className="text-white text-xs font-medium py-1 px-2 rounded-md mb-1 mr-1"
+                        //style={{ backgroundColor: item.gradients[index % item.gradients.length] }}
+                        style={{ backgroundColor: getColor(item.categories[index % item.categories.length].love) }}
+                    >
+                        {tag.name}
+                    </li>
+                ))}
+                </ul>
+              )}
+              {addButtonsEnabled && (
+              <Fab className="-top-2 -right-2" sx={{top: -2, right: -2, zIndex: 500, position: "absolute", width: "40px", height: "40px"}} onClick={() => onAdd(item)} color="primary" aria-label="add">
+                  <AddIcon />
+              </Fab>
+              )}            
             </div>
-            {tagsEnabled && item.categories && item.categories.length > 0 && (
-              <ul className="flex flex-wrap items-start absolute bottom-0 left-0">
-              {item.categories.map((tag, index) => (
-                  <li
-                      key={index}
-                      className="text-white text-xs font-medium py-1 px-2 rounded-md mb-1 mr-1"
-                      //style={{ backgroundColor: item.gradients[index % item.gradients.length] }}
-                      style={{ backgroundColor: getColor(item.categories[index % item.categories.length].love) }}
-                  >
-                      {tag.name}
-                  </li>
-              ))}
-              </ul>
-            )}
-          </div>
-        ))}
-      </div>
+          ))}
+      </div>}
     </div>
   );
 };

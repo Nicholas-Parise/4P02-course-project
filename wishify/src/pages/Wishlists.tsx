@@ -3,6 +3,7 @@ import { type Wishlist } from '../types/types'
 import {CreateWishlist} from '../components/CreateButton'
 import {WishlistThumbnail} from '../components/Thumbnail'
 import ShareWishlistModal from '../components/ShareWishlistModal'
+import Loading from '../components/Loading'
 
 import styled from '@emotion/styled'
 import ModalBox from '@mui/material/Box';
@@ -38,61 +39,67 @@ const Wishlists = () => {
   const userUrl = `https://api.wishify.ca/users/`
 
   const [token, setToken] = useState<string>(localStorage.getItem('token') || '')
+  const [loading, setLoading] = useState(true)
   
   const [wishlists, setWishlists] = useState<Wishlist[]>([])
   const [sharedWishlists, setSharedWishlists] = useState<Wishlist[]>([])
-  const [userId, setUserId] = useState<number>()
+  const [pro, setPro] = useState<boolean>(false)
+
 
   // pulling all wishlists from the backend and storing in wishlists state
   useEffect(() => {
-    setToken(localStorage.getItem('token') || '')
-    console.log(token)
-    fetch(wishlistUrl, {
-        method: 'get',
-        headers: new Headers({
-          'Authorization': "Bearer "+token
-        })
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          let ownedWishlists = data.filter((wishlist: Wishlist) => wishlist.creator_id == userId);
-          let sharedWishlists = data.filter((wishlist: Wishlist) => wishlist.creator_id != userId);
-          setWishlists(ownedWishlists);
-          setSharedWishlists(sharedWishlists);
-          console.log(data);
-          //setLoading(false)
-        })
-        .catch((error) => {
-          //setError(error)
-          //setLoading(false)
-          console.log(error)
-        })
-        //.finally(() => setLoading(false))
-  }, [userId])
-
-  useEffect(() => {
-    setToken(localStorage.getItem('token') || '')
-    console.log(token)
-    fetch(userUrl, {
-        method: 'get',
-        headers: new Headers({
-          'Authorization': "Bearer "+token
-        })
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          let userId = data.user.id
-          setUserId(userId);
-          console.log(data);
-          //setLoading(false)
-        })
-        .catch((error) => {
-          //setError(error)
-          //setLoading(false)
-          console.log(error)
-        })
-        //.finally(() => setLoading(false))
-  }, [])
+    const fetchData = async () => {
+      setToken(localStorage.getItem('token') || '');
+      console.log(token);
+  
+      try {
+        // Fetch user data and wishlists concurrently
+        const [userResponse, wishlistResponse] = await Promise.all([
+          fetch(userUrl, {
+            method: 'get',
+            headers: new Headers({
+              'Authorization': "Bearer " + token,
+            }),
+          }),
+          fetch(wishlistUrl, {
+            method: 'get',
+            headers: new Headers({
+              'Authorization': "Bearer " + token,
+            }),
+          }),
+        ]);
+  
+        // Parse responses
+        const userData = await userResponse.json();
+        const wishlistData = await wishlistResponse.json();
+  
+        // Process user data
+        const userId = userData.user.id;
+        const userPro = userData.user.pro;
+        setPro(userPro);
+  
+        // Process wishlist data
+        const ownedWishlists = wishlistData.filter(
+          (wishlist: Wishlist) => wishlist.creator_id === userId
+        );
+        const sharedWishlists = wishlistData.filter(
+          (wishlist: Wishlist) => wishlist.creator_id !== userId
+        );
+        setWishlists(ownedWishlists);
+        setSharedWishlists(sharedWishlists);
+  
+        console.log("User Data:", userData);
+        console.log("Wishlist Data:", wishlistData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        // Set loading to false after both requests are complete
+        setLoading(false);
+      }
+    };
+  
+    fetchData();
+  }, []);
 
   
   const [newWishlistTitle, setNewWishlistTitle] = useState('');
@@ -223,6 +230,12 @@ const Wishlists = () => {
     const wishlistId = wishlistToDuplicate.id;
     console.log(wishlistToDuplicate)
 
+    // if user is not pro redirect to upgrade page
+    if (!pro) {
+      window.location.href = "/upgrade";
+      return;
+    }
+
     const url = `https://api.wishify.ca/wishlists/${wishlistId}/duplicate`
     fetch(url, {
       method: 'post',
@@ -254,9 +267,9 @@ const Wishlists = () => {
     }
   };
 
-  const handleShareModalClose = () => {
-    setIsShareModalOpen(false);
-  };
+  const redirectToUpgrade = () => {
+    window.location.href='/upgrade';
+  }
 
   const activeWishlist = wishlists.find((wishlist) => wishlist.name === activeOverlay);
 
@@ -264,8 +277,12 @@ const Wishlists = () => {
     <section className='bg-white border-2 border-solid border-[#5651e5] rounded-[25px]'>
       <h1>My Wishlists</h1>
       <WishlistContainer>
+        { !pro && wishlists.length >= 3 ? 
+          <CreateWishlist disabled={true} addThumbnail={handleModalOpen}>Upgrade to pro to create more wishlists</CreateWishlist> :
         <CreateWishlist addThumbnail={handleModalOpen}>Create a Wishlist</CreateWishlist>
-        {wishlists.map((wishlist, index) => (
+        }
+
+        {loading ? <Loading/> : wishlists.map((wishlist, index) => (
           <WishlistThumbnail 
             active={activeOverlay} 
             toggleActive={() => changeActiveOverlay(wishlist.name)} 

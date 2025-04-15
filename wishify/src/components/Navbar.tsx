@@ -164,6 +164,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
   };
 
   const [profile, setProfile] = useState<User>();
+
   useEffect(() => {
     setToken(localStorage.getItem('token') || '')
     console.log(token)

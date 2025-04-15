@@ -123,6 +123,8 @@
   font-size: 25px;
   font-weight: bold;
   margin: 0;
+  align-items: center;
+  display: inline-flex;
 }
   
 .user-email {
@@ -352,4 +354,13 @@
   font-size: 0.8rem;
   margin: 0.25rem 0 0;
   color: #666;
+}
+
+.pro-badge{
+  background-color: #5651E5;
+  color: white;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-left: 4px;
 }
