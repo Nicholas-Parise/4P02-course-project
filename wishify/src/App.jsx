@@ -67,7 +67,6 @@ function App() {
                 <Route path="privacy-policy" element={<Privacy />} />
                 <Route path="terms-of-service" element={<TOS />} />
                 <Route path="about" element={<About />} />
-
                 <Route path="upgrade-redirect" element={<UpgradeRedirect isLoggedIn={isLoggedIn} />} />
                 
                 <Route path="/manage-subscription" element={<ManageSubscription />} />
