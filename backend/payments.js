@@ -175,12 +175,17 @@ router.get('/subscription', authenticate, async (req, res) => {
         // Assume you stored the subscription ID for the user
         const { subscriptionId } = await getSubscriptionForUser(req.user.userId);
         //const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-
+/*
         const subscription = await stripe.subscriptions.list({
             subscription: subscriptionId,
             status: 'all',
             expand: ['data.default_payment_method'],
         });
+*/
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+            status: 'all',
+            expand: ['default_payment_method'],
+          });
 
         const activeSub = subscriptions.data[0];
 
