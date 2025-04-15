@@ -327,6 +327,7 @@ useEffect(() => {
               <ShareEventModal
               eventID={activeEvent.id}
               shareToken={activeEvent.share_token} 
+              isOwner={activeEvent.owner}
               isOpen={isShareModalOpen} 
               setIsOpen={setIsShareModalOpen}/>
             )}
