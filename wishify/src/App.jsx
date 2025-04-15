@@ -25,6 +25,7 @@ import Ideas from "./pages/Ideas";
 import UpgradePage from "./pages/UpgradePage";
 import UpgradeRedirect from "./components/UpgradeRedirect"; // Add this import
 
+import ManageSubscription from './pages/ManageSubscription';
 import Success from './pages/Success';
 import Cancel from './pages/Cancel';
 
@@ -65,6 +66,8 @@ function App() {
                 <Route path="terms-of-service" element={<TOS />} />
                 <Route path="about" element={<About />} />
 
+                
+                <Route path="/manage-subscription" element={<ManageSubscription />} />
                 <Route path="/success" element={<Success />} />
                 <Route path="/cancel" element={<Cancel />} />
 

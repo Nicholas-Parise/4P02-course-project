@@ -32,6 +32,55 @@ router.post('/create-subscription-session', express.json(), authenticate, async 
 });
 
 
+
+router.post('/create-portal-session', authenticate, async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        const user = await db.query(
+            `SELECT stripe_customer_id FROM users WHERE id = $1;`, [userId]
+        );
+
+        if (!user || !user.stripeCustomerId) {
+            return res.status(400).json({ error: 'No Stripe customer ID found for user.' });
+        }
+
+        const session = await stripe.billingPortal.sessions.create({
+            customer: user.stripeCustomerId,
+            return_url: 'https://wishify.ca/manage-subscription', // redirect after managing
+        });
+
+        res.json({ url: session.url });
+    } catch (error) {
+        console.error('Error creating billing portal session:', error);
+        res.status(500).json({ error: 'Something went wrong' });
+    }
+});
+
+router.post('/reactivate-subscription', authenticate, async (req, res) => {
+    try {
+      const userId = req.user.id;
+  
+      const user = await db.query(
+        `SELECT stripe_subscription_id FROM users WHERE id = $1;`, [userId]
+    );
+  
+      if (!user || !user.stripe_subscription_id) {
+        return res.status(400).json({ error: 'No active subscription found.' });
+      }
+  
+      const subscription = await stripe.subscriptions.update(user.stripe_subscription_id, {
+        cancel_at_period_end: false,
+      });
+  
+      res.json({ message: 'Subscription reactivated.', subscription });
+    } catch (err) {
+      console.error('Error reactivating subscription:', err);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+
 router.post('/webhook', bodyParser.raw({ type: 'application/json' }), async (req, res) => {
     let event;
     try {
@@ -124,9 +173,26 @@ router.post('/webhook', bodyParser.raw({ type: 'application/json' }), async (req
 router.get('/subscription', authenticate, async (req, res) => {
     try {
         // Assume you stored the subscription ID for the user
-        const { subscriptionId } = await getSubscriptionForUser(req.user.userId); // implement this
-        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-        res.json(subscription);
+        const { subscriptionId } = await getSubscriptionForUser(req.user.userId);
+        //const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+
+        const subscription = await stripe.subscriptions.list({
+            subscription: subscriptionId,
+            status: 'all',
+            expand: ['data.default_payment_method'],
+        });
+
+        const activeSub = subscriptions.data[0];
+
+        if (!activeSub) {
+            return res.json({ status: 'none' });
+        }
+
+        res.json({
+            status: activeSub.status,
+            cancelAt: activeSub.cancel_at ? new Date(activeSub.cancel_at * 1000) : null,
+            currentPeriodEnd: new Date(activeSub.current_period_end * 1000),
+        });
     } catch (error) {
         console.error('Error fetching subscription:', error);
         res.status(500).json({ error: 'Could not fetch subscription' });
@@ -136,7 +202,7 @@ router.get('/subscription', authenticate, async (req, res) => {
 
 router.post('/cancel-subscription', authenticate, async (req, res) => {
     try {
-        const { subscriptionId } = req.body;
+        const { subscriptionId } = await getSubscriptionForUser(req.user.userId);
         const deleted = await stripe.subscriptions.del(subscriptionId);
 
         await db.query(`
