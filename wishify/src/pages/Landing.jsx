@@ -246,6 +246,7 @@ const Landing = () => {
         title="Most Wishlisted Items" 
         subtitle="Discover what people are loving right now"
         wishlistCountEnabled={true}
+        addButtonsEnabled={false}
       />
 
       {/* Use Cases Section */}
