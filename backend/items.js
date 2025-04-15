@@ -137,7 +137,7 @@ router.post('/', authenticate, uploadPicture, async (req, res, next) => {
       const result = await db.query(`
       INSERT INTO items 
       (member_id, name, description, url, image, quantity, price, priority, dateCreated)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW()) RETURNING name, description, url, image, quantity, price, priority, dateCreated;
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW()) RETURNING id, name, description, url, image, quantity, price, priority, dateCreated;
       `, [member_id, ideaData.name, ideaData.description, ideaData.url, ideaData.image, quantity, ideaData.price, priority]);
 
       return res.status(201).json({ message: "Item created successfully", item: {...result.rows[0], wishlists_id} });
@@ -154,7 +154,7 @@ router.post('/', authenticate, uploadPicture, async (req, res, next) => {
       const result = await db.query(`
       INSERT INTO items 
       (member_id, name, description, url, image, quantity, price, priority, dateCreated)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW()) RETURNING name, description, url, image, quantity, price, priority, dateCreated;
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW()) RETURNING id, name, description, url, image, quantity, price, priority, dateCreated;
       `, [member_id, name, description, url, image, quantity, price, priority]);
 
       return res.status(201).json({ message: "Item created successfully", item: {...result.rows[0], wishlists_id} });
