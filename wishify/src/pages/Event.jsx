@@ -375,7 +375,7 @@ const Event = () => {
         'Authorization': "Bearer "+token,
       }),
       body: JSON.stringify({
-        event_id: null
+        event_id: "null"
       })
     })
     .then((response) => response.json())
@@ -428,10 +428,6 @@ const Event = () => {
   const handleShare = () => {
     console.log(event)
     setIsShareModalOpen(true);
-  };
-
-  const handleShareModalClose = () => {
-    setIsShareModalOpen(false);
   };
 
   const handleChooseWishlist = (e) => {
@@ -602,9 +598,7 @@ const Event = () => {
               <ModalButton type="submit">Choose</ModalButton>
             </FormControl>
           </form>
-          <Typography className='text-center py-4' id="modal-modal-subtitle" variant="subtitle1" component="h4">
-            Or
-          </Typography>
+          <Divider sx={{mb: 2, mt:2}}>OR</Divider>
           <form autoComplete="off" onSubmit={handleCreateWishlist}>
             <Typography id="modal-modal-title" variant="h6" component="h2">
               Create a new Wishlist
