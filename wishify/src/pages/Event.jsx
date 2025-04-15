@@ -393,10 +393,6 @@ const Event = () => {
     }
   };
 
-  const handleShareModalClose = () => {
-    setIsShareModalOpen(false);
-  };
-
   const handleChooseWishlist = (e) => {
     e.preventDefault();
     if (selectedWishlist) {

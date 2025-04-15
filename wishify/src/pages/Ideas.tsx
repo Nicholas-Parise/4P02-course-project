@@ -136,7 +136,7 @@ const Ideas = () => {
         <section className="bg-white border-2 border-solid border-[#5651e5] rounded-[25px]">
             <h1 className="text-3xl font-bold text-center text-[#5651e5]">Ideas</h1>
             <PopularItems loading={loading} title={"Trending"} items={trending} tagsEnabled={false} wishlistCountEnabled={true} onAdd={handleOpenModal}/>
-            <PopularItems loading={loading} title="AI Recommended For You" items={ideas} tagsEnabled={true} wishlistCountEnabled={false} onAdd={handleOpenModal}/>
+            <PopularItems loading={loading} title="Recommendations - Powered by AI" items={ideas} tagsEnabled={true} wishlistCountEnabled={false} onAdd={handleOpenModal}/>
             <div className="grid md:grid-cols-4 gap-4 p-4">
                 {/*ideas.map((item) => (
                     <div key={item.id} className="bg-white border rounded-lg shadow-md p-4 text-center">
