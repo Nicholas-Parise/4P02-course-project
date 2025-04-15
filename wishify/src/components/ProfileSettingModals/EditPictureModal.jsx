@@ -1,85 +1,110 @@
-import React from 'react'
-import { Modal, Button, TextField, Typography, Box, Divider } from '@mui/material'
+import React, { useState, useRef} from 'react'
+import {
+  Box,
+  Button,
+  Avatar,
+  Stack,
+} from '@mui/material'
+import CloudUploadIcon from '@mui/icons-material/CloudUpload'
+import { data } from 'react-router-dom'
 
-const EditPictureModal = ({ open, handleClose, value, onSave }) => {
-  const [inputValue, setInputValue] = React.useState(value)
+const EditPictureModal = ({ onClose }) => {
+  const [selectedImage, setSelectedImage] = useState(null)
+  const [previewUrl, setPreviewUrl] = useState(null)
+  const fileInputRef = useRef(null)
 
-  React.useEffect(() => {
-    if (open) {
-      setInputValue('')
+  const handleImageChange = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+      setSelectedImage(file)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result)
+      }
+      reader.readAsDataURL(file)
     }
-  }, [open])
-
-  const handleSave = () => {
-    onSave(inputValue)
-    handleClose()
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    handleSave()
+  const handleUploadClick = () => {
+    fileInputRef.current.click()
   }
 
-  const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 500,
-    bgcolor: 'background.paper',
-    border: '2px solid #5651e5',
-    borderRadius: '25px',
-    boxShadow: 24,
-    p: 4,
+  const handleSubmit = async () => {
+    if (!selectedImage) {
+      alert('Please select an image to upload.')
+      return
+    }
+
+    const formData = new FormData()
+    formData.append('image', selectedImage)
+
+    try {
+      const response = await fetch('https://api.wishify.ca/users/upload/', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem("token")}`,
+          'Accept': 'application/json',
+        },
+        body: formData
+      })
+
+      if (response.ok) {
+        alert('Image uploaded successfully!')
+        onClose()
+      } else {
+        alert('Failed to upload image. Please try again.')
+      }
+    }
+    catch (error) {
+      console.error('Error uploading image:', error)
+      alert('Error uploading image')
+    }
   }
 
   return (
-    <Modal open={open} onClose={handleClose}>
-      <Box sx={style}>
-        <Typography variant='h6' sx={{ textAlign: 'center', fontWeight: 'bold', color: '#5651e5' }}>Edit Picture</Typography>
+    <Box sx={{ textAlign: 'center', p: 2 }}>
+      <Avatar
+        src={previewUrl || '/default-avatar.png'}
+        alt="Profile Picture Preview"
+        sx={{ width: 100, height: 100, mx: 'auto', mb: 2 }}
+      />
 
-        <Divider sx={{mb: 2}} />
+      <input
+        type="file"
+        accept="image/*"
+        ref={fileInputRef}
+        onChange={handleImageChange}
+        style={{ display: 'none' }}
+      />
 
-        <Typography variant='body2' mb={2}>
-          Choose a profile picture that best represents you! You can upload a picture to your profile by submitting a link to an image.
-        </Typography>
+      <Stack spacing={2}>
+        <Button
+          variant="outlined"
+          startIcon={<CloudUploadIcon />}
+          onClick={handleUploadClick}
+          sx={{
+            color: "#5651e5",
+            borderColor: "#5651e5",
+            borderRadius: '25px',
+          }}
+        >
+          Choose Image
+        </Button>
 
-        <Divider sx={{mb: 2}} />
-
-        <form onSubmit={handleSubmit}>
-          <TextField
-            label="Image URL"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            fullWidth
-            variant='outlined'
-            sx={{mb: 2}}
-          />
-
-          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
-            <Button
-              variant="contained"
-              type="submit"
-              sx={{
-                background: 'linear-gradient(to right, #8d8aee, #5651e5)',
-                color: 'white',
-                borderRadius: '25px',
-                '&:hover': { background: 'linear-gradient(to right, #5651e5, #343188)' }
-              }}
-            >
-              Save
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={handleClose}
-              sx={{ borderRadius: '25px', borderColor: '#5651e5', color: '#5651e5', ml: '8px' }}
-            >
-              Cancel
-            </Button>
-          </Box>
-        </form>
-      </Box>
-    </Modal>
+        <Button
+          variant="contained"
+          onClick={handleSubmit}
+          disabled={!selectedImage}
+          sx={{ 
+            backgroundColor: '#5651e5',
+            color: 'white' ,
+            borderRadius: '25px'
+          }}
+        >
+          Upload
+        </Button>
+      </Stack>
+    </Box>
   )
 }
 
