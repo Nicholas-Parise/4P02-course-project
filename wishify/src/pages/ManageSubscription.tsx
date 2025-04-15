@@ -62,9 +62,9 @@ export default function ManageSubscription() {
 
     console.log(data);
 
-    const stripe = await stripePromise;
-    stripe?.redirectToCheckout(data.url);
-    //window.location.href = data.url;
+    //const stripe = await stripePromise;
+    //stripe?.redirectToCheckout(data.url);
+    window.location.href = data.url;
    
   };
 
@@ -82,12 +82,12 @@ export default function ManageSubscription() {
 
     const data = await res.json();
 
-    const stripe = await stripePromise;
-    stripe?.redirectToCheckout(data.url);
+    //const stripe = await stripePromise;
+    //stripe?.redirectToCheckout(data.url);
 
     //stripe.redirectToCheckout({ url: data.url });
     //stripe.redirectToCheckout({ sessionId: data.sessionId });
-   // window.location.href = data.url;
+    window.location.href = data.url;
     
   };
 
@@ -158,7 +158,7 @@ export default function ManageSubscription() {
         </div>
       )}
 
-      {!status.cancelAt ? (
+      {status.status === 'active' ? (
         <button
           onClick={cancelSubscription}
           className="mt-4 w-full px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition"
