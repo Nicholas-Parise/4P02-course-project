@@ -23,7 +23,7 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
           const reader = new FileReader()
           reader.onloadend = () => {
             setImage(reader.result as string)
-            setNewItem({ ...newItem, image: reader.result as string })
+            setNewItem({ ...newItem, picture: file })
           }
           reader.readAsDataURL(file)
         }
@@ -34,21 +34,22 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
 
         const url = "https://api.wishify.ca/items"
 
+        let data = new FormData()
+        data.append("name", newItem.name || "");
+        data.append("description", newItem.description || "");
+        data.append("url", newItem.url || "");
+        data.append("picture", newItem.picture || "");
+        data.append("quantity", newItem.quantity?.toString() || "1");
+        data.append("price", newItem.price?.toString() || "");
+        data.append("wishlists_id", selectedWishlist.toString());
+
         fetch(url, {
         method: 'post',
         headers: new Headers({
             'Authorization': "Bearer "+token,
-            'Content-Type': 'application/json'
+            'Accept': 'application/json'
         }),
-        body: JSON.stringify({
-            name: newItem.name,
-            description: newItem.description || "",
-            url: newItem.url || "",
-            image: image || "", // TODO UPLOAD IMAGE SOMEHOW
-            quantity: newItem.quantity,
-            price: newItem.price,
-            wishlists_id: Number(selectedWishlist)
-        })
+        body: data
         })
         .then((response) => response.json())
         .then((data) => {
@@ -56,8 +57,8 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
             setOpen(false)
             console.log(data)
             console.log(id)
-            if(id!=undefined && data.item.member_id == id){
-                window.location.reload()
+            if(id!=undefined && data.item.wishlists_id == id){
+                window.location.reload()  // soft reload instead?
             }
         })
         .catch((error) => {

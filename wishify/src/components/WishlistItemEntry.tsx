@@ -29,7 +29,6 @@ const WishlistItemEntry = ({ item, editWishlistItem, sortBy, reservations, onRes
     transition,
   };
 
-  const isDraggable = sortBy === "priority"
   const totalReserved = item.quantitySupplied || 0
   const availableQuantity = item.quantity - totalReserved
 
@@ -94,7 +93,7 @@ const WishlistItemEntry = ({ item, editWishlistItem, sortBy, reservations, onRes
         className="bg-white shadow-md p-4 flex items-center space-x-4 cursor-pointer rounded-[25px] border-2 border-[#5651e5]"
         onClick={() => setIsModalOpen(true)}
       >
-        {isDraggable && (
+        {owner && sortBy === "priority" && (
           <div {...attributes} {...listeners} className="cursor-move" onClick={(e) => e.stopPropagation()}>
             <svg {...attributes} {...listeners} className='w-6 cursor-move touch-none outline-none fill-gray-700' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path d="M96 32H32C14.3 32 0 46.3 0 64v64c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32V64c0-17.7-14.3-32-32-32zm0 160H32c-17.7 0-32 14.3-32 32v64c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32v-64c0-17.7-14.3-32-32-32zm0 160H32c-17.7 0-32 14.3-32 32v64c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32v-64c0-17.7-14.3-32-32-32zM288 32h-64c-17.7 0-32 14.3-32 32v64c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32V64c0-17.7-14.3-32-32-32zm0 160h-64c-17.7 0-32 14.3-32 32v64c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32v-64c0-17.7-14.3-32-32-32zm0 160h-64c-17.7 0-32 14.3-32 32v64c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32v-64c0-17.7-14.3-32-32-32z"/></svg>
           </div>

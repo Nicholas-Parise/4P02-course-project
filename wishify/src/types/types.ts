@@ -33,6 +33,7 @@ export interface WishlistItem {
     description: string,
     url: string,
     image: string,
+    picture: File,
     quantity: number,
     quantitySupplied: number
     dateupdated: string,
