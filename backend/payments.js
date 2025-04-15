@@ -41,12 +41,12 @@ router.post('/create-portal-session', authenticate, async (req, res) => {
             `SELECT stripe_customer_id FROM users WHERE id = $1;`, [userId]
         );
 
-        if (!user || !user.stripe_customer_id) {
+        if (user.rows.length === 0 || !user.rows[0].stripe_customer_id) {
             return res.status(400).json({ error: 'No Stripe customer ID found for user.' });
         }
 
         const session = await stripe.billingPortal.sessions.create({
-            customer: user.stripe_customer_id,
+            customer: user.rows[0].stripe_customer_id,
             return_url: 'https://wishify.ca/manage-subscription', // redirect after managing
         });
 
@@ -59,17 +59,17 @@ router.post('/create-portal-session', authenticate, async (req, res) => {
 
 router.post('/reactivate-subscription', authenticate, async (req, res) => {
     try {
-      const userId = req.user.userid;
+      const userId = req.user.userId;
   
       const user = await db.query(
         `SELECT stripe_subscription_id FROM users WHERE id = $1;`, [userId]
     );
   
-      if (!user || !user.stripe_subscription_id) {
+      if (user.rows.length === 0 || !user.rows[0].stripe_subscription_id) {
         return res.status(400).json({ error: 'No active subscription found.' });
       }
   
-      const subscription = await stripe.subscriptions.update(user.stripe_subscription_id, {
+      const subscription = await stripe.subscriptions.update(user.rows[0].stripe_subscription_id, {
         cancel_at_period_end: false,
       });
   
