@@ -66,7 +66,7 @@ router.post('/reactivate-subscription', authenticate, async (req, res) => {
         const user = await db.query(
             `SELECT stripe_subscription_id FROM users WHERE id = $1;`, [userId]
         );
-        
+
         if (user.rows.length === 0 || !user.rows[0].stripe_subscription_id) {
             return res.status(400).json({ error: 'No active subscription found.' });
         }
@@ -179,14 +179,6 @@ router.get('/subscription', authenticate, async (req, res) => {
     try {
         // Assume you stored the subscription ID for the user
         const { subscriptionId } = await getSubscriptionForUser(req.user.userId);
-        //const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-        /*
-                const subscription = await stripe.subscriptions.list({
-                    subscription: subscriptionId,
-                    status: 'all',
-                    expand: ['data.default_payment_method'],
-                });
-        */
         const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
             expand: ['default_payment_method']
         });
@@ -225,21 +217,25 @@ router.post('/cancel-subscription', authenticate, async (req, res) => {
 
         await db.query(`BEGIN;`);
 
+
+        const updatedSub = await stripe.subscriptions.update(subscriptionId, {
+            cancel_at_period_end: true,
+        });
+
         await db.query(`
             UPDATE users
             SET 
-                subscription_status = 'canceled',
-                subscription_ends = NOW(),
-                pro = FALSE,
+                subscription_status = 'canceling',
+                subscription_ends = to_timestamp($1),
                 dateUpdated = NOW()
-            WHERE id = $1
+            WHERE id = $2
             RETURNING *;
-            `, [req.user.userId]);
+            `, [Math.floor(new Date(updatedSub.current_period_end * 1000).getTime() / 1000),req.user.userId]);
 
-            const deleted = await stripe.subscriptions.cancel(subscriptionId);
-            
-            await db.query(`COMMIT;`);
-        res.json({ canceled: true, status: deleted.status });
+        //const deleted = await stripe.subscriptions.cancel(subscriptionId);
+
+        await db.query(`COMMIT;`);
+        res.json({ canceled: true, status: updatedSub.status, cancel_at: updatedSub.current_period_end });
     } catch (error) {
         await db.query(`ROLLBACK;`);
         console.error('Error canceling subscription:', error);
