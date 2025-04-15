@@ -21,6 +21,7 @@ const Wishlist = () => {
     const navigate = useNavigate();
 
     const { id } = useParams();
+    id && localStorage.setItem('id', id)
 
     const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([])
     const [wishlistContributions, setWishlistContributions] = useState<Contribution[]>([])
