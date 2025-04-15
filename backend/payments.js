@@ -35,17 +35,17 @@ router.post('/create-subscription-session', express.json(), authenticate, async 
 
 router.post('/create-portal-session', authenticate, async (req, res) => {
     try {
-        const userId = req.user.userid;
+        const userId = req.user.userId;
 
         const user = await db.query(
             `SELECT stripe_customer_id FROM users WHERE id = $1;`, [userId]
         );
 
-        console.log(user.rows[0].stripe_customer_id);
-
-        if (user.rows.length === 0) { // || !user.rows[0].stripe_customer_id
+        if (user.rows.length === 0 || !user.rows[0].stripe_customer_id) {
             return res.status(400).json({ error: 'No Stripe customer ID found for user.' });
         }
+
+        console.log(user.rows[0].stripe_customer_id);
 
         const session = await stripe.billingPortal.sessions.create({
             customer: user.rows[0].stripe_customer_id,
@@ -66,12 +66,12 @@ router.post('/reactivate-subscription', authenticate, async (req, res) => {
         const user = await db.query(
             `SELECT stripe_subscription_id FROM users WHERE id = $1;`, [userId]
         );
-
-        console.log(user.rows[0].stripe_subscription_id);
-
-        if (user.rows.length === 0) { // || !user.rows[0].stripe_subscription_id
+        
+        if (user.rows.length === 0 || !user.rows[0].stripe_subscription_id) {
             return res.status(400).json({ error: 'No active subscription found.' });
         }
+
+        console.log(user.rows[0].stripe_subscription_id);
 
         const subscription = await stripe.subscriptions.update(user.rows[0].stripe_subscription_id, {
             cancel_at_period_end: false,
@@ -215,11 +215,14 @@ router.get('/subscription', authenticate, async (req, res) => {
     }
 });
 
-
+/** 
+ * Cancel the users pro subscription
+*/
 router.post('/cancel-subscription', authenticate, async (req, res) => {
     try {
         const { subscriptionId } = await getSubscriptionForUser(req.user.userId);
-        const deleted = await stripe.subscriptions.cancel(subscriptionId);
+
+        await db.query(`BEGIN;`);
 
         await db.query(`
             UPDATE users
@@ -228,13 +231,16 @@ router.post('/cancel-subscription', authenticate, async (req, res) => {
                 subscription_ends = NOW(),
                 pro = FALSE,
                 dateUpdated = NOW()
-            WHERE email = $1
+            WHERE id = $1
             RETURNING *;
-            `, [email]);
+            `, [req.user.userId]);
 
-
+            const deleted = await stripe.subscriptions.cancel(subscriptionId);
+            
+            await db.query(`COMMIT;`);
         res.json({ canceled: true, status: deleted.status });
     } catch (error) {
+        await db.query(`ROLLBACK;`);
         console.error('Error canceling subscription:', error);
         res.status(500).json({ error: 'Failed to cancel subscription' });
     }
