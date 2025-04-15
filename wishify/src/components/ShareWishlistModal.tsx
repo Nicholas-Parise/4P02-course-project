@@ -39,6 +39,7 @@ const ShareWishlistModal = ({ wishlistID, isOwner, shareToken, isOpen, setIsOpen
             })
             .finally(() => {
               setIsOpen(false)
+              setInputEmail("")
             })     
     }
 

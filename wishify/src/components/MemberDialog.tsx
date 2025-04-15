@@ -143,7 +143,7 @@ const MemberDialog = ({ open, setOpen, members, userID, isOwner, setBlind, setOw
                                             <div className="flex justify-center">
                                                 <img 
                                                     src={member.picture} 
-                                                    className={`w-5 h-5 mr-3 overflow-hidden rounded-full ${member.pro && "ring-amber-400 ring-2 "}`}
+                                                    className={`w-5 h-5 mr-3 overflow-hidden rounded-full ${member.pro && "ring-[#5651e5] ring-2 "}`}
                                                 />
                                             </div>
                                             <div>
