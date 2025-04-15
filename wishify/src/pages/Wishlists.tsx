@@ -43,7 +43,8 @@ const Wishlists = () => {
   
   const [wishlists, setWishlists] = useState<Wishlist[]>([])
   const [sharedWishlists, setSharedWishlists] = useState<Wishlist[]>([])
-  const [userId, setUserId] = useState<number>()
+  const [pro, setPro] = useState<boolean>(false)
+
 
   // pulling all wishlists from the backend and storing in wishlists state
   useEffect(() => {
@@ -74,7 +75,8 @@ const Wishlists = () => {
   
         // Process user data
         const userId = userData.user.id;
-        setUserId(userId);
+        const userPro = userData.user.pro;
+        setPro(userPro);
   
         // Process wishlist data
         const ownedWishlists = wishlistData.filter(
@@ -228,6 +230,12 @@ const Wishlists = () => {
     const wishlistId = wishlistToDuplicate.id;
     console.log(wishlistToDuplicate)
 
+    // if user is not pro redirect to upgrade page
+    if (!pro) {
+      window.location.href = "/upgrade";
+      return;
+    }
+
     const url = `https://api.wishify.ca/wishlists/${wishlistId}/duplicate`
     fetch(url, {
       method: 'post',
@@ -259,9 +267,9 @@ const Wishlists = () => {
     }
   };
 
-  const handleShareModalClose = () => {
-    setIsShareModalOpen(false);
-  };
+  const redirectToUpgrade = () => {
+    window.location.href='/upgrade';
+  }
 
   const activeWishlist = wishlists.find((wishlist) => wishlist.name === activeOverlay);
 
@@ -269,7 +277,10 @@ const Wishlists = () => {
     <section className='bg-white border-2 border-solid border-[#5651e5] rounded-[25px]'>
       <h1>My Wishlists</h1>
       <WishlistContainer>
+        { !pro && wishlists.length >= 3 ? 
+          <CreateWishlist disabled={true} addThumbnail={handleModalOpen}>Upgrade to pro to create more wishlists</CreateWishlist> :
         <CreateWishlist addThumbnail={handleModalOpen}>Create a Wishlist</CreateWishlist>
+        }
 
         {loading ? <Loading/> : wishlists.map((wishlist, index) => (
           <WishlistThumbnail 

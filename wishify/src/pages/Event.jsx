@@ -337,7 +337,7 @@ const Event = () => {
         'Authorization': "Bearer "+token,
       }),
       body: JSON.stringify({
-        event_id: null
+        event_id: "null"
       })
     })
     .then((response) => response.json())
