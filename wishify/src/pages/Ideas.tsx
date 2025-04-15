@@ -52,7 +52,7 @@ const Ideas = () => {
                 const trendingData = await trendingResponse.json();
 
                 // Update state with fetched data
-                setWishlists(wishlistData);
+                setWishlists(wishlistData.filter((wishlist: Wishlist) => wishlist.owner));
                 setIdeas(ideaData.ideas);
                 setTrending(trendingData.trending);
 
