@@ -190,10 +190,19 @@ router.get('/subscription', authenticate, async (req, res) => {
             return res.json({ status: 'none' });
         }
 
+        const price = subscription.items.data[0].price;
+        const product = price.product;
+
         res.json({
-            tatus: subscription.status,
+            status: subscription.status,
             cancelAt: subscription.cancel_at ? new Date(subscription.cancel_at * 1000) : null,
-            currentPeriodEnd: new Date(subscription.current_period_end * 1000)
+            currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+            plan: product.name,
+            price: {
+                amount: (price.unit_amount / 100).toFixed(2),
+                currency: price.currency.toUpperCase(),
+                interval: price.recurring.interval,
+            },
         });
     } catch (error) {
         console.error('Error fetching subscription:', error);
