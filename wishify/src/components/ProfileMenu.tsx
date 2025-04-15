@@ -1,25 +1,25 @@
 import { useState, useEffect, useRef } from "react";
-import { AiOutlineUser, AiOutlineLogout, AiFillGift, AiOutlineCloseCircle, AiOutlineBell, AiFillBell } from "react-icons/ai";
-import { FaCrown } from "react-icons/fa";
+import { AiOutlineLogout, AiFillGift, AiOutlineCloseCircle, AiOutlineBell, AiFillBell } from "react-icons/ai";
+import { FaStar } from "react-icons/fa";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from "@mui/material";
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, IconButton } from "@mui/material";
 import "./ProfileMenu.css";
-import React from "react";
+import { Notification, User } from "../types/types";
+import NotificationEntry from "./NotificationEntry";
 
 interface Props {
   closeMenu: () => void,
   logOut: () => void,
-  profile:{
-    displayName: string,
-    email: string,
-    pro: boolean
-  };
+  profile: User,
+  token: string,
+  notifications: Notification[],
+  deleteNotification: (id: number) => void
 }
 
-const ProfileMenu = ({ closeMenu, logOut, profile }: Props) => {
+const ProfileMenu = ({ closeMenu, logOut, profile, token, notifications, deleteNotification }: Props) => {
   const [isClosing, setIsClosing] = useState(false);
   const [showLogOutModal, setShowLogOutModal] = useState(false);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(profile.notifications);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
 
@@ -45,6 +45,11 @@ const ProfileMenu = ({ closeMenu, logOut, profile }: Props) => {
     handleClose();
   };
 
+  const handleRedirect = (url: string) => {
+    navigate(url);
+    handleClose();
+  }
+
   const confirmLogOut = () => {
     logOut(); 
     navigate("/landing");
@@ -57,7 +62,32 @@ const ProfileMenu = ({ closeMenu, logOut, profile }: Props) => {
   };
 
   const toggleNotifications = () => {
-    setNotificationsEnabled(!notificationsEnabled);
+    let status_code = -1
+    let url = `https://api.wishify.ca/users`
+    // update blind status
+    fetch(url, {
+        method: 'put',
+        headers: new Headers({
+            'Authorization': "Bearer "+token,
+            'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify({
+            "notifications": !notificationsEnabled,
+        })
+    })
+    .then((response) => {
+        status_code = response.status
+        return response.json();
+    })
+    .then(() => {
+        if(status_code != 200 && status_code != 201){
+          return
+        }
+        setNotificationsEnabled(!notificationsEnabled);
+    })
+    .catch((error) => {
+        console.log(error)
+    })
   };
 
   return (
@@ -66,6 +96,20 @@ const ProfileMenu = ({ closeMenu, logOut, profile }: Props) => {
 
       <div className={`profile-menu ${isClosing ? "slide-out" : ""}`} ref={menuRef}>
         <div className="header">
+          <IconButton 
+            sx={{":hover":{color:'#5651e5'}, position:"absolute", left: 0, color:"#444"}} onClick={toggleNotifications}
+          >
+            { notificationsEnabled ? (
+              <AiFillBell className='transition-[1]'/>
+            )
+            :
+            (
+              <AiOutlineBell className='transition-[1]'/>
+            )
+            }
+                    
+          </IconButton>
+
           <NavLink to="/home" onClick={handleClose}>
             <h1>
               <span>
@@ -75,6 +119,7 @@ const ProfileMenu = ({ closeMenu, logOut, profile }: Props) => {
               ify
             </h1>
           </NavLink>
+
           <button className="close-btn" onClick={handleClose}>
             <AiOutlineCloseCircle />
           </button>
@@ -82,10 +127,14 @@ const ProfileMenu = ({ closeMenu, logOut, profile }: Props) => {
 
         <div className="user-info cursor-pointer" onClick={handleAccountSettings}>
           <div className="profile-image">
-            <AiOutlineUser className="user-icon" />
+          <img 
+              src={profile.picture} 
+              className={`w-[75px] h-[75px] overflow-hidden rounded-full ${profile.pro && "ring-[#5651e5] ring-3 "}`}
+            />
           </div>
           <div className="profile-text">
-            <p className="user-name">{profile.displayName} &nbsp; { profile.pro ? (
+
+            <p className="user-name">{profile.displayname} &nbsp; { profile.pro ? (
             <span className="pro-badge">PRO</span>
             ):( <span></span>)}</p>
             
@@ -93,38 +142,42 @@ const ProfileMenu = ({ closeMenu, logOut, profile }: Props) => {
           </div>
         </div>
 
-
         { !profile.pro ? (
-        <div className="upgrade-pro cursor-pointer" onClick={handleUpgrade}>
-          <FaCrown className="crown-icon" />
-          <div>
-            <p className="upgrade-title">Upgrade to Pro</p>
-            <p className="upgrade-subtitle">Unlock premium features</p>
-          </div>
-        </div>
-            ):( 
-              <div className="upgrade-pro cursor-pointer" onClick={handleManage}>
-              <FaCrown className="crown-icon" />
-              <div>
-                <p className="upgrade-title">Manage subscription</p>
-                <p className="upgrade-subtitle">Manage premium features</p>
-              </div>
+          <div className="upgrade-pro cursor-pointer" onClick={handleUpgrade}>
+            <FaStar className="star-icon" />
+            <div>
+              <p className="upgrade-title">Upgrade to Pro</p>
+              <p className="upgrade-subtitle">Unlock premium features</p>
             </div>
-            )}
-
-        <div className="notification-toggle-container cursor-pointer" onClick={toggleNotifications}>
-          <div className="notification-toggle">
-            {notificationsEnabled ? (
-              <AiFillBell className="bell-icon" />
-            ) : (
-              <AiOutlineBell className="bell-icon" />
-            )}
-            <span>{notificationsEnabled ? "Notifications Enabled" : "Notifications Disabled"}</span>
           </div>
-        </div>
+        ):( 
+          <div className="upgrade-pro cursor-pointer" onClick={handleManage}>
+            <FaStar className="star-icon" />
+            <div>
+              <p className="upgrade-title">Manage subscription</p>
+              <p className="upgrade-subtitle">Manage premium features</p>
+            </div>
+
+          </div>
+        )
+        }
         
-        <div className="notifications-placeholder">
-          <p>Your notifications will appear here.</p>
+        <div className={`notifications-container-outer ${notifications.length === 0 ? 'flex justify-center items-center' : ''}`}>
+          <div className="notifications-container">
+            {notifications.length == 0 ?  <p>Your notifications will appear here.</p> :
+              <>
+                {notifications.map(notification => (
+                  <NotificationEntry
+                    key={notification.id} 
+                    notification={notification}
+                    handleRedirect={handleRedirect}
+                    deleteNotification={deleteNotification}
+                  />
+                ))}
+              </>
+            }
+            
+          </div>
         </div>
 
         <div className="horizontal-buttons-container">

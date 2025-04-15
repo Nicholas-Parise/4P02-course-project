@@ -88,10 +88,11 @@ export default function WishlistHeader({ wishlist, setWishlist, event, setEventI
             </div>
           </div>
           
-          <p className="text-gray-600">{wishlist.description}</p>
           { wishlist.deadline &&
-            <p className="text-gray-800">Deadline: {wishlist.deadline}</p>
+            <p className="text-gray-800">Deadline: {new Date(wishlist.deadline).toLocaleString()}</p>
           }
+          <p className="text-gray-600">{wishlist.description}</p>
+          
 
 
           {event ? (

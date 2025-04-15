@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProtectedRoutes from "./components/ProtectedRoutes"
+import { Toaster } from 'sonner';
 
 import './App.css'
 
@@ -45,6 +46,7 @@ function App() {
 
   return (
     <>
+      <Toaster richColors position="bottom-left" closeButton />
       <BrowserRouter>
 
         <div className="relative min-h-screen">
