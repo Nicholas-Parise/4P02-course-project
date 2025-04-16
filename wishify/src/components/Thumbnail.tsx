@@ -9,35 +9,49 @@ const WishlistButton = styled.button`
     overflow: hidden;
     text-overflow: ellipsis;
     border: 2px solid #5651e5;
-    padding: 20px;
-    width: 200px;
-    height: 200px;
+    padding: 15px;
+    width: 100%;
+    aspect-ratio: 1/1;
     position: relative;
-    font-size: clamp(0.5em, 0.75em, 1em);
-    @media screen and (max-width: 440px){
-        width: 150px;
-        height: 150px;
-    }
-    &:hover{
+    font-size: 1.5rem;
+    transition: transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  
+    &:hover {
         transform: scale(1.05);
         cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+        font-size: 1.6rem;
+    }
+
+    @media (max-width: 480px) {
+        font-size: 1.6rem;
     }
 `
 
 const WishlistMenu = styled.div`
     background: #FFFFFF;
-    display: grid;
-    gap: 0px;
-    grid-template-rows: 20% 1fr 1fr 1fr 1fr 1fr;
+    display: flex;
+    flex-direction: column;
     border-radius: 25px;
     border: 2px solid #5651e5;
-    width: 200px;
-    height: 200px;
-    font-size: clamp(0.5em, 0.75em, 1em);
+    width: 100%;
+    aspect-ratio: 1/1;
     position: relative;
-    @media screen and (max-width: 440px){
-        width: 150px;
-        height: 150px;
+    font-size: 1.1rem;
+    overflow: hidden;
+
+    @media (max-width: 768px) {
+        font-size: 1.3rem;
+    }
+
+    @media (max-width: 480px) {
+        font-size: 1rem;
     }
 `
 
@@ -47,35 +61,49 @@ const EventButton = styled.button`
     overflow: hidden;
     text-overflow: ellipsis;
     border: 2px solid #5651e5;
-    padding: 20px;
-    width: 200px;
-    height: 200px;
+    padding: 15px;
+    width: 100%;
+    aspect-ratio: 1/1;
     position: relative;
-    font-size: clamp(0.5em, 0.75em, 1em);
-    @media screen and (max-width: 440px){
-        width: 150px;
-        height: 150px;
-    }
-    &:hover{
+    font-size: 1.5rem;
+    transition: transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  
+    &:hover {
         transform: scale(1.05);
         cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+        font-size: 1.6rem;
+      }
+
+    @media (max-width: 480px) {
+        font-size: 1.6rem;
     }
 `
 
 const EventMenu = styled.div`
     background: #FFFFFF;
-    display: grid;
-    gap: 0px;
-    grid-template-rows: 20% 1fr 1fr 1fr 1fr;
+    display: flex;
+    flex-direction: column;
     border-radius: 25px;
     border: 2px solid #5651e5;
-    width: 200px;
-    height: 200px;
-    font-size: clamp(0.5em, 0.75em, 1em);
+    width: 100%;
+    aspect-ratio: 1/1;
     position: relative;
-    @media screen and (max-width: 440px){
-        width: 150px;
-        height: 150px;
+    font-size: 1.1rem;
+    overflow: hidden;
+
+    @media (max-width: 768px) {
+        font-size: 1.3rem;
+    }
+
+    @media (max-width: 480px) {
+        font-size: 1rem;
     }
 `
 
@@ -94,20 +122,31 @@ const OwnerText = styled.p`
 const Crown = createStyledIcon(FaCrown);
 
 const MenuButton = styled.button`
-    &:hover{
-        border: solid #5651e5 1px;
-        border-radius: 20px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 4px;
+    border: none;
+    background: none;
+    font-size: inherit;
+  
+    &:hover {
+        background: rgba(86, 81, 229, 0.1);
         cursor: pointer;
-    } 
+    }
 `
 
 const OverlayTitle = styled.p`
-    overflow: hidden;
-    white-space: nowrap;
-    font-size: 18px;
+    padding: 10px 8px;
+    font-weight: bold;
     text-align: center;
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid #e0e0e0;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
     text-overflow: ellipsis;
+    font-size: 1.3rem;
 `
 
 
@@ -116,7 +155,7 @@ export const WishlistThumbnail = (props: any) => {
     const WishlistOverlayMenu = () => {
         return (
             <WishlistMenu onMouseLeave={props.toggleActive}>
-                <p style={{margin: "4px"}}>Creator: {props.owner}</p>
+                <p style={{margin: "4px", paddingLeft:"10px"}}>Creator: {props.owner}</p>
                 <OverlayTitle title={props.title}>{props.title}</OverlayTitle>
                 <MenuButton onClick={openWishlist}>Open</MenuButton>
                 <MenuButton onClick={props.edit}>Edit</MenuButton>
@@ -134,7 +173,7 @@ export const WishlistThumbnail = (props: any) => {
 
     if(props.role == "contributor"){
         return(
-        <WishlistButton onClick={openWishlist}><OwnerText style={{fontSize: "small"}}>Owner: {props.owner}</OwnerText>{props.title}</WishlistButton>
+        <WishlistButton onClick={openWishlist}><OwnerText style={{fontSize: "small"}}>Creator: {props.owner}</OwnerText>{props.title}</WishlistButton>
         )
     } else{
         return(
@@ -166,7 +205,7 @@ export const EventThumbnail = (props: any) => {
 
     if(props.role == "contributor"){
         return(
-        <EventButton onClick={openEvent}><OwnerText style={{fontSize: "small"}}>Owner: {props.owner}</OwnerText>{props.title}</EventButton>
+        <EventButton onClick={openEvent}><OwnerText style={{fontSize: "small"}}>Creator: {props.owner}</OwnerText>{props.title}</EventButton>
         )
     } else{
         return(

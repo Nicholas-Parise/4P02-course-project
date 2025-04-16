@@ -5,14 +5,17 @@ const CreateWishlistButton = styled.button<{isDisabled?: boolean}>`
     background: linear-gradient(to right, #8d8aee, #5651e5);
     color: white;
     border-radius: 25px;
-    padding: 20px;
-    width: 200px;
-    height: 200px;
-    transition: background 0.3s;
-    @media screen and (max-width: 440px){
-        width: 150px;
-        height: 150px;
-    }
+    padding: 15px;
+    width: 100%;
+    aspect-ratio: 1/1;
+    transition: all 0.3s;
+    font-size: 1.5rem;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  
     &:hover {
         background: ${({ isDisabled }) =>
             isDisabled
@@ -21,24 +24,45 @@ const CreateWishlistButton = styled.button<{isDisabled?: boolean}>`
         transform: ${({ isDisabled }) => (isDisabled ? "none" : "scale(1.05)")};
         cursor: ${({ isDisabled }) => (isDisabled ? "not-allowed" : "pointer")};
     }
+
+    @media (max-width: 768px) {
+        font-size: 1.6rem;
+    }
+
+    @media (max-width: 480px) {
+        font-size: 1.6rem;
+        padding: 12px;
+    }
 `
 
 const CreateEventButton = styled.button`
     background: linear-gradient(to right, #8d8aee, #5651e5);
     color: white;
     border-radius: 25px;
-    padding: 20px;
-    width: 200px;
-    height: 200px;
-    transition: background 0.3s;
-    @media screen and (max-width: 440px){
-        width: 150px;
-        height: 150px;
-    }
+    padding: 15px;
+    width: 100%;
+    aspect-ratio: 1/1;
+    transition: all 0.3s;
+    font-size: 1.5rem;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  
     &:hover {
         background: linear-gradient(to right, #5651e5, #343188);
         transform: scale(1.05);
         cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+        font-size: 1.6rem;
+    }
+
+    @media (max-width: 480px) {
+        font-size: 1.6rem;
+        padding: 12px;
     }
 `
 

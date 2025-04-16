@@ -598,7 +598,6 @@
     }
 }
 
-/* Footer Section */
 .footer {
     width: 100%;
     padding: 2rem 0;
@@ -636,7 +635,6 @@
     justify-content: space-between;
     align-items: center;
     padding: 0 20%;
-    margin-bottom: 1.5rem;
     box-sizing: border-box;
 }
 
@@ -663,10 +661,6 @@
 @media screen and (max-width: 768px) {
     .footer .social {
         padding: 0 10%;
-    }
-
-    .footer{
-        padding-bottom: 50px;
     }
     
     .footer .icon {
