@@ -7,12 +7,39 @@ import PopularItems from "../components/PopularItems.jsx";
 const Landing = () => {
   const [activeIndex, setActiveIndex] = useState(null);
   const [currentFeature, setCurrentFeature] = useState(0);
+  const [popularItems, setPopularItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState(localStorage.getItem('token') || '');
 
   const toggleFAQ = (index) => {
     setActiveIndex(activeIndex === index ? null : index);
   };
 
-  // Auto-rotate features in hero section
+  useEffect(() => {
+    const fetchPopularItems = async () => {
+      const trendingUrl = "https://api.wishify.ca/ideas/trending";
+      
+      try {
+        const response = await fetch(trendingUrl, {
+          method: 'get',
+          headers: new Headers({
+            'Authorization': "Bearer " + token,
+          }),
+        });
+        
+        const trendingData = await response.json();
+        setPopularItems((trendingData.trending || []).slice(0, 4));
+        console.log("Trending:", trendingData.trending);
+      } catch (error) {
+        console.error("Error fetching trending items:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPopularItems();
+  }, [token]);
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentFeature((prev) => (prev + 1) % herohighlights.length);
@@ -51,7 +78,6 @@ const Landing = () => {
     },
   ];
 
-  // Autorotate feature highlights for hero section
   const herohighlights = [
     {
       title: "Create Wishlists",
@@ -73,74 +99,6 @@ const Landing = () => {
       description: "Get all these features in one application, making it the ultimate gift-giving tool.",
       highlight: "All-in-one solution"
     },
-  ];
-
-  // Popular items data - placeholder until API is ready
-  const popularItems = [
-    {
-      id: 1,
-      name: "Nintendo Switch",
-      image: "/assets/popular/nintendoswitch.jpg",
-      price: "$399.99",
-      rating: 4.8,
-      uses: 10
-    },
-    {
-      id: 2,
-      name: "Smart Water Bottle",
-      image: "/assets/popular/smartwaterbottle.jpg",
-      price: "$109.95",
-      rating: 4.5,
-      uses: 6
-    },
-    {
-      id: 3,
-      name: "Cozy Blanket",
-      image: "/assets/popular/blankets.jpg",
-      price: "$49.99",
-      rating: 4.9,
-      uses: 20
-    },
-    {
-      id: 4,
-      name: "Gourmet Coffee Set",
-      image: "/assets/popular/coffeeset.jpg",
-      price: "$29.99",
-      rating: 4.7,
-      uses: 8
-    },
-    {
-      id: 5,
-      name: "Portable Charger",
-      image: "/assets/popular/portablecharger.jpg",
-      price: "$24.99",
-      rating: 4.6,
-      uses: 15
-    },
-    {
-      id: 6,
-      name: "PS5 Console",
-      image: "/assets/popular/ps5.jpg",
-      price: "$499.99",
-      rating: 4.8,
-      uses: 30
-    },
-    {
-      id: 7,
-      name: "Xbox Series X Console",
-      image: "/assets/popular/xbox.jpg",
-      price: "$399.99",
-      rating: 4.8,
-      uses: 24
-    },
-    {
-      id: 8,
-      name: "Asus ROG Ally X",
-      image: "/assets/popular/rogally.png",
-      price: "$1299.99",
-      rating: 4.8,
-      uses: 4
-    }
   ];
 
   const faqs = [
@@ -186,8 +144,8 @@ const Landing = () => {
       period: "per month",
       features: [
         "Unlimited wishlists",
-        "Priority support",
-        "Analytics dashboard",
+        "Exclusive Pro Badge",
+        "Priority Support",
         "Early access to new features"
       ],
       cta: "Upgrade Now",
@@ -197,7 +155,6 @@ const Landing = () => {
 
   return (
     <div className="landing-page">
-      {/* Hero Section */}
       <div className="hero">
         <div className="hero-content">
           <div className="hero-text">
@@ -226,7 +183,6 @@ const Landing = () => {
         </div>
       </div>
 
-      {/* Features Section */}
       <div className="features-section">
         <h2>Powerful Features for Every Occasion</h2>
         <div className="card-wrapper">
@@ -240,15 +196,17 @@ const Landing = () => {
         </div>
       </div>
 
-      {/* Popular Items Section */}
-      <PopularItems 
-        items={popularItems} 
-        title="Most Wishlisted Items" 
-        subtitle="Discover what people are loving right now"
-        wishlistCountEnabled={true}
-      />
+      {(!loading || popularItems.length > 0) && (
+        <PopularItems 
+          loading={loading}
+          items={popularItems} 
+          title="Most Wishlisted Items" 
+          subtitle="Discover what people are loving right now"
+          wishlistCountEnabled={true}
+          addButtonsEnabled={false}
+        />
+      )}
 
-      {/* Use Cases Section */}
       <div className="use-cases">
         <h2>Perfect For Any Occasion</h2>
         <div className="case-studies">
@@ -267,7 +225,6 @@ const Landing = () => {
         </div>
       </div>
 
-      {/* FAQ Section */}
       <div className="faq-section">
         <h2 className="faq-title">Frequently Asked Questions</h2>
         <div className="faq-container">
@@ -292,7 +249,6 @@ const Landing = () => {
         </div>
       </div>
 
-      {/* Pricing Section */}
       <div className="pricing-section">
         <h2 className="pricing-title">Simple, Transparent Pricing</h2>
         <p className="pricing-subtitle">Choose the plan that's right for you</p>
@@ -327,7 +283,6 @@ const Landing = () => {
         </div>
       </div>
 
-      {/* Footer Section */}
       <div className="footer">
         <div className="social">
           <a href="https://github.com/Nicholas-Parise/4P02-course-project" target="_blank" rel="noopener noreferrer">

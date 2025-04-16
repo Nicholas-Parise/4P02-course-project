@@ -16,7 +16,9 @@ const uploadPicture = require('./middleware/upload');
 router.get('/', authenticate, async (req, res, next) => {
   try {
     const userId = req.user.userId; // Get user ID from authenticated token
-    const result = await db.query('SELECT id, email, displayName, bio, picture, pro, setup, datecreated, dateupdated, (google_id IS NOT NULL) AS oauth FROM users WHERE id = $1', [userId]);
+
+    const result = await db.query('SELECT id, email, displayName, bio, picture, pro, setup, notifications, datecreated, dateupdated, (google_id IS NOT NULL) AS oauth FROM users WHERE id = $1', [userId]);
+
     const result2 = await db.query(
       `SELECT c.*, uc.love FROM categories c
         JOIN user_categories uc ON c.id = uc.category_id

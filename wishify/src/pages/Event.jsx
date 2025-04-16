@@ -9,7 +9,7 @@ import {WishlistThumbnail} from '../components/Thumbnail';
 import {CreateWishlist} from '../components/CreateButton';
 import ShareWishlistModal from '../components/ShareWishlistModal';
 import ShareEventModal from '../components/ShareEventModal';
-import MemberDialog from '../components/MemberDialog';
+import EventMemberDialog from '../components/EventMemberDialog';
 
 import ModalBox from '@mui/material/Box';
 import ModalButton from '@mui/material/Button';
@@ -93,6 +93,7 @@ const Event = () => {
   const [eventMembers, setEventMembers] = useState([])
   const [saving, setSaving] = useState(false);
   const [rsvpAlert, setRsvpAlert] = useState(false);
+  const [owner, setOwner] = useState(false)
 
   const [activeOverlay, setActiveOverlay] = useState("");
   const [modalOpen, setModalOpen] = React.useState(false);
@@ -145,6 +146,7 @@ const Event = () => {
           addr: eventData.addr || '',
           city: eventData.city || '',
           share_token: eventData.share_token || '',
+          owner: eventData.owner || false,
         };
         setEvent(fetchedEvent);
         setOriginalEvent(fetchedEvent);
@@ -646,16 +648,15 @@ const Event = () => {
       <Alert severity="success" sx={{ position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)', zIndex: 900, opacity: rsvpAlert ? 1 : 0, transition: rsvpAlert ? "none" : "opacity 1s ease-out"}}>
         RSVP successfully added.
       </Alert>
-      <MemberDialog 
+      <EventMemberDialog 
         open={isMemberDialogOpen}
         setOpen={setIsMemberDialogOpen}
         members={eventMembers}
         userID={userID || -1}
-        isOwner={true}
-        setBlind={() => {}}
-        setOwner={() => {}}
+        isOwner={event.owner}
+        setOwner={setOwner}
         editMember={editMember}
-        wishlistID={event?.id || -1}
+        eventID={event?.id || -1}
         token={token}
       />
       { event.share_token && (

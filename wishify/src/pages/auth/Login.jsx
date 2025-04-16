@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import '../../login.css'
 import google from "../../assets/Google.svg";
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const Login = ({setIsLoggedIn}) => {
   const [isAuthenticating, setIsAuthenticating] = React.useState(false)
@@ -168,7 +169,7 @@ const Login = ({setIsLoggedIn}) => {
               className='login-password-toggle'
               onClick={togglePasswordVisibility}
             >
-              {showPassword ? "Hide" : "Show"}
+              {showPassword ? <VisibilityOff /> : <Visibility />}
             </span>
           </div>
 

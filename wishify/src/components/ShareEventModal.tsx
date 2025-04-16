@@ -5,10 +5,11 @@ interface Props{
     eventID: number,
     shareToken: string,
     isOpen: boolean,
+    isOwner: boolean | undefined,
     setIsOpen: (state: boolean) => void,
 }
 
-const ShareEventModal = ({ eventID, shareToken, isOpen, setIsOpen }: Props) => {
+const ShareEventModal = ({ eventID, shareToken, isOpen, isOwner, setIsOpen }: Props) => {
     const [inputEmail, setInputEmail] = useState("")
     const token = localStorage.getItem('token') || ''
   
@@ -21,8 +22,8 @@ const ShareEventModal = ({ eventID, shareToken, isOpen, setIsOpen }: Props) => {
               'Content-Type': 'application/json'
             }),
             body: JSON.stringify({
-                event_id: eventID, // change to event_id when Nick pushes backend change
-                email: inputEmail,
+                event_id: eventID,
+                email: inputEmail
             })
             })
             .then((response) => {
@@ -77,47 +78,50 @@ const ShareEventModal = ({ eventID, shareToken, isOpen, setIsOpen }: Props) => {
                 Copy Link
             </Button>
           </Box>
-          
-            <Divider sx={{mb: 2, mt:2}}>OR</Divider>
+          { isOwner && 
+            <>
+                <Divider sx={{mb: 2, mt:2}}>OR</Divider>
 
-            <Typography variant='body1' mb={2}>
-            Enter the email of the person you want to share this event with.
-            </Typography>
-    
-            <form onSubmit={handleSubmit}>
-            <TextField
-                required
-                type="email"
-                label="Email"
-                value={inputEmail}
-                onChange={(e) => setInputEmail(e.target.value)}
-                fullWidth
-                variant='outlined'
-                sx={{mb: 2}}
-            />
-    
-            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
-                <Button
-                variant="contained"
-                type="submit"
-                sx={{
-                    background: 'linear-gradient(to right, #8d8aee, #5651e5)',
-                    color: 'white',
-                    borderRadius: '25px',
-                    '&:hover': { background: 'linear-gradient(to right, #5651e5, #343188)' }
-                }}
-                >
-                Share
-                </Button>
-                <Button
-                variant="outlined"
-                onClick={() => {setIsOpen(false)}}
-                sx={{ borderRadius: '25px', borderColor: '#5651e5', color: '#5651e5', ml: '8px' }}
-                >
-                Close
-                </Button>
-            </Box>
-            </form>
+                <Typography variant='body1' mb={2}>
+                Enter the email of the person you want to share this event with.
+                </Typography>
+        
+                <form onSubmit={handleSubmit}>
+                <TextField
+                    required
+                    type="email"
+                    label="Email"
+                    value={inputEmail}
+                    onChange={(e) => setInputEmail(e.target.value)}
+                    fullWidth
+                    variant='outlined'
+                    sx={{mb: 2}}
+                />
+        
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+                    <Button
+                    variant="contained"
+                    type="submit"
+                    sx={{
+                        background: 'linear-gradient(to right, #8d8aee, #5651e5)',
+                        color: 'white',
+                        borderRadius: '25px',
+                        '&:hover': { background: 'linear-gradient(to right, #5651e5, #343188)' }
+                    }}
+                    >
+                    Share
+                    </Button>
+                    <Button
+                    variant="outlined"
+                    onClick={() => {setIsOpen(false)}}
+                    sx={{ borderRadius: '25px', borderColor: '#5651e5', color: '#5651e5', ml: '8px' }}
+                    >
+                    Close
+                    </Button>
+                </Box>
+                </form>
+            </>
+          }
         </Box>
       </Modal>
     )

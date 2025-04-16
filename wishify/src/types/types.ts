@@ -17,6 +17,7 @@ export interface Event {
     name: string,
     description: string,
     url: string,
+    owner?: boolean,
     addr: string,
     city: string,
     deadline: string,
@@ -52,7 +53,8 @@ export interface IdeaItem {
     sponsor: boolean,
     price: string,
     rating?: string,
-    wishlistCount?: number
+    wishlistCount?: number,
+    uses: number
 }
 
 export interface Contribution {
@@ -75,4 +77,26 @@ export interface Member {
     owner: boolean,
     pro: boolean,
     picture: string
+}
+
+export interface User {
+    id: number,
+    email: string,
+    displayname: string,
+    bio: string,
+    picture: string,
+    pro: boolean,
+    setup: boolean,
+    notifications: boolean,
+    datecreated: string,
+    dateupdated: string
+}
+
+export interface Notification {
+    id: number,
+    title: string,
+    body: string,
+    url: string,
+    is_read: boolean,
+    created: string
 }
