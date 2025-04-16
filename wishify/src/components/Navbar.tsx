@@ -21,7 +21,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
     { label: 'Ideas', href: '/ideas' },
   ]);
 
-  const [token, setToken] = useState<string>(localStorage.getItem('token') || '');
+  const [token, setToken] = useState<string>(localStorage.getItem('token') || '')
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [wishlists, setWishlists] = useState<Wishlist[]>([]);
   const [error, setError] = useState(null);
@@ -36,7 +36,19 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
   const [openedNotificationAlert, setOpenedNotificationAlert] = useState<boolean>(false)
 
   useEffect(() => {
+    if (!isLoggedIn){
+      toast.dismiss()
+      setOpenedNotificationAlert(false)
+      return
+    } 
+
+    setNotifications([])
+    const token = localStorage.getItem('token') || ''
+    console.log(token)
+    setToken(token)
+
     const getNotifications = () => {
+      console.log(token)
       let status_code = -1
       const notificationsURL = `https://api.wishify.ca/notifications`
       fetch(notificationsURL, {
@@ -52,11 +64,12 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
       .then((data) => {
         if(status_code == 404) return
         console.log(data)
-        setNotifications(data.reverse());
+        setNotifications(data);
       })
       .catch((error) => {
         console.log(error)
       })
+      .finally(() => console.log(token))
     }
     getNotifications()
 
@@ -64,7 +77,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
       getNotifications()
     },25*1000); // 25 second notification refresh
     return () => clearInterval(interval);
-  }, [])
+  }, [isLoggedIn])
 
   const deleteNotification = (id: number) => {
     // send delete request
@@ -137,8 +150,6 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
   }, [notifications])
 
   const fetchWishlists = () => {
-    const token = localStorage.getItem('token') || '';
-    setToken(token);
     setLoading(true);
 
     const url = "https://api.wishify.ca/wishlists";
@@ -166,8 +177,8 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
   const [profile, setProfile] = useState<User>();
 
   useEffect(() => {
-    setToken(localStorage.getItem('token') || '')
-    console.log(token)
+    if(token === '') return
+
     fetch("https://api.wishify.ca/users/", {
         method: 'get',
         headers: new Headers({
@@ -227,7 +238,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
                 
                 <AiOutlineUser className="text-2xl cursor-pointer" onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)} />
                 {profile && isProfileMenuOpen && <ProfileMenu 
-                      logOut={() => {setIsLoggedIn(false); localStorage.removeItem("token")}}
+                      logOut={() => {setIsLoggedIn(false); localStorage.removeItem("token"); setToken('')}}
                       closeMenu={() => setIsProfileMenuOpen(false)} 
                       profile={profile}
                       token={token}
@@ -332,7 +343,6 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
             {isDesktop && (
               <div className='container2'>
                 <a href='/Register'><button className='btn'>Sign Up</button></a>
-                &nbsp;
                 <a href='/Login'><button className='btn'>Log In</button></a>
               </div>
             )}

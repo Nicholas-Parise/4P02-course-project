@@ -67,10 +67,24 @@ const DetailItem = styled.div`
 `;
 
 const WishlistContainer = styled.div`
-  grid-column: 1 / -1;
-  display: flex;
-  gap: 3vw;
-  flex-wrap: wrap;
+  display: grid;
+  gap: 20px;
+  padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
+
+  /* Mobile (default): 1 column */
+  grid-template-columns: repeat(1, 1fr);
+
+  /* Tablet (768px and up): 2 columns */
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Desktop (1024px and up): 4 columns */
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
 `;
 
 const DescriptionTextarea = styled(EditTextarea)`

@@ -98,15 +98,9 @@ router.delete('/:id', authenticate, async (req, res, next) => {
     await db.query(`DELETE FROM notifications WHERE id = $1;`, [notificationId]);
 
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "notification not found." });
-    }
-
-    res.status(200).json({ message: "notification updated successfully."});
-
-
+    res.status(200).json({ message: "notification deleted successfully."});
   } catch (error) {
-    console.error("Error editing contribution:", error);
+    console.error("Error deleted contribution:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 

@@ -1,6 +1,5 @@
 import React, { useState, useEffect} from 'react';
 import {
-  Container,
   Box,
   Typography,
   TextField,
@@ -89,9 +88,21 @@ export default function ResetPasswordPage() {
     }
   };
 
+  const style = {
+    background: '#FFFFFF',
+    border: '1px solid #5651E5',
+    fontFamily: 'Arial, Helvetica, sans-serif',
+    margin: '50px auto',
+    padding: '50px',
+    borderRadius: '10px',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
+    textAlign: 'center',
+    maxWidth: '500px',
+  }
+
   return (
-    <Container maxWidth="sm">
-      <Box sx={{ mt: 8, p: 4, boxShadow: 3, borderRadius: 2 }}>
+    <section style={style}>
+      <Box>
         <Typography variant="h5" gutterBottom>
           Reset Your Password
         </Typography>
@@ -120,6 +131,17 @@ export default function ResetPasswordPage() {
               margin="normal"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              sx={{
+                '& label.Mui-focused': {
+                  color: '#5651e5',
+                },
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#5651e5',
+                  },
+                },
+                mb: 2,
+              }}
             />
 
             <TextField
@@ -129,6 +151,17 @@ export default function ResetPasswordPage() {
               margin="normal"
               value={otc}
               onChange={(e) => setOtc(e.target.value)}
+              sx={{
+                '& label.Mui-focused': {
+                  color: '#5651e5',
+                },
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#5651e5',
+                  },
+                },
+                mb: 2,
+              }}
             />
 
             <TextField
@@ -151,6 +184,17 @@ export default function ResetPasswordPage() {
                     </IconButton>
                   </InputAdornment>
                 )
+              }}
+              sx={{
+                '& label.Mui-focused': {
+                  color: '#5651e5',
+                },
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#5651e5',
+                  },
+                },
+                mb: 2,
               }}
             />
 
@@ -175,6 +219,17 @@ export default function ResetPasswordPage() {
                   </InputAdornment>
                 )
               }}
+              sx={{
+                '& label.Mui-focused': {
+                  color: '#5651e5',
+                },
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#5651e5',
+                  },
+                },
+                mb: 2,
+              }}
             />
 
             {error && (
@@ -183,12 +238,25 @@ export default function ResetPasswordPage() {
               </Alert>
             )}
 
-            <Button variant="contained" fullWidth type="submit" sx={{ mt: 3 }}>
+            <Button
+              variant="contained" 
+              fullWidth type="submit" 
+              sx={{
+                mt: 2,
+                background: 'linear-gradient(to right, #8d8aee, #5651e5)',
+                color: 'white',
+                borderRadius: '8px',
+                transition: 'background 0.3s ease',
+                padding: '12px',
+                fontSize: '1rem',
+                '&:hover': { background: 'linear-gradient(to right, #5651e5, #343188)' }
+              }}
+            >
               Reset Password
             </Button>
           </form>
         )}
       </Box>
-    </Container>
+    </section>
   );
 }

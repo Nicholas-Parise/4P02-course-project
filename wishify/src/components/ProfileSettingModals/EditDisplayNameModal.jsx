@@ -25,7 +25,8 @@ const EditDisplayNameModal = ({ open, handleClose, value, onSave }) => {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 500,
+    width: '90%',
+    maxWidth: 500,
     bgcolor: 'background.paper',
     border: '2px solid #5651e5',
     borderRadius: '25px',
@@ -58,7 +59,17 @@ const EditDisplayNameModal = ({ open, handleClose, value, onSave }) => {
             fullWidth
             variant='outlined'
             slotProps={{ htmlInput: { maxLength: 30 } }}
-            sx={{mb: 2}}
+            sx={{
+              '& label.Mui-focused': {
+                color: '#5651e5',
+              },
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused fieldset': {
+                  borderColor: '#5651e5',
+                },
+              },
+              mb: 2,
+            }}
           />
 
           <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>

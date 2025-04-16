@@ -6,9 +6,8 @@ import {
   Stack,
 } from '@mui/material'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload'
-import { data } from 'react-router-dom'
 
-const EditPictureModal = ({ onClose }) => {
+const EditPictureModal = ({ onSave }) => {
   const [selectedImage, setSelectedImage] = useState(null)
   const [previewUrl, setPreviewUrl] = useState(null)
   const fileInputRef = useRef(null)
@@ -34,38 +33,7 @@ const EditPictureModal = ({ onClose }) => {
       alert('Please select an image to upload.')
       return
     }
-
-    const formData = new FormData()
-    formData.append('picture', selectedImage)
-
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ', ' + pair[1]);
-    }
-
-
-    try {
-      const response = await fetch('https://api.wishify.ca/users/upload/', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: formData
-      })
-
-      const result = await response.json()
-      console.log(result)
-
-      if (response.ok) {
-        alert('Image uploaded successfully!')
-        onClose()
-      } else {
-        alert('Failed to upload image. Please try again.')
-      }
-    }
-    catch (error) {
-      console.error('Error uploading image:', error)
-      alert('Error uploading image')
-    }
+    onSave(selectedImage)
   }
 
   return (
@@ -73,7 +41,7 @@ const EditPictureModal = ({ onClose }) => {
       <Avatar
         src={previewUrl || '/default-avatar.png'}
         alt="Profile Picture Preview"
-        sx={{ width: 100, height: 100, mx: 'auto', mb: 2 }}
+        sx={{ width: 150, height: 150, mx: 'auto', mb: 3 }}
       />
 
       <input
@@ -102,10 +70,18 @@ const EditPictureModal = ({ onClose }) => {
           variant="contained"
           onClick={handleSubmit}
           disabled={!selectedImage}
-          sx={{ 
-            backgroundColor: '#5651e5',
-            color: 'white' ,
-            borderRadius: '25px'
+          sx={{
+            background: 'linear-gradient(to right, #8d8aee, #5651e5)',
+            color: 'white',
+            borderRadius: '25px',
+            '&:hover': { background: 'linear-gradient(to right, #5651e5, #343188)'
+            },
+            '&:disabled': {
+              background: '#ccc',
+              color: '#888',
+              cursor: 'not-allowed',
+              pointerEvents: 'auto'
+            },
           }}
         >
           Upload

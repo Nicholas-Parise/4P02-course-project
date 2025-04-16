@@ -1,6 +1,6 @@
 import React from 'react'
 import { Box, Button, Modal, Typography, TextField, List, ListItem, ListItemText, Divider, IconButton, Grid2, Paper } from '@mui/material'
-import { Add, Close } from '@mui/icons-material'
+import { Close } from '@mui/icons-material'
 
 const AddLikesModal = ({ open, handleClose, type, values, onSave }) => {
   const [predefinedItems, setPredefinedItems] = React.useState([])
@@ -77,14 +77,15 @@ const AddLikesModal = ({ open, handleClose, type, values, onSave }) => {
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          width: 500,
+          width: '90%',
+          maxWidth: 600,
           bgcolor: 'background.paper',
           borderRadius: 7,
           boxShadow: 24,
           p: 4,
         }}
       >
-      <Typography variant="h6">Select more {type}</Typography>
+      <Typography variant="h6" sx={{ textAlign: 'center', fontWeight: 'bold', color: '#5651e5' }}>Select More {type}</Typography>
 
       <Divider sx={{ mt: 2, mb: 2 }} />
 
@@ -101,77 +102,110 @@ const AddLikesModal = ({ open, handleClose, type, values, onSave }) => {
       <TextField
         fullwidth
         variant="outlined"
-        placeholder={'Search...'}
-        sx={{ mt: 2, mb: 2 }}
+        fullWidth
+        label="Search"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
+        sx={{
+          '& label.Mui-focused': {
+            color: '#5651e5',
+          },
+          '& .MuiOutlinedInput-root': {
+            '&.Mui-focused fieldset': {
+              borderColor: '#5651e5',
+            },
+          },
+          mt: 2,
+          mb: 2,
+        }}
       />
 
-      <Grid2 container spacing={2}>
-        {/* Available Items List */}
-        <Grid2 item xs={6}>
-          <Paper sx={{ height: 200, overflowY: 'auto', p: 1, width: 200, minWidth: 200 }}>
-            <List sx={{ width: '100%' }}>
-              {predefinedItems
-                .filter((item) => 
-                  !itemsToAdd.some((value) => value.name === item.name))
-                .filter((item) =>
-                  !values.some((value) => value.name === item.name))
-                .filter((item) =>
-                  item.name.toLowerCase().includes(search.toLowerCase()))
-                .map((item) => (
-                  <ListItem key={item.id} button onClick={() => handleAddItem(item)}>
-                    <ListItemText
-                      primary={item.name}
-                      sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-                    />
-                  </ListItem>
-                ))}
-            </List>
-          </Paper>
-        </Grid2>
-
-        {/* Selected Items List */}
-        <Grid2 item xs={6}>
-          <Paper sx={{ height: 200, overflowY: 'auto', p: 1, width: 200, minWidth: 200 }}>
-            <Typography variant="subtitle1">Selected Items</Typography>
-            {itemsToAdd.length > 0 ? (
+        <Grid2 container spacing={2} justifyContent={'center'}>
+          {/* Available Items List */}
+          <Grid2 item xs={12} md={6} sx={{ minWidth: 0}}>
+            <Paper sx={{ 
+              height: 200, 
+              width: 260,
+              overflowY: 'auto',
+              p: 1, 
+              boxSizing: 'border-box',
+              }}
+            >
+              <Typography variant="subtitle1" sx={{ color: '#5651e5'}}>Categories</Typography>
               <List sx={{ width: '100%' }}>
-                {itemsToAdd.map((item) => (
-                  <ListItem key={item.id} secondaryAction={
-                    <IconButton edge="end" onClick={() => handleRemoveItem(item)}>
-                      <Close />
-                    </IconButton>
-                  }>
-                    <ListItemText 
-                      primary={item.name} 
-                      sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-                    />
-                  </ListItem>
-                ))}
+                {predefinedItems
+                  .filter((item) => 
+                    !itemsToAdd.some((value) => value.name === item.name))
+                  .filter((item) =>
+                    !values.some((value) => value.name === item.name))
+                  .filter((item) =>
+                    item.name.toLowerCase().includes(search.toLowerCase()))
+                  .map((item) => (
+                    <ListItem key={item.id} button onClick={() => handleAddItem(item)}>
+                      <ListItemText
+                        primary={item.name}
+                        sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                      />
+                    </ListItem>
+                  ))}
               </List>
-            ) : (
-              <Typography variant="body2" sx={{ textAlign: 'center', mt: 2 }}>
-                No items selected
-              </Typography>
-            )}
-          </Paper>
+            </Paper>
+          </Grid2>
+
+          {/* Selected Items List */}
+          <Grid2 item xs={12} md={6}>
+            <Paper sx={{ 
+              height: 200,
+              width: 260,
+              overflowY: 'auto',
+              p: 1,
+              boxSizing: 'border-box',
+              }}
+            >
+              <Typography variant="subtitle1" sx={{ color: '#5651e5'}}>Selected Items</Typography>
+              {itemsToAdd.length > 0 ? (
+                <List sx={{ width: '100%' }}>
+                  {itemsToAdd.map((item) => (
+                    <ListItem key={item.id} secondaryAction={
+                      <IconButton edge="end" onClick={() => handleRemoveItem(item)}>
+                        <Close />
+                      </IconButton>
+                    }>
+                      <ListItemText 
+                        primary={item.name} 
+                        sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              ) : (
+                <Typography variant="body2" sx={{ textAlign: 'center', mt: 2 }}>
+                  No items selected
+                </Typography>
+              )}
+            </Paper>
+          </Grid2>
         </Grid2>
-      </Grid2>
 
       <Divider sx={{ mb: 2, mt: 2 }} />
 
-      <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
         <Button
           variant="contained"
           onClick={handleSave}
-          sx={{ mr: 1 }}
+          sx={{
+            background: 'linear-gradient(to right, #8d8aee, #5651e5)',
+            color: 'white',
+            borderRadius: '25px',
+            '&:hover': { background: 'linear-gradient(to right, #5651e5, #343188)' }
+          }}
         >
           Save
         </Button>
         <Button
           variant="outlined"
           onClick={handleCancel}
+          sx={{ borderRadius: '25px', borderColor: '#5651e5', color: '#5651e5', ml: '8px' }}
         >
           Cancel
         </Button>

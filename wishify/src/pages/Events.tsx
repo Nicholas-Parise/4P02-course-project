@@ -29,10 +29,20 @@ const boxStyle = {
 };
 
 const EventContainer = styled.div`
-  display: flex;
-  gap: 3vw;
-  margin: 3vw;
-  flex-wrap: wrap;
+  display: grid;
+  gap: 20px;
+  padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  grid-template-columns: repeat(4, 1fr);
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
 `
 
 const Events = () => {
@@ -306,7 +316,7 @@ const Events = () => {
     
 
   return (
-    <section className='bg-white border-2 border-solid border-[#5651e5] rounded-[25px]'>
+    <section className='bg-white border-2 border-solid border-[#5651e5] rounded-[25px]' style={{marginTop:'20px', paddingTop:'20px', paddingBottom:'20px'}}>
       <h1>My Events</h1>
       <EventContainer>
         <CreateEvent addThumbnail={handleModalOpen}>Create an Event</CreateEvent>

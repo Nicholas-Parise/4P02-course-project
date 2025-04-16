@@ -44,8 +44,8 @@ const PublicProfile = () => {
   return (
     <>
     <section className="profile-container">
-      <div className="profile-header">
-        <div className="profile-picture">
+      <div className="profile-header flex flex-col md:flex-row gap-[10px]">
+        <div className="profile-picture w-full mb-[20px] sm:mb-0 sm:w-[25%]">
           <img
             src={
               user.user.picture
@@ -56,19 +56,26 @@ const PublicProfile = () => {
 
         <div className="profile-header-fields">
           <div className="profile-settings-item">
-
-            <div className='profile-setting-displayname'>
+            <div className='profile-setting-displayname flex justify-center md:justify-start items-center'>
               {user.user.displayname}
+              {user.user.pro && (
+                <>
+                  &nbsp;
+                  <span className='pro-badge' style={{verticalAlign: 'middle'}}>PRO</span>
+                </>
+              )}
             </div>
+            </div>
+          
+          {user.user.bio && (
+          <>
+            <hr />
 
-          </div>
-          <hr />
-
-          {/* <div className="profile-settings-item"> */}
-            <div className='profile-setting-value'>
+            <div className='profile-setting-value text-base md:text-lg'>
               {user.user.bio}
             </div>
-          {/* </div> */}
+          </>
+          )}
         </div>
       </div>
 
@@ -78,12 +85,12 @@ const PublicProfile = () => {
         
         <div className="profile-settings-item">
           
-          <div className='profile-setting-label'>
+          <div className='profile-setting-label mb-2'>
             Likes:
           </div>
 
           <div className='profile-setting-value'>
-            <ul className="max-w-xl mx-auto columns-1 sm:columns-1 md:columns-2 lg:columns-3 space-y-2">
+            <ul className="max-w-xl grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-3 gap-y-1">
               {user.categories
                 .filter(item => item.love) // Show likes only
                 .sort((a, b) => a.name.localeCompare(b.name)) // Sort items alphabetically
@@ -108,12 +115,12 @@ const PublicProfile = () => {
         <hr />
 
         <div className="profile-settings-item">
-          <div className='profile-setting-label'>
+          <div className='profile-setting-label mb-2'>
             Dislikes:
           </div>
 
           <div className='profile-setting-value'>
-            <ul className="max-w-xl mx-auto columns-1 sm:columns-1 md:columns-2 lg:columns-3 space-y-2">
+            <ul className="max-w-xl grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-3 gap-y-1">
               {user.categories
                 .filter(item => !item.love) // Show dislikes only
                 .sort((a, b) => a.name.localeCompare(b.name)) // Sort items alphabetically

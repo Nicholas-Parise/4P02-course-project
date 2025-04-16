@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Container,
   Box,
   Typography,
   TextField,
@@ -69,10 +68,20 @@ export default function ForgotPasswordPage() {
     }
   };
 
-  return (
+  const style = {
+    background: '#FFFFFF',
+    border: '1px solid #5651E5',
+    fontFamily: 'Arial, Helvetica, sans-serif',
+    margin: '50px auto',
+    padding: '50px',
+    borderRadius: '10px',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
+    textAlign: 'center',
+    maxWidth: '500px',
+  }
 
-    
-    <Container maxWidth="sm">
+  return (
+    <section style={style}>
 
       <Snackbar
         open={openSuccessMessage}
@@ -85,7 +94,8 @@ export default function ForgotPasswordPage() {
         </Alert>
       </Snackbar>
 
-      <Box sx={{ mt: 8, p: 4, boxShadow: 3, borderRadius: 2 }}>
+      <Box>
+        
         <Typography variant="h5" gutterBottom>
           Forgot your password?
         </Typography>
@@ -109,13 +119,37 @@ export default function ForgotPasswordPage() {
               onChange={(e) => setEmail(e.target.value)}
               error={!!error}
               helperText={error}
+              sx={{
+                '& label.Mui-focused': {
+                  color: '#5651e5',
+                },
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#5651e5',
+                  },
+                },
+                mb: 2,
+              }}
             />
-            <Button variant="contained" fullWidth type="submit" sx={{ mt: 2 }}>
+            <Button 
+              variant="contained" 
+              fullWidth type="submit" 
+              sx={{
+                mt: 2,
+                background: 'linear-gradient(to right, #8d8aee, #5651e5)',
+                color: 'white',
+                borderRadius: '8px',
+                transition: 'background 0.3s ease',
+                padding: '12px',
+                fontSize: '1rem',
+                '&:hover': { background: 'linear-gradient(to right, #5651e5, #343188)' }
+              }}
+            >
               Send Reset Link
             </Button>
           </form>
         )}
       </Box>
-    </Container>
+    </section>
   );
 }
