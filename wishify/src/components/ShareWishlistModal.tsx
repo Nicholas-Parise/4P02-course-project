@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react"
-import { Modal, Button, TextField, Typography, Box, Divider } from '@mui/material'
+import { Modal, Button, TextField, Typography, Box, Divider, Tooltip } from '@mui/material'
 
 interface Props{
     wishlistID: number,
@@ -12,9 +12,12 @@ interface Props{
 const ShareWishlistModal = ({ wishlistID, isOwner, shareToken, isOpen, setIsOpen }: Props) => {
     const [inputEmail, setInputEmail] = useState("")
     const token = localStorage.getItem('token') || ''
+
+    const [isTooltipOpen, setIsToolTipOpen] = useState<boolean>(false)
   
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault()
+
         fetch(`https://api.wishify.ca/wishlists/share`, {
             method: 'post',
             headers: new Headers({
@@ -39,6 +42,7 @@ const ShareWishlistModal = ({ wishlistID, isOwner, shareToken, isOpen, setIsOpen
             })
             .finally(() => {
               setIsOpen(false)
+              setInputEmail("")
             })     
     }
 
@@ -67,8 +71,15 @@ const ShareWishlistModal = ({ wishlistID, isOwner, shareToken, isOpen, setIsOpen
           </Typography>
 
           <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+          <Tooltip
+            title="Copied!"
+            onClose={() => setIsToolTipOpen(false)}
+            open={isTooltipOpen}
+            arrow
+            placement="left"
+          >
             <Button
-                onClick={() => navigator.clipboard.writeText(`https://wishify.ca/wishlists/share/${shareToken}`)}
+                onClick={() => (setIsToolTipOpen(true), navigator.clipboard.writeText(`https://wishify.ca/wishlists/share/${shareToken}`))}
                 variant="contained"
                 type="submit"
                 sx={{
@@ -79,7 +90,8 @@ const ShareWishlistModal = ({ wishlistID, isOwner, shareToken, isOpen, setIsOpen
                 }>
                 Copy Link
             </Button>
-          </Box>
+          </Tooltip>
+        </Box>
           
   
           { isOwner && 
@@ -103,7 +115,7 @@ const ShareWishlistModal = ({ wishlistID, isOwner, shareToken, isOpen, setIsOpen
                 />
         
                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
-                    <Button
+                  <Button
                     variant="contained"
                     type="submit"
                     sx={{
@@ -112,16 +124,16 @@ const ShareWishlistModal = ({ wishlistID, isOwner, shareToken, isOpen, setIsOpen
                         borderRadius: '25px',
                         '&:hover': { background: 'linear-gradient(to right, #5651e5, #343188)' }
                     }}
-                    >
+                  >
                     Share
-                    </Button>
-                    <Button
-                    variant="outlined"
-                    onClick={() => {setIsOpen(false)}}
-                    sx={{ borderRadius: '25px', borderColor: '#5651e5', color: '#5651e5', ml: '8px' }}
-                    >
+                  </Button>
+                  <Button
+                  variant="outlined"
+                  onClick={() => {setIsOpen(false)}}
+                  sx={{ borderRadius: '25px', borderColor: '#5651e5', color: '#5651e5', ml: '8px' }}
+                  >
                     Close
-                    </Button>
+                  </Button>
                 </Box>
                 </form>
             </>

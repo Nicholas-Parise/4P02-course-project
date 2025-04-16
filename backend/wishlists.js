@@ -51,6 +51,20 @@ router.post('/', authenticate, async (req, res, next) => {
       return res.status(400).json({ error: "name is required" });
     }
 
+    // Get number of created wishlists, and user pro status
+    const proPrevent = await db.query(
+      `SELECT 
+      (SELECT COUNT(*) FROM wishlists WHERE creator_id = $1) AS count,
+      (SELECT pro FROM users WHERE id = $1) AS pro;`,
+      [user_id]
+    );
+
+    console.log(proPrevent);
+    if (!proPrevent.rows[0].pro && proPrevent.rows[0].count > 2) {
+      return res.status(403).json({ error: "you must be pro to make more than 3 wishlists" });
+    }
+
+
     // make sure name is unique with a user
     // this query gets the most recently created wishlist with a name like the one provided
     const checkNames = await db.query(
@@ -842,7 +856,7 @@ router.post('/share', authenticate, async (req, res) => {
       `, [userId]);
 
     const fromUser = fromUserResult.rows[0].displayname;
-    
+
     // if the user has an account add them as a member
     if (userCheck.rows.length > 0) {
       // User exists, add them as a wishlist member

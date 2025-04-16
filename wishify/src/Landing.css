@@ -545,7 +545,7 @@
   
 .feature-item {
     margin-bottom: 1rem;
-    padding-left: 1.5rem;
+    padding-left: 3rem;
     position: relative;
     color: #555;
 }
@@ -664,13 +664,16 @@
     .footer .social {
         padding: 0 10%;
     }
+
+    .footer{
+        padding-bottom: 50px;
+    }
     
     .footer .icon {
         font-size: 1.5rem;
     }
 }
 
-/* Responsive adjustments for cards */
 @media (min-width: 1400px) {
     .card-wrapper {
         grid-template-columns: repeat(4, 1fr);
@@ -691,154 +694,4 @@
     .card-container {
         max-width: 100%;
     }
-}
-
-/* Payment Modal Styles */
-.payment-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-  
-.payment-modal {
-    background: white;
-    border-radius: 15px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-}
-  
-.payment-modal-header {
-    background: linear-gradient(135deg, #5651e5 0%, #6b66ff 100%);
-    color: white;
-    padding: 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-  
-.payment-modal-header h3 {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 600;
-}
-  
-.payment-modal-close {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-  
-.payment-modal-close:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: rotate(90deg);
-}
-  
-.payment-form {
-    padding: 2rem;
-}
-  
-.form-group {
-    margin-bottom: 1.5rem;
-}
-  
-.form-group label {
-    display: block;
-    margin-bottom: 0.75rem;
-    font-weight: 500;
-    color: #5651e5;
-    font-size: 0.95rem;
-}
-  
-.form-group input {
-    width: 100%;
-    padding: 1rem;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background-color: #f9f9ff;
-}
-  
-.form-group input:focus {
-    outline: none;
-    border-color: #5651e5;
-    box-shadow: 0 0 0 3px rgba(86, 81, 229, 0.2);
-}
-  
-.form-row {
-    display: flex;
-    gap: 1.5rem;
-}
-  
-.form-row .form-group {
-    flex: 1;
-}
-  
-.payment-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 2rem;
-}
-  
-.payment-submit {
-    background: linear-gradient(135deg, #5651e5 0%, #6b66ff 100%);
-    color: white;
-    border: none;
-    padding: 1rem 2rem;
-    border-radius: 50px;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-  
-.payment-submit:hover {
-    background: linear-gradient(135deg, #453fce 0%, #5a55e8 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(86, 81, 229, 0.3);
-}
-  
-.payment-submit:disabled {
-    background: #cccccc;
-    transform: none;
-    box-shadow: none;
-    cursor: not-allowed;
-}
-  
-.payment-cancel {
-    background: transparent;
-    color: #5651e5;
-    border: 2px solid #5651e5;
-    padding: 1rem 2rem;
-    border-radius: 50px;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-  
-.payment-cancel:hover {
-    background: rgba(86, 81, 229, 0.1);
 }

@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink } from "react-router-dom";
-import { AiFillGift, AiOutlinePlus, AiOutlineUser, AiFillQuestionCircle, AiOutlineMenu, AiOutlineClose } from 'react-icons/ai';
-import { Wishlist } from '../types/types';
-import { WishlistItem } from '../types/types';
+import { AiFillGift, AiOutlinePlus, AiOutlineUser, AiFillQuestionCircle, AiOutlineMenu, AiOutlineClose, AiFillBell } from 'react-icons/ai';
+import { User, Wishlist, Notification, WishlistItem } from '../types/types';
 import CreateItemDialog from './CreateItemDialog';
 import ProfileMenu from './ProfileMenu';
 import HelpMenu from './HelpMenu';
 import '../components/landingheader.css';
+import { toast } from "sonner"
+import { IconButton } from '@mui/material';
 
 const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLoggedIn: (val: boolean)=>void, page: string }) => {
   interface NavItem {
@@ -31,6 +32,109 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth > 900);
+  const [notifications, setNotifications] = useState<Notification[]>([])
+  const [openedNotificationAlert, setOpenedNotificationAlert] = useState<boolean>(false)
+
+  useEffect(() => {
+    const getNotifications = () => {
+      let status_code = -1
+      const notificationsURL = `https://api.wishify.ca/notifications`
+      fetch(notificationsURL, {
+        method: 'get',
+        headers: new Headers({
+          'Authorization': "Bearer "+token
+        })
+      })
+      .then((response) => {
+        status_code = response.status
+        return response.json();
+      })
+      .then((data) => {
+        if(status_code == 404) return
+        console.log(data)
+        setNotifications(data.reverse());
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+    }
+    getNotifications()
+
+    const interval = setInterval(() => {
+      getNotifications()
+    },25*1000); // 25 second notification refresh
+    return () => clearInterval(interval);
+  }, [])
+
+  const deleteNotification = (id: number) => {
+    // send delete request
+    fetch(`https://api.wishify.ca/notifications/${id}`, {
+      method: 'delete',
+      headers: new Headers({
+        'Authorization': "Bearer "+token
+      })
+      })
+      .then((response) => {
+        return response.json();
+      })
+      .then(() => {
+        // remove from array
+        const newNotifications = notifications.filter(notif => notif.id !== id)
+        setNotifications(newNotifications)
+      })
+      .catch((error) => {
+        console.log("Failed to delete notification\n" + error)
+      })
+  }
+
+  useEffect(() => {
+    if(openedNotificationAlert || !profile?.notifications) return // existing alert
+
+    const readNotifications = () => {
+      notifications.filter(n => !n.is_read).forEach(n => {
+        fetch(`https://api.wishify.ca/notifications/${n.id}`, {
+          method: 'put',
+          headers: new Headers({
+            'Authorization': "Bearer "+token,
+            'Content-Type': 'application/json'
+          }),
+          body: JSON.stringify({
+            "is_read": true,
+          })
+          })
+          .catch((error) => {
+            console.log("Failed to set notification as read\n" + error)
+          })
+      })
+    }
+
+    const newNotifications = notifications.filter(n => !n.is_read)
+    let num = newNotifications.length
+
+    if(num == 0 || openedNotificationAlert) return // no new notifications or the alert is already opened
+
+    setOpenedNotificationAlert(true)
+    toast.custom(t => (
+      <div className='notification-toast' onClick={() => (setIsProfileMenuOpen(true), setOpenedNotificationAlert(false), readNotifications(), toast.dismiss(t))}>
+        <AiFillBell className='mr-1 text-[#5651e5]' size={28} />
+        {num == 1 ? "You have a new notification!" : "You have new notifications!"}
+        <IconButton sx={{marginLeft: 2}} onClick={(e) => (e.stopPropagation(), setOpenedNotificationAlert(false), readNotifications(), toast.dismiss(t))}>
+          <AiOutlineClose size={18} />
+        </IconButton>
+      </div>
+    ),{
+      onDismiss: () => {
+        setOpenedNotificationAlert(false)
+        readNotifications()
+      },
+      onAutoClose: () => {
+        setOpenedNotificationAlert(false)
+        readNotifications()
+      },
+      duration: Number.POSITIVE_INFINITY,
+    })
+    
+  }, [notifications])
 
   const fetchWishlists = () => {
     const token = localStorage.getItem('token') || '';
@@ -59,10 +163,8 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
     return { wishlists, loading, error };
   };
 
-  const [displayName, setDisplayName] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [pro, setPro] = useState<boolean>(false);
-  
+  const [profile, setProfile] = useState<User>();
+
   useEffect(() => {
     setToken(localStorage.getItem('token') || '')
     console.log(token)
@@ -74,18 +176,12 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
       })
         .then((response) => response.json())
         .then((data) => {
-          setDisplayName(data.user.displayname)
-          setEmail(data.user.email)
-          setPro(data.user.pro)
+          setProfile(data.user)
           console.log(data)
-          //setLoading(false)
         })
         .catch((error) => {
-          //setError(error)
-          //setLoading(false)
           console.log(error)
         })
-        //.finally(() => setLoading(false))
   }, [token, isLoggedIn]);
 
   
@@ -130,10 +226,13 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
                 {isHelpMenuOpen && <HelpMenu closeMenu={() => setIsHelpMenuOpen(false)} />}
                 
                 <AiOutlineUser className="text-2xl cursor-pointer" onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)} />
-                {isProfileMenuOpen && <ProfileMenu 
+                {profile && isProfileMenuOpen && <ProfileMenu 
                       logOut={() => {setIsLoggedIn(false); localStorage.removeItem("token")}}
                       closeMenu={() => setIsProfileMenuOpen(false)} 
-                      profile={{displayName, email,pro}}
+                      profile={profile}
+                      token={token}
+                      notifications={notifications}
+                      deleteNotification={deleteNotification}
                       />}
 
                 <div className='mobile-menu-button' onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
@@ -165,10 +264,13 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
                   <div className="relative desktop-profile-icon">
                     <AiOutlineUser className="text-2xl cursor-pointer" onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)} />
                     
-                    {isProfileMenuOpen && <ProfileMenu 
+                    {profile && isProfileMenuOpen && <ProfileMenu 
                       logOut={() => {setIsLoggedIn(false); localStorage.removeItem("token")}}
                       closeMenu={() => setIsProfileMenuOpen(false)} 
-                      profile={{displayName, email,pro}}
+                      profile={profile}
+                      token={token}
+                      notifications={notifications}
+                      deleteNotification={deleteNotification}
                       />}
                   </div>
                   
