@@ -17,12 +17,12 @@ import pictureTech from '/assets/tech.jpg';
 
 // Predefined gallery of images for wishlists
 const galleryImages = [
-  { id: 1, src: pictureClothing, alt: "Sports theme" },
-  { id: 2, src: pictureGames, alt: "Clothing theme" },
+  { id: 1, src: pictureClothing, alt: "Clothing theme" },
+  { id: 2, src: pictureGames, alt: "Game theme" },
   { id: 3, src: pictureGift, alt: "Holiday theme" },
-  { id: 4, src: pictureGiftbox, alt: "Sports theme" },
-  { id: 5, src: pictureGroceries, alt: "Home decor theme" },
-  { id: 6, src: pictureSports, alt: "Travel theme" },
+  { id: 4, src: pictureGiftbox, alt: "Gift theme" },
+  { id: 5, src: pictureGroceries, alt: "Grocery theme" },
+  { id: 6, src: pictureSports, alt: "Sports theme" },
   { id: 7, src: pictureTech, alt: "Technology theme" },
 ]
 

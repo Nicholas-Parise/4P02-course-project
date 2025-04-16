@@ -329,7 +329,7 @@ const [contributions, setContributions] = useState([])
           newContributions = newContributions.map((contribution) => ({
             ...contribution,
             wishlist_name:
-              contribution.wishlist_name ||
+              contribution.wishlists_name ||
               wishlists.find((wishlist) => wishlist.id === contribution.wishlists_id)?.name ||
               "Unknown",
           }));

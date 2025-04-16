@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import styled from "@emotion/styled";
 import {FaCrown} from 'react-icons/fa';
+import { useRef, useEffect } from "react";
 
 
 const WishlistButton = styled.button`
@@ -115,8 +116,9 @@ const createStyledIcon = (IconComponent: any) => styled(IconComponent)`
 
 const OwnerText = styled.p`
     position: absolute;
-    right: 20px;
-    top: 10px;
+    font-size: 1.2rem;
+    left: 4px;
+    top: 4px;
 `
 
 const Crown = createStyledIcon(FaCrown);
@@ -153,6 +155,7 @@ const OverlayTitle = styled.p`
 
 export const WishlistThumbnail = (props: any) => {
     const WishlistOverlayMenu = () => {
+        
         return (
             <WishlistMenu onMouseLeave={props.toggleActive}>
                 <p style={{margin: "4px", paddingLeft:"10px"}}>Creator: {props.owner}</p>
@@ -171,24 +174,35 @@ export const WishlistThumbnail = (props: any) => {
         navigate(path);
     }
 
-    if(props.role == "contributor"){
-        return(
-        <WishlistButton onClick={openWishlist}><OwnerText style={{fontSize: "small"}}>Creator: {props.owner}</OwnerText>{props.title}</WishlistButton>
-        )
-    } else{
-        return(
+    if(props.isOwner){
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+        if (isTouchDevice) {
+            return (
+                <>
+                {props.active == props.title ? <WishlistOverlayMenu></WishlistOverlayMenu> : <WishlistButton onClick={props.toggleActive}>{props.title}<Crown></Crown></WishlistButton>}
+                </>
+            );
+        }
+
+        return (
             <>
-                {props.active == props.title ? <WishlistOverlayMenu></WishlistOverlayMenu> : <WishlistButton onMouseEnter={props.toggleActive}>{props.title}{props.isOwner? <Crown></Crown> : null}</WishlistButton>}
+            {props.active == props.title ? <WishlistOverlayMenu></WishlistOverlayMenu> : <WishlistButton onMouseEnter={props.toggleActive}>{props.title}<Crown></Crown></WishlistButton>}
             </>
+        );
+    } else {
+        return(
+            <WishlistButton onClick={openWishlist}><OwnerText>Creator: {props.owner}</OwnerText>{props.title}</WishlistButton>
         )
     }
 }
 
 export const EventThumbnail = (props: any) => {
     const EventOverlayMenu = () => {
+        
         return (
             <EventMenu onMouseLeave={props.toggleActive}>
-                <p style={{margin: "4px"}}>Creator: {props.owner}</p>
+                <p style={{margin: "4px", paddingLeft:"10px"}}>Creator: {props.owner}</p>
                 <OverlayTitle title={props.title}>{props.title}</OverlayTitle>
                 <MenuButton onClick={openEvent}>Open</MenuButton>
                 <MenuButton onClick={props.edit}>Edit</MenuButton>
@@ -203,15 +217,25 @@ export const EventThumbnail = (props: any) => {
         navigate(path);
     }
 
-    if(props.role == "contributor"){
-        return(
-        <EventButton onClick={openEvent}><OwnerText style={{fontSize: "small"}}>Creator: {props.owner}</OwnerText>{props.title}</EventButton>
-        )
-    } else{
-        return(
+    if(props.isOwner){
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+        if (isTouchDevice) {
+            return (
+                <>
+                {props.active == props.title ? <EventOverlayMenu></EventOverlayMenu> : <EventButton onClick={props.toggleActive}>{props.title}<Crown></Crown></EventButton>}
+                </>
+            );
+        }
+
+        return (
             <>
-                {props.active == props.title ? <EventOverlayMenu></EventOverlayMenu> : <EventButton onMouseEnter={props.toggleActive}>{props.title}</EventButton>}
+            {props.active == props.title ? <EventOverlayMenu></EventOverlayMenu> : <EventButton onMouseEnter={props.toggleActive}>{props.title}<Crown></Crown></EventButton>}
             </>
+        );
+    } else {
+        return(
+            <EventButton onClick={openEvent}><OwnerText>Creator: {props.owner}</OwnerText>{props.title}</EventButton>
         )
     }
 }
