@@ -278,7 +278,7 @@ const Wishlists = () => {
       <h1>My Wishlists</h1>
       <WishlistContainer>
         { !pro && wishlists.length >= 3 ? 
-          <CreateWishlist disabled={true} addThumbnail={handleModalOpen}>Upgrade to pro to create more wishlists</CreateWishlist> :
+          <CreateWishlist disabled={true} addThumbnail={redirectToUpgrade}>Upgrade to pro to create more wishlists</CreateWishlist> :
         <CreateWishlist addThumbnail={handleModalOpen}>Create a Wishlist</CreateWishlist>
         }
 
@@ -293,6 +293,7 @@ const Wishlists = () => {
             duplicate={handleDuplicate}
             share={handleShare}
             owner={wishlist.creator_displayname || "None"}
+            isOwner = {wishlist.owner}
           />
         ))}
       </WishlistContainer>

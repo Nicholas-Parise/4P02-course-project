@@ -87,8 +87,9 @@ const createStyledIcon = (IconComponent: any) => styled(IconComponent)`
 
 const OwnerText = styled.p`
     position: absolute;
-    right: 20px;
-    top: 10px;
+
+    left: 4px;
+    top: 4px;
 `
 
 const Crown = createStyledIcon(FaCrown);
@@ -132,15 +133,15 @@ export const WishlistThumbnail = (props: any) => {
         navigate(path);
     }
 
-    if(props.role == "contributor"){
-        return(
-        <WishlistButton onClick={openWishlist}><OwnerText style={{fontSize: "small"}}>Owner: {props.owner}</OwnerText>{props.title}</WishlistButton>
-        )
-    } else{
+    if(props.isOwner){
         return(
             <>
-                {props.active == props.title ? <WishlistOverlayMenu></WishlistOverlayMenu> : <WishlistButton onMouseEnter={props.toggleActive}>{props.title}{props.isOwner? <Crown></Crown> : null}</WishlistButton>}
+                {props.active == props.title ? <WishlistOverlayMenu></WishlistOverlayMenu> : <WishlistButton onMouseEnter={props.toggleActive}>{props.title}</WishlistButton>}
             </>
+        )
+    } else {
+        return(
+            <WishlistButton onClick={openWishlist}><OwnerText>Creator: {props.owner}</OwnerText>{props.title}</WishlistButton>
         )
     }
 }
@@ -163,16 +164,16 @@ export const EventThumbnail = (props: any) => {
         let path = "/events/" + props.id;
         navigate(path);
     }
-
-    if(props.role == "contributor"){
-        return(
-        <EventButton onClick={openEvent}><OwnerText style={{fontSize: "small"}}>Owner: {props.owner}</OwnerText>{props.title}</EventButton>
-        )
-    } else{
+    console.log(props.isOwner)
+    if(props.isOwner){
         return(
             <>
-                {props.active == props.title ? <EventOverlayMenu></EventOverlayMenu> : <EventButton onMouseEnter={props.toggleActive}>{props.title}</EventButton>}
+                {props.active == props.title ? <EventOverlayMenu></EventOverlayMenu> : <EventButton onMouseEnter={props.toggleActive}><OwnerText>Creator: {props.owner}</OwnerText>{props.title}</EventButton>}
             </>
+        )
+    } else {
+        return(
+            <EventButton onClick={openEvent}><OwnerText>Creator: {props.owner}</OwnerText>{props.title}</EventButton>
         )
     }
 }

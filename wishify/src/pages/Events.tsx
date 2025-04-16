@@ -3,6 +3,7 @@ import { type Event } from '../types/types'
 import {CreateEvent} from '../components/CreateButton'
 import {EventThumbnail} from '../components/Thumbnail'
 import Loading from '../components/Loading'
+import CreateEventModal from '../components/CreateEventModal'
 
 import styled from '@emotion/styled'
 import ModalBox from '@mui/material/Box';
@@ -12,6 +13,7 @@ import TextField from '@mui/material/TextField';
 import Modal from '@mui/material/Modal';
 import FormControl from "@mui/material/FormControl";
 import ShareEventModal from '../components/ShareEventModal'
+
 
 const boxStyle = {
   position: 'absolute',
@@ -43,7 +45,7 @@ const Events = () => {
   const [loading, setLoading] = useState(true)
 
   // pulling all events from the backend and storing in events state
-useEffect(() => {
+  useEffect(() => {
     const fetchData = async () => {
       setToken(localStorage.getItem('token') || '');
       console.log(token);
@@ -99,9 +101,10 @@ useEffect(() => {
   const [newEventTitle, setNewEventTitle] = useState('');
   const [activeOverlay, setActiveOverlay] = useState<string>("");
   const [modalOpen, setModalOpen] = React.useState(false);
-  const handleModalOpen = () => setModalOpen(true);
+  const [createEventModalOpen, setCreateEventModalOpen] = React.useState(false);
+  const handleModalOpen = () => setCreateEventModalOpen(true);
   const handleModalClose = () => {
-    setModalOpen(false);
+    setCreateEventModalOpen(false);
     setErrorMessage('');
   }
   const [editOpen, setEditOpen] = React.useState(false);
@@ -318,6 +321,7 @@ useEffect(() => {
               edit={handleEditOpen}
               share={handleShare}
               owner={"Me"}
+              isOwner={event.owner}
             />
           ))
         }
@@ -343,6 +347,7 @@ useEffect(() => {
             edit={handleEditOpen}
             share={handleShare}
             owner={event.creator_displayname || "None"}
+            isOwner={event.owner}
           />
         ))}
       </EventContainer>
@@ -422,7 +427,14 @@ useEffect(() => {
           </ModalBox>
         </Modal>
       </ModalBox>
-      </Modal>
+      </Modal>      
+      <CreateEventModal 
+        open={createEventModalOpen}
+        setOpen={setCreateEventModalOpen}
+        events={events}
+        setEvents={setEvents}
+        token={token}
+      />
     </section>
   )
 }

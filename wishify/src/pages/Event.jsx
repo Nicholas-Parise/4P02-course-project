@@ -4,7 +4,6 @@ import { EditText, EditTextarea } from 'react-edit-text';
 import { useParams } from 'react-router-dom';
 import 'react-edit-text/dist/index.css';
 import { FaPeopleGroup, FaShare } from 'react-icons/fa6';
-import banner from "../assets/bday-banner.jpg";
 import {WishlistThumbnail} from '../components/Thumbnail';
 import {CreateWishlist} from '../components/CreateButton';
 import ShareWishlistModal from '../components/ShareWishlistModal';
@@ -33,8 +32,7 @@ const EventSection = styled.section`
 `;
 
 const EventImage = styled.img`
-  grid-column: 1 / -1;
-  display: block;
+  grid-column: 1 / 3;
   width: 100%;
   height: 180px;
   object-fit: cover;
@@ -130,7 +128,6 @@ const Event = () => {
   const [event, setEvent] = useState({
     name: '',
     description: '',
-    deadline: '',
     addr: '',
     city: '',
   });
@@ -140,7 +137,7 @@ const Event = () => {
   const [eventMembers, setEventMembers] = useState([])
   const [saving, setSaving] = useState(false);
   const [rsvpAlert, setRsvpAlert] = useState(false);
-  const [owner, setOwner] = useState(false)
+  const [owner, setOwner] = useState(false);
 
   const [activeOverlay, setActiveOverlay] = useState("");
   const [modalOpen, setModalOpen] = React.useState(false);
@@ -189,13 +186,17 @@ const Event = () => {
         const fetchedEvent = {
           name: eventData.name || '',
           description: eventData.description || '',
-          deadline: eventData.deadline || '',
+          deadline: eventData.deadline || 'null',
           addr: eventData.addr || '',
           city: eventData.city || '',
           share_token: eventData.share_token || '',
           owner: eventData.owner || false,
+          image: eventData.image || '/assets/generic.jpg',
         };
+        console.log("Event Data")
+        console.log(data)
         setEvent(fetchedEvent);
+        setOwner(eventData.owner || false);
         setOriginalEvent(fetchedEvent);
         setWishlists(data.wishlists || []);
         setEventMembers(data.members)
@@ -293,6 +294,10 @@ const Event = () => {
   }, [event, originalEvent]);
 
   const handleChange = (e) => {
+    if (!e.target.value){
+      setEvent({ ...event, deadline: "null" });
+      return;
+    }
     const localDate = new Date(e.target.value);
     setEvent({ ...event, deadline: localDate.toISOString() });
   };
@@ -518,7 +523,7 @@ const Event = () => {
   return (
   <>
     <EventSection>
-      <EventImage src={banner} alt="Event banner" />
+      <EventImage src={event.image} alt="Event banner" />
       
       <FloatingActions>
         <ActionButton onClick={() => setIsMemberDialogOpen(true)}>
@@ -532,57 +537,109 @@ const Event = () => {
       </FloatingActions>
       
       <Content>
-        <EditText
-          name="name"
-          style={{ 
+        {event.owner ? (
+          <EditText
+            name="name"
+            style={{ 
+              fontSize: '30px',
+              fontWeight: 'bold',
+              color: '#5651e5',
+              padding: '8px 0',
+              justifyContent: 'center',
+              textAlign: 'center',
+
+            }}
+            value={event.name}
+            onChange={(e) => setEvent({ ...event, name: e.target.value })}
+            onBlur={saveEvent}
+          />
+        ) : (
+          <h1 style={{
             fontSize: '30px',
             fontWeight: 'bold',
             color: '#5651e5',
             padding: '8px 0',
             justifyContent: 'center',
             textAlign: 'center',
-
-          }}
-          value={event.name}
-          onChange={(e) => setEvent({ ...event, name: e.target.value })}
-          onBlur={saveEvent}
-        />
-        
-        <DescriptionTextarea
-          value={event.description}
-          onChange={(e) => setEvent({ ...event, description: e.target.value })}
-          onBlur={saveEvent}
-          rows={4}
-        />
+          }}>{event.name}</h1>
+        )}
+        {event.owner ? (        
+          <DescriptionTextarea
+            value={event.description}
+            onChange={(e) => setEvent({ ...event, description: e.target.value })}
+            onBlur={saveEvent}
+            rows={4}
+          />) : (event.description && (
+          <p style={{
+            resize: "none",
+            marginBottom: "10px",
+            height: "100px !important",
+            borderRadius: "8px",
+            fontSize: "20px",
+            width: "100%"
+          }}>{event.description}</p>)
+        )}
         
         <DetailsContainer>
-          <DetailItem>
-            <label style={{ fontWeight: 'bold', color: '#5651e5' }}>Date</label>
-            <input
-              type="datetime-local"
-              value={formatDateForInput(event.deadline)}
-              onChange={handleChange}
-              onBlur={saveEvent}
-              style={{
-                width: '100%',
-                padding: '8px',
-                borderRadius: '8px'
-              }}
-            />
-          </DetailItem>
-          
-          <DetailItem>
-            <label style={{ fontWeight: 'bold', color: '#5651e5' }}>Address</label>
-            <EditText
-              name="address"
-              value={event.addr}
-              onChange={(e) => setEvent({ ...event, addr: e.target.value })}
-              onBlur={saveEvent}
-              label="Enter Address"
-              style={{ width: '100%', height: '100%' }}
-            />
-          </DetailItem>
-          
+          {event.owner ? 
+            (
+            <DetailItem>
+              <label style={{ fontWeight: 'bold', color: '#5651e5' }}>Date</label>
+              <input
+                type="datetime-local"
+                value={formatDateForInput(event.deadline)}
+                onChange={handleChange}
+                onBlur={saveEvent}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  borderRadius: '8px'
+                }}
+              />
+            </DetailItem>
+            ) : ( event.deadline !== "null" && (
+              <DetailItem>
+              <label style={{ fontWeight: 'bold', color: '#5651e5' }}>Date</label>
+              <p style={{
+                resize: "none",
+                marginBottom: "10px",
+                height: "100px !important",
+                borderRadius: "8px",
+                fontSize: "20px",
+                width: "100%"
+              }}>{new Date(event.deadline).toLocaleString()}</p>
+            </DetailItem>
+            ))
+          }
+          {event.owner ?
+            (
+            <DetailItem>
+              <label style={{ fontWeight: 'bold', color: '#5651e5' }}>Address</label>
+              <EditText
+                name="address"
+                value={event.addr}
+                onChange={(e) => setEvent({ ...event, addr: e.target.value })}
+                onBlur={saveEvent}
+                label="Enter Address"
+                style={{ width: '100%', height: '100%' }}
+              />
+            </DetailItem>
+            ) : ( event.addr && (
+              <DetailItem>
+              <label style={{ fontWeight: 'bold', color: '#5651e5' }}>Address</label>
+              <p style={{
+                resize: "none",
+                marginBottom: "10px",
+                height: "100px !important",
+                borderRadius: "8px",
+                fontSize: "20px",
+                width: "100%"
+              }}>{event.addr}</p>
+            </DetailItem>
+            ))
+          }      
+          {event.owner ?
+          (
           <DetailItem>
             <label style={{ fontWeight: 'bold', color: '#5651e5' }}>City</label>
             <EditText
@@ -594,6 +651,20 @@ const Event = () => {
               style={{ width: '100%', height: '100%' }}
             />
           </DetailItem>
+          ) : ( event.city && (
+            <DetailItem>
+            <label style={{ fontWeight: 'bold', color: '#5651e5' }}>City</label>
+            <p style={{
+              resize: "none",
+              marginBottom: "10px",
+              height: "100px !important",
+              borderRadius: "8px",
+              fontSize: "20px",
+              width: "100%"
+            }}>{event.city}</p>
+          </DetailItem>
+          ))
+          }
         </DetailsContainer>
       </Content>
       
@@ -713,7 +784,7 @@ const Event = () => {
         setOpen={setIsMemberDialogOpen}
         members={eventMembers}
         userID={userID || -1}
-        isOwner={event.owner}
+        isOwner={owner}
         setOwner={setOwner}
         editMember={editMember}
         eventID={event?.id || -1}
@@ -723,7 +794,8 @@ const Event = () => {
           <ShareEventModal
           eventID={id}
           shareToken={event.share_token} 
-          isOpen={isShareModalOpen} 
+          isOpen={isShareModalOpen}
+          isOwner={event.owner}
           setIsOpen={setIsShareModalOpen}/>
         )
       }
