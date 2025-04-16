@@ -44,7 +44,7 @@ const PopularItems = ({ loading, items, bgColor="#f7f7f7", title="", subtitle=""
               <div className="item-details">
                 <h3 className="item-name">{item.name}</h3>
                 <div className="item-price-rating">
-                  <span className="item-price">{item.price}</span>
+                  <span className="item-price">${item.price.toFixed(2)}</span>
                   <span className="item-rating">
                     <FaStar className="star-icon" />
                     {item.rating}
