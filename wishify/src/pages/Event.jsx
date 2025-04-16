@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { EditText, EditTextarea } from 'react-edit-text';
 import { useParams } from 'react-router-dom';
 import 'react-edit-text/dist/index.css';
-import { FaPeopleGroup } from 'react-icons/fa6';
+import { FaPeopleGroup, FaShare } from 'react-icons/fa6';
 import banner from "../assets/bday-banner.jpg";
 import {WishlistThumbnail} from '../components/Thumbnail';
 import {CreateWishlist} from '../components/CreateButton';
@@ -26,35 +26,46 @@ import Alert from '@mui/material/Alert';
 const EventSection = styled.section`
   margin-top: 20px;
   display: grid;
-  grid-template-columns: 3fr 1fr;
-  grid-template-rows: auto 1fr;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto;
   gap: 20px;
+  position: relative;
 `;
+
 const EventImage = styled.img`
   grid-column: 1 / -1;
   display: block;
   width: 100%;
+  height: 180px;
   object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 `;
+
+const FloatingActions = styled.div`
+  position: absolute;
+  top: 10px;
+  right: 60px;
+  display: flex;
+  gap: 10px;
+  z-index: 10;
+`;
+
 const Content = styled.div`
   grid-column: 1 / 2;
 `;
-const Sidebar = styled.div`
-  grid-column: 2 / 3;
+
+const DetailsContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  padding: 10px;
+  border-radius: 12px;
+`;
+
+const DetailItem = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 10px;
-`;
-const RSVP = styled.button`
-  background: rgb(0, 0, 0);
-  color: white;
-  padding: 10px;
-  width: 100%;
-  text-align: center;
-  &:hover {
-    background: #222;
-    cursor: pointer;
-  }
 `;
 
 const WishlistContainer = styled.div`
@@ -62,7 +73,42 @@ const WishlistContainer = styled.div`
   display: flex;
   gap: 3vw;
   flex-wrap: wrap;
-`
+`;
+
+const DescriptionTextarea = styled(EditTextarea)`
+  resize: none;
+  height: 100px !important;
+  border-radius: 8px;
+  font-size: 20px;
+  width: 100%;
+  
+  &:hover {
+    border-color: #5651e5;
+    outline: none;
+  }
+`;
+
+const ActionButton = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 25px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid #5651e5;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  
+  &:hover {
+    background: #e9e9ff;
+  }
+
+  svg {
+    color: #5651e5;
+  }
+`;
 
 const boxStyle = {
   position: 'absolute',
@@ -76,6 +122,7 @@ const boxStyle = {
   boxShadow: 24,
   p: 4,
 };
+
 const Event = () => {
   const { id } = useParams();
   const [token, setToken] = useState(localStorage.getItem('token') || '');
@@ -469,98 +516,109 @@ const Event = () => {
   const [selectedWishlist, setSelectedWishlist] = useState('')
 
   return (
-    <>
-      <EventSection>
-        <EventImage src={banner}></EventImage>
-        <Content>
-          <EditText
-            name="name"
-            style={{ fontWeight: 'bold' }}
-            value={event.name}
-            onChange={(e) => setEvent({ ...event, name: e.target.value })}
-            onBlur={saveEvent} // Save on blur
-          />
-          <EditTextarea
-            value={event.description}
-            onChange={(e) => setEvent({ ...event, description: e.target.value })}
-        // Save on blur
-            style={{
-              resize: 'none',
-            }}
-            rows={12}
-            />
-          </Content>
-          <Sidebar>
-            <RSVP onClick={handleRSVP}>RSVP Now</RSVP>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '10px',
-                width: '100%',
-              }}
-            >
-              <div
-                onClick={() => setIsMemberDialogOpen(true)}
-                className="items-center flex gap-2 cursor-pointer select-none text-xs hover:bg-gray-200 bg-gray-100 p-4 rounded-[25px] border-2 border-[#5651e5]"
-              >
-                View Members
-                <FaPeopleGroup className="text-2xl text-[#5651e5]" />
-              </div>
-              <div
-                onClick={handleShare}
-                className="items-center justify-center flex gap-2 cursor-pointer select-none text-xs hover:bg-gray-200 bg-gray-100 p-4 rounded-[25px] border-2 border-[#5651e5]"
-              >
-                Share Event
-              </div>
-            </div>
-            <div>
-            <p style={{ fontWeight: 'bold' }}>Date:</p>
+  <>
+    <EventSection>
+      <EventImage src={banner} alt="Event banner" />
+      
+      <FloatingActions>
+        <ActionButton onClick={() => setIsMemberDialogOpen(true)}>
+          <FaPeopleGroup size={18} />
+          <span>View Members</span>
+        </ActionButton>
+        <ActionButton onClick={handleShare}>
+          <FaShare size={18} />
+          <span>Share Event</span>
+        </ActionButton>
+      </FloatingActions>
+      
+      <Content>
+        <EditText
+          name="name"
+          style={{ 
+            fontSize: '30px',
+            fontWeight: 'bold',
+            color: '#5651e5',
+            padding: '8px 0',
+            justifyContent: 'center',
+            textAlign: 'center',
+
+          }}
+          value={event.name}
+          onChange={(e) => setEvent({ ...event, name: e.target.value })}
+          onBlur={saveEvent}
+        />
+        
+        <DescriptionTextarea
+          value={event.description}
+          onChange={(e) => setEvent({ ...event, description: e.target.value })}
+          onBlur={saveEvent}
+          rows={4}
+        />
+        
+        <DetailsContainer>
+          <DetailItem>
+            <label style={{ fontWeight: 'bold', color: '#5651e5' }}>Date</label>
             <input
-              aria-label="Date and time"
               type="datetime-local"
               value={formatDateForInput(event.deadline)}
-              onChange={handleChange} // Update event.date on change
-              onBlur={saveEvent} // Save on blur
+              onChange={handleChange}
+              onBlur={saveEvent}
+              style={{
+                width: '100%',
+                padding: '8px',
+                borderRadius: '8px'
+              }}
             />
-          </div>
-          <div>
-            <p style={{ fontWeight: 'bold' }}>Address:</p>
+          </DetailItem>
+          
+          <DetailItem>
+            <label style={{ fontWeight: 'bold', color: '#5651e5' }}>Address</label>
             <EditText
               name="address"
               value={event.addr}
               onChange={(e) => setEvent({ ...event, addr: e.target.value })}
-              onBlur={saveEvent} // Save on blur
+              onBlur={saveEvent}
+              label="Enter Address"
+              style={{ width: '100%', height: '100%' }}
             />
-          </div>
-          <div>
-            <p style={{ fontWeight: 'bold' }}>City:</p>
+          </DetailItem>
+          
+          <DetailItem>
+            <label style={{ fontWeight: 'bold', color: '#5651e5' }}>City</label>
             <EditText
               name="city"
               value={event.city}
               onChange={(e) => setEvent({ ...event, city: e.target.value })}
-              onBlur={saveEvent} // Save on blur
+              onBlur={saveEvent}
+              label="Enter City"
+              style={{ width: '100%', height: '100%' }}
             />
-          </div>
-        </Sidebar>
-        <WishlistContainer>
-          <CreateWishlist addThumbnail={handleModalOpen}> Add a Wishlist </CreateWishlist>
-          {wishlists.map((wishlist, index) => (
-            <WishlistThumbnail 
-              active={activeOverlay} 
-              toggleActive={() => changeActiveOverlay(wishlist.name)} 
-              key={index} 
-              id={wishlist.id}
-              title={wishlist.name}
-              edit={handleEditOpen}
-              duplicate={handleDuplicate}
-              share={handleShare}
-              owner={"Me"}
-            />
-          ))}
-        </WishlistContainer>
-        {activeWishlist && activeWishlist.share_token && (
-          <ShareWishlistModal
+          </DetailItem>
+        </DetailsContainer>
+      </Content>
+      
+      <WishlistContainer>
+        <CreateWishlist addThumbnail={handleModalOpen}> 
+          Add a Wishlist 
+        </CreateWishlist>
+        
+        {wishlists.map((wishlist, index) => (
+          <WishlistThumbnail 
+            active={activeOverlay} 
+            toggleActive={() => changeActiveOverlay(wishlist.name)} 
+            key={index} 
+            id={wishlist.id}
+            title={wishlist.name}
+            edit={handleEditOpen}
+            duplicate={handleDuplicate}
+            share={handleShare}
+            owner={"Me"}
+          />
+        ))}
+      </WishlistContainer>
+
+      {activeWishlist && activeWishlist.share_token && (
+        <ShareWishlistModal
           wishlistID={activeWishlist.id}
           isOwner={activeWishlist.owner} 
           shareToken={activeWishlist.share_token} 
@@ -568,9 +626,11 @@ const Event = () => {
           setIsOpen={setIsShareModalOpen}/>
         )}
       </EventSection>
+
       {saving && (
         <p style={{ textAlign: 'center', color: 'green' }}>Saving...</p>
       )}
+
       <Modal
         open={modalOpen}
         onClose={handleModalClose}
