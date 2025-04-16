@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { IdeaItem, Wishlist } from "../types/types";
 import PopularItems from "../components/PopularItems";
 import AddIdeaModal from "../components/AddIdeaModal";
-import {Alert} from '@mui/material/';
+import { Alert, Divider } from '@mui/material';
 
 const Ideas = () => {
     const [token, setToken] = useState<string>(localStorage.getItem('token') || '')
@@ -72,18 +72,6 @@ const Ideas = () => {
         fetchData();
     }, []);
 
-
-
-    const getColor = (love: boolean | null) => {
-        if (love === null) {
-            return "#808080"; // Default color for null
-        } else if (love) {
-            return "#00FF00"; // Green for true
-        } else {
-            return "#FF0000"; // Red for false
-        }
-    };
-
     const [modalOpen, setModalOpen] = useState(false);
 
     function addItemToWishlist(wishlistId: number, quantity: number = 1) {
@@ -124,6 +112,7 @@ const Ideas = () => {
             setAddedAlert(false);
         }, 2000);
     };
+
     const handleOpenModal = (item?: IdeaItem) => {
         console.log("Open modal clicked");
         console.log(item);
@@ -135,16 +124,74 @@ const Ideas = () => {
     }
 
     return (
-        <section className="bg-white border-2 border-solid border-[#5651e5] rounded-[25px]">
-            <h1 className="text-3xl font-bold text-center text-[#5651e5]">Ideas</h1>
-            <PopularItems addButtonsEnabled={true} bgColor={"#fff"} loading={loading} title={"Trending"} items={trending} tagsEnabled={false} wishlistCountEnabled={true} onAdd={handleOpenModal}/>
-            <PopularItems addButtonsEnabled={true} bgColor={"#fff"} loading={loading} title="Recommendations - Powered by AI" items={ideas} tagsEnabled={true} wishlistCountEnabled={false} onAdd={handleOpenModal}/>
-            <AddIdeaModal open={modalOpen} onClose={handleCloseModal} wishlists={wishlists} onAdd={handleAddItem}/>
-            <Alert severity="success" sx={{ position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)', zIndex: 900, opacity: addedAlert ? 1 : 0, transition: addedAlert ? "none" : "opacity 1s ease-out"}}>
+        <section className="bg-white rounded-[25px] shadow-lg max-w-7xl border-2 border-[#5651e5]">
+
+            {/* Trending Section */}
+            <div className="mb-10">
+                <PopularItems 
+                    addButtonsEnabled={true} 
+                    bgColor={"#fff"} 
+                    loading={loading} 
+                    title={"Trending Now"} 
+                    subtitle="Most popular ideas this week"
+                    items={trending} 
+                    tagsEnabled={false} 
+                    wishlistCountEnabled={true} 
+                    onAdd={handleOpenModal}
+                />
+            </div>
+            
+            {/* Divider */}
+            <Divider 
+                sx={{ 
+                    my: 6, 
+                    borderColor: '#5651e5', 
+                    borderWidth: 1,
+                }} 
+            />
+            
+            {/* Recommendations Section */}
+            <div className="mt-10">
+                <PopularItems 
+                    addButtonsEnabled={true} 
+                    bgColor={"#fff"} 
+                    loading={loading} 
+                    title="Recommended for You - Powered by AI" 
+                    subtitle="Personalized suggestions based on your preferences"
+                    items={ideas} 
+                    tagsEnabled={true} 
+                    wishlistCountEnabled={false} 
+                    onAdd={handleOpenModal}
+                />
+            </div>
+            
+            <AddIdeaModal 
+                open={modalOpen} 
+                onClose={handleCloseModal} 
+                wishlists={wishlists} 
+                onAdd={handleAddItem}
+            />
+            
+            <Alert 
+                severity="success" 
+                sx={{ 
+                    position: 'fixed', 
+                    bottom: 20, 
+                    left: '50%', 
+                    transform: 'translateX(-50%)', 
+                    zIndex: 900, 
+                    opacity: addedAlert ? 1 : 0, 
+                    transition: addedAlert ? "none" : "opacity 1s ease-out",
+                    backgroundColor: '#5651e5',
+                    color: 'white',
+                    '& .MuiAlert-icon': {
+                        color: 'white'
+                    }
+                }}
+            >
                 Item added to wishlist!
             </Alert>
         </section>
-        
     );
 };
 
