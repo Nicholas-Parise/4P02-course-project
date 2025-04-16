@@ -52,23 +52,45 @@ const PopularItems = ({ loading, items, bgColor="#f7f7f7", title="", subtitle=""
                 </div>
               </div>
               {tagsEnabled && item.categories && item.categories.length > 0 && (
-                <ul className="flex flex-wrap items-start absolute bottom-0 left-0">
-                {item.categories.map((tag, index) => (
+                <ul className="flex flex-wrap items-start absolute bottom-0 left-0 p-2">
+                  {item.categories.map((tag, index) => (
                     <li
-                        key={index}
-                        className="text-white text-xs font-medium py-1 px-2 rounded-md mb-1 mr-1"
-                        //style={{ backgroundColor: item.gradients[index % item.gradients.length] }}
-                        style={{ backgroundColor: getColor(item.categories[index % item.categories.length].love) }}
+                      key={index}
+                      className={`text-xs font-medium py-1 px-2 rounded-md mb-1 mr-1 ${
+                        tag.love === null ? "bg-gray-500" : 
+                        tag.love ? "bg-green-600" : "bg-red-600"
+                      }`}
+                      style={{
+                        color: "white",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                        textTransform: "capitalize"
+                      }}
                     >
-                        {tag.name}
+                      {tag.name}
                     </li>
-                ))}
+                  ))}
                 </ul>
               )}
               {addButtonsEnabled && (
-              <Fab className="-top-2 -right-2" sx={{top: -2, right: -2, zIndex: 500, position: "absolute", width: "40px", height: "40px"}} onClick={() => onAdd(item)} color="primary" aria-label="add">
-                  <AddIcon />
-              </Fab>
+                <Fab 
+                  className="-top-2 -right-2" 
+                  sx={{
+                    top: -2, 
+                    right: -2, 
+                    zIndex: 500, 
+                    position: "absolute", 
+                    width: "40px", 
+                    height: "40px",
+                    backgroundColor: "#5651e5",
+                    '&:hover': {
+                      backgroundColor: "#4540d4",
+                    }
+                  }} 
+                  onClick={() => onAdd(item)} 
+                  aria-label="add"
+                >
+                  <AddIcon sx={{ color: "white" }} />
+                </Fab>
               )}            
             </div>
           ))}
