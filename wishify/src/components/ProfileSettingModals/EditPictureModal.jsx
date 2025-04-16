@@ -4,9 +4,9 @@ import {
   Button,
   Avatar,
   Stack,
+  Divider,
 } from '@mui/material'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload'
-import { data } from 'react-router-dom'
 
 const EditPictureModal = ({ onClose }) => {
   const [selectedImage, setSelectedImage] = useState(null)
@@ -73,7 +73,7 @@ const EditPictureModal = ({ onClose }) => {
       <Avatar
         src={previewUrl || '/default-avatar.png'}
         alt="Profile Picture Preview"
-        sx={{ width: 100, height: 100, mx: 'auto', mb: 2 }}
+        sx={{ width: 150, height: 150, mx: 'auto', mb: 3 }}
       />
 
       <input
@@ -102,10 +102,18 @@ const EditPictureModal = ({ onClose }) => {
           variant="contained"
           onClick={handleSubmit}
           disabled={!selectedImage}
-          sx={{ 
-            backgroundColor: '#5651e5',
-            color: 'white' ,
-            borderRadius: '25px'
+          sx={{
+            background: 'linear-gradient(to right, #8d8aee, #5651e5)',
+            color: 'white',
+            borderRadius: '25px',
+            '&:hover': { background: 'linear-gradient(to right, #5651e5, #343188)'
+            },
+            '&:disabled': {
+              background: '#ccc',
+              color: '#888',
+              cursor: 'not-allowed',
+              pointerEvents: 'auto'
+            },
           }}
         >
           Upload

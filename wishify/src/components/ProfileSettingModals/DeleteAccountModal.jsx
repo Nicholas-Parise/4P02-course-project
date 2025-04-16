@@ -47,7 +47,8 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 400,
+    width: '90%',
+    maxWidth: 500,
     bgcolor: 'background.paper',
     border: '2px solid #5651e5', // Same border style
     borderRadius: '25px',
@@ -82,7 +83,17 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
             fullWidth
             variant='outlined'
             slotProps={{ htmlInput: { maxLength: 64 } }}
-            sx={{mb: 2}}
+            sx={{
+              '& label.Mui-focused': {
+                color: '#5651e5',
+              },
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused fieldset': {
+                  borderColor: '#5651e5',
+                },
+              },
+              mb: 2,
+            }}
           />
 
           {responseMessage && (
@@ -129,7 +140,8 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
             padding: 3,
             borderRadius: 4,
             boxShadow: 24,
-            width: '400px',
+            maxWidth: '500px',
+            width: '90%',
             border: '2px solid #5651e5', // Same border style
           }}
         >
@@ -149,7 +161,17 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder='Type DELETE here'
-            sx={{ mb: 2 }}
+            sx={{
+              '& label.Mui-focused': {
+                color: '#5651e5',
+              },
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused fieldset': {
+                  borderColor: '#5651e5',
+                },
+              },
+              mb: 2,
+            }}
           />
             
           <Divider sx={{ mb: 2 }} />

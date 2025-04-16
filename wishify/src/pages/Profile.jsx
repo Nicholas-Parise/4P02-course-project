@@ -19,7 +19,8 @@ import {
   CircularProgress, 
   Typography, 
   Snackbar, 
-  Alert 
+  Alert, 
+  Divider
 } from '@mui/material'
 
 const Profile = () => {
@@ -30,6 +31,7 @@ const Profile = () => {
     displayName: '',
     bio: '',
     picture: '',
+    pro: false,
     likes: []
   })
 
@@ -64,7 +66,8 @@ const Profile = () => {
           displayName: data.user.displayname,
           bio: data.user.bio === null ? '' : data.user.bio,
           picture: data.user.picture,
-          likes: data.categories
+          pro: data.user.pro,
+          likes: data.categories,
         })
       }
       else if (response.status === 404) {
@@ -365,8 +368,8 @@ const Profile = () => {
 
       <h1>Profile settings</h1>
 
-      <div className="profile-header">
-        <div className="profile-picture">
+      <div className="profile-header flex flex-col sm:flex-row gap-[10px]">
+        <div className="profile-picture w-full mb-[20px] sm:mb-0  sm:w-[25%]">
           <img
             src={
               user.picture
@@ -376,13 +379,18 @@ const Profile = () => {
           <button style={{color: "#5651e5"}} onClick={() => handleOpenModal('picture')}>Update Picture</button>
         </div>
 
-        <div className="profile-header-fields">
+        <hr className="block sm:hidden" />
+
+        <div className="profile-header-fields flex flex-col flex-[1] gap-[10px] sm:flex-[5]">
           <SettingsItem
             label="Display Name:"
             values={user.displayName}
+            isPro={user.pro}
             buttonText={'Edit'}
             onEdit={() => handleOpenModal('displayName')}
           />
+
+          <hr />
 
           <SettingsItem
             label="Email:"
@@ -403,6 +411,8 @@ const Profile = () => {
           onEdit={() => handleOpenModal("bio")}
         />
 
+        <hr />
+
         <LikesSettingsItem
           label="Likes:"
           values={user.likes}
@@ -417,7 +427,7 @@ const Profile = () => {
           onDelete={handleDeleteLikes}
         />
 
-        <div className="button-container">
+        <div className="button-container flex flex-col-reverse sm:flex-row">
             <button
               className="delete-account-button"
               style={{
@@ -429,7 +439,7 @@ const Profile = () => {
                 cursor: 'pointer',
                 fontSize: '1rem',
                 transition: 'background 0.3s ease, color 0.3s ease',
-                width: '50%',
+                width: '100%',
               }}
               onClick={() => handleOpenDeleteAccountModal()}
             >
@@ -446,7 +456,7 @@ const Profile = () => {
                 cursor: 'pointer',
                 fontSize: '1rem',
                 transition: 'background 0.3s ease',
-                width: '50%',
+                width: '100%',
               }}
               onClick={() => handleOpenPasswordModal()}
             >
@@ -460,12 +470,16 @@ const Profile = () => {
         onClose={handleClose}
         PaperProps={{
           sx: {
-            borderRadius: 4,
+            borderRadius: '25px',
+            bgcolor: 'background.paper',
             border: '2px solid #5651e5',
           },
         }}
       >
-        <DialogTitle>Update Profile Picture</DialogTitle>
+        <DialogTitle variant='h6' sx={{ textAlign: 'center', fontWeight: 'bold', color: '#5651e5' }}>
+          Update Profile Picture
+          <Divider />
+        </DialogTitle>
         <DialogContent>
           <EditPictureModal
             onSave={handleSavePicture}
