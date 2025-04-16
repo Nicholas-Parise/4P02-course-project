@@ -95,7 +95,6 @@ router.post('/', authenticate, uploadPicture, async (req, res, next) => {
 
     const member_id = member.rows[0].id;
 
-
     // Get the current max priority for items in this wishlist
     const priorityResult = await db.query(
       `SELECT COALESCE(MAX(priority), 0) + 1 AS next_priority 
@@ -138,10 +137,10 @@ router.post('/', authenticate, uploadPicture, async (req, res, next) => {
       const result = await db.query(`
       INSERT INTO items 
       (member_id, name, description, url, image, quantity, price, priority, dateCreated)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW()) RETURNING *;
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW()) RETURNING id, name, description, url, image, quantity, price, priority, dateCreated;
       `, [member_id, ideaData.name, ideaData.description, ideaData.url, ideaData.image, quantity, ideaData.price, priority]);
 
-      res.status(201).json({ message: "Item created successfully", item: result.rows[0] });
+      return res.status(201).json({ message: "Item created successfully", item: {...result.rows[0], wishlists_id} });
 
     } else {
       // Determine image path 
@@ -155,10 +154,10 @@ router.post('/', authenticate, uploadPicture, async (req, res, next) => {
       const result = await db.query(`
       INSERT INTO items 
       (member_id, name, description, url, image, quantity, price, priority, dateCreated)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW()) RETURNING *;
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW()) RETURNING id, name, description, url, image, quantity, price, priority, dateCreated;
       `, [member_id, name, description, url, image, quantity, price, priority]);
 
-      return res.status(201).json({ message: "Item created successfully", item: result.rows[0] });
+      return res.status(201).json({ message: "Item created successfully", item: {...result.rows[0], wishlists_id} });
     }
 
   } catch (error) {

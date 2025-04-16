@@ -175,6 +175,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
   };
 
   const [profile, setProfile] = useState<User>();
+
   useEffect(() => {
     if(token === '') return
 

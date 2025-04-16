@@ -38,7 +38,7 @@ router.put('/:id', authenticate, async (req, res, next) => {
 
   // Type checking
   if (is_read !== undefined && typeof is_read !== "boolean") {
-    return res.status(400).json({ error: "purchased must be a boolean (true or false)" });
+    return res.status(400).json({ error: "is_read must be a boolean (true or false)" });
   }
 
   try {
@@ -56,8 +56,7 @@ router.put('/:id', authenticate, async (req, res, next) => {
     const result = await db.query(`
         UPDATE notifications
         SET 
-            is_read = COALESCE($1, is_read),
-            dateUpdated = NOW()
+            is_read = COALESCE($1, is_read)
         WHERE id = $2
         RETURNING id, body, url, is_read, created;
       `, [is_read, notificationId]);
@@ -70,7 +69,7 @@ router.put('/:id', authenticate, async (req, res, next) => {
 
 
   } catch (error) {
-    console.error("Error editing contribution:", error);
+    console.error("Error editing notification:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 
@@ -99,15 +98,9 @@ router.delete('/:id', authenticate, async (req, res, next) => {
     await db.query(`DELETE FROM notifications WHERE id = $1;`, [notificationId]);
 
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "notification not found." });
-    }
-
-    res.status(200).json({ message: "notification updated successfully."});
-
-
+    res.status(200).json({ message: "notification deleted successfully."});
   } catch (error) {
-    console.error("Error editing contribution:", error);
+    console.error("Error deleted contribution:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 

@@ -143,7 +143,7 @@ router.get('/me', async (req, res, next) => {
             return res.status(401).json({ message: "Invalid token" });
         }
 
-        const user = await db.query("SELECT id, displayName, email, picture, bio, setup FROM users WHERE id = $1", [session.rows[0].user_id]);
+        const user = await db.query("SELECT id, displayName, email, picture, bio, setup, (google_id IS NOT NULL) AS oauth FROM users WHERE id = $1", [session.rows[0].user_id]);
 
         if (user.rows.length === 0) { // If a user gets removed but the token is still active 
             return res.status(404).json({ message: "User not found" });
@@ -188,10 +188,14 @@ router.post('/forgot-password', async (req, res, next) => {
 
     try {
         // Check if user exists
-        const userCheck = await db.query("SELECT id, displayName FROM users WHERE email = $1", [email]);
+        const userCheck = await db.query("SELECT id, displayName, google_id FROM users WHERE email = $1", [email]);
 
         if (userCheck.rows.length === 0) {
             return res.status(404).json({ message: "No account with that email exists." });
+        }
+
+        if (userCheck.rows[0].google_id) {
+            return res.status(404).json({ message: "Oauth users cannot change their password." });
         }
 
         const userId = userCheck.rows[0].id;
@@ -204,11 +208,6 @@ router.post('/forgot-password', async (req, res, next) => {
 
         const resetLink = `https://www.wishify.ca/forgot?token=${resetToken}`;
 
-/*
-        await sendEmail(email,
-            "Password Reset Request",
-            `Your one time code is: ${resetToken} or click the link to reset your password: ${resetLink}`)
-*/
         await forgotEmail(email,user_displayName,resetLink,resetToken,1);
 
         await db.query("COMMIT"); // Commit the transaction

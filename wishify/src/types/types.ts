@@ -17,12 +17,16 @@ export interface Event {
     name: string,
     description: string,
     url: string,
+    owner?: boolean,
     addr: string,
     city: string,
     deadline: string,
     image: string,
     dateUpdated: string,
-    dateCreated: string
+    dateCreated: string,
+    creator_id: number,
+    creator_displayname: string,
+    share_token: string
 };
 
 export interface WishlistItem {
@@ -33,6 +37,7 @@ export interface WishlistItem {
     description: string,
     url: string,
     image: string,
+    picture: File,
     quantity: number,
     quantitySupplied: number
     dateupdated: string,
@@ -40,21 +45,16 @@ export interface WishlistItem {
     contributions: Contribution[]
 };
 
-export interface Tag {
-    name: string,
-    love: boolean | null
-}
-
 export interface IdeaItem {
     id: number,
     match_rating: number,
     name: string,
-    tags: Tag[]
     image: string,
     sponsor: boolean,
     price: string,
     rating?: string,
-    wishlistCount?: number
+    wishlistCount?: number,
+    uses: number
 }
 
 export interface Contribution {

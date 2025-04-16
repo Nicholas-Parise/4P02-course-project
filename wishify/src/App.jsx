@@ -51,7 +51,7 @@ function App() {
 
         <div className="relative min-h-screen">
           <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} page={window.location.pathname}/>
-          <div className="pb-[200px]">
+          <div className="pb-[253px] sm:pb-[208px]"> {/* Tweaked to stop some overlap on mobile */}
             <Routes>
                 <Route index element={<Index />} />
                 <Route path="landing" element={<Landing />} />
@@ -67,7 +67,7 @@ function App() {
                 <Route path="privacy-policy" element={<Privacy />} />
                 <Route path="terms-of-service" element={<TOS />} />
                 <Route path="about" element={<About />} />
-
+                <Route path="upgrade-redirect" element={<UpgradeRedirect isLoggedIn={isLoggedIn} />} />
                 
                 <Route path="/manage-subscription" element={<ManageSubscription />} />
                 <Route path="/success" element={<Success />} />

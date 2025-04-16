@@ -70,7 +70,7 @@ const CreateWishlistModal = ({ open, setOpen, wishlists, setWishlists, token }: 
       .then((response) => response.json())
       .then((data) => {
           let newWishlist: Wishlist = 
-          {id: data.wishlist_id,
+          {id: data.wishlist.id,
             event_id: 0, // TODO add event support
             name: uniqueTitle,
             description: "",

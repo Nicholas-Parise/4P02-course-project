@@ -153,7 +153,7 @@ export const EventThumbnail = (props: any) => {
                 <OverlayTitle title={props.title}>{props.title}</OverlayTitle>
                 <MenuButton onClick={openEvent}>Open</MenuButton>
                 <MenuButton onClick={props.edit}>Edit</MenuButton>
-                <MenuButton>Share</MenuButton>
+                <MenuButton onClick={props.share}>Share</MenuButton>
             </EventMenu>
         )
     }

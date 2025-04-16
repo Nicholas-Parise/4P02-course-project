@@ -20,7 +20,7 @@ const EditItemDialog = ({ open, setOpen, item, editWishlistItem, }: Props) => {
           const reader = new FileReader()
           reader.onloadend = () => {
             setImage(reader.result as string)
-            setNewItem({ ...newItem, image: reader.result as string })
+            setNewItem({ ...newItem, picture: file, image: reader.result as string })
           }
           reader.readAsDataURL(file)
         }
@@ -29,8 +29,32 @@ const EditItemDialog = ({ open, setOpen, item, editWishlistItem, }: Props) => {
     const editItem = (e: FormEvent) => {
         e.preventDefault();
 
-        const url = `https://api.wishify.ca/items/${newItem.id}`
-        fetch(url, {
+        const editUrl = `https://api.wishify.ca/items/${newItem.id}`
+        const imageUrl = `https://api.wishify.ca/items/upload/${newItem.id}`
+        let newImage = ""
+
+        let data = new FormData()
+        data.append("picture", newItem.picture || "");
+        // Update Image
+        fetch(imageUrl, {
+          method: 'post',
+          headers: new Headers({
+              'Authorization': "Bearer "+token,
+              'Accept': 'application/json'
+          }),
+          body: data
+          })
+          .then((response) => response.json())
+          .then((data) => {
+              setOpen(false)
+              newImage = data.imageUrl
+          })
+          .catch((error) => {
+              console.log(error)
+          })
+
+        // Update Item Data
+        fetch(editUrl, {
             method: 'put',
             headers: new Headers({
                 'Authorization': "Bearer "+token,
@@ -40,14 +64,14 @@ const EditItemDialog = ({ open, setOpen, item, editWishlistItem, }: Props) => {
                 name: newItem.name,
                 description: newItem.description || "",
                 url: newItem.url || "",
-                image: image || "", // TODO UPLOAD IMAGE SOMEHOW
                 quantity: newItem.quantity,
                 price: newItem.price,
             })
         })
         .then((response) => response.json())
         .then((data) => {
-            editWishlistItem(data.item)
+            console.log(newImage)
+            editWishlistItem({...data.item, image: newImage})
             setOpen(false)
         })
         .catch((error) => {
@@ -153,7 +177,19 @@ const EditItemDialog = ({ open, setOpen, item, editWishlistItem, }: Props) => {
                     />
     
     
-                    <Button sx={{mt: 3}} type="submit" variant="contained">Save</Button>
+                    <Button 
+                      sx={{
+                        mt: 3,
+                        background: 'linear-gradient(to right, #8d8aee, #5651e5)',
+                        color: 'white',
+                        borderRadius: '25px',
+                        '&:hover': { background: 'linear-gradient(to right, #5651e5, #343188)' }
+                      }}  
+                      type="submit" 
+                      variant="contained"
+                    >
+                      Save
+                    </Button>
     
                   </FormControl>
                 </form>

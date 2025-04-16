@@ -2,6 +2,7 @@ import React, {useState, useEffect, FormEvent} from 'react'
 import { type Event } from '../types/types'
 import {CreateEvent} from '../components/CreateButton'
 import {EventThumbnail} from '../components/Thumbnail'
+import Loading from '../components/Loading'
 
 import styled from '@emotion/styled'
 import ModalBox from '@mui/material/Box';
@@ -10,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Modal from '@mui/material/Modal';
 import FormControl from "@mui/material/FormControl";
+import ShareEventModal from '../components/ShareEventModal'
 
 const boxStyle = {
   position: 'absolute',
@@ -33,33 +35,66 @@ const EventContainer = styled.div`
 
 const Events = () => {
   const eventUrl = `https://api.wishify.ca/events/`
+  const userUrl = `https://api.wishify.ca/users/`
 
   const [token, setToken] = useState<string>(localStorage.getItem('token') || '')
   const [events, setEvents] = useState<Event[]>([])
+  const [sharedEvents, setSharedEvents] = useState<Event[]>([])
+  const [loading, setLoading] = useState(true)
 
-  // pulling all wishlists from the backend and storing in wishlists state
-  useEffect(() => {
-    setToken(localStorage.getItem('token') || '')
-    console.log(token)
-    fetch(eventUrl, {
-        method: 'get',
-        headers: new Headers({
-          'Authorization': "Bearer "+token
-        })
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          setEvents(data);
-          console.log(data);
-          //setLoading(false)
-        })
-        .catch((error) => {
-          //setError(error)
-          //setLoading(false)
-          console.log(error)
-        })
-        //.finally(() => setLoading(false))
-  }, [])
+  // pulling all events from the backend and storing in events state
+useEffect(() => {
+    const fetchData = async () => {
+      setToken(localStorage.getItem('token') || '');
+      console.log(token);
+  
+      try {
+        // Fetch user data and events concurrently
+        const [userResponse, eventResponse] = await Promise.all([
+          fetch(userUrl, {
+            method: 'get',
+            headers: new Headers({
+              'Authorization': "Bearer " + token,
+            }),
+          }),
+          fetch(eventUrl, {
+            method: 'get',
+            headers: new Headers({
+              'Authorization': "Bearer " + token,
+            }),
+          }),
+        ]);
+  
+        // Parse responses
+        const userData = await userResponse.json();
+        const eventData = await eventResponse.json();
+  
+        // Process user data
+        const userId = userData.user.id;
+        const userPro = userData.user.pro;
+  
+        // Process event data
+        const ownedEvents = eventData.filter(
+          (event: Event) => event.creator_id === userId
+        );
+        const sharedEvents = eventData.filter(
+          (event: Event) => event.creator_id !== userId
+        );
+        setEvents(ownedEvents);
+        setSharedEvents(sharedEvents);
+  
+        console.log("User Data:", userData);
+        console.log("Event Data:", eventData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        // Set loading to false after both requests are complete
+        setLoading(false);
+      }
+    };
+  
+    fetchData();
+  }, []);
   
   const [newEventTitle, setNewEventTitle] = useState('');
   const [activeOverlay, setActiveOverlay] = useState<string>("");
@@ -108,7 +143,7 @@ const Events = () => {
       }
     }
 
-    // create wishlist in the backend
+    // create event in the backend
     fetch(eventUrl, {
       method: 'post',
       headers: new Headers({
@@ -125,18 +160,7 @@ const Events = () => {
       })
       .then((response) => response.json())
       .then((data) => {
-          let newEvent: Event = 
-          {id: data.event.id,
-            name: uniqueTitle,
-            description: "Type your description here",
-            url: "",
-            addr: "Type your address here",
-            city: "Type your city here",
-            deadline: "",
-            image: "",
-            dateCreated: Date.now().toString(),
-            dateUpdated: Date.now().toString()
-          }
+          let newEvent: Event = data.event
           setEvents([...events, newEvent])
       })
       .catch((error) => {
@@ -188,7 +212,7 @@ const Events = () => {
       .then((response) => response.json())
       .then((data) => {
           console.log(data)
-          // update the wishlists state with the new data
+          // update the events state with the new data
           const updatedEvents = events.map(event =>
             event.id === eventId ? data.event : event
           );
@@ -234,17 +258,17 @@ const Events = () => {
   }
 
   /*const handleDuplicate = () => {
-    // find the wishlist to duplicate
-    const wishlistToDuplicate = wishlists.find(wishlist => wishlist.name === activeOverlay);
+    // find the event to duplicate
+    const eventToDuplicate = events.find(event => event.name === activeOverlay);
     // this condition should never happen but I've left it here just in case
-    if (!wishlistToDuplicate) {
-      console.log("Wishlist not found");
+    if (!eventToDuplicate) {
+      console.log("Event not found");
       return;
     }
-    const wishlistId = wishlistToDuplicate.id;
-    console.log(wishlistToDuplicate)
+    const eventId = eventToDuplicate.id;
+    console.log(eventToDuplicate)
 
-    const url = `https://api.wishify.ca/wishlists/${wishlistId}/duplicate`
+    const url = `https://api.wishify.ca/events/${eventId}/duplicate`
     fetch(url, {
       method: 'post',
       headers: new Headers({
@@ -255,17 +279,27 @@ const Events = () => {
       .then((response) => response.json())
       .then((data) => {
           console.log(data)
-          // update the wishlists state with the new data
-          let duplicatedWishlist: Wishlist = structuredClone(wishlistToDuplicate);
-          duplicatedWishlist.id = data.wishlist.id;
-          duplicatedWishlist.name = data.wishlist.name;
-          const updatedWishlists = [...wishlists, duplicatedWishlist];
-          setWishlists(updatedWishlists);
+          // update the events state with the new data
+          let duplicatedEvent: event = structuredClone(eventToDuplicate);
+          duplicatedEvent.id = data.event.id;
+          duplicatedEvent.name = data.event.name;
+          const updatedEvents = [...events, duplicatedEvent];
+          setEvents(updatedEvents);
       })
       .catch((error) => {
           console.log(error)
       })
   }*/
+
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+
+  const handleShare = () => {
+    if (activeOverlay) {
+      setIsShareModalOpen(true);
+    }
+  };
+
+  const activeEvent = events.find((event) => event.name === activeOverlay);
     
 
   return (
@@ -273,7 +307,33 @@ const Events = () => {
       <h1>My Events</h1>
       <EventContainer>
         <CreateEvent addThumbnail={handleModalOpen}>Create an Event</CreateEvent>
-        {events.map((event, index) => (
+        {loading ? <Loading /> : 
+          events.map((event, index) => (
+            <EventThumbnail 
+              active={activeOverlay} 
+              toggleActive={() => changeActiveOverlay(event.name)} 
+              key={index} 
+              id={event.id}
+              title={event.name}
+              edit={handleEditOpen}
+              share={handleShare}
+              owner={"Me"}
+            />
+          ))
+        }
+      </EventContainer>
+
+      {activeEvent  && activeEvent.share_token && (
+              <ShareEventModal
+              eventID={activeEvent.id}
+              shareToken={activeEvent.share_token} 
+              isOwner={activeEvent.owner}
+              isOpen={isShareModalOpen} 
+              setIsOpen={setIsShareModalOpen}/>
+            )}
+      <h1>Shared Events</h1>
+      <EventContainer>
+        {sharedEvents.map((event, index) => (
           <EventThumbnail 
             active={activeOverlay} 
             toggleActive={() => changeActiveOverlay(event.name)} 
@@ -281,14 +341,10 @@ const Events = () => {
             id={event.id}
             title={event.name}
             edit={handleEditOpen}
-            owner={"Me"}
+            share={handleShare}
+            owner={event.creator_displayname || "None"}
           />
         ))}
-      </EventContainer>
-      <h1>Shared Wishlists</h1>
-      <EventContainer>
-        <EventThumbnail title={"Birthday Blam's Birthday Bash (can view and contribute)"} role={"contributor"} owner={"Birthday Blam"}></EventThumbnail>
-        <EventThumbnail title={"Geoff's Christmas Wishlist"} id={1234} role={"contributor"} owner={"Geoff"}></EventThumbnail>
       </EventContainer>
       {/* Modal for Creating Events */}
       <Modal

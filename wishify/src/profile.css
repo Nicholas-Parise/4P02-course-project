@@ -8,8 +8,7 @@
 
 .profile-container {
   max-width: 1300px;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding: 40px 40px;
   background: white;
   border: 2px solid #5651e5; 
   border-radius: 25px;
@@ -28,8 +27,7 @@
 
 .profile-header {
   display: flex;
-  align-items: flex-start; 
-  gap: 20px;
+  /* align-items: flex-end;  */
   margin-bottom: 20px;
 }
 
@@ -37,6 +35,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  align-self: center;
 }
 
 .profile-picture img {
@@ -49,19 +48,15 @@
 .profile-header-fields {
   display: flex;
   flex-direction: column;
-  flex: 1;
+  flex: 5;
   gap: 10px;
 }
 
 .profile-settings-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   padding: 10px 0;
 }
 
 .profile-setting-label {
-  width: 30%; /* Adjust label width */
   font-weight: bold;
   font-size: 20px;
   color: black;
@@ -76,8 +71,6 @@
 
 .profile-setting-value {
   flex: 1;
-  padding-right: 25px;
-  font-size: 20px;
   text-overflow: ellipsis;
 }
 
@@ -89,7 +82,6 @@
 
 .profile-setting-button {
   width: 15%;
-  text-align: right;
   color: #5651e5;
   font-weight: bold;
 }
@@ -186,9 +178,6 @@
 }
 
 .button-container {
-  display: flex;
-  width: 100%;
   gap: 10px;
-  justify-content: flex-end;
   margin-top: 20px;
 }

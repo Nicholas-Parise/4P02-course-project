@@ -3,8 +3,25 @@ import { useNavigate } from 'react-router-dom'
 import '../profile.css'
 import SettingsItem from '../components/SettingsItem.jsx'
 import LikesSettingsItem from '../components/LikesSettingsItem.jsx'
-import { EditPictureModal, EditDisplayNameModal, EditBioModal, EditEmailModal, EditPasswordModal, DeleteAccountModal, AddLikesModal } from '../components/ProfileSettingModals'
-import { CircularProgress, Typography, Snackbar, Alert } from '@mui/material'
+import { 
+  EditPictureModal, 
+  EditDisplayNameModal, 
+  EditBioModal, 
+  EditEmailModal, 
+  EditPasswordModal, 
+  DeleteAccountModal, 
+  AddLikesModal 
+} from '../components/ProfileSettingModals'
+import { 
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  CircularProgress, 
+  Typography, 
+  Snackbar, 
+  Alert, 
+  Divider
+} from '@mui/material'
 
 const Profile = () => {
   const navigate = useNavigate()
@@ -14,6 +31,7 @@ const Profile = () => {
     displayName: '',
     bio: '',
     picture: '',
+    pro: false,
     likes: []
   })
 
@@ -48,7 +66,8 @@ const Profile = () => {
           displayName: data.user.displayname,
           bio: data.user.bio === null ? '' : data.user.bio,
           picture: data.user.picture,
-          likes: data.categories
+          pro: data.user.pro,
+          likes: data.categories,
         })
       }
       else if (response.status === 404) {
@@ -151,9 +170,40 @@ const Profile = () => {
     }
   }
 
-  const handleSavePicture = async (file) => {
-    // to be implemented
-    console.log(file)
+  const handleSavePicture = async (selectedImage) => {
+
+    const formData = new FormData()
+    formData.append('picture', selectedImage)
+
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ', ' + pair[1]);
+    }
+
+
+    try {
+      const response = await fetch('https://api.wishify.ca/users/upload/', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: formData
+      })
+
+      const result = await response.json()
+      console.log(result)
+
+      if (response.ok) {
+        alert('Image uploaded successfully!')
+        handleClose()
+        fetchUserData()
+      } else {
+        alert('Failed to upload image. Please try again.')
+      }
+    }
+    catch (error) {
+      console.error('Error uploading image:', error)
+      alert('Error uploading image')
+    }
   }
 
   const handleSaveEmail = async (email, password) => {
@@ -349,9 +399,9 @@ const Profile = () => {
 
       <h1>Profile settings</h1>
 
-      <div className="profile-header">
-        <div className="profile-picture">
-          <img
+      <div className="profile-header flex flex-col sm:flex-row gap-[10px]">
+        <div className="profile-picture w-full mb-[20px] sm:mb-0  sm:w-[25%]">
+          <img className='mb-[10px]'
             src={
               user.picture
             }
@@ -360,13 +410,18 @@ const Profile = () => {
           <button style={{color: "#5651e5"}} onClick={() => handleOpenModal('picture')}>Update Picture</button>
         </div>
 
-        <div className="profile-header-fields">
+        <hr className="block sm:hidden" />
+
+        <div className="profile-header-fields flex flex-col flex-[1] gap-[10px] sm:flex-[5]">
           <SettingsItem
             label="Display Name:"
             values={user.displayName}
+            isPro={user.pro}
             buttonText={'Edit'}
             onEdit={() => handleOpenModal('displayName')}
           />
+
+          <hr />
 
           <SettingsItem
             label="Email:"
@@ -387,6 +442,8 @@ const Profile = () => {
           onEdit={() => handleOpenModal("bio")}
         />
 
+        <hr />
+
         <LikesSettingsItem
           label="Likes:"
           values={user.likes}
@@ -401,7 +458,7 @@ const Profile = () => {
           onDelete={handleDeleteLikes}
         />
 
-        <div className="button-container">
+        <div className="button-container flex flex-col-reverse sm:flex-row">
             <button
               className="delete-account-button"
               style={{
@@ -413,7 +470,7 @@ const Profile = () => {
                 cursor: 'pointer',
                 fontSize: '1rem',
                 transition: 'background 0.3s ease, color 0.3s ease',
-                width: '50%',
+                width: '100%',
               }}
               onClick={() => handleOpenDeleteAccountModal()}
             >
@@ -430,7 +487,7 @@ const Profile = () => {
                 cursor: 'pointer',
                 fontSize: '1rem',
                 transition: 'background 0.3s ease',
-                width: '50%',
+                width: '100%',
               }}
               onClick={() => handleOpenPasswordModal()}
             >
@@ -439,12 +496,27 @@ const Profile = () => {
         </div>
       </div>
 
-      <EditPictureModal
-        open={openModals.picture}
-        value={currentValue}
-        onSave={handleSavePicture}
-        handleClose={handleClose}
-      />
+      <Dialog 
+        open={openModals.picture} 
+        onClose={handleClose}
+        PaperProps={{
+          sx: {
+            borderRadius: '25px',
+            bgcolor: 'background.paper',
+            border: '2px solid #5651e5',
+          },
+        }}
+      >
+        <DialogTitle variant='h6' sx={{ textAlign: 'center', fontWeight: 'bold', color: '#5651e5' }}>
+          Update Profile Picture
+          <Divider />
+        </DialogTitle>
+        <DialogContent>
+          <EditPictureModal
+            onSave={handleSavePicture}
+          />
+        </DialogContent>
+      </Dialog>
 
       <EditDisplayNameModal
         open={openModals.displayName}

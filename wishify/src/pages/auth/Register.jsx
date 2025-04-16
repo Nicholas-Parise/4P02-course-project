@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useSearchParams } from 'react-router-dom'
 import '../../register.css'
 import google from "../../assets/Google.svg";
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const Register = () => {
   // Put share_token in sessionStorage if it's in the URL query string
@@ -219,7 +220,7 @@ const Register = () => {
               className='register-password-toggle'
               onClick={togglePasswordVisibility}
             >
-              {showPassword ? "Hide" : "Show"}
+              {showPassword ? <VisibilityOff /> : <Visibility />}
             </span>
             {showTooltip && (
               <div className="tooltip">
@@ -253,7 +254,7 @@ const Register = () => {
               className='register-password-toggle'
               onClick={togglePasswordVisibility}
             >
-              {showPassword ? "Hide" : "Show"}
+              {showPassword ? <VisibilityOff /> : <Visibility />}
             </span>
           </div>
 
