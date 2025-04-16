@@ -170,9 +170,40 @@ const Profile = () => {
     }
   }
 
-  const handleSavePicture = async (file) => {
-    // to be implemented
-    console.log(file)
+  const handleSavePicture = async (selectedImage) => {
+
+    const formData = new FormData()
+    formData.append('picture', selectedImage)
+
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ', ' + pair[1]);
+    }
+
+
+    try {
+      const response = await fetch('https://api.wishify.ca/users/upload/', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: formData
+      })
+
+      const result = await response.json()
+      console.log(result)
+
+      if (response.ok) {
+        alert('Image uploaded successfully!')
+        handleClose()
+        fetchUserData()
+      } else {
+        alert('Failed to upload image. Please try again.')
+      }
+    }
+    catch (error) {
+      console.error('Error uploading image:', error)
+      alert('Error uploading image')
+    }
   }
 
   const handleSaveEmail = async (email, password) => {
@@ -483,7 +514,6 @@ const Profile = () => {
         <DialogContent>
           <EditPictureModal
             onSave={handleSavePicture}
-            onClose={handleClose}
           />
         </DialogContent>
       </Dialog>
