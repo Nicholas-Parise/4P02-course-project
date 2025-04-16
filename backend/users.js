@@ -5,6 +5,9 @@ const fs = require('fs');
 const path = require('path');
 const bcrypt = require("bcryptjs");
 
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+require("dotenv").config();
+
 const authenticate = require('./middleware/authenticate');
 const uploadPicture = require('./middleware/upload');
 
@@ -13,7 +16,7 @@ const uploadPicture = require('./middleware/upload');
 router.get('/', authenticate, async (req, res, next) => {
   try {
     const userId = req.user.userId; // Get user ID from authenticated token
-    const result = await db.query('SELECT id, email, displayName, bio, picture, pro, setup, datecreated, dateupdated FROM users WHERE id = $1', [userId]);
+    const result = await db.query('SELECT id, email, displayName, bio, picture, pro, setup, datecreated, dateupdated, (google_id IS NOT NULL) AS oauth FROM users WHERE id = $1', [userId]);
     const result2 = await db.query(
       `SELECT c.*, uc.love FROM categories c
         JOIN user_categories uc ON c.id = uc.category_id
@@ -68,10 +71,14 @@ router.put('/', authenticate, async (req, res) => {
       }
 
       // Get the user's stored hashed password
-      const userResult = await db.query("SELECT password FROM users WHERE id = $1", [userId]);
+      const userResult = await db.query("SELECT password,(google_id IS NOT NULL) AS oauth FROM users WHERE id = $1", [userId]);
 
       if (userResult.rows.length === 0) {
         return res.status(404).json({ message: "user not found" });
+      }
+
+      if (userResult.rows.oauth) {
+        return res.status(403).json({ message: "email and/or password cannot be changed with an oauth user" });
       }
 
       const hashedPassword = userResult.rows[0].password;
@@ -108,11 +115,11 @@ router.put('/', authenticate, async (req, res) => {
 
   } catch (error) {
 
-      // Handle duplicate email error
-      // error code 23505 means unique constraint violated.
-      if (error.code === "23505") {
-          return res.status(409).json({ message: "Email is already in use" });
-      }
+    // Handle duplicate email error
+    // error code 23505 means unique constraint violated.
+    if (error.code === "23505") {
+      return res.status(409).json({ message: "Email is already in use" });
+    }
 
     console.error("Error updating user:", error);
     res.status(500).json({ message: "Error updating user profile" });
@@ -132,13 +139,28 @@ router.delete('/', authenticate, async (req, res) => {
     }
 
     // Get the user's stored hashed password
-    const userResult = await db.query("SELECT password FROM users WHERE id = $1", [userId]);
+    const userResult = await db.query("SELECT password,(google_id IS NOT NULL) AS oauth, pro, stripe_subscription_id FROM users WHERE id = $1", [userId]);
+
+    const user = userResult.rows[0];
 
     if (userResult.rows.length === 0) {
       return res.status(404).json({ message: "user not found" });
     }
 
-    const hashedPassword = userResult.rows[0].password;
+    if (user.oauth) {
+      // remove their autopayment
+      if (user.pro) {
+        if (user.stripe_subscription_id) {
+          await stripe.subscriptions.cancel(stripe_subscription_id);
+        }
+      }
+      await deleteImage(userId);
+      await db.query("DELETE FROM users WHERE id = $1", [userId]);
+      return res.status(200).json({ message: "OAuth account deleted successfully" });
+    }
+
+
+    const hashedPassword = user.password;
 
     // Compare provided password with stored hash
     const isMatch = await bcrypt.compare(password, hashedPassword);
@@ -148,6 +170,13 @@ router.delete('/', authenticate, async (req, res) => {
 
     // Delete the users profile picture
     await deleteImage(userId);
+
+    // remove their autopayment
+    if (user.pro) {
+      if (user.stripe_subscription_id) {
+        await stripe.subscriptions.cancel(stripe_subscription_id);
+      }
+    }
 
     // Delete user if password is correct
     await db.query("DELETE FROM users WHERE id = $1", [userId]);

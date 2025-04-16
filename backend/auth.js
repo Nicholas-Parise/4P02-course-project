@@ -143,7 +143,7 @@ router.get('/me', async (req, res, next) => {
             return res.status(401).json({ message: "Invalid token" });
         }
 
-        const user = await db.query("SELECT id, displayName, email, picture, bio, setup FROM users WHERE id = $1", [session.rows[0].user_id]);
+        const user = await db.query("SELECT id, displayName, email, picture, bio, setup, (google_id IS NOT NULL) AS oauth FROM users WHERE id = $1", [session.rows[0].user_id]);
 
         if (user.rows.length === 0) { // If a user gets removed but the token is still active 
             return res.status(404).json({ message: "User not found" });

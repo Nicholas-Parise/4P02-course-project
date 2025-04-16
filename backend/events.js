@@ -97,7 +97,7 @@ router.get('/:eventId', authenticate, async (req, res, next) => {
     const userId = req.user.userId; // Get user ID from authenticated token
 
     const result = await db.query(`
-      SELECT e.*, u.displayname AS creator_displayName
+      SELECT e.*, m.owner, u.displayname AS creator_displayName
       FROM events e
       JOIN event_members m ON e.id = m.event_id
       LEFT JOIN users u ON e.creator_id = u.id
