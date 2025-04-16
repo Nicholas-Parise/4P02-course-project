@@ -188,7 +188,7 @@ const ProfileMenu = ({ closeMenu, logOut, profile, token, notifications, deleteN
             className="horizontal-button" 
             onClick={handleClose}
           >
-            Terms of Service
+            ToS
           </NavLink>
           <NavLink 
             to="/about" 
