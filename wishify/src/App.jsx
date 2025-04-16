@@ -49,7 +49,7 @@ function App() {
 
         <div className="relative min-h-screen">
           <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} page={window.location.pathname}/>
-          <div className="pb-[200px]">
+          <div className="pb-[253px] sm:pb-[208px]"> {/* Tweaked to stop some overlap on mobile */}
             <Routes>
                 <Route index element={<Index />} />
                 <Route path="landing" element={<Landing />} />

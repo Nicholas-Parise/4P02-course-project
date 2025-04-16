@@ -59,6 +59,12 @@ const PublicProfile = () => {
 
             <div className='profile-setting-displayname'>
               {user.user.displayname}
+              {user.user.pro && (
+                <>
+                  &nbsp;
+                  <span className='pro-badge' style={{verticalAlign: 'middle'}}>PRO</span>
+                </>
+              )}
             </div>
 
           </div>
@@ -83,7 +89,7 @@ const PublicProfile = () => {
           </div>
 
           <div className='profile-setting-value'>
-            <ul className="max-w-xl mx-auto columns-1 sm:columns-1 md:columns-2 lg:columns-3 space-y-2">
+            <ul className="max-w-xl grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-3 gap-y-1">
               {user.categories
                 .filter(item => item.love) // Show likes only
                 .sort((a, b) => a.name.localeCompare(b.name)) // Sort items alphabetically
@@ -113,7 +119,7 @@ const PublicProfile = () => {
           </div>
 
           <div className='profile-setting-value'>
-            <ul className="max-w-xl mx-auto columns-1 sm:columns-1 md:columns-2 lg:columns-3 space-y-2">
+            <ul className="max-w-xl grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-3 gap-y-1">
               {user.categories
                 .filter(item => !item.love) // Show dislikes only
                 .sort((a, b) => a.name.localeCompare(b.name)) // Sort items alphabetically
