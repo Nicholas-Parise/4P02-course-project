@@ -32,6 +32,7 @@ const Profile = () => {
     bio: '',
     picture: '',
     pro: false,
+    oauth: false,
     likes: []
   })
 
@@ -67,6 +68,7 @@ const Profile = () => {
           bio: data.user.bio === null ? '' : data.user.bio,
           picture: data.user.picture,
           pro: data.user.pro,
+          oauth: data.user.oauth,
           likes: data.categories,
         })
       }
@@ -399,7 +401,7 @@ const Profile = () => {
 
       <h1>Profile settings</h1>
 
-      <div className="profile-header flex flex-col sm:flex-row gap-[10px]">
+      <div className="profile-header flex flex-col sm:flex-row gap-[10px] mb-[10px] md:mb-[20px]">
         <div className="profile-picture w-full mb-[20px] sm:mb-0  sm:w-[25%]">
           <img className='mb-[10px]'
             src={
@@ -421,14 +423,18 @@ const Profile = () => {
             onEdit={() => handleOpenModal('displayName')}
           />
 
-          <hr />
 
-          <SettingsItem
-            label="Email:"
-            values={user.email}
-            buttonText={'Edit'}
-            onEdit={() => handleOpenModal('email')}
-          />
+          {!user.oauth && (
+            <>
+              <hr />
+              <SettingsItem
+                label="Email:"
+                values={user.email}
+                buttonText={'Edit'}
+                onEdit={() => handleOpenModal('email')}
+              />
+            </>
+          )}
         </div>
       </div>
 
@@ -470,29 +476,35 @@ const Profile = () => {
                 cursor: 'pointer',
                 fontSize: '1rem',
                 transition: 'background 0.3s ease, color 0.3s ease',
-                width: '100%',
+                width: user.oauth ? '200px' : '100%',
+                margin: 'auto',
               }}
               onClick={() => handleOpenDeleteAccountModal()}
             >
               Delete Account
             </button>
 
-            <button
-              className="change-password-button"
-              style={{
-                background: 'linear-gradient(135deg, #8d8aee, #5651e5)',
-                color: 'white',
-                padding: '10px 20px',
-                borderRadius: '25px',
-                cursor: 'pointer',
-                fontSize: '1rem',
-                transition: 'background 0.3s ease',
-                width: '100%',
-              }}
-              onClick={() => handleOpenPasswordModal()}
-            >
-              Change Password
-            </button>
+            {!user.oauth && (
+             <>
+              <button
+                className="change-password-button"
+                style={{
+                  background: 'linear-gradient(135deg, #8d8aee, #5651e5)',
+                  color: 'white',
+                  padding: '10px 20px',
+                  borderRadius: '25px',
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                  transition: 'background 0.3s ease',
+                  width: '100%',
+                }}
+                onClick={() => handleOpenPasswordModal()}
+              >
+                Change Password
+              </button>
+             </> 
+            )}
+
         </div>
       </div>
 
