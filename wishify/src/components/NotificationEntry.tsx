@@ -13,7 +13,7 @@ const NotificationEntry = ({notification, handleRedirect, deleteNotification} : 
     <div 
       onClick={() => handleRedirect(notification.url)} 
       
-      className={`notifications-entry ${notification.is_read ? 'bg-[#f0f0f0]' : 'bg-[#e8e7ff]'}`}
+      className={`notifications-entry ${notification.is_read ? 'bg-[#ffffff]' : 'bg-[#e8e7ff]'}`}
     >
       <div className="flex justify-between items-center">
         <h2>{notification.title}</h2>
