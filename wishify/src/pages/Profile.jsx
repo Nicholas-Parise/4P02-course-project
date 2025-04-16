@@ -401,7 +401,7 @@ const Profile = () => {
 
       <div className="profile-header flex flex-col sm:flex-row gap-[10px]">
         <div className="profile-picture w-full mb-[20px] sm:mb-0  sm:w-[25%]">
-          <img
+          <img className='mb-[10px]'
             src={
               user.picture
             }
