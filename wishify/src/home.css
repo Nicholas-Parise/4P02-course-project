@@ -1,5 +1,6 @@
 .home-container {
     max-width: 1300px;
+    margin-top: 30px;
     padding-top: 20px;
     padding-bottom: 20px;
     background: white;
@@ -10,37 +11,54 @@
     font-weight: 500;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
 }
 
 .home-container h1 {
     font-weight: bold;
+    align-self: flex-start; 
+    width: 100%;
+    padding-left: 20px;
 }
 
 .home-user-picture {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    margin-bottom: 40px;
+    align-items: center; 
+    margin-bottom: 20px;
 }
   
 .home-user-picture img {
-    width: 150px;
-    height: 150px;
+    width: 200px;
+    height: 200px;
     border-radius: 50%;
     object-fit: cover;
 }
 
 .home-welcome-text {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #333;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #5651e5;
+    text-align: center;
+}
+
+.home-welcome-text h2 {
+    animation: fadeIn 1s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .home-user-info {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 30px;
 }

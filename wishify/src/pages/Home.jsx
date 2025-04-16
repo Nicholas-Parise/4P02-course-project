@@ -7,84 +7,238 @@ import {EventThumbnail} from '../components/Thumbnail'
 import FirstSetupModal from '../components/ProfileSettingModals/FirstSetupModal';
 
 const WishlistContainer = styled.div`
-      display: flex;
-      gap: 3vw;
-      margin: 3vw;
-      flex-wrap: wrap;
-    `
+  display: grid;
+  gap: 20px;
+  padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  grid-template-columns: repeat(4, 1fr);
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
+`
 const CreateWishlistButton = styled.button`
-    background: linear-gradient(to right, #8d8aee, #5651e5);
-    color: white;
-    border-radius: 25px;
-    padding: 20px;
-    width: 200px;
-    height: 200px;
-    transition: background 0.3s;
-    @media screen and (max-width: 440px){
-        width: 150px;
-        height: 150px;
-    }
-    &:hover {
-        background: linear-gradient(to right, #5651e5, #343188);
-        transform: scale(1.05);
-        cursor: pointer;
-    }
+  background: linear-gradient(to right, #8d8aee, #5651e5);
+  color: white;
+  border-radius: 25px;
+  padding: 15px;
+  width: 100%;
+  aspect-ratio: 1/1;
+  transition: all 0.3s;
+  font-size: 1.5rem;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  
+  &:hover {
+    background: ${({ isDisabled }) =>
+      isDisabled
+        ? "linear-gradient(to right, #8d8aee, #5651e5);" // Keep disabled gradient
+        : "linear-gradient(to right, #5651e5, #343188)"};
+      transform: ${({ isDisabled }) => (isDisabled ? "none" : "scale(1.05)")};
+      cursor: ${({ isDisabled }) => (isDisabled ? "not-allowed" : "pointer")};
+  }
+
+  @media (max-width: 768px) {
+    font-size: 1.6rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1.6rem;
+    padding: 12px;
+  }
 `
 const EventContainer = styled.div`
-  display: flex;
-  gap: 3vw;
-  margin: 3vw;
-  flex-wrap: wrap;
+  display: grid;
+  gap: 20px;
+  padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  grid-template-columns: repeat(4, 1fr);
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
 `
 const CreateEventButton = styled.button`
-    background: linear-gradient(to right, #8d8aee, #5651e5);
-    color: white;
-    border-radius: 25px;
-    padding: 20px;
-    width: 200px;
-    height: 200px;
-    transition: background 0.3s;
-    @media screen and (max-width: 440px){
-        width: 150px;
-        height: 150px;
-    }
-    &:hover {
-        background: linear-gradient(to right, #5651e5, #343188);
-        transform: scale(1.05);
-        cursor: pointer;
-    }
+  background: linear-gradient(to right, #8d8aee, #5651e5);
+  color: white;
+  border-radius: 25px;
+  padding: 15px;
+  width: 100%;
+  aspect-ratio: 1/1;
+  transition: all 0.3s;
+  font-size: 1.5rem;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  
+  &:hover {
+    background: linear-gradient(to right, #5651e5, #343188);
+    transform: scale(1.05);
+    cursor: pointer;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 1.6rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1.6rem;
+    padding: 12px;
+  }
 `
 
 const ContributionContainer = styled.div`
   display: grid;
-  margin: 3vw;
-  gap: 3vw;
+  gap: 20px;
+  padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
   grid-template-columns: repeat(4, 1fr);
-  @media screen and (max-width: 768px){
-    grid-template-columns: repeat(3, 1fr);
-  }
-  @media screen and (max-width: 440px){
+
+  @media (max-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(1, 1fr);
   }
 `
 
-const ItemDisplay = ({ item }) => {
+const ContributionCard = styled.div`
+  background: white;
+  border-radius: 12px;
+  border: 2px solid #5651e5;
+  padding: 16px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(86, 81, 229, 0.1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(86, 81, 229, 0.15);
+  }
+`
+
+const ContributionHeader = styled.h3`
+  color: #5651e5;
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+`
+
+const ContributionDetail = styled.div`
+  display: flex;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+`
+
+const DetailLabel = styled.span`
+  font-weight: 600;
+  color: #5651e5;
+  min-width: 80px;
+`
+
+const DetailValue = styled.span`
+  color: #333;
+  flex-grow: 1;
+  word-break: break-word;
+`
+
+const ContributionLink = styled.a`
+  color: #5651e5;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #343188;
+    text-decoration: underline;
+  }
+`
+
+const EmptyNote = styled.span`
+  color: #ef4444;
+  font-style: italic;
+`
+
+const ItemDisplay = ({ item }) => {
   return (
-    <div className="p-1 border rounded-lg shadow-lg bg-white" style={{maxWidth: "200px"}}>
-      <h2 className="text-xl font-bold mb-2">{item.wishlist_name}</h2>
-      <ul className="list-disc list-inside text-base">
-        <li><strong>Item:</strong> <a href={`/wishlists/${item.wishlists_id}#${item.item_id}`} className={"font-medium text-blue-600 dark:text-blue-500 hover:underline"}>{item.name}</a></li>
-        <li><strong>Note:</strong> {item.note? item.note: <span className='text-red-400'>None</span>}</li>
-        <li><strong>Quantity:</strong> {item.quantity}</li>
-        <li><strong>Purchased:</strong> {item.purchased ? "Yes" : "No"}</li>
-        <li><strong>Created:</strong> {new Date(item.datecreated).toLocaleString()}</li>
-        <li><strong>Updated:</strong> {item.dateupdated ? new Date(item.dateupdated).toLocaleString() : "Not Updated"}</li>
-      </ul>
-    </div>
+    <ContributionCard>
+      <ContributionHeader title={item.wishlist_name}>
+        {item.wishlist_name}
+      </ContributionHeader>
+      
+      <ContributionDetail>
+        <DetailLabel>Item:</DetailLabel>
+        <DetailValue>
+          <ContributionLink href={`/wishlists/${item.wishlists_id}#${item.item_id}`}>
+            {item.name}
+          </ContributionLink>
+        </DetailValue>
+      </ContributionDetail>
+      
+      <ContributionDetail>
+        <DetailLabel>Note:</DetailLabel>
+        <DetailValue>
+          {item.note ? item.note : <EmptyNote>None</EmptyNote>}
+        </DetailValue>
+      </ContributionDetail>
+      
+      <ContributionDetail>
+        <DetailLabel>Quantity:</DetailLabel>
+        <DetailValue>{item.quantity}</DetailValue>
+      </ContributionDetail>
+      
+      <ContributionDetail>
+        <DetailLabel>Status:</DetailLabel>
+        <DetailValue>
+          <span style={{ color: item.purchased ? '#10b981' : '#ef4444' }}>
+            {item.purchased ? 'Purchased' : 'Not Purchased'}
+          </span>
+        </DetailValue>
+      </ContributionDetail>
+      
+      <ContributionDetail>
+        <DetailLabel>Created:</DetailLabel>
+        <DetailValue>
+          {new Date(item.datecreated).toLocaleDateString()}
+        </DetailValue>
+      </ContributionDetail>
+      
+      {item.dateupdated && (
+        <ContributionDetail>
+          <DetailLabel>Updated:</DetailLabel>
+          <DetailValue>
+            {new Date(item.dateupdated).toLocaleDateString()}
+          </DetailValue>
+        </ContributionDetail>
+      )}
+    </ContributionCard>
   );
 };
-
 
 const Home = () => {
 
@@ -97,29 +251,27 @@ const Home = () => {
       let token = localStorage.getItem('token') || ''
       console.log(token)
       fetch(wishlistUrl, {
-          method: 'get',
-          headers: new Headers({
-            'Authorization': "Bearer "+token
-          })
+        method: 'get',
+        headers: new Headers({
+          'Authorization': "Bearer "+token
         })
-          .then((response) => response.json())
-          .then((data) => {
-            data.sort((a, b) => new Date(b.datecreated) - new Date(a.datecreated))
-            data = data.slice(0,3);
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        data.sort((a, b) => new Date(b.datecreated) - new Date(a.datecreated))
+        data = data.slice(0,3);
+        setWishlists(data);
+        console.log("Wishlists:")
+        console.log(wishlists);
+        console.log(data);
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }, [])
+}
 
-            setWishlists(data);
-            console.log("Wishlists:")
-            console.log(wishlists);
-            console.log(data);
-          })
-          .catch((error) => {
-            console.log(error)
-          })
-    }, [])
-  }
-
-  const [eventList, setEventList] = useState([])
-
+const [eventList, setEventList] = useState([])
   const eventListLoading = () => {
     const eventListURL = `https://api.wishify.ca/events`
 
@@ -127,29 +279,27 @@ const Home = () => {
       let token = localStorage.getItem('token') || ''
       console.log(token)
       fetch(eventListURL, {
-          method: 'get',
-          headers: new Headers({
-            'Authorization': "Bearer "+token
-          })
+        method: 'get',
+        headers: new Headers({
+          'Authorization': "Bearer "+token
         })
-          .then((response) => response.json())
-          .then((data) => {
-            data.sort((a, b) => new Date(b.datecreated) - new Date(a.datecreated))
-            data = data.slice(0,3);
-
-            setEventList(data);
-            console.log("Events:")
-            console.log(eventList);
-            console.log(data);
-          })
-          .catch((error) => {
-            console.log(error)
-          })
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        data.sort((a, b) => new Date(b.datecreated) - new Date(a.datecreated))
+        data = data.slice(0,3);
+        setEventList(data);
+        console.log("Events:")
+        console.log(eventList);
+        console.log(data);
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     }, [])
-  }
+}
 
-  const [contributions, setContributions] = useState([])
-
+const [contributions, setContributions] = useState([])
   const contributionLoading = () => {
     let token = localStorage.getItem('token') || ''
     useEffect(() => {
@@ -189,23 +339,23 @@ const Home = () => {
   
           setContributions(newContributions);
           console.log("Processed Contributions:", newContributions);
-        } catch (error) {
+        } 
+        catch (error) {
           console.error("Error in backendLoading:", error);
         }
       };
-  
-      fetchData();
+    fetchData();
     }, [wishlists]);
   };
-
+  
   const [user, setUser] = React.useState({
-      email: '',
-      displayName: '',
-      bio: '',
-      picture: '',
-      likes: [],
-      setup: false
-    })
+    email: '',
+    displayName: '',
+    bio: '',
+    picture: '', // This will store the profile image URL
+    likes: [],
+    setup: false
+  })
 
   const userLoading = () => {
     const userURL = `https://api.wishify.ca/users`
@@ -214,27 +364,27 @@ const Home = () => {
       let token = localStorage.getItem('token') || ''
       console.log(token)
       fetch(userURL, {
-          method: 'get',
-          headers: new Headers({
-            'Authorization': "Bearer "+token
-          })
+        method: 'get',
+        headers: new Headers({
+          'Authorization': "Bearer "+token
         })
-          .then((response) => response.json())
-          .then((data) => {
-            setUser({
-              email: data.user.email,
-              displayName: data.user.displayname,
-              bio: data.user.bio === null ? '' : data.user.bio,
-              picture: data.user.picture,
-              likes: data.categories,
-              setup: data.user.setup
-            })
-            console.log(user);
-            console.log(data);
-          })
-          .catch((error) => {
-            console.log(error)
-          })
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        setUser({
+          email: data.user.email,
+          displayName: data.user.displayname,
+          bio: data.user.bio === null ? '' : data.user.bio,
+          picture: data.user.picture, // Set the picture from backend
+          likes: data.categories,
+          setup: data.user.setup
+        })
+        console.log(user);
+        console.log(data);
+      })
+      .catch((error) => {
+        console.log(error)
+      })
     }, [])
   }
 
@@ -261,64 +411,51 @@ const Home = () => {
     <>
       <section className="home-container">
         <div className="home-user-info">
-
           <div className="home-user-picture">
-            <img
-              src={user.profilePicture || "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?t=st=1738333167~exp=1738336767~hmac=d1a2645bf22eff4e35bc060e5a7529cb9cbf09696ae232ab6690c137ad06d5e4&w=1060"}
-              alt='User profile picture'
-            />
+              <img
+                  src={user.picture || "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg"}
+                  alt='User profile picture'
+                  className="w-[150px] h-[150px] rounded-full object-cover"
+              />
           </div>
-
+  
           <div className="home-welcome-text">
             <h2>Welcome back, {user.displayName}!</h2>
           </div>
         </div>
-
-        <br/>
-
+  
         <h1>Wishlists</h1>
-        <div className="home-wishlist-top">
-          <WishlistContainer>
+        <WishlistContainer>
           <NavLink to="/wishlists">
-              <CreateWishlistButton> Create a Wishlist </CreateWishlistButton>
-            </NavLink>
-
-            {wishlists.map((wishlist, index) => (
-              <WishlistThumbnail 
-                //active={''}
-                key={index}
-                id={wishlist.id}
-                title={wishlist.name}
-                owner={user.displayName}
-                role={"contributor"}
-              />
-            ))}
-          </WishlistContainer>
-        </div>
-
-        <br/>
-
+            <CreateWishlistButton>Create a Wishlist</CreateWishlistButton>
+          </NavLink>
+          {wishlists.map((wishlist, index) => (
+            <WishlistThumbnail 
+              key={index}
+              id={wishlist.id}
+              title={wishlist.name}
+              owner={wishlist.creator_displayname || "None"}
+              role={"contributor"}
+            />
+          ))}
+        </WishlistContainer>
+  
         <h1>Events</h1>
-        <div className="home-wishlist-top">
-          <EventContainer>
+        <EventContainer>
           <NavLink to="/events">
-              <CreateEventButton> Create an Event </CreateEventButton>
-            </NavLink>
-            {eventList.map((event, index) => (
-              <WishlistThumbnail 
-                //active={''}
-                key={index}
-                id={event.id}
-                title={event.name}
-                owner={user.displayName}
-                role={"contributor"}
-              />
-            ))}
-          </EventContainer>
-        </div>
-
-        <br/>
-
+            <CreateEventButton>Create an Event</CreateEventButton>
+          </NavLink>
+          {eventList.map((event, index) => (
+            <WishlistThumbnail 
+              key={index}
+              id={event.id}
+              title={event.name}
+              owner={event.creator_displayname || "None"}
+              role={"contributor"}
+            />
+          ))}
+        </EventContainer>
+  
         <h1>Contributions</h1>
         <div className="home-wishlist-top" w>
           <ContributionContainer>

@@ -332,7 +332,6 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
             {isDesktop && (
               <div className='container2'>
                 <a href='/Register'><button className='btn'>Sign Up</button></a>
-                &nbsp;
                 <a href='/Login'><button className='btn'>Log In</button></a>
               </div>
             )}
