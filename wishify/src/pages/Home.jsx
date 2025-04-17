@@ -22,7 +22,7 @@ const WishlistContainer = styled.div`
     grid-template-columns: repeat(1, 1fr);
   }
 `
-const CreateWishlistButton = styled.button`
+const ViewMoreButton = styled.button`
   background: linear-gradient(to right, #8d8aee, #5651e5);
   color: white;
   border-radius: 25px;
@@ -426,9 +426,6 @@ const [contributions, setContributions] = useState([])
   
         <h1>Wishlists</h1>
         <WishlistContainer>
-          <NavLink to="/wishlists">
-            <CreateWishlistButton>Create a Wishlist</CreateWishlistButton>
-          </NavLink>
           {wishlists.map((wishlist, index) => (
             <WishlistThumbnail 
               key={index}
@@ -438,15 +435,15 @@ const [contributions, setContributions] = useState([])
               role={"contributor"}
             />
           ))}
+          <NavLink to="/wishlists">
+            <ViewMoreButton>View More...</ViewMoreButton>
+          </NavLink>
         </WishlistContainer>
   
         <h1>Events</h1>
         <EventContainer>
-          <NavLink to="/events">
-            <CreateEventButton>Create an Event</CreateEventButton>
-          </NavLink>
           {eventList.map((event, index) => (
-            <WishlistThumbnail 
+            <EventThumbnail 
               key={index}
               id={event.id}
               title={event.name}
@@ -454,10 +451,13 @@ const [contributions, setContributions] = useState([])
               role={"contributor"}
             />
           ))}
+          <NavLink to="/events">
+            <ViewMoreButton>View More...</ViewMoreButton>
+          </NavLink>
         </EventContainer>
   
         <h1>Contributions</h1>
-        <div className="home-wishlist-top" w>
+        <div className="home-wishlist-top">
           <ContributionContainer>
             {contributions.map((contribution) => (
               <ItemDisplay key={contribution.id} item={contribution} />

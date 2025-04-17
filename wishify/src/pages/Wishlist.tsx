@@ -400,26 +400,62 @@ const Wishlist = () => {
             toggleNotifications={toggleNotifications}
           />
           <div className="mt-8 mb-4 flex gap-1 items-center justify-between">
-            <div className='flex'>
-              <FormControl fullWidth>
-                  <InputLabel id="sort-select-label">Sort by</InputLabel>
-                  <Select
-                      labelId="sort-select-label"
-                      id="sort-select"
-                      value={sortBy}
-                      label="Sort by"
-                      onChange={(event: SelectChangeEvent) => setSortBy(event.target.value as SortOption)}
-                      sx={{width:120}}
-                  >
-                      <MenuItem value={'priority'}>Priority</MenuItem>
-                      <MenuItem value={'price'}>Price</MenuItem>
-                      <MenuItem value={'quantity'}>Quantity</MenuItem>
-                  </Select>
-              </FormControl>
-              <IconButton className='w-12 h-12' onClick={() => setSortDirection(sortDirection === 1 ? -1 : 1)}>
-                  <FaArrowUp className={`transition-[1]  ${sortDirection === -1 ? 'rotate-180' : 'rotate-0'}`} />
-              </IconButton>
-            </div>
+          <div className='flex'>
+            <FormControl fullWidth>
+              <InputLabel 
+                id="sort-select-label"
+                sx={{
+                  color: '#5651e5',
+                  '&.Mui-focused': {
+                    color: '#5651e5',
+                  },
+                }}
+              >
+                Sort by
+              </InputLabel>
+              <Select
+                labelId="sort-select-label"
+                id="sort-select"
+                value={sortBy}
+                label="Sort by"
+                onChange={(event: SelectChangeEvent) => setSortBy(event.target.value as SortOption)}
+                sx={{
+                  width: 120,
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: '#a5a2f3',
+                      borderRadius: '25px',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#8d8aee',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#5651e5',
+                    },
+                  },
+                  '& .MuiSelect-icon': {
+                    color: '#5651e5',
+                  },
+                }}
+              >
+                <MenuItem value={'priority'}>Priority</MenuItem>
+                <MenuItem value={'price'}>Price</MenuItem>
+                <MenuItem value={'quantity'}>Quantity</MenuItem>
+              </Select>
+            </FormControl>
+            <IconButton 
+              className='w-12 h-12' 
+              onClick={() => setSortDirection(sortDirection === 1 ? -1 : 1)}
+              sx={{
+                color: '#5651e5',
+                '&:hover': {
+                  backgroundColor: '#EDEDFF',
+                },
+              }}
+            >
+              <FaArrowUp className={`transition-[1] ${sortDirection === -1 ? 'rotate-180' : 'rotate-0'}`} />
+            </IconButton>
+          </div>
             <div>
               <div 
                 onClick={() => setIsMemberDialogOpen(true)}

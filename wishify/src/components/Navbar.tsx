@@ -236,7 +236,19 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
                   
                 {isHelpMenuOpen && <HelpMenu closeMenu={() => setIsHelpMenuOpen(false)} />}
                 
-                <AiOutlineUser className="text-2xl cursor-pointer" onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)} />
+                {profile ? (
+                  <img 
+                    src={profile.picture} 
+                    className={`w-8 h-8 rounded-full cursor-pointer object-cover ${profile.pro ? "ring-2 ring-[#5651e5]" : ""}`}
+                    onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                    alt="Profile"
+                  />
+                ) : (
+                  <AiOutlineUser 
+                    className="text-2xl cursor-pointer" 
+                    onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)} 
+                  />
+                )}
                 {profile && isProfileMenuOpen && <ProfileMenu 
                       logOut={() => {setIsLoggedIn(false); localStorage.removeItem("token"); setToken('')}}
                       closeMenu={() => setIsProfileMenuOpen(false)} 
@@ -270,10 +282,21 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
                     {isHelpMenuOpen && <HelpMenu closeMenu={() => setIsHelpMenuOpen(false)} />}
                   </div>
 
-
                   {/* Profile Button */}
                   <div className="relative desktop-profile-icon">
-                    <AiOutlineUser className="text-2xl cursor-pointer" onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)} />
+                    {profile ? (
+                      <img 
+                        src={profile.picture} 
+                        className={`w-8 h-8 rounded-full cursor-pointer object-cover ${profile.pro ? "ring-2 ring-[#5651e5]" : ""}`}
+                        onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                        alt="Profile"
+                      />
+                    ) : (
+                      <AiOutlineUser 
+                        className="text-2xl cursor-pointer" 
+                        onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)} 
+                      />
+                    )}
                     
                     {profile && isProfileMenuOpen && <ProfileMenu 
                       logOut={() => {setIsLoggedIn(false); localStorage.removeItem("token")}}
@@ -284,7 +307,6 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
                       deleteNotification={deleteNotification}
                       />}
                   </div>
-                  
                 </div>
               )}
             </div>

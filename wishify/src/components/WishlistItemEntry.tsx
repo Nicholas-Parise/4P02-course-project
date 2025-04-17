@@ -3,7 +3,7 @@ import { type WishlistItem, Contribution } from '../types/types';
 import { useSortable } from '@dnd-kit/sortable';
 import {CSS} from '@dnd-kit/utilities';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, Button, TextField, IconButton } from '@mui/material';
-import { FaExternalLinkAlt, FaMinus, FaPlus, FaChevronDown, FaChevronRight, FaPencilAlt } from 'react-icons/fa';
+import { FaExternalLinkAlt, FaMinus, FaPlus, FaChevronDown, FaChevronRight, FaPencilAlt, FaTimes } from 'react-icons/fa';
 import { FaTrashCan } from "react-icons/fa6";
 import DeleteItemModal from './DeleteItemModal';
 import EditItemDialog from './EditItemDialog';
@@ -90,54 +90,78 @@ const WishlistItemEntry = ({ item, editWishlistItem, sortBy, reservations, onRes
         id={id.toString()}
         ref={setNodeRef}
         style={style}
-        className="bg-white shadow-md p-4 flex items-center space-x-4 cursor-pointer rounded-[25px] border-2 border-[#5651e5]"
+        className="bg-white shadow-md p-3 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 cursor-pointer rounded-[25px] border-2 border-[#5651e5]"
         onClick={() => setIsModalOpen(true)}
       >
-        {owner && sortBy === "priority" && (
-          <div {...attributes} {...listeners} className="cursor-move" onClick={(e) => e.stopPropagation()}>
-            <svg {...attributes} {...listeners} className='w-6 cursor-move touch-none outline-none fill-gray-700' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path d="M96 32H32C14.3 32 0 46.3 0 64v64c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32V64c0-17.7-14.3-32-32-32zm0 160H32c-17.7 0-32 14.3-32 32v64c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32v-64c0-17.7-14.3-32-32-32zm0 160H32c-17.7 0-32 14.3-32 32v64c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32v-64c0-17.7-14.3-32-32-32zM288 32h-64c-17.7 0-32 14.3-32 32v64c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32V64c0-17.7-14.3-32-32-32zm0 160h-64c-17.7 0-32 14.3-32 32v64c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32v-64c0-17.7-14.3-32-32-32zm0 160h-64c-17.7 0-32 14.3-32 32v64c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32v-64c0-17.7-14.3-32-32-32z"/></svg>
+        <div className="flex items-center w-full sm:w-auto gap-3">
+          {owner && sortBy === "priority" && (
+            <div 
+              {...attributes} 
+              {...listeners} 
+              className="cursor-move flex-shrink-0"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <svg 
+                className='w-5 sm:w-6 cursor-move touch-none outline-none fill-gray-700' 
+                xmlns="http://www.w3.org/2000/svg" 
+                viewBox="0 0 320 512"
+              >
+                <path d="M96 32H32C14.3 32 0 46.3 0 64v64c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32V64c0-17.7-14.3-32-32-32zm0 160H32c-17.7 0-32 14.3-32 32v64c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32v-64c0-17.7-14.3-32-32-32zm0 160H32c-17.7 0-32 14.3-32 32v64c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32v-64c0-17.7-14.3-32-32-32zM288 32h-64c-17.7 0-32 14.3-32 32v64c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32V64c0-17.7-14.3-32-32-32zm0 160h-64c-17.7 0-32 14.3-32 32v64c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32v-64c0-17.7-14.3-32-32-32zm0 160h-64c-17.7 0-32 14.3-32 32v64c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32v-64c0-17.7-14.3-32-32-32z"/>
+              </svg>
+            </div>
+          )}
+          
+          <div className="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 relative">
+            <img 
+              src={item.image || "/placeholder.svg"} 
+              alt={item.name}
+              className="w-full h-full object-contain"
+            />
           </div>
-        )}
-        <div className="flex-shrink-0 w-16 h-16 relative">
-          <img src={item.image || "/placeholder.svg"} alt={item.name}/>
-        </div>
-        <div className="flex-grow">
-          <div className="flex items-center space-x-2">
-            <h3 className="text-2xl font-semibold">{item.name}</h3>
-            {totalReserved > 0 && 
-              <div className={`${reservedBadgeColour} p-3 flex-shrink-0 h-8 text-xl font-semibold text-white rounded-full flex items-center justify-center`}>
-                {availableQuantity <= 0 ? "Fully Reserved" : "Partially Reserved"}
-              </div>
-            }
-            { owner &&(
-              <>
-                <IconButton sx={{marginLeft: 2, ":hover":{color:'#5651e5'}}} onClick={(e) => {e.stopPropagation(), setIsEditModalOpen(true)}} className='w-8 h-8'>
-                <FaPencilAlt className='transition-[1]'/>
-                </IconButton>
-                <IconButton sx={{marginLeft: 1, ":hover":{color:'#fb2c36'}}} onClick={(e) => {e.stopPropagation(), setIsDeleteModalOpen(true)}} className='w-8 h-8'>
-                <FaTrashCan className='transition-[1]'/>
-                </IconButton>
-              </>
-            )}
-            
-          </div>
-          <p className="text-gray-600">Price: ${item.price.toFixed(2)}</p>
-          <p className="text-gray-600">
-          { blind ? 
-                  <>
-                    Quantity: {item.quantity}
-                  </>
-                :
-                  <>
-                    Quantity: {availableQuantity} available / {item.quantity} total
-                  </>
+
+          <div className="flex-grow min-w-0">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+              <h3 className="text-lg sm:text-xl font-semibold truncate">{item.name}</h3> 
+              
+              {totalReserved > 0 && 
+                <div className={`${reservedBadgeColour} px-2 py-1 sm:px-3 sm:py-1 h-6 sm:h-7 text-xs sm:text-sm font-semibold text-white rounded-full flex-shrink-0`}>
+                  {availableQuantity <= 0 ? "Fully Reserved" : "Partially Reserved"}
+                </div>
               }
-          </p>
+            </div>
+            
+            <div className="flex flex-wrap gap-x-4 mt-1">
+              <p className="text-gray-600 text-sm">${item.price.toFixed(2)}</p>
+              <p className="text-gray-600 text-sm">
+                {blind ? `Qty: ${item.quantity}` : `Available: ${availableQuantity}/${item.quantity}`}
+              </p>
+            </div>
+          </div>
         </div>
-        <div className="flex-shrink-0 p-3 h-8 bg-[#5651e5] text-white rounded-full flex items-center justify-center">
-          {item.priority}
+
+        <div className="flex items-center justify-between sm:justify-end gap-2 sm:ml-auto">
+          <div className="flex-shrink-0 px-3 py-1 h-7 bg-[#5651e5] text-white rounded-full flex items-center justify-center text-sm">
+            {item.priority}
+          </div>
+          
+          {owner && (
+            <div className="flex gap-2">
+              <button 
+                onClick={(e) => { e.stopPropagation(); setIsEditModalOpen(true); }}
+                className="p-2 text-[#5651e5] hover:bg-gray-100 rounded-full"
+              >
+                <FaPencilAlt className='text-sm'/>
+              </button>
+              <button 
+                onClick={(e) => { e.stopPropagation(); setIsDeleteModalOpen(true); }}
+                className="p-2 text-[#fb2c36] hover:bg-gray-100 rounded-full"
+              >
+                <FaTrashCan className='text-sm'/>
+              </button>
+            </div>
+          )}
         </div>
-    </li>
+      </li>
 
     <Dialog 
       open={isModalOpen} 
@@ -148,12 +172,23 @@ const WishlistItemEntry = ({ item, editWishlistItem, sortBy, reservations, onRes
         style: {
           border: '2px solid #5651e5',
           borderRadius: '25px',
-          minWidth: '400px', // Ensure min width
         },
       }}
     >
-      <DialogTitle id="item-dialog-title" className="text-[#5651e5]">
+      <DialogTitle id="item-dialog-title" className="text-[#5651e5] relative">
         <div className="text-center font-bold">{item.name}</div>
+        <IconButton
+          aria-label="close"
+          onClick={() => setIsModalOpen(false)}
+          sx={{
+            position: 'absolute',
+            right: 8,
+            top: 8,
+            color: '#5651e5',
+          }}
+        >
+          <FaTimes />
+        </IconButton>
       </DialogTitle>
       <DialogContent className="sm:max-w-[425px]">
           <DialogContentText id="alert-dialog-description" className="text-[#5651e5] text-center">
@@ -200,7 +235,7 @@ const WishlistItemEntry = ({ item, editWishlistItem, sortBy, reservations, onRes
               </div>
             )}
             { !blind && (
-              <div className="space-y-2">
+              <div className="space-y-2 flex flex-col items-center">
                 <p className="text-md font-medium text-[#5651e5]">Your Reservation</p>
                 <div className="flex items-center space-x-2">
                   <Button onClick={decrementReserve}>
@@ -225,19 +260,29 @@ const WishlistItemEntry = ({ item, editWishlistItem, sortBy, reservations, onRes
               </div>
             )}
             
-            <div className="flex space-x-2 gap-2">
-              { item.url && (
+            <div className="flex flex-col sm:flex-row w-full gap-2">
+              {item.url && (
                 <Button
-                  className="!text-[#5651e5] !rounded-[25px]" sx={{border: '2px solid #5651e5', '&:hover': { background: '#EDEDFF'}}} // TODO edit this on hover colour to be the same as everything else
+                  fullWidth 
+                  className="!text-[#5651e5] !rounded-[25px]" 
+                  sx={{
+                    border: '2px solid #5651e5', 
+                    '&:hover': { background: '#EDEDFF' },
+                    padding: '8px 16px'
+                  }}
                   onClick={() => window.open(item.url, '_blank')}
                 >
                   View Item <FaExternalLinkAlt className="ml-2 h-4 w-4" />
                 </Button>
               )}
               
-              { !blind && (
+              {!blind && (
                 <Button
+                  fullWidth 
                   className="!rounded-[25px] bg-gradient-to-r from-[#8d8aee] to-[#5651e5] !text-white hover:from-[#5651e5] hover:to-[#343188]"
+                  sx={{
+                    padding: '8px 16px'
+                  }}
                   onClick={handleReserve}
                 >
                   {userReservation > 0 ? 'Update Reservation' : 'Reserve'}

@@ -1,6 +1,7 @@
 import { useState, type ChangeEvent, FormEvent } from 'react'
-import { Dialog, DialogTitle, DialogContent, DialogContentText, FormControl, Button, TextField } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogContentText, FormControl, Button, TextField, IconButton } from '@mui/material';
 import { WishlistItem } from '../types/types';
+import { FaTimes } from 'react-icons/fa';
 
 interface Props {
     open: boolean, 
@@ -85,118 +86,197 @@ const EditItemDialog = ({ open, setOpen, item, editWishlistItem, }: Props) => {
             onClose={() => setOpen(false)}
             aria-labelledby="item-dialog-title"
             aria-describedby="item-dialog-description"
-            sx={{
-              '& .MuiDialog-paper': {
-                borderRadius: '25px', // Rounded corners
-                background: '#FFFFFF', // Background color matching ProfileMenu
-                padding: '20px',
-                border: '2px solid #5651e5', // Border color
-                maxWidth: '900px', // Set max width to 900px
-                //width: '100%', // Ensure it takes full width up to the max width
-              },
+            PaperProps={{
+                style: {
+                    border: '2px solid #5651e5',
+                    borderRadius: '25px',
+                    maxWidth: '900px',
+                    width: '90%'
+                },
             }}
-          >
-            <DialogTitle id="item-dialog-title" sx={{ textAlign: 'center', fontWeight: 'bold', color: '#000', fontSize: '24px' }}>
-                Edit Item
+        >
+            <DialogTitle id="item-dialog-title" className="text-[#5651e5] relative">
+                <div className="text-center font-bold">Edit Item</div>
+                <IconButton
+                    aria-label="close"
+                    onClick={() => setOpen(false)}
+                    sx={{
+                        position: 'absolute',
+                        right: 8,
+                        top: 8,
+                        color: '#5651e5',
+                    }}
+                >
+                    <FaTimes />
+                </IconButton>
             </DialogTitle>
             <DialogContent className="sm:max-w-[425px]">
-                <DialogContentText id="item-dialog-description" sx={{ color: '#000' }}>
-                  Modify the details of this item.
+                <DialogContentText id="item-dialog-description" className="text-[#5651e5] text-center">
+                    Modify the details of this item.
                 </DialogContentText>
                 
                 <form autoComplete="off" onSubmit={editItem}>
-                  <FormControl sx={{ width: '25ch' }}>
-                   <TextField 
-                      sx={{mt: 3}}
-                      label="Name" 
-                      value={newItem.name || ""} 
-                      onChange={e => setNewItem({ ...newItem, name: e.target.value})}
-                      required
-                    />
+                    <div className="grid gap-4 py-4">
+                        <TextField 
+                            label="Name"
+                            value={newItem.name || ""}
+                            onChange={e => setNewItem({ ...newItem, name: e.target.value})}
+                            required
+                            fullWidth
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    '& fieldset': {
+                                        borderColor: '#a5a2f3',
+                                    },
+                                    '&:hover fieldset': {
+                                        borderColor: '#8d8aee',
+                                    },
+                                },
+                            }}
+                        />
 
-                    <TextField
-                      sx={{mt: 3}}
-                      type="file"
-                      slotProps={{htmlInput: { accept: 'image/*' }, inputLabel:{shrink: true}}}
-                      fullWidth
-                      label="Upload Image"
-                      onChange={handleImageUpload}
-                    />
-                    {image && (
-                    <div className="mt-2 relative">
-                      <img
-                        src={image}
-                        alt="Item preview"
-                        className="rounded-md"
-                      />
+                        <div>
+                            <TextField
+                                type="file"
+                                slotProps={{htmlInput: { accept: 'image/*' }, inputLabel:{shrink: true}}}
+                                fullWidth
+                                label="Upload Image"
+                                onChange={handleImageUpload}
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        '& fieldset': {
+                                            borderColor: '#a5a2f3',
+                                        },
+                                        '&:hover fieldset': {
+                                            borderColor: '#8d8aee',
+                                        },
+                                    },
+                                }}
+                            />
+                            {image && (
+                              <div className="mt-2 flex items-center justify-center h-48 bg-gray-50 rounded-md">
+                                <img
+                                  src={image}
+                                  alt="Item preview"
+                                  className="max-h-full max-w-full object-contain"
+                                />
+                              </div>
+                            )}
+                        </div>
+        
+                        <TextField 
+                            label="Description"
+                            multiline
+                            rows={3}
+                            value={newItem.description || ""}
+                            onChange={e => setNewItem({ ...newItem, description: e.target.value})}
+                            fullWidth
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    '& fieldset': {
+                                        borderColor: '#a5a2f3',
+                                    },
+                                    '&:hover fieldset': {
+                                        borderColor: '#8d8aee',
+                                    },
+                                },
+                            }}
+                        />
+        
+                        <TextField 
+                            type='number'
+                            label="Price"
+                            value={newItem.price || ""}
+                            required
+                            onChange={e => {
+                                let price = Number(e.target.value)
+                                if(price < 0) price = 0
+                                setNewItem({ ...newItem, price: price})
+                            }}
+                            fullWidth
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    '& fieldset': {
+                                        borderColor: '#a5a2f3',
+                                    },
+                                    '&:hover fieldset': {
+                                        borderColor: '#8d8aee',
+                                    },
+                                },
+                            }}
+                        />
+        
+                        <TextField
+                            value={newItem.quantity || ""}
+                            label="Quantity"
+                            type='number'
+                            required
+                            onChange={e => {
+                                let quantity = Number(e.target.value)
+                                if(quantity < 0) quantity = 0
+                                setNewItem({ ...newItem, quantity: quantity})
+                            }}
+                            fullWidth
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    '& fieldset': {
+                                        borderColor: '#a5a2f3',
+                                    },
+                                    '&:hover fieldset': {
+                                        borderColor: '#8d8aee',
+                                    },
+                                },
+                            }}
+                        />
+        
+                        <TextField 
+                            label="Purchase Link"
+                            type='url'
+                            value={newItem.url || ""}
+                            onChange={e => setNewItem({ ...newItem, url: e.target.value})}
+                            fullWidth
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    '& fieldset': {
+                                        borderColor: '#a5a2f3',
+                                    },
+                                    '&:hover fieldset': {
+                                        borderColor: '#8d8aee',
+                                    },
+                                },
+                            }}
+                        />
+        
+                        <div className="flex flex-col sm:flex-row gap-2">
+                            <Button 
+                                fullWidth
+                                className="!rounded-[25px]"
+                                sx={{
+                                    border: '2px solid #5651e5',
+                                    color: '#5651e5',
+                                    '&:hover': { background: '#EDEDFF' },
+                                    padding: '8px 16px'
+                                }}
+                                onClick={() => setOpen(false)}
+                            >
+                                Cancel
+                            </Button>
+                            <Button 
+                                fullWidth
+                                className="!rounded-[25px] bg-gradient-to-r from-[#8d8aee] to-[#5651e5] !text-white hover:from-[#5651e5] hover:to-[#343188]"
+                                sx={{
+                                    padding: '8px 16px'
+                                }}
+                                type="submit"
+                            >
+                                Save Changes
+                            </Button>
+                        </div>
                     </div>
-                    )}
-                    
-    
-                    <TextField 
-                      sx={{mt: 3}}
-                      label="Description" 
-                      multiline
-                      value={newItem.description || ""} 
-                      onChange={e => setNewItem({ ...newItem, description: e.target.value})}
-                    />
-    
-                    <TextField 
-                      sx={{mt: 3}}
-                      type='number'
-                      label="Price" 
-                      value={newItem.price || ""} 
-                      required
-                      onChange={e => {
-                        let price = Number(e.target.value)
-                        if(price < 0) price = 0
-                        setNewItem({ ...newItem, price: price})
-                      }}
-                    />
-    
-                    <TextField
-                      sx={{mt: 3}}
-                      value={newItem.quantity || ""}
-                      className="w-25"
-                      label="Quantity"
-                      type='number'
-                      required
-                      onChange={e => {
-                        let quantity = Number(e.target.value)
-                        if(quantity < 0) quantity = 0
-                        setNewItem({ ...newItem, quantity: quantity})
-                      }}
-                    />
-    
-                    <TextField 
-                      sx={{mt: 3}}
-                      label="Purchase Link" 
-                      type='url'
-                      value={newItem.url || ""} 
-                      onChange={e => setNewItem({ ...newItem, url: e.target.value})}
-                    />
-    
-    
-                    <Button 
-                      sx={{
-                        mt: 3,
-                        background: 'linear-gradient(to right, #8d8aee, #5651e5)',
-                        color: 'white',
-                        borderRadius: '25px',
-                        '&:hover': { background: 'linear-gradient(to right, #5651e5, #343188)' }
-                      }}  
-                      type="submit" 
-                      variant="contained"
-                    >
-                      Save
-                    </Button>
-    
-                  </FormControl>
                 </form>
-                
             </DialogContent>
-          </Dialog>
-      )
+        </Dialog>
+    )
 }
 
 export default EditItemDialog
