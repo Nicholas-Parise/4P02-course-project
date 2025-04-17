@@ -82,6 +82,7 @@ const EditPasswordModal = ({ open, handleClose, onSave }) => {
             value={oldPasswordValue}
             onChange={(e) => setOldPasswordValue(e.target.value)}
             fullWidth
+            required
             variant='outlined'
             slotProps={{ htmlInput: { maxLength: 64 } }}
             sx={{
@@ -105,6 +106,7 @@ const EditPasswordModal = ({ open, handleClose, onSave }) => {
             value={newPasswordValue}
             onChange={(e) => setNewPasswordValue(e.target.value)}
             fullWidth
+            required
             variant='outlined'
             slotProps={{ htmlInput: { maxLength: 64 } }}
             sx={{
@@ -126,6 +128,7 @@ const EditPasswordModal = ({ open, handleClose, onSave }) => {
             value={confirmPasswordValue}
             onChange={(e) => setConfirmPasswordValue(e.target.value)}
             fullWidth
+            required
             variant='outlined'
             slotProps={{ htmlInput: { maxLength: 64 } }}
             sx={{

@@ -511,12 +511,14 @@ const Profile = () => {
       <Dialog 
         open={openModals.picture} 
         onClose={handleClose}
-        PaperProps={{
-          sx: {
-            borderRadius: '25px',
-            bgcolor: 'background.paper',
-            border: '2px solid #5651e5',
-          },
+        slotProps={{
+          paper: {
+            sx: {
+              borderRadius: '25px',
+              bgcolor: 'background.paper',
+              border: '2px solid #5651e5',
+            }
+          }
         }}
       >
         <DialogTitle variant='h6' sx={{ textAlign: 'center', fontWeight: 'bold', color: '#5651e5' }}>

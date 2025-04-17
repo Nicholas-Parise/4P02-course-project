@@ -78,6 +78,7 @@ const EditEmailModal = ({ open, handleClose, value, onSave }) => {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             fullWidth
+            required
             variant='outlined'
             slotProps={{ htmlInput: { maxLength: 256 } }}
             sx={{
@@ -99,6 +100,7 @@ const EditEmailModal = ({ open, handleClose, value, onSave }) => {
             value={passwordValue}
             onChange={(e) => setPasswordValue(e.target.value)}
             fullWidth
+            required
             variant='outlined'
             slotProps={{ htmlInput: { maxLength: 64 } }}
             sx={{

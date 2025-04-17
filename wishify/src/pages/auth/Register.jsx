@@ -273,8 +273,9 @@ const Register = () => {
         <br></br>
         <hr></hr>
         <button onClick={handleGoogleLogin}>
-                <img align="left" src={google} alt="G" />
-                  Login with Google</button>
+          <img align="left" src={google} alt="G" />
+          Login with Google
+        </button>
       </section>
       
     </>

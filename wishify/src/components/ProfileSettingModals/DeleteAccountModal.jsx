@@ -81,6 +81,7 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             fullWidth
+            required
             variant='outlined'
             slotProps={{ htmlInput: { maxLength: 64 } }}
             sx={{

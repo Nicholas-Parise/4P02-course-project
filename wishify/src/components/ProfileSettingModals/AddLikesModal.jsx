@@ -90,7 +90,7 @@ const AddLikesModal = ({ open, handleClose, type, values, onSave }) => {
       <Divider sx={{ mt: 2, mb: 2 }} />
 
       <Typography variant="body1">
-        You can select {itemsLeft} more {itemsLeft === 1 ? type.toLowerCase().slice(0, -1) : type.toLowerCase()}.
+        You can select up to {itemsLeft} more {itemsLeft === 1 ? type.toLowerCase().slice(0, -1) : type.toLowerCase()}.
       </Typography>
 
       {unableToFetchCategories && (
@@ -100,7 +100,6 @@ const AddLikesModal = ({ open, handleClose, type, values, onSave }) => {
       )}
 
       <TextField
-        fullwidth
         variant="outlined"
         fullWidth
         label="Search"
