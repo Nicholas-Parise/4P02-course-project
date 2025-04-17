@@ -7,6 +7,8 @@ const path = require('path');
 const authenticate = require('./middleware/authenticate');
 const uploadPicture = require('./middleware/upload');
 
+const createNotification = require("./middleware/createNotification");
+
 // localhost:3000/items/0
 // get the contents of a single item
 router.get('/:itemId', authenticate, async (req, res, next) => {
@@ -18,7 +20,6 @@ router.get('/:itemId', authenticate, async (req, res, next) => {
 
     const result = await db.query(
       `SELECT * FROM items WHERE id = $1`, [itemId]);
-
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Item not found." });
@@ -140,6 +141,8 @@ router.post('/', authenticate, uploadPicture, async (req, res, next) => {
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW()) RETURNING id, name, description, url, image, quantity, price, priority, dateCreated;
       `, [member_id, ideaData.name, ideaData.description, ideaData.url, ideaData.image, quantity, ideaData.price, priority]);
 
+      await notifyAllOnAdd(ideaData.name, wishlists_id, userId);
+
       return res.status(201).json({ message: "Item created successfully", item: {...result.rows[0], wishlists_id} });
 
     } else {
@@ -156,6 +159,8 @@ router.post('/', authenticate, uploadPicture, async (req, res, next) => {
       (member_id, name, description, url, image, quantity, price, priority, dateCreated)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW()) RETURNING id, name, description, url, image, quantity, price, priority, dateCreated;
       `, [member_id, name, description, url, image, quantity, price, priority]);
+
+      await notifyAllOnAdd(name, wishlists_id, userId);
 
       return res.status(201).json({ message: "Item created successfully", item: {...result.rows[0], wishlists_id} });
     }
@@ -502,5 +507,28 @@ function deleteUploadedFile(req) {
 }
 
 
+async function notifyAllOnAdd(item_name, wishlists_id, user_id){
+try{
+  /// get all members of wishlist, and get their notificatons status
+  const members = await db.query(
+    `SELECT wm.id, wm.notifications AS member_notifications, u.notifications AS user_notifications 
+    FROM wishlist_members wm
+    JOIN users u ON wm.user_id = u.id
+    WHERE wm.wishlists_id = $1;`,
+    [wishlists_id]);
+
+    // get array of users ids where both notifications are true 
+    const notifyMembers = members
+    .filter(member => member.member_notifications && member.user_notifications && member.id != user_id)
+    .map(member => member.id);
+
+    await createNotification(notifyMembers, 
+      "Item added to wishlist", 
+      `Hello, an item ${item_name} has been added to a wishlist.`, 
+      `/wishlists/${wishlists_id}`);
+    }catch(error){
+      console.error("Error sending item notifications:", error);
+    }
+}
 
 module.exports = router;

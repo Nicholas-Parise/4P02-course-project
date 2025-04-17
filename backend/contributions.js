@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('./db');
 const authenticate = require('./middleware/authenticate');
-
+const createNotification = require("./middleware/createNotification");
 
 // localhost:3000/contributions/
 // get all contributions from logged in user
@@ -45,15 +45,13 @@ router.get('/wishlists/:id', authenticate, async (req, res, next) => {
   try {
 
     const result = await db.query(
-      `SELECT c.id, c.item_id, c.quantity, c.purchased, c.note, c.dateUpdated, c.dateCreated, u.displayName AS user_displayName, u.id AS user_id
+      `SELECT c.id, c.item_id, c.quantity, c.purchased, c.note, c.dateUpdated, c.dateCreated, u.picture, u.pro, u.displayName AS user_displayName, u.id AS user_id
         FROM contributions c
         JOIN wishlist_members wm ON c.member_id = wm.id
         JOIN users u ON wm.user_id = u.id
         WHERE wm.wishlists_id = $1;`,
       [wishlistId]
     );
-
-
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "no contributions found." });
@@ -77,7 +75,7 @@ router.get('/items/:id', authenticate, async (req, res, next) => {
     //const result = await db.query(`SELECT c.id, c.item_id, c.quantity, c.purchased, c.note, c.dateUpdated, c.dateCreated FROM contributions WHERE item_id = $1`,[itemId]);
 
     const result = await db.query(
-      `SELECT c.id, c.item_id, c.quantity, c.purchased, c.note, c.dateUpdated, c.dateCreated, u.displayName AS user_displayName, u.id AS user_id
+      `SELECT c.id, c.item_id, c.quantity, c.purchased, c.note, c.dateUpdated, c.dateCreated, u.picture, u.pro, u.displayName AS user_displayName, u.id AS user_id
               FROM contributions c
               JOIN wishlist_members wm ON c.member_id = wm.id
               JOIN users u ON wm.user_id = u.id
@@ -125,10 +123,11 @@ router.post('/', authenticate, async (req, res, next) => {
   try {
     // get user membership from item id
     const wishlistResult = await db.query(
-      `SELECT wm.wishlists_id, u.displayName AS user_displayName, u.id AS user_id
+      `SELECT wm.wishlists_id, u.displayName AS user_displayname, u.id AS user_id, u.picture, u.pro, i.name AS item_name, w.name AS wishlist_name
       FROM wishlist_members wm
         JOIN items i ON wm.id = i.member_id
         JOIN users u ON wm.user_id = u.id
+        JOIN wishlists w ON wm.wishlists_id = w.id
         WHERE i.id = $1;`,
       [item_id]);
 
@@ -157,11 +156,17 @@ router.post('/', authenticate, async (req, res, next) => {
       `, [item_id, member_id, quantity, purchased, note]);
 
       const contribution_results = result.rows[0];
-      const user_displayname = wishlistResult.rows[0].user_displayName;
+      const user_displayname = wishlistResult.rows[0].user_displayname;
+      const picture = wishlistResult.rows[0].picture;
+      const pro = wishlistResult.rows[0].pro
       const user_id = userId;
+      const item_name = wishlistResult.rows[0].item_name
+      const wishlist_name = wishlistResult.rows[0].wishlist_name
+      
+      await notifyAllOnAdd(item_name, wishlistId, user_id, wishlist_name);
 
     //res.status(201).json({ message: "contribution created successfully", contribution: result.rows[0] });
-    res.status(201).json({ message: "contribution created successfully", contribution: {...contribution_results, user_displayname, user_id} });
+    res.status(201).json({ message: "contribution created successfully", contribution: {...contribution_results, user_displayname, user_id, picture,pro} });
 
   } catch (error) {
 
@@ -201,7 +206,7 @@ router.put('/:id', authenticate, async (req, res, next) => {
   try {
     /// make sure that only the user that created the contribution can edit it.
     const ownershipCheck = await db.query(
-      `SELECT c.id, u.displayName AS user_displayName, u.id AS user_id
+      `SELECT c.id, u.displayName AS user_displayname, u.id AS user_id, u.picture, u.pro
         FROM contributions c
         JOIN wishlist_members wm ON c.member_id = wm.id
         JOIN users u ON wm.user_id = u.id
@@ -232,8 +237,10 @@ router.put('/:id', authenticate, async (req, res, next) => {
     const contribution_results = result.rows[0];
     const user_displayname = ownershipCheck.rows[0].user_displayname;
     const user_id = ownershipCheck.rows[0].user_id;
+    const picture = ownershipCheck.rows[0].picture;
+    const pro = ownershipCheck.rows[0].pro
 
-    res.status(200).json({ message: "contribution updated successfully.", contribution: {...contribution_results, user_displayname, user_id} });
+    res.status(200).json({ message: "contribution updated successfully.", contribution: {...contribution_results, user_displayname, user_id, picture, pro} });
 
 
   } catch (error) {
@@ -278,6 +285,29 @@ router.delete('/:id', authenticate, async (req, res, next) => {
 });
 
 
+async function notifyAllOnAdd(item_name, wishlists_id, user_id, wishlist_name){
+  try{
+    /// get all members of wishlist, and get their notificatons status
+    const members = await db.query(
+      `SELECT wm.id, wm.blind, wm.notifications AS member_notifications, u.notifications AS user_notifications 
+      FROM wishlist_members wm
+      JOIN users u ON wm.user_id = u.id
+      WHERE wm.wishlists_id = $1;`,
+      [wishlists_id]);
+  
+      // get array of users ids where both notifications are true 
+      const notifyMembers = members
+      .filter(member => member.member_notifications && member.user_notifications && !member.blind && member.id != user_id)
+      .map(member => member.id);
+  
+      await createNotification(notifyMembers, 
+        "Contribution added to wishlist", 
+        `a contribution has been added for '${item_name}' in the wishlist: '${wishlist_name}'.`, 
+        `/wishlists/${wishlists_id}`);
+      }catch(error){
+        console.error("Error sending item notifications:", error);
+      }
+  }
 
 
 module.exports = router;

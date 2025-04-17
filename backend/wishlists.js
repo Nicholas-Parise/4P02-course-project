@@ -170,7 +170,7 @@ router.get('/:wishlistId', authenticate, async (req, res, next) => {
 
     if (!wishlist.blind) {  // return the contributions but only if user is not blind 
       contributionResult = await db.query(
-        `SELECT c.id, c.item_id, c.quantity, c.purchased, c.note, c.dateUpdated, c.dateCreated, u.displayName AS user_displayName, u.id AS user_id
+        `SELECT c.id, c.item_id, c.quantity, c.purchased, c.note, c.dateUpdated, c.dateCreated, u.picture, u.pro, u.displayName AS user_displayName, u.id AS user_id
         FROM contributions c
         JOIN wishlist_members wm ON c.member_id = wm.id
         JOIN users u ON wm.user_id = u.id
@@ -275,25 +275,35 @@ router.put('/:wishlistId', authenticate, async (req, res, next) => {
       return res.status(403).json({ error: "Only the owner can edit this wishlist." });
     }
 
+
+    let tempDeadline = deadline;
+    let tempEventId = event_id;
+
+    if (deadline && typeof deadline === "string") {
+      if (deadline.toLowerCase() === "null") {
+        tempDeadline = null;
+        await db.query(`
+          UPDATE wishlists
+          SET 
+              deadline = NULL,
+              dateUpdated = NOW()
+          WHERE id = $1;
+        `, [wishlistId]);
+      }
+    }
+
     // if event id is something and is a string
     if (event_id && typeof event_id === "string") {
       if (event_id.toLowerCase() === "null") {
-
+        tempEventId = null;
         // Update the wishlist with provided values (only update fields that are passed)
-        const result = await db.query(`
+        await db.query(`
           UPDATE wishlists
           SET 
-              event_id = null,
-              name = COALESCE($1, name),
-              description = COALESCE($2, description),
-              image = COALESCE($3, image),
-              deadline = COALESCE($4, deadline),
+              event_id = NULL,
               dateUpdated = NOW()
-          WHERE id = $5
-          RETURNING *;
-        `, [name, description, image, deadline, wishlistId]);
-
-        res.status(200).json({ message: "Wishlist updated successfully.", wishlist: result.rows[0] });
+          WHERE id = $1;
+        `, [wishlistId]);
       }
     }
 
@@ -309,7 +319,7 @@ router.put('/:wishlistId', authenticate, async (req, res, next) => {
           dateUpdated = NOW()
       WHERE id = $6
       RETURNING *;
-    `, [event_id, name, description, image, deadline, wishlistId]);
+    `, [tempEventId, name, description, image, tempDeadline, wishlistId]);
 
     res.status(200).json({ message: "Wishlist updated successfully.", wishlist: result.rows[0] });
 
@@ -718,6 +728,16 @@ router.put('/:id/members', authenticate, async (req, res) => {
         WHERE id = $4
         RETURNING blind,owner,notifications,dateUpdated;
       `, [blind, owner, notifications, memberCheck.rows[0].id]);
+
+
+      // if blind isn't null, and blind is false
+      if (typeof blind !== 'undefined' && blind !== null && !blind) {
+        // await createNotification(notifyMembers, 
+        // "a user is no longer blind",
+        // `${user_name} is no longer blind in the wishlist: ${wishlist_name}`,
+        // `/wishlists/${wishlists_id}`)
+      }
+
 
     } else {
       // if the user is trying to edit their notifications

@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('./db');
 const bodyParser = require('body-parser');
 const authenticate = require('./middleware/authenticate');
+const createNotification = require("./middleware/createNotification");
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 require("dotenv").config();
 
@@ -121,7 +122,7 @@ router.post('/webhook', bodyParser.raw({ type: 'application/json' }), async (req
 
                 const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
-                await db.query(`
+                const user = await db.query(`
                 UPDATE users
                 SET 
                     stripe_customer_id = $1,
@@ -139,6 +140,11 @@ router.post('/webhook', bodyParser.raw({ type: 'application/json' }), async (req
                     subscription.items.data[0].current_period_end,
                     subscription.items.data[0].price.id,
                     email]);
+
+                await createNotification([user.rows[0].id],
+                    "You're a pro!", 
+                    "Welcome to Wishify Pro! You can now view and manage your subscription.", 
+                    "/manage-subscription");
 
                 console.log(`Subscription completed and updated for email: ${email}`);
             } catch (err) {
