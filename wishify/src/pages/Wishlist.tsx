@@ -514,7 +514,6 @@ const Wishlist = () => {
                         userID={userID || -1}
                         owner={owner}
                         blind={blind}
-                        members={wishlistMembers}
                       />
                   ))}
                   </ul>

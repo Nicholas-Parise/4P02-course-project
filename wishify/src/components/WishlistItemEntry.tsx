@@ -20,10 +20,9 @@ type WishlistItemProps = {
   userID: number,
   owner: boolean,
   blind: boolean,
-  members: Member[]
 }
 
-const WishlistItemEntry = ({ item, editWishlistItem, sortBy, reservations, onReserve, id, onDelete, userID, owner, blind, members }: WishlistItemProps) => {
+const WishlistItemEntry = ({ item, editWishlistItem, sortBy, reservations, onReserve, id, onDelete, userID, owner, blind }: WishlistItemProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, } = useSortable({ id, animateLayoutChanges: () => false });
 
   const style = {
