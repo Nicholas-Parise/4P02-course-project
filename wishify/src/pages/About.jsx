@@ -55,7 +55,7 @@ const teamMembers = [
   {
     name: "Ethan Brennan",
     role: "Developer",
-    image: "assets/placehold-avatar.png",
+    image: "/assets/placeholder-avatar.png",
     contributions: [
       "Edited the Home page and created Help menu",
     ]
