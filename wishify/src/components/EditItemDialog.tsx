@@ -90,7 +90,7 @@ const EditItemDialog = ({ open, setOpen, item, editWishlistItem, }: Props) => {
                 style: {
                     border: '2px solid #5651e5',
                     borderRadius: '25px',
-                    maxWidth: '900px',
+                    maxWidth: '400px',
                     width: '90%'
                 },
             }}

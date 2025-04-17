@@ -22,6 +22,7 @@ const DeleteItemModal = ({ isModalOpen, setIsModalOpen, onDelete, item } : Props
             borderRadius: 4,
             boxShadow: 24,
             width: '90%', // Responsive width
+            maxWidth: 400,
             border: '2px solid #5651e5', // Same border style
           }}
         >
