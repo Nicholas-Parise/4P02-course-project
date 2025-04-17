@@ -51,7 +51,7 @@ export default function WishlistHeader({ wishlist, setWishlist, event, setEventI
     <div className="items-center justify-center flex">
       { wishlist ? (
         <div className="bg-white shadow-md rounded-[25px] p-6 border-2 border-[#5651e5] w-full">
-          <div className="flex items-center mb-2 ">
+          <div className="hidden md:flex items-center mb-2">
             <h1 className="text-3xl font-bold items-center">{wishlist.name}</h1>
             <div className="items-center flex justify-between w-full ml-2">
               <div className="flex items-center">
@@ -68,7 +68,6 @@ export default function WishlistHeader({ wishlist, setWishlist, event, setEventI
                   </span>
                 </div>
               </div>
-      
               <div>
                 <IconButton sx={{marginLeft: 1 ,":hover":{color:'#5651e5'}}} onClick={() => {toggleNotifications()}} className='w-10 h-10'>
                   { notifications ? (
@@ -87,59 +86,146 @@ export default function WishlistHeader({ wishlist, setWishlist, event, setEventI
               </div>
             </div>
           </div>
-          
-          { wishlist.deadline &&
-            <p className="text-gray-800">Deadline: {new Date(wishlist.deadline).toLocaleString()}</p>
-          }
-          <p className="text-gray-600">{wishlist.description}</p>
-          
 
+          <div className="md:hidden">
+            <div className="flex items-center gap-2 mb-2" style={{width: '50px'}}>
+              <span className="fa-layers fa-fw">
+                <FontAwesomeIcon icon={faCrown} className="text-lg opacity-[54%]"/>
+                {!owner && <FontAwesomeIcon icon={faSlash} />}
+              </span>
+              <span className="fa-layers fa-fw">
+                <FontAwesomeIcon icon={faEye} className="text-lg opacity-[54%]"/>
+                {blind && <FontAwesomeIcon icon={faSlash} />}
+              </span>
+            </div>
+
+            {/* Title and Action Buttons */}
+            <div className="flex justify-between items-center mb-2">
+              <h1 className="text-2xl font-bold break-words">
+                {wishlist.name}
+              </h1>
+              <div className="flex items-center gap-1">
+                <IconButton 
+                  sx={{":hover": {color: '#5651e5'}, padding: '8px'}} 
+                  onClick={toggleNotifications}
+                >
+                  {notifications ? (
+                    <AiFillBell className="text-lg"/>
+                  ) : (
+                    <AiOutlineBell className="text-lg"/>
+                  )}
+                </IconButton>
+                <IconButton 
+                  sx={{":hover": {color: '#5651e5'}, padding: '8px'}} 
+                  onClick={() => setIsShareModalOpen(true)}
+                >
+                  <FaShare className="text-lg"/>
+                </IconButton>
+              </div>
+            </div>
+          </div>
+          
+          {/* Content - Mobile and Desktop versions */}
+          {wishlist.deadline && (
+            <>
+              {/* Desktop version */}
+              <p className="hidden md:block text-gray-800">
+                Deadline: {new Date(wishlist.deadline).toLocaleString()}
+              </p>
+              {/* Mobile version */}
+              <p className="md:hidden text-gray-800 text-sm">
+                Deadline: {new Date(wishlist.deadline).toLocaleString()}
+              </p>
+            </>
+          )}
+          
+          {/* Desktop version */}
+          <p className="hidden md:block text-gray-600">
+            {wishlist.description}
+          </p>
+          {/* Mobile version */}
+          <p className="md:hidden text-gray-600 text-sm break-words">
+            {wishlist.description}
+          </p>
 
           {event ? (
-            <Link className="hover:text-[#5651e5] transition-colors" to={`/events/${event.id}`}>
-              <div className="hover:bg-gray-200 bg-gray-100 p-4 rounded-[25px] border-2 border-[#5651e5] mt-4">
-                <h2 className="text-xl font-semibold">      
-                  {event.name}
-                </h2>
-                { event.deadline &&
-                  <div className="flex items-center text-gray-600 mb-1">
-                    <SlCalender className="w-5 h-5 mr-2" />
-                    <span>{event.deadline}</span>
-                  </div>
-                }
-                {event.addr && event.city && 
-                  <div className="flex items-center text-gray-600">
-                    <FaMapPin className="w-5 h-5 mr-2" />
-                    <span>{event.addr + ", " + event.city}</span>
-                  </div>
-                }
-              </div>
-            </Link>
-          )
-          :
-          (<>
-            {
-              wishlist.owner &&
-              <button 
-                className="cursor-pointer w-full flex items-center hover:bg-gray-200 bg-gray-100 p-4 rounded-[25px] border-2 border-[#5651e5] mt-4 hover:text-[#5651e5] transition-colors"
-                onClick={() => (fetchEvents(), setIsLinkEventModalOpen(true))}
-              >
+            <>
+              {/* Desktop version */}
+              <Link className="hidden md:block hover:text-[#5651e5] transition-colors" to={`/events/${event.id}`}>
+                <div className="hover:bg-gray-200 bg-gray-100 p-4 rounded-[25px] border-2 border-[#5651e5] mt-4">
+                  <h2 className="text-xl font-semibold">      
+                    {event.name}
+                  </h2>
+                  {event.deadline && (
+                    <div className="flex items-center text-gray-600 mb-1">
+                      <SlCalender className="w-5 h-5 mr-2" />
+                      <span>{event.deadline}</span>
+                    </div>
+                  )}
+                  {event.addr && event.city && (
+                    <div className="flex items-center text-gray-600">
+                      <FaMapPin className="w-5 h-5 mr-2" />
+                      <span>{event.addr + ", " + event.city}</span>
+                    </div>
+                  )}
+                </div>
+              </Link>
+              
+              {/* Mobile version */}
+              <Link className="md:hidden hover:text-[#5651e5] transition-colors" to={`/events/${event.id}`}>
+                <div className="hover:bg-gray-200 bg-gray-100 p-3 rounded-[25px] border-2 border-[#5651e5] mt-4">
+                  <h2 className="text-lg font-semibold">      
+                    {event.name}
+                  </h2>
+                  {event.deadline && (
+                    <div className="flex items-center text-gray-600 mb-1 text-sm">
+                      <SlCalender className="w-4 h-4 mr-2" />
+                      <span>{event.deadline}</span>
+                    </div>
+                  )}
+                  {event.addr && event.city && (
+                    <div className="flex items-center text-gray-600 text-sm">
+                      <FaMapPin className="w-4 h-4 mr-2" />
+                      <span>{event.addr + ", " + event.city}</span>
+                    </div>
+                  )}
+                </div>
+              </Link>
+            </>
+          ) : (
+            owner && (
+              <>
+                {/* Desktop version */}
+                <button 
+                  className="hidden md:flex cursor-pointer w-full items-center hover:bg-gray-200 bg-gray-100 p-4 rounded-[25px] border-2 border-[#5651e5] mt-4 hover:text-[#5651e5] transition-colors"
+                  onClick={() => (fetchEvents(), setIsLinkEventModalOpen(true))}
+                >
                   <FaPlus fontSize={18} className="mr-2"/> Link Event
-              </button>
-            }
-          </>
-          )
-          }
-          { wishlist.share_token && 
+                </button>
+                
+                {/* Mobile version */}
+                <button 
+                  className="md:hidden cursor-pointer w-full flex items-center hover:bg-gray-200 bg-gray-100 p-3 rounded-[25px] border-2 border-[#5651e5] mt-4 hover:text-[#5651e5] transition-colors text-sm"
+                  onClick={() => (fetchEvents(), setIsLinkEventModalOpen(true))}
+                >
+                  <FaPlus className="mr-2"/> Link Event
+                </button>
+              </>
+            )
+          )}
+
+          {/* Modals */}
+          {wishlist.share_token && (
             <ShareWishlistModal
               wishlistID={wishlist.id}
               isOwner={wishlist.owner} 
               shareToken={wishlist.share_token} 
               isOpen={isShareModalOpen} 
-              setIsOpen={setIsShareModalOpen}/>
-          }
+              setIsOpen={setIsShareModalOpen}
+            />
+          )}
 
-          { wishlist.owner &&
+          {wishlist.owner && (
             <LinkEventModal 
               wishlist={wishlist}
               setWishlist={setWishlist}
@@ -149,15 +235,11 @@ export default function WishlistHeader({ wishlist, setWishlist, event, setEventI
               setOpen={setIsLinkEventModalOpen}
               token={token}
             />
-          }
-          
-
+          )}
         </div>
-        )
-        :
+      ) : (
         <CircularProgress />
-      }
+      )}
     </div>
   )
 }
-

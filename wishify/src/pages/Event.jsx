@@ -24,7 +24,6 @@ import Alert from '@mui/material/Alert';
 
 const EventSection = styled.section`
   margin-top: 20px;
-  display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: auto auto auto;
   gap: 20px;

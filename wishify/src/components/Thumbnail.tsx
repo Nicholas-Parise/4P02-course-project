@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import styled from "@emotion/styled";
 import {FaCrown} from 'react-icons/fa';
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 
 
 const WishlistButton = styled.button`
@@ -154,10 +154,28 @@ const OverlayTitle = styled.p`
 
 
 export const WishlistThumbnail = (props: any) => {
+    const [imageLoaded, setImageLoaded] = useState(false);
+    
+    useEffect(() => {
+        if (props.image) {
+            const img = new Image();
+            img.onload = () => setImageLoaded(true);
+            img.src = `${props.image}?${new Date().getTime()}`; // Cache busting
+        } else {
+            setImageLoaded(false);
+        }
+    }, [props.image]);
+
     const WishlistOverlayMenu = () => {
-        
         return (
-            <WishlistMenu onMouseLeave={props.toggleActive}>
+            <WishlistMenu 
+                style={imageLoaded ? {
+                    background: `linear-gradient(rgba(255, 255, 255, 0.85), url(${props.image})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center'
+                } : {}}
+                onMouseLeave={props.toggleActive}
+            >
                 <p style={{margin: "4px", paddingLeft:"10px"}}>Creator: {props.owner}</p>
                 <OverlayTitle title={props.title}>{props.title}</OverlayTitle>
                 <MenuButton onClick={openWishlist}>Open</MenuButton>
@@ -180,19 +198,63 @@ export const WishlistThumbnail = (props: any) => {
         if (isTouchDevice) {
             return (
                 <>
-                {props.active == props.title ? <WishlistOverlayMenu></WishlistOverlayMenu> : <WishlistButton onClick={props.toggleActive}>{props.title}<Crown></Crown></WishlistButton>}
+                {props.active == props.title ? 
+                    <WishlistOverlayMenu /> 
+                    : 
+                    <WishlistButton 
+                        onClick={props.toggleActive}
+                        style={imageLoaded ? {
+                            background: `linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)), url(${props.image})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            color: '#000',
+                            textShadow: '0 0 4px rgba(255, 255, 255, 0.8)'
+                        } : {}}
+                    >
+                        {props.title}
+                        <Crown />
+                    </WishlistButton>
+                }
                 </>
             );
         }
 
         return (
             <>
-            {props.active == props.title ? <WishlistOverlayMenu></WishlistOverlayMenu> : <WishlistButton onMouseEnter={props.toggleActive}>{props.title}<Crown></Crown></WishlistButton>}
+            {props.active == props.title ? 
+                <WishlistOverlayMenu /> 
+                : 
+                <WishlistButton 
+                    onMouseEnter={props.toggleActive}
+                    style={imageLoaded ? {
+                        background: `linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)), url(${props.image})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        color: '#000',
+                        textShadow: '0 0 4px rgba(255, 255, 255, 0.8)'
+                    } : {}}
+                >
+                    {props.title}
+                    <Crown />
+                </WishlistButton>
+            }
             </>
         );
     } else {
         return(
-            <WishlistButton onClick={openWishlist}><OwnerText>Creator: {props.owner}</OwnerText>{props.title}</WishlistButton>
+            <WishlistButton 
+                onClick={openWishlist}
+                style={imageLoaded ? {
+                    background: `linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)), url(${props.image})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    color: '#000',
+                    textShadow: '0 0 4px rgba(255, 255, 255, 0.8)'
+                } : {}}
+            >
+                <OwnerText>Creator: {props.owner}</OwnerText>
+                {props.title}
+            </WishlistButton>
         )
     }
 }

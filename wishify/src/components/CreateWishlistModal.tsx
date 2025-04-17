@@ -7,23 +7,25 @@ import { Wishlist } from "../types/types";
 
 import { Dayjs } from "dayjs";
 
-import pictureClothing from '/assets/clothing.jpeg';
-import pictureGames from '/assets/games.jpg';
 import pictureGift from '/assets/gift.jpg';
-import pictureGiftbox from '/assets/giftbox.jpg';
-import pictureGroceries from '/assets/groceries.jpg';
 import pictureSports from '/assets/sports.jpg';
 import pictureTech from '/assets/tech.jpg';
+import pictureWedding from '/assets/wedding.jpeg';
+import pictureHome from '/assets/kitchen.jpg';
+import pictureBooks from '/assets/books.jpg';
+import pictureTravel from '/assets/travel.jpg';
+import pictureHobby from '/assets/hobby.jpg';
 
 // Predefined gallery of images for wishlists
 const galleryImages = [
-  { id: 1, src: pictureClothing, alt: "Clothing theme" },
-  { id: 2, src: pictureGames, alt: "Game theme" },
-  { id: 3, src: pictureGift, alt: "Holiday theme" },
-  { id: 4, src: pictureGiftbox, alt: "Gift theme" },
-  { id: 5, src: pictureGroceries, alt: "Grocery theme" },
-  { id: 6, src: pictureSports, alt: "Sports theme" },
-  { id: 7, src: pictureTech, alt: "Technology theme" },
+  { id: 1, src: pictureGift, alt: "Holiday Gift Theme" },
+  { id: 2, src: pictureWedding, alt: "Wedding Registry Theme" },
+  { id: 3, src: pictureSports, alt: "Sports Theme" },
+  { id: 4, src: pictureHome, alt: "Home & Kitchen Theme" },
+  { id: 5, src: pictureTech, alt: "Tech & Gadgets Theme" },
+  { id: 6, src: pictureBooks, alt: "Book Lovers Theme" },
+  { id: 7, src: pictureTravel, alt: "Travel & Adventure Theme" },
+  { id: 8, src: pictureHobby, alt: "Hobby & Crafts Theme" },
 ]
 
 interface Props {
@@ -90,67 +92,103 @@ const CreateWishlistModal = ({ open, setOpen, wishlists, setWishlists, token }: 
       onClose={() => setOpen(false)}
       sx={{
         '& .MuiDialog-paper': {
-          borderRadius: '25px', // Rounded corners
-          background: '#FFFFFF', // Background color matching ProfileMenu
-          padding: '20px',
-          border: '2px solid #5651e5', // Border color
-          maxWidth: '900px', // Set max width to 900px
-          //width: '100%', // Ensure it takes full width up to the max width
-        },
-      }}
+          borderRadius: '16px',
+          background: '#FFFFFF',
+          padding: '24px',
+          maxWidth: '600px',
+          width: '100%',
+          boxShadow: '0 4px 20px rgba(86, 81, 229, 0.15)',
+      }}}
     >
-      <DialogTitle id="item-dialog-title" sx={{ textAlign: 'center', fontWeight: 'bold', color: '#000', fontSize: '24px' }}>
+      <DialogTitle 
+        sx={{ 
+          textAlign: 'center', 
+          fontWeight: 'bold', 
+          color: '#5651e5',
+          fontSize: '1.5rem',
+          padding: '16px 0',
+          borderBottom: '1px solid #e0e0e0'
+        }}
+      >
         Create New Wishlist
       </DialogTitle>
-      <DialogContent className="sm:max-w-[525px]">
-        <DialogContentText id="item-dialog-description" sx={{ color: '#000' }}>
-          Enter the details for a new wishlist.
+      
+      <DialogContent sx={{ padding: '24px 0' }}>
+        <DialogContentText 
+          sx={{ 
+            color: '#666',
+            textAlign: 'center',
+            marginBottom: '24px'
+          }}
+        >
+          Enter the details for your new wishlist
         </DialogContentText>
+        
         <form autoComplete="off" onSubmit={createWishlist}>
-          <FormControl>
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <TextField 
-                  label="Wishlist Name" 
-                  value={newWishlist.name || ""} 
-                  onChange={e => setNewWishlist({...newWishlist, name: e.target.value})}
-                  placeholder="Name your wishlist"
-                  required
-                />
-              </div>
-              <div className="grid gap-2">
-                <TextField
-                  label="Wishlist Description" 
-                  value={newWishlist.description || ""} 
-                  onChange={(e) => setNewWishlist({...newWishlist, description: e.target.value})}
-                  multiline
-                />
-              </div>
+          <FormControl fullWidth>
+            <div className="grid gap-6">
+              <TextField 
+                label="Wishlist Name" 
+                value={newWishlist.name || ""} 
+                onChange={e => setNewWishlist({...newWishlist, name: e.target.value})}
+                placeholder="Name your wishlist"
+                required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '12px',
+                  }
+                }}
+              />
+              
+              <TextField
+                label="Description (Optional)" 
+                value={newWishlist.description || ""} 
+                onChange={(e) => setNewWishlist({...newWishlist, description: e.target.value})}
+                multiline
+                rows={3}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '12px',
+                  }
+                }}
+              />
+              
               <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <div className="grid gap-2">
-                  <DatePicker
-                    label="Due Date"
-                    value={date}
-                    onChange={(newValue: any) => setDate(newValue)}
-                  />
-                </div>
+                <DatePicker
+                  label="Due Date (Optional)"
+                  value={date}
+                  onChange={(newValue: any) => setDate(newValue)}
+                  slotProps={{
+                    textField: {
+                      sx: {
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: '12px',
+                        }
+                      }
+                    }
+                  }}
+                />
               </LocalizationProvider>
 
-
-              <div className="grid gap-2">
-                <Typography id="modal-modal-title">
-                  Wishlist Image
+              <div>
+                <Typography 
+                  sx={{ 
+                    color: '#5651e5',
+                    fontWeight: '500',
+                    marginBottom: '12px'
+                  }}
+                >
+                  Choose a cover image
                 </Typography>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-4 gap-3">
                   {galleryImages.map((image) => (
                     <div
                       key={image.id}
-                      className={ `relative cursor-pointer border-2 rounded-md overflow-hidden transition-all 
-                          ${selectedImage === image.src ?
-                          'border-[#5651e5] ring-2 ring-[#5651e5] ring-opacity-50'
-                          :
-                          'border-transparent hover:border-muted-foreground'}`
-                      }
+                      className={`relative cursor-pointer border-2 rounded-lg overflow-hidden transition-all 
+                        ${selectedImage === image.src ?
+                        'border-[#5651e5] ring-2 ring-[#5651e5] ring-opacity-50'
+                        :
+                        'border-transparent hover:border-[#5651e5]'}`}
                       onClick={() => setSelectedImage(image.src)}
                     >
                       <img
@@ -164,29 +202,48 @@ const CreateWishlistModal = ({ open, setOpen, wishlists, setWishlists, token }: 
               </div>
             </div>
 
-            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+            <Box 
+              sx={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                gap: '16px',
+                marginTop: '24px'
+              }}
+            >
+              <Button
+                variant="outlined"
+                onClick={() => setOpen(false)}
+                sx={{ 
+                  borderRadius: '12px', 
+                  borderColor: '#5651e5', 
+                  color: '#5651e5',
+                  padding: '8px 24px',
+                  '&:hover': {
+                    backgroundColor: '#f0f0ff',
+                    borderColor: '#5651e5'
+                  }
+                }}
+              >
+                Cancel
+              </Button>
               <Button 
                 type="submit" 
                 variant="contained"
                 sx={{
                   background: 'linear-gradient(to right, #8d8aee, #5651e5)',
                   color: 'white',
-                  borderRadius: '25px',
-                  '&:hover': { background: 'linear-gradient(to right, #5651e5, #343188)' }
+                  borderRadius: '12px',
+                  padding: '8px 24px',
+                  boxShadow: 'none',
+                  '&:hover': { 
+                    background: 'linear-gradient(to right, #5651e5, #343188)',
+                    boxShadow: 'none'
+                  }
                 }}
               >
                 Create Wishlist
               </Button>
-              <Button
-                variant="outlined"
-                onClick={() => {setOpen(false)}}
-                sx={{ borderRadius: '25px', borderColor: '#5651e5', color: '#5651e5', ml: '8px' }}
-              >
-                Close
-              </Button>
             </Box>
-            
-            
           </FormControl>
         </form>
       </DialogContent>
@@ -195,4 +252,3 @@ const CreateWishlistModal = ({ open, setOpen, wishlists, setWishlists, token }: 
 }
 
 export default CreateWishlistModal
-

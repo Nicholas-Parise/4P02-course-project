@@ -299,6 +299,7 @@ const Wishlists = () => {
             key={index} 
             id={wishlist.id}
             title={wishlist.name}
+            image={wishlist.image}
             edit={handleEditOpen}
             duplicate={handleDuplicate}
             share={handleShare}
@@ -325,6 +326,7 @@ const Wishlists = () => {
             key={index} 
             id={wishlist.id}
             title={wishlist.name}
+            image={wishlist.image}
             edit={handleEditOpen}
             duplicate={handleDuplicate}
             share={handleShare}
