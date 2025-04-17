@@ -72,6 +72,10 @@ const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
     if (likesValues) {
       setLikes(likesValues.filter((item) => item.love))
       setDislikes(likesValues.filter((item) => !item.love))
+      const filteredLikes = likes.filter(item => item.love)
+      const filteredDislikes = dislikes.filter(item => !item.love)
+      setLikesLeft(12 - filteredLikes.length)
+      setDislikesLeft(12 - filteredDislikes.length)
     }
   }, [bioValue, likesValues])
   
@@ -96,12 +100,12 @@ const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
     fileInputRef.current.value = null
   }
 
-  React.useEffect(() => {
-    const filteredLikes = likes.filter(item => item.love)
-    const filteredDislikes = dislikes.filter(item => !item.love)
-    setLikesLeft(12 - filteredLikes.length)
-    setDislikesLeft(12 - filteredDislikes.length)
-  }, [likesValues])
+  // React.useEffect(() => {
+  //   const filteredLikes = likes.filter(item => item.love)
+  //   const filteredDislikes = dislikes.filter(item => !item.love)
+  //   setLikesLeft(12 - filteredLikes.length)
+  //   setDislikesLeft(12 - filteredDislikes.length)
+  // }, [likesValues])
 
   const handleNext = () => {
     setSearch('')
