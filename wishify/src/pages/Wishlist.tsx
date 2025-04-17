@@ -20,6 +20,10 @@ import MemberDialog from '../components/MemberDialog';
 const Wishlist = () => {
     const navigate = useNavigate();
 
+    const handleEventRedirect = (eventID: number) => {
+      navigate(`/events/${eventID}`)
+    }
+
     const { id } = useParams();
     id && localStorage.setItem('id', id)
 
@@ -31,7 +35,7 @@ const Wishlist = () => {
     const [notifications, setNotifications] = useState<boolean>(false)
     //const [error, setError] = useState(null)
     //const [loading, setLoading] = useState(false)
-    const [token] = useState<string>(localStorage.getItem('token') || '')
+    const token = localStorage.getItem('token') || ''
     const [sortDirection, setSortDirection] = useState<-1 | 1>(1)
     const [isMemberDialogOpen, setIsMemberDialogOpen] = useState<boolean>(false)
 
@@ -165,12 +169,15 @@ const Wishlist = () => {
     }, [location]);
 
     const [wishlist, setWishlist] = useState<Wishlist | undefined>()
-    const [eventID, setEventID] = useState<number>()
+    const [eventID, setEventID] = useState<number | undefined>()
     const [event, setEvent] = useState<Event | undefined>()
 
 
     useEffect(() => {
-      if(!eventID || eventID === undefined) return;
+      if(!eventID || eventID === undefined){
+        setEvent(undefined)
+        return;
+      }
 
       let statusCode = -1
       let url = `https://api.wishify.ca/events/${eventID}`
@@ -250,9 +257,9 @@ const Wishlist = () => {
   const [contributeAlert, setContributeAlert] = useState(false);
 
   // TODO: send to backend contributions
-  const handleReserveItem = (item: WishlistItem, reservation: number, note: string) => {
+  const handleReserveItem = (item: WishlistItem, reservation: number, note: string, purchased: boolean) => {
     //console.log(wishlistContributions)
-    const contribution = wishlistContributions.find((c) => c.item_id === item.id);
+    const contribution = wishlistContributions.find((c) => c.item_id === item.id && c.user_id === userID);
     
     if (contribution) {
       if(reservation == 0){
@@ -293,8 +300,8 @@ const Wishlist = () => {
           }),
           body: JSON.stringify({
               "quantity": reservation,
-              "purchased": false,
-              "note": note || ""
+              "purchased": purchased,
+              "note": note || "",
           })})
           .then((response) => response.json())
           .then((data) => {
@@ -324,7 +331,7 @@ const Wishlist = () => {
         body: JSON.stringify({
             "item_id": item.id,
             "quantity": reservation,
-            "purchased": false,
+            "purchased": purchased,
             "note": note || ""
         })})
         .then((response) => response.json())
@@ -376,6 +383,28 @@ const Wishlist = () => {
       })
   }
 
+  const unlinkEvent = () => {
+      const url = `https://api.wishify.ca/wishlists/${wishlist?.id}`;
+  
+      fetch(url, {
+        method: 'put',
+        headers: new Headers({
+          'Authorization': "Bearer " + token,
+          'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify({
+          "event_id":"null"
+      })
+      })
+        .then((response) => response.json())
+        .then(() => {
+          setEventID(undefined)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    }
+
   const [sortBy, setSortBy] = useState<SortOption>("priority")
 
   const sortedItems = wishlistItems ? [...wishlistItems].sort((a, b) => {
@@ -398,6 +427,8 @@ const Wishlist = () => {
             token={token}
             notifications={notifications}
             toggleNotifications={toggleNotifications}
+            unlinkEvent={unlinkEvent}
+            handleEventRedirect={handleEventRedirect}
           />
           <div className="mt-8 mb-4 flex gap-1 items-center justify-between">
           <div className='flex'>
@@ -483,6 +514,7 @@ const Wishlist = () => {
                         userID={userID || -1}
                         owner={owner}
                         blind={blind}
+                        members={wishlistMembers}
                       />
                   ))}
                   </ul>

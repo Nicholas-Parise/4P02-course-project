@@ -1,12 +1,12 @@
 import { Dialog, Button, DialogTitle, FormControl, Select, MenuItem, DialogContent, SelectChangeEvent, InputLabel } from '@mui/material'
-import { useState, FormEvent } from 'react'
+import { useState, FormEvent, useEffect } from 'react'
 import { Event, Wishlist } from '../types/types'
 
 interface Props{
     wishlist: Wishlist,
     setWishlist: (state: Wishlist) => void,
     events: Event[],
-    setEventID: (state: number) => void,
+    setEventID: (state: number | undefined) => void,
     open: boolean,
     setOpen: (state: boolean) => void,
     token: string,
@@ -32,9 +32,9 @@ const LinkEventModal = ({ wishlist, setWishlist, events, setEventID, open, setOp
         })
         .then((response) => response.json())
         .then((data) => {
-            setWishlist(data.wishlist)
+            setWishlist({...wishlist, ...data.wishlist})
+            setSelectedEvent('')
             setEventID(Number(selectedEvent))
-            setOpen(false)
         })
         .catch((error) => {
             console.log(error)
@@ -72,7 +72,7 @@ const LinkEventModal = ({ wishlist, setWishlist, events, setEventID, open, setOp
             Link Event
         </DialogTitle>
         <DialogContent className="sm:max-w-[425px]">
-            <form autoComplete="off" onSubmit={linkEvent}>
+            <form autoComplete="off" onSubmit={(e) => (linkEvent(e), setOpen(false))}>
                 <FormControl sx={{ width: '25ch' }}>
                     <InputLabel sx={{mt: 1}} id="event-select" required>Event</InputLabel>
                     <Select 

@@ -4,11 +4,11 @@ import { Event, Wishlist } from "../types/types";
 import { Link } from 'react-router-dom';
 import { CircularProgress } from "@mui/material";
 import { IconButton } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ShareWishlistModal from "./ShareWishlistModal";
 import LinkEventModal from "./LinkEventModal";
 
-import { AiOutlineBell, AiFillBell } from "react-icons/ai";
+import { AiOutlineBell, AiFillBell, AiOutlineClose } from "react-icons/ai";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSlash, faEye, faCrown } from "@fortawesome/free-solid-svg-icons";
 
@@ -16,18 +16,24 @@ type WishlistHeaderProps = {
   wishlist: Wishlist | undefined
   setWishlist: (state: Wishlist) => void,
   event: Event | undefined,
-  setEventID: (state: number) => void,
+  setEventID: (state: number | undefined) => void,
   owner: boolean,
   blind: boolean,
   notifications: boolean,
   token: string,
-  toggleNotifications: () => void
+  toggleNotifications: () => void,
+  unlinkEvent: () => void,
+  handleEventRedirect: (eventID: number) => void
 }
 
-export default function WishlistHeader({ wishlist, setWishlist, event, setEventID, owner, blind, notifications, toggleNotifications, token }: WishlistHeaderProps) {
+export default function WishlistHeader({ wishlist, setWishlist, event, setEventID, owner, blind, notifications, toggleNotifications, token, unlinkEvent, handleEventRedirect }: WishlistHeaderProps) {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false)
   const [isLinkEventModalOpen, setIsLinkEventModalOpen] = useState(false)
   const [events, setEvents] = useState<Event[]>([])
+
+  useEffect(()=>{
+    console.log(isLinkEventModalOpen)
+},[isLinkEventModalOpen])
 
   const fetchEvents = () => {
     const url = "https://api.wishify.ca/events";
@@ -151,15 +157,20 @@ export default function WishlistHeader({ wishlist, setWishlist, event, setEventI
           {event ? (
             <>
               {/* Desktop version */}
-              <Link className="hidden md:block hover:text-[#5651e5] transition-colors" to={`/events/${event.id}`}>
+              <div onClick={() => handleEventRedirect(event.id)} className="cursor-pointer hidden md:block hover:text-[#5651e5] transition-colors">
                 <div className="hover:bg-gray-200 bg-gray-100 p-4 rounded-[25px] border-2 border-[#5651e5] mt-4">
-                  <h2 className="text-xl font-semibold">      
-                    {event.name}
-                  </h2>
+                  <div className="flex justify-between">
+                    <h2 className="text-xl font-semibold">      
+                      {event.name}
+                    </h2>
+                    <IconButton onClick={(e) => (e.stopPropagation(), unlinkEvent())}>
+                      <AiOutlineClose size={18} />
+                    </IconButton>
+                  </div>
                   {event.deadline && (
                     <div className="flex items-center text-gray-600 mb-1">
                       <SlCalender className="w-5 h-5 mr-2" />
-                      <span>{event.deadline}</span>
+                      <span>{new Date(event.deadline).toLocaleString()}</span>
                     </div>
                   )}
                   {event.addr && event.city && (
@@ -169,7 +180,7 @@ export default function WishlistHeader({ wishlist, setWishlist, event, setEventI
                     </div>
                   )}
                 </div>
-              </Link>
+              </div>
               
               {/* Mobile version */}
               <Link className="md:hidden hover:text-[#5651e5] transition-colors" to={`/events/${event.id}`}>
@@ -180,7 +191,7 @@ export default function WishlistHeader({ wishlist, setWishlist, event, setEventI
                   {event.deadline && (
                     <div className="flex items-center text-gray-600 mb-1 text-sm">
                       <SlCalender className="w-4 h-4 mr-2" />
-                      <span>{event.deadline}</span>
+                      <span>{new Date(event.deadline).toLocaleString()}</span>
                     </div>
                   )}
                   {event.addr && event.city && (

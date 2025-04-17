@@ -62,6 +62,8 @@ export interface Contribution {
     item_id: number,
     user_id: number,
     user_displayname: string,
+    picture: string,
+    pro: boolean,
     quantity: number,
     purchased: boolean,
     note: string,
