@@ -729,6 +729,16 @@ router.put('/:id/members', authenticate, async (req, res) => {
         RETURNING blind,owner,notifications,dateUpdated;
       `, [blind, owner, notifications, memberCheck.rows[0].id]);
 
+
+      // if blind isn't null, and blind is false
+      if (typeof blind !== 'undefined' && blind !== null && !blind) {
+        // await createNotification(notifyMembers, 
+        // "a user is no longer blind",
+        // `${user_name} is no longer blind in the wishlist: ${wishlist_name}`,
+        // `/wishlists/${wishlists_id}`)
+      }
+
+
     } else {
       // if the user is trying to edit their notifications
       // edit your own membership
