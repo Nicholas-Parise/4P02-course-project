@@ -12,7 +12,7 @@
   position: fixed;
   top: 0;
   right: 0;
-  width: 400px;
+  width: 600px;
   height: 100%;
   background: #D5D4F0;
   box-shadow: -10px 0 10px rgba(0, 0, 0, 0.1);
@@ -106,6 +106,7 @@
   margin-top: 10px;
   width: 100%;
   padding-right: 20px;
+  padding-left: 1px;
   background: #FFFFFF;
   text-align: left;
   font-size: 16px;
@@ -131,7 +132,19 @@
   border-radius: 10px;
 }
 
+.help-topic-summary {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+}
+
 .help-topic-text {
   font-size: 16px;
+  margin: 0;
+}
+
+.help-title {
+  font-size: 22px;
+  font-weight: bold;
   margin: 0;
 }
