@@ -73,7 +73,7 @@ const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
       setLikes(likesValues.filter((item) => item.love))
       setDislikes(likesValues.filter((item) => !item.love))
     }
-  }, [])
+  }, [bioValue, likesValues])
   
   const handleImageChange = (event) => {
     const file = event.target.files[0]
