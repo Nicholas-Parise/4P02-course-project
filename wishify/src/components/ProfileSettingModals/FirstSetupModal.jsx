@@ -70,10 +70,12 @@ const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
       setBio(bioValue)
     }
     if (likesValues) {
-      setLikes(likesValues.filter((item) => item.love))
-      setDislikes(likesValues.filter((item) => !item.love))
-      const filteredLikes = likes.filter(item => item.love)
-      const filteredDislikes = dislikes.filter(item => !item.love)
+      const filteredLikes = likesValues.filter(item => item.love)
+      const filteredDislikes = likesValues.filter(item => !item.love)
+
+      setLikes(filteredLikes)
+      setDislikes(filteredDislikes)
+      
       setLikesLeft(12 - filteredLikes.length)
       setDislikesLeft(12 - filteredDislikes.length)
     }
