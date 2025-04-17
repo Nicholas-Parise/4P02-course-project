@@ -433,6 +433,7 @@ const [contributions, setContributions] = useState([])
               title={wishlist.name}
               owner={wishlist.creator_displayname || "None"}
               role={"contributor"}
+              image={wishlist.image}
             />
           ))}
           <NavLink to="/wishlists">
@@ -449,13 +450,14 @@ const [contributions, setContributions] = useState([])
               title={event.name}
               owner={event.creator_displayname || "None"}
               role={"contributor"}
+              image={event.image}
             />
           ))}
           <NavLink to="/events">
             <ViewMoreButton>View More...</ViewMoreButton>
           </NavLink>
         </EventContainer>
-  
+          
         <h1>Contributions</h1>
         <div className="home-wishlist-top">
           <ContributionContainer>
