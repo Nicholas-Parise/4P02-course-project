@@ -1,27 +1,29 @@
 import { useState, useEffect } from 'react';
-import { type WishlistItem, Contribution } from '../types/types';
+import { type WishlistItem, Contribution, Member } from '../types/types';
 import { useSortable } from '@dnd-kit/sortable';
 import {CSS} from '@dnd-kit/utilities';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, Button, TextField, IconButton } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogContentText, Button, TextField, IconButton, Typography, Checkbox } from '@mui/material';
 import { FaExternalLinkAlt, FaMinus, FaPlus, FaChevronDown, FaChevronRight, FaPencilAlt, FaTimes } from 'react-icons/fa';
 import { FaTrashCan } from "react-icons/fa6";
 import DeleteItemModal from './DeleteItemModal';
 import EditItemDialog from './EditItemDialog';
+import { Link } from 'react-router-dom';
 
 type WishlistItemProps = {
   item: WishlistItem,
   editWishlistItem: (item: WishlistItem) => void,
   sortBy: "priority" | "price" | "quantity",
   reservations: Contribution[] | undefined,
-  onReserve: (item: WishlistItem, reservation: number, note: string) => void,
+  onReserve: (item: WishlistItem, reservation: number, note: string, purchased: boolean) => void,
   id: number,
   onDelete: (id: number) => void,
   userID: number,
   owner: boolean,
-  blind: boolean
+  blind: boolean,
+  members: Member[]
 }
 
-const WishlistItemEntry = ({ item, editWishlistItem, sortBy, reservations, onReserve, id, onDelete, userID, owner, blind }: WishlistItemProps) => {
+const WishlistItemEntry = ({ item, editWishlistItem, sortBy, reservations, onReserve, id, onDelete, userID, owner, blind, members }: WishlistItemProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, } = useSortable({ id, animateLayoutChanges: () => false });
 
   const style = {
@@ -39,6 +41,7 @@ const WishlistItemEntry = ({ item, editWishlistItem, sortBy, reservations, onRes
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [reserveNote, setReserveNote] = useState("")
   const [userReservation, setUserReservation] = useState<number>(0)
+  const [purchased, setPurchased] = useState<boolean>(false)
   const [tempUserReservation, setTempUserResrvation] = useState<number>(0)
 
   const incrementReserve = () => setTempUserResrvation((prev) => Math.min(prev + 1, availableQuantity + userReservation))
@@ -50,6 +53,7 @@ const WishlistItemEntry = ({ item, editWishlistItem, sortBy, reservations, onRes
     if(contribution) {
       setUserReservation(contribution.quantity)
       setReserveNote(contribution.note)
+      setPurchased(contribution.purchased)
     }
     else {
       setUserReservation(0)
@@ -66,10 +70,10 @@ const WishlistItemEntry = ({ item, editWishlistItem, sortBy, reservations, onRes
     if (tempUserReservation > availableQuantity + userReservation) return; // TODO Add alert that there is not enough available quantity
     if (tempUserReservation > 0) {
       //onReserve(item.id, reserveQuantity, currentUser)
-      onReserve(item, tempUserReservation, reserveNote)
+      onReserve(item, tempUserReservation, reserveNote, purchased)
       setUserReservation(tempUserReservation)
     } else {
-      onReserve(item, 0, reserveNote)
+      onReserve(item, 0, reserveNote, purchased)
       setUserReservation(0)
     }
     setIsModalOpen(false)
@@ -82,17 +86,37 @@ const WishlistItemEntry = ({ item, editWishlistItem, sortBy, reservations, onRes
     setTempUserResrvation(parseInt(e.target.value) || 0);
   }
 
-  const [showNote, setShowNote] = useState<{ [key: number]: boolean }>({});
-
   return (
     <>
       <li
         id={id.toString()}
         ref={setNodeRef}
         style={style}
-        className="bg-white shadow-md p-3 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 cursor-pointer rounded-[25px] border-2 border-[#5651e5]"
+        className="bg-white shadow-md p-3 flex flex-col sm:items-center sm:flex-row-reverse gap-3 sm:gap-4 cursor-pointer rounded-[25px] border-2 border-[#5651e5]"
         onClick={() => setIsModalOpen(true)}
       >
+        <div className="flex items-center justify-between sm:justify-end gap-2 sm:ml-auto">
+          <div className="flex-shrink-0 px-3 py-1 h-7 bg-[#5651e5] text-white rounded-full flex items-center justify-center text-sm">
+            {item.priority}
+          </div>
+          
+          {owner && (
+            <div className="flex gap-2">
+              <button 
+                onClick={(e) => { e.stopPropagation(); setIsEditModalOpen(true); }}
+                className="p-2 text-[#5651e5] hover:bg-gray-100 rounded-full cursor-pointer"
+              >
+                <FaPencilAlt className='text-sm'/>
+              </button>
+              <button 
+                onClick={(e) => { e.stopPropagation(); setIsDeleteModalOpen(true); }}
+                className="p-2 text-[#fb2c36] hover:bg-gray-100 rounded-full cursor-pointer"
+              >
+                <FaTrashCan className='text-sm'/>
+              </button>
+            </div>
+          )}
+        </div>
         <div className="flex items-center w-full sm:w-auto gap-3">
           {owner && sortBy === "priority" && (
             <div 
@@ -124,7 +148,7 @@ const WishlistItemEntry = ({ item, editWishlistItem, sortBy, reservations, onRes
               <h3 className="text-lg sm:text-xl font-semibold truncate">{item.name}</h3> 
               
               {totalReserved > 0 && 
-                <div className={`${reservedBadgeColour} px-2 py-1 sm:px-3 sm:py-1 h-6 sm:h-7 text-xs sm:text-sm font-semibold text-white rounded-full flex-shrink-0`}>
+                <div className={`${reservedBadgeColour} w-fit px-2 py-1 sm:px-3 sm:py-1 h-6 sm:h-7 text-xs sm:text-sm font-semibold text-white rounded-full flex-shrink-0`}>
                   {availableQuantity <= 0 ? "Fully Reserved" : "Partially Reserved"}
                 </div>
               }
@@ -139,28 +163,7 @@ const WishlistItemEntry = ({ item, editWishlistItem, sortBy, reservations, onRes
           </div>
         </div>
 
-        <div className="flex items-center justify-between sm:justify-end gap-2 sm:ml-auto">
-          <div className="flex-shrink-0 px-3 py-1 h-7 bg-[#5651e5] text-white rounded-full flex items-center justify-center text-sm">
-            {item.priority}
-          </div>
-          
-          {owner && (
-            <div className="flex gap-2">
-              <button 
-                onClick={(e) => { e.stopPropagation(); setIsEditModalOpen(true); }}
-                className="p-2 text-[#5651e5] hover:bg-gray-100 rounded-full"
-              >
-                <FaPencilAlt className='text-sm'/>
-              </button>
-              <button 
-                onClick={(e) => { e.stopPropagation(); setIsDeleteModalOpen(true); }}
-                className="p-2 text-[#fb2c36] hover:bg-gray-100 rounded-full"
-              >
-                <FaTrashCan className='text-sm'/>
-              </button>
-            </div>
-          )}
-        </div>
+        
       </li>
 
     <Dialog 
@@ -216,20 +219,29 @@ const WishlistItemEntry = ({ item, editWishlistItem, sortBy, reservations, onRes
               <div>
                 <p className="font-semibold">Current Reservations:</p>
                 {reservations?.map((res, index) => (
-                    <div key={index}>
-                      <div 
-                        className="text-green-600 cursor-pointer flex items-center"
-                        onClick={() => {
-                          setShowNote((prev) => ({
-                            ...prev,
-                            [index]: !prev[index],
-                          }));
-                        }}
-                      >
-                        <p>{res.user_displayname}: {res.quantity} {res.note ? "(note is attached)" : null}</p>
-                        { res.note ? (showNote[index] ? <FaChevronDown className="ml-2" /> : <FaChevronRight className="ml-2" />) : null}
+                    <div className='bg-gray-200 p-2 rounded-2xl mb-2' key={index}>
+                      <div className='flex items-center justify-between flex-wrap'>
+                        <Link to={`/profile/${res.user_id}`} className='flex'>
+                          <div className='flex items-center'>
+                            <img 
+                              src={res.picture} 
+                              className={`w-5 h-5 mr-3 overflow-hidden rounded-full ${res.pro && "ring-[#5651e5] ring-2 "}`}
+                            />
+                          </div>
+                          <div className='flex items-center'>
+                            {res.user_displayname}
+                            {res.pro && (
+                                <span className='pro-badge' style={{verticalAlign: 'middle'}}>PRO</span>
+                            )}
+                          </div>
+                        </Link>
+                        <Typography>
+                          Quantity: {res.quantity}
+                        </Typography>
                       </div>
-                      {showNote[index] ? <p className="text-gray-600">{res.note}</p> : null}
+                      <Typography>
+                        {res.note}
+                      </Typography>
                     </div>
                 ))}
               </div>
@@ -245,13 +257,49 @@ const WishlistItemEntry = ({ item, editWishlistItem, sortBy, reservations, onRes
                     value={tempUserReservation}
                     onChange={(e) => handleReserveQuantity(e)}
                     className="w-20 text-center"
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                          '& fieldset': {
+                              borderColor: '#a5a2f3',
+                          },
+                          '&:hover fieldset': {
+                              borderColor: '#8d8aee',
+                          },
+                      },
+                    }}
                   />
                   <Button onClick={incrementReserve}>
                     <FaPlus className="h-4 w-4 text-[#5651e5]" />
                   </Button>
                 </div>
+                
+
+                <p className="text-md font-medium text-[#5651e5] mb-0">Purchased</p>
+                  <Checkbox 
+                    size='large'
+                    checked={purchased}
+                    onChange={() => setPurchased(!purchased)}
+                    sx={{
+                      marginTop: -1,
+                      color: "#5651e5",
+                      '&.Mui-checked': {
+                        color: "#5651e5",
+                      },
+                    }}
+                  />
+                
                 <TextField
-                  sx={{width:'100%'}}
+                sx={{
+                  width:'100%',
+                  '& .MuiOutlinedInput-root': {
+                      '& fieldset': {
+                          borderColor: '#a5a2f3',
+                      },
+                      '&:hover fieldset': {
+                          borderColor: '#8d8aee',
+                      },
+                  },
+                }}
                   multiline
                   value={reserveNote}
                   label="Leave a comment"
