@@ -29,6 +29,23 @@ const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
 
   const [successMessage, setSuccessMessage] = useState('')
 
+  const [step, setStep] = useState(1)
+  const [bio, setBio] = useState('')
+
+  const [likesLeft, setLikesLeft] = useState(0)
+  const [likes, setLikes] = useState([])
+  const [likesToAdd, setLikesToAdd] = useState([])
+
+  const [dislikesLeft, setDislikesLeft] = useState(0)
+  const [dislikes, setDislikes] = useState([])
+  const [dislikesToAdd, setDislikesToAdd] = useState([])
+
+  const [selectedImage, setSelectedImage] = useState(null)
+  const [previewUrl, setPreviewUrl] = useState(null)
+  const fileInputRef = useRef(null)
+
+  const [search, setSearch] = useState('')
+
   React.useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -56,21 +73,6 @@ const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
       setDislikes(likesValues.filter((item) => !item.love))
     }
   }, [bioValue, likesValues])
-
-  const [step, setStep] = useState(1)
-  const [bio, setBio] = useState('')
-
-  const [likesLeft, setLikesLeft] = useState(0)
-  const [likes, setLikes] = useState([])
-  const [likesToAdd, setLikesToAdd] = useState([])
-
-  const [dislikesLeft, setDislikesLeft] = useState(0)
-  const [dislikes, setDislikes] = useState([])
-  const [dislikesToAdd, setDislikesToAdd] = useState([])
-
-  const [selectedImage, setSelectedImage] = useState(null)
-  const [previewUrl, setPreviewUrl] = useState(null)
-  const fileInputRef = useRef(null)
   
   const handleImageChange = (event) => {
     const file = event.target.files[0]
@@ -92,8 +94,6 @@ const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
     setPreviewUrl(null)
     fileInputRef.current.value = null
   }
-
-  const [search, setSearch] = useState('')
 
   React.useEffect(() => {
     const filteredLikes = likes.filter(item => item.love)
