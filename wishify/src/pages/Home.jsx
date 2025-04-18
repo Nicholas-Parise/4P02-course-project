@@ -394,6 +394,15 @@ const [contributions, setContributions] = useState([])
   userLoading()
 
   // CODE FOR FIRST SETUP MODAL
+  const updatePicture = (newPicture) => {
+    const trimmed = newPicture.split('/uploads')[1];
+    const final = '/uploads' + trimmed;
+    setUser((prevUser) => ({
+      ...prevUser,
+      picture: final,
+    }))
+  }
+
   const [openFirstSetupModal, setOpenFirstSetupModal] = useState(false)
   useEffect(() => {
     if (user?.setup) {
@@ -472,6 +481,7 @@ const [contributions, setContributions] = useState([])
         open={openFirstSetupModal}
         bioValue={user.bio}
         likesValues={user.likes}
+        onSavePicture={updatePicture}
         onClose={handleCloseFirstSetupModal}
       />
     </>

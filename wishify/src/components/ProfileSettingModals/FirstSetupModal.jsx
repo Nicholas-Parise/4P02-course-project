@@ -24,7 +24,7 @@ import PersonIcon from "@mui/icons-material/Person"
 
 
 
-const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
+const FirstSetupModal = ({ open, onSavePicture, onClose, bioValue, likesValues }) => {
   const [predefinedItems, setPredefinedItems] = useState([])
   const [unableToFetchCategories, setUnableToFetchMessage] = useState(false)
 
@@ -232,11 +232,12 @@ const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
 
       const result = await response.json()
       console.log(result)
+      onSavePicture(result.imageUrl)
 
-      if (response.ok) {
+      if (!response.ok) {
         throw new Error('Failed to upload image')
       }
-      const data = await response.json()
+
     }
     catch (error) {
       return true
