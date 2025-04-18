@@ -49,7 +49,7 @@ const EditPictureModal = ({ onSave }) => {
 
       <input
         type="file"
-        accept="image/*"
+        accept=".png, .jpg, .jpeg, .gif"
         ref={fileInputRef}
         onChange={handleImageChange}
         style={{ display: 'none' }}
