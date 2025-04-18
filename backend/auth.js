@@ -195,7 +195,7 @@ router.post('/forgot-password', async (req, res, next) => {
         }
 
         if (userCheck.rows[0].google_id) {
-            return res.status(404).json({ message: "Oauth users cannot change their password." });
+        //    return res.status(404).json({ message: "Oauth users cannot change their password." });
         }
 
         const userId = userCheck.rows[0].id;
