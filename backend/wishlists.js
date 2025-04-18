@@ -125,6 +125,8 @@ router.post('/', authenticate, async (req, res, next) => {
 
     await db.query("COMMIT"); // Commit the transaction
 
+    const owner = true;
+
     res.status(201).json({ wishlist: { ...wishlist, owner }, message: "Wishlist created successfully!" });
 
   } catch (error) {
