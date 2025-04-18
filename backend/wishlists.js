@@ -125,7 +125,7 @@ router.post('/', authenticate, async (req, res, next) => {
 
     await db.query("COMMIT"); // Commit the transaction
 
-    res.status(201).json({ wishlist, message: "Wishlist created successfully!" });
+    res.status(201).json({ wishlist: { ...wishlist, owner }, message: "Wishlist created successfully!" });
 
   } catch (error) {
     await db.query("ROLLBACK"); // Rollback if an error occurs
@@ -143,13 +143,31 @@ router.get('/:wishlistId', authenticate, async (req, res, next) => {
 
   try {
     const userId = req.user.userId; // Get user ID from authenticated token
+    /*
+        const result = await db.query(`
+          SELECT w.*, u.displayname AS creator_displayName, m.blind, m.owner, m.notifications
+          FROM wishlists w
+          JOIN wishlist_members m ON w.id = m.wishlists_id
+          LEFT JOIN users u ON w.creator_id = u.id
+          WHERE m.user_id = $1 AND w.id = $2;`, [userId, wishlistId]);
+    */
 
     const result = await db.query(`
-      SELECT w.*, u.displayname AS creator_displayName, m.blind, m.owner, m.notifications
+      SELECT w.*, 
+            u.displayname AS creator_displayName,
+            wm.blind AS is_blind,
+            wm.owner AS is_owner,
+            wm.notifications,
+            (wm.user_id IS NOT NULL) AS is_wishlist_member,
+            (em.user_id IS NOT NULL) AS is_event_member
       FROM wishlists w
-      JOIN wishlist_members m ON w.id = m.wishlists_id
+      LEFT JOIN wishlist_members wm ON wm.user_id = $1 AND wm.wishlists_id = w.id
+      LEFT JOIN event_members em ON em.user_id = $1 AND em.event_id = w.event_id
       LEFT JOIN users u ON w.creator_id = u.id
-      WHERE m.user_id = $1 AND w.id = $2;`, [userId, wishlistId]);
+      WHERE w.id = $2
+      LIMIT 1;
+      `, [userId, wishlistId]);
+
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "wishlist not found." });
@@ -164,7 +182,7 @@ router.get('/:wishlistId', authenticate, async (req, res, next) => {
       JOIN wishlist_members wm ON i.member_id = wm.id
       JOIN users u ON wm.user_id = u.id
       WHERE wm.wishlists_id = $1
-      ORDER BY i.priority;`, [wishlist.id]);
+      ORDER BY i.priority;`, [wishlistId]);
 
     let contributionResult = null;
 
@@ -679,18 +697,20 @@ router.put('/:id/members', authenticate, async (req, res) => {
   try {
 
     const wishlistCheck = await db.query(`
-      SELECT id FROM wishlists WHERE id = $1;
+      SELECT id,name FROM wishlists WHERE id = $1;
     `, [wishlistId]);
 
     if (wishlistCheck.rows.length === 0) {
       return res.status(404).json({ error: "Wishlist not found." });
     }
 
-    // Get the membership ID
+    // Get the membership ID & user existance check
     const memberCheck = await db.query(`
-      SELECT * FROM wishlist_members WHERE wishlists_id = $1 AND user_id = $2
+      SELECT wm.*, u.displayName 
+      FROM wishlist_members wm
+      JOIN users u ON wm.user_id = u.id
+      WHERE wm.wishlists_id = $1 AND wm.user_id = $2;
     `, [wishlistId, userId]);
-
 
     if (memberCheck.rows.length === 0) {
       return res.status(404).json({ message: "User is not a member of this wishlist" });
@@ -699,7 +719,8 @@ router.put('/:id/members', authenticate, async (req, res) => {
 
     // make sure user is the owner of the wishlist before allowing editing of others memberships
     const ownershipCheck = await db.query(`
-      SELECT m.owner
+      SELECT m.owner,
+      (SELECT COUNT(*)::int FROM wishlist_members WHERE wishlists_id = $2 AND owner = TRUE) AS owner_count
       FROM wishlist_members m
       WHERE m.user_id = $1 AND m.wishlists_id = $2;
       `, [authUserId, wishlistId]);
@@ -717,6 +738,14 @@ router.put('/:id/members', authenticate, async (req, res) => {
         return res.status(403).json({ error: "Only the owner can edit this wishlist membership." });
       }
 
+      // if owner isn't null, and owner is false
+      if (typeof owner !== 'undefined' && owner !== null && !owner) {
+        // we are taking away someones ownership
+        if (ownershipCheck.rows[0].owner_count <= 1) {
+          return res.status(403).json({ error: "Cannot remove an owner when only one left." });
+        }
+      }
+
       // edit a users membership
       result = await db.query(`
         UPDATE wishlist_members
@@ -732,16 +761,21 @@ router.put('/:id/members', authenticate, async (req, res) => {
 
       // if blind isn't null, and blind is false
       if (typeof blind !== 'undefined' && blind !== null && !blind) {
-        // await createNotification(notifyMembers, 
-        // "a user is no longer blind",
-        // `${user_name} is no longer blind in the wishlist: ${wishlist_name}`,
-        // `/wishlists/${wishlists_id}`)
+        await notifyAllOnBlind(wishlistId, userId, memberCheck.rows[0].displayname, wishlistCheck.rows[0].name);
       }
-
 
     } else {
       // if the user is trying to edit their notifications
       // edit your own membership
+
+      // if owner isn't null, and owner is false
+      if (typeof owner !== 'undefined' && owner !== null && !owner) {
+        // we must make sure we don't take away owner if only one owner left
+        if (ownershipCheck.rows[0].owner_count <= 1) {
+          return res.status(403).json({ error: "Cannot remove yourself as an owner when you're the only one." });
+        }
+      }
+
 
       if (ownershipCheck.rows[0].owner) {
         // you are the owner so you can change anything
@@ -755,6 +789,11 @@ router.put('/:id/members', authenticate, async (req, res) => {
         WHERE id = $4
         RETURNING blind,owner,notifications,dateUpdated;
       `, [blind, owner, notifications, memberCheck.rows[0].id]);
+
+        // if blind isn't null, and blind is false
+        if (typeof blind !== 'undefined' && blind !== null && !blind) {
+          await notifyAllOnBlind(wishlistId, userId, memberCheck.rows[0].displayname, wishlistCheck.rows[0].name);
+        }
 
       } else {
         // you are not an owner so you can only change your notifications
@@ -956,6 +995,31 @@ async function memberAdded(to, recipient_name, sender_name, list_name, event_dat
   }
 }
 
+
+
+async function notifyAllOnBlind(wishlists_id, user_id, user_name, wishlist_name) {
+  try {
+    /// get all members of wishlist, and get their notificatons status
+    const members = await db.query(
+      `SELECT wm.id, wm.notifications AS member_notifications, u.notifications AS user_notifications 
+      FROM wishlist_members wm
+      JOIN users u ON wm.user_id = u.id
+      WHERE wm.wishlists_id = $1;`,
+      [wishlists_id]);
+
+    // get array of users ids where both notifications are true 
+    const notifyMembers = members
+      .filter(member => member.member_notifications && member.user_notifications && member.id != user_id)
+      .map(member => member.id);
+
+    await createNotification(notifyMembers,
+      "a user is no longer blind",
+      `${user_name} is no longer blind in the wishlist: ${wishlist_name}`,
+      `/wishlists/${wishlists_id}`);
+  } catch (error) {
+    console.error("Error sending item notifications:", error);
+  }
+}
 
 
 module.exports = router;
