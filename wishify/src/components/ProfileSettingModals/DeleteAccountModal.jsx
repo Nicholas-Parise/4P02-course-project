@@ -1,7 +1,7 @@
 import React from 'react'
 import { Modal, Button, TextField, Typography, Box, Divider } from '@mui/material'
 
-const DeleteAccountModal = ({ open, handleClose, onSave }) => {
+const DeleteAccountModal = ({ open, pro, handleClose, onSave }) => {
   const [password, setPassword] = React.useState("")
   const [confirmOpen, setConfirmOpen] = React.useState(false)
   const [input, setInput] = React.useState('')
@@ -67,10 +67,16 @@ const DeleteAccountModal = ({ open, handleClose, onSave }) => {
         <Typography variant='body1' mb={2}>
           To delete your account, please enter your password.
         </Typography>
-
+        
         <Typography variant='body2' mb={2} style={{color: 'red'}}>
           Warning: This action is final and cannot be undone.
         </Typography>
+
+        {pro && (
+          <Typography variant='body2' mb={2} style={{color: 'red'}}>
+            Deleting your account will also remove your Pro subscription.
+          </Typography>
+        )}
 
         <Divider sx={{mb: 2}} />
 

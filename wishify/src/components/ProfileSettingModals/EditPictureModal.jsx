@@ -5,6 +5,7 @@ import {
   Avatar,
   Stack,
 } from '@mui/material'
+import PersonIcon from '@mui/icons-material/Person'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload'
 
 const EditPictureModal = ({ onSave }) => {
@@ -39,10 +40,12 @@ const EditPictureModal = ({ onSave }) => {
   return (
     <Box sx={{ textAlign: 'center', p: 2 }}>
       <Avatar
-        src={previewUrl || '/default-avatar.png'}
+        src={previewUrl}
         alt="Profile Picture Preview"
         sx={{ width: 150, height: 150, mx: 'auto', mb: 3 }}
-      />
+      >
+        {previewUrl ? null : <PersonIcon sx={{ fontSize: 100 }} />}
+      </Avatar>
 
       <input
         type="file"

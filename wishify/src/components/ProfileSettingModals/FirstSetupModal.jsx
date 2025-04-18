@@ -20,6 +20,7 @@ import {
 } from "@mui/material"
 import { Close } from "@mui/icons-material"
 import CloudUploadIcon from "@mui/icons-material/CloudUpload"
+import PersonIcon from "@mui/icons-material/Person"
 
 
 
@@ -344,6 +345,7 @@ const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
               variant="outlined"
               value={bio}
               onChange={(e) => setBio(e.target.value)}
+              slotProps={{ htmlInput: { maxLength: 300 } }}
               sx={{
                 '& label.Mui-focused': {
                   color: '#5651e5',
@@ -589,7 +591,9 @@ const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
               src={previewUrl || '/default-avatar.png'}
               alt="Profile Picture Preview"
               sx={{ width: 150, height: 150, mx: 'auto', mb: 3 }}
-            />
+            >
+              {previewUrl ? null : <PersonIcon sx={{ fontSize: 100 }} />}
+            </Avatar>
 
             <input
               type="file"
