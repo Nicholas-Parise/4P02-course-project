@@ -41,7 +41,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
   useEffect(() => {
     const loggedIn = isLoggedInCheck()
     if (!loggedIn) {
-      setNotifications([])
+      setToken('')
       setIsLoggedIn(false)
     }
   }, [location.pathname])
