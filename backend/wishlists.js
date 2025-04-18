@@ -59,7 +59,7 @@ router.post('/', authenticate, async (req, res, next) => {
       [user_id]
     );
 
-    console.log(proPrevent);
+    //console.log(proPrevent);
     if (!proPrevent.rows[0].pro && proPrevent.rows[0].count > 2) {
       return res.status(403).json({ error: "you must be pro to make more than 3 wishlists" });
     }
