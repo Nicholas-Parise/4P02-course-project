@@ -71,18 +71,14 @@ const WishlistContainer = styled.div`
   padding: 20px;
   width: 100%;
   box-sizing: border-box;
+  grid-template-columns: repeat(4, 1fr);
 
-  /* Mobile (default): 1 column */
-  grid-template-columns: repeat(1, 1fr);
-
-  /* Tablet (768px and up): 2 columns */
-  @media (min-width: 768px) {
+  @media (max-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  /* Desktop (1024px and up): 4 columns */
-  @media (min-width: 1024px) {
-    grid-template-columns: repeat(4, 1fr);
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(1, 1fr);
   }
 `;
 

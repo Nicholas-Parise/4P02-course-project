@@ -117,6 +117,7 @@ const createStyledIcon = (IconComponent: any) => styled(IconComponent)`
 const OwnerText = styled.p`
     position: absolute;
     font-size: 1.2rem;
+    padding: 4px;
     left: 4px;
     top: 4px;
 `
