@@ -153,7 +153,7 @@ router.delete('/', authenticate, async (req, res) => {
       // remove their autopayment
       if (user.pro) {
         if (user.stripe_subscription_id) {
-          await stripe.subscriptions.cancel(stripe_subscription_id);
+          await stripe.subscriptions.cancel(user.stripe_subscription_id);
         }
       }
       await deleteImage(userId);
@@ -176,7 +176,7 @@ router.delete('/', authenticate, async (req, res) => {
     // remove their autopayment
     if (user.pro) {
       if (user.stripe_subscription_id) {
-        await stripe.subscriptions.cancel(stripe_subscription_id);
+        await stripe.subscriptions.cancel(user.stripe_subscription_id);
       }
     }
 

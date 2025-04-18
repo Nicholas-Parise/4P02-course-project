@@ -109,11 +109,12 @@ router.get('/:eventId', authenticate, async (req, res, next) => {
 
 
     const wishlistResult = await db.query(`
-      SELECT w.*, u.displayname AS creator_displayName
+      SELECT w.*, u.displayname AS creator_displayName, u.id AS creator_id, wm.owner
       FROM wishlists w
       JOIN events e ON w.event_id = e.id
       LEFT JOIN users u ON w.creator_id = u.id
-      WHERE e.id = $1;`, [eventId]);
+      LEFT JOIN wishlist_members wm ON w.id = wm.wishlists_id AND wm.user_id = $2
+      WHERE e.id = $1;`, [eventId, userId]);
 
 
     const memberResult = await db.query(`
@@ -405,10 +406,12 @@ router.put('/:id/members', authenticate, async (req, res) => {
   try {
     // make sure user is the owner of the event before allowing editing of others memberships
     const ownershipCheck = await db.query(`
-          SELECT m.owner
+          SELECT m.owner,
+          (SELECT COUNT(*)::int FROM event_members WHERE event_id = $2 AND owner = TRUE) AS owner_count
           FROM event_members m
           WHERE m.user_id = $1 AND m.event_id = $2;
-          `, [authUserId, wishlistId]);
+          `, [authUserId, eventId]);
+
 
     if (ownershipCheck.rows.length === 0) {
       return res.status(403).json({ error: "Access denied. You are not a member of this event." });
@@ -428,6 +431,13 @@ router.put('/:id/members', authenticate, async (req, res) => {
       return res.status(404).json({ message: "User is not a member of this event" });
     }
 
+     // if owner isn't null, and owner is false
+     if (typeof owner !== 'undefined' && owner !== null && !owner) {
+      // we must make sure we don't take away owner if only one owner left
+      if(ownershipCheck.rows[0].owner_count <= 1){
+        return res.status(403).json({ error: "Cannot remove owner when there is only one." });
+      }
+    }
 
     // edit a users membership
     const result = await db.query(`
