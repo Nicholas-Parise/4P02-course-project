@@ -1,11 +1,12 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams, useNavigate } from 'react-router-dom'
 import '../../register.css'
 import google from "../../assets/Google.svg";
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const Register = () => {
+  const navigate = useNavigate()
+
   // Put share_token in sessionStorage if it's in the URL query string
   const [searchParams, setSearchParams] = useSearchParams();
   const share_token = searchParams.get("wishlist")
@@ -69,7 +70,7 @@ const Register = () => {
     const isEmailValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(data.email)
     const isDisplayNameValid = 
       (data.displayName !== "" &&
-      data.displayName.length  <= 64)
+      data.displayName.length  <= 30)
     const isPasswordValid = 
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,64}$/.test(data.password)
     const isConfirmPasswordValid =
@@ -112,7 +113,7 @@ const Register = () => {
         setResponseMessage(
           <>
             Account successfully created!<br />
-            Please proceed to the <Link to="/login" className='login-link'>login</Link> page.
+            Redirecting you to the <Link to="/login" className='login-link'>login</Link> page...
           </>
         );
         setResponseType("success");
@@ -135,6 +136,9 @@ const Register = () => {
           confirmPassword: false
         });
         setIsValid(false);
+        setTimeout(() => {
+          navigate('/Login')
+        }, 3000)
       } else if (response.status === 400) {
         setResponseMessage("Bad request. Please fill in all required fields.");
         setResponseType("error");
@@ -222,7 +226,7 @@ const Register = () => {
             >
               {showPassword ? <VisibilityOff /> : <Visibility />}
             </span>
-            {showTooltip && (
+            {showTooltip && !isFieldValid.password && (
               <div className="tooltip">
                 Password must contain a minimum of:
                 <ul>

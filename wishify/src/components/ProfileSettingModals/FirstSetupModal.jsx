@@ -21,10 +21,11 @@ import {
 } from "@mui/material"
 import { Close } from "@mui/icons-material"
 import CloudUploadIcon from "@mui/icons-material/CloudUpload"
+import PersonIcon from "@mui/icons-material/Person"
 
 
 
-const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
+const FirstSetupModal = ({ open, onSavePicture, onClose, bioValue, likesValues }) => {
   const [predefinedItems, setPredefinedItems] = useState([])
   const [unableToFetchCategories, setUnableToFetchMessage] = useState(false)
 
@@ -122,7 +123,7 @@ const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
   }
 
   const handleSave = async () => {
-    if (!bio && likesToAdd.length === 0 && dislikesToAdd.length === 0) {
+    if (!bio && likesToAdd.length === 0 && dislikesToAdd.length === 0 && !selectedImage) {
       setSuccessMessage("Thanks for signing up! You can always update your profile later in profile settings. We hope you enjoy using Wishify!")
       handleNext()
       return
@@ -186,7 +187,6 @@ const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
       if (!response.ok) {
         throw new Error('Failed to save bio')
       }
-      const data = await response.json()
     } catch (err) {
       return true
     }
@@ -208,7 +208,6 @@ const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
       if (!response.ok) {
         throw new Error('Failed to save likes')
       }
-      const data = await response.json()
     } catch (err) {
       return true
     }
@@ -240,6 +239,9 @@ const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
       if (!response.ok) {
         throw new Error('Failed to upload image')
       }
+
+      const result = await response.json()
+      onSavePicture(result.imageUrl)
     }
     catch (error) {
       console.error('Error uploading image:', error)
@@ -349,6 +351,7 @@ const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
               variant="outlined"
               value={bio}
               onChange={(e) => setBio(e.target.value)}
+              slotProps={{ htmlInput: { maxLength: 300 } }}
               sx={{
                 '& label.Mui-focused': {
                   color: '#5651e5',
@@ -594,7 +597,9 @@ const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
               src={previewUrl || '/default-avatar.png'}
               alt="Profile Picture Preview"
               sx={{ width: 150, height: 150, mx: 'auto', mb: 3 }}
-            />
+            >
+              {previewUrl ? null : <PersonIcon sx={{ fontSize: 100 }} />}
+            </Avatar>
 
             <input
               type="file"

@@ -581,6 +581,7 @@ const Profile = () => {
         open={openModals.deleteAccount}
         onSave={handleDeleteAccount}
         handleClose={handleClose}
+        pro={user.pro}
       />
     </section>
     </>
