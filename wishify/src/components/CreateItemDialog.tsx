@@ -151,7 +151,7 @@ const CreateItemDialog = ({ open, setOpen, image, setImage, newItem, setNewItem,
                         
                         <TextField
                             type="file"
-                            slotProps={{htmlInput: { accept: 'image/*' }, inputLabel:{shrink: true}}}
+                            slotProps={{htmlInput: { accept:".png, .jpg, .jpeg, .gif" }, inputLabel:{shrink: true}}}
                             fullWidth
                             label="Upload Image"
                             onChange={handleImageUpload}
