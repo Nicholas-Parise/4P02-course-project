@@ -121,7 +121,7 @@ const FirstSetupModal = ({ open, onSavePicture, onClose, bioValue, likesValues }
   }
 
   const handleSave = async () => {
-    if (!bio && likesToAdd.length === 0 && dislikesToAdd.length === 0) {
+    if (!bio && likesToAdd.length === 0 && dislikesToAdd.length === 0 && !selectedImage) {
       setSuccessMessage("Thanks for signing up! You can always update your profile later in profile settings. We hope you enjoy using Wishify!")
       handleNext()
       return
@@ -179,7 +179,6 @@ const FirstSetupModal = ({ open, onSavePicture, onClose, bioValue, likesValues }
       if (!response.ok) {
         throw new Error('Failed to save bio')
       }
-      const data = await response.json()
     } catch (err) {
       return true
     }
@@ -201,14 +200,13 @@ const FirstSetupModal = ({ open, onSavePicture, onClose, bioValue, likesValues }
       if (!response.ok) {
         throw new Error('Failed to save likes')
       }
-      const data = await response.json()
     } catch (err) {
       return true
     }
     return false
   }
 
-  const handleSavePicture = async (picture) => {
+  const handleSavePicture = async () => {
     if (!selectedImage) {
       alert('Please select an image to upload.')
       return false
@@ -230,14 +228,12 @@ const FirstSetupModal = ({ open, onSavePicture, onClose, bioValue, likesValues }
         body: formData
       })
 
-      const result = await response.json()
-      console.log(result)
-      onSavePicture(result.imageUrl)
-
       if (!response.ok) {
         throw new Error('Failed to upload image')
       }
 
+      const result = await response.json()
+      onSavePicture(result.imageUrl)
     }
     catch (error) {
       return true
