@@ -17,6 +17,7 @@ import {
   Divider,
   Avatar,
   Stack,
+  CircularProgress
 } from "@mui/material"
 import { Close } from "@mui/icons-material"
 import CloudUploadIcon from "@mui/icons-material/CloudUpload"
@@ -27,6 +28,7 @@ const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
   const [predefinedItems, setPredefinedItems] = useState([])
   const [unableToFetchCategories, setUnableToFetchMessage] = useState(false)
 
+  const [isSaving, setIsSaving] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
 
   const [step, setStep] = useState(1)
@@ -126,6 +128,8 @@ const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
       return
     }
 
+    setIsSaving(true)
+
     let bioError = false
     let likesError = false
     let imageError = false
@@ -151,6 +155,10 @@ const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
     if (selectedImage) {
       imageError = await handleSavePicture(selectedImage)
     }
+
+    console.log('bioError', bioError)
+    console.log('likesError', likesError)
+    console.log('imageError', imageError)
 
     if (bioError || likesError || imageError) {
       setSuccessMessage('Uh oh! There was an error saving your profile. Please try again later in profile settings.')
@@ -207,7 +215,7 @@ const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
     return false
   }
 
-  const handleSavePicture = async (picture) => {
+  const handleSavePicture = async () => {
     if (!selectedImage) {
       alert('Please select an image to upload.')
       return false
@@ -229,15 +237,12 @@ const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
         body: formData
       })
 
-      const result = await response.json()
-      console.log(result)
-
-      if (response.ok) {
+      if (!response.ok) {
         throw new Error('Failed to upload image')
       }
-      const data = await response.json()
     }
     catch (error) {
+      console.error('Error uploading image:', error)
       return true
     }
     return false
@@ -659,6 +664,7 @@ const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
             sx={{ 
               borderRadius: '25px', 
               borderColor: '#5651e5', 
+              width: '120px',
               color: '#5651e5',
               mb: '20px',
             }}
@@ -676,6 +682,7 @@ const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
             sx={{
               background: 'linear-gradient(to right, #8d8aee, #5651e5)',
               color: 'white',
+              width: '120px',
               borderRadius: '25px',
               mb: '20px',
               '&:hover': { background: 'linear-gradient(to right, #5651e5, #343188)' }
@@ -688,16 +695,33 @@ const FirstSetupModal = ({ open, onClose, bioValue, likesValues }) => {
         {step === 4 &&
           <Button
             onClick={handleSave}
-            variant="contained" color="primary"
+            variant="contained" 
+            color="primary"
+            disabled={isSaving}
             sx={{
               background: 'linear-gradient(to right, #8d8aee, #5651e5)',
               color: 'white',
               borderRadius: '25px',
+              width: '120px',
               mb: '20px',
-              '&:hover': { background: 'linear-gradient(to right, #5651e5, #343188)' }
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              '&:hover': { background: 'linear-gradient(to right, #5651e5, #343188)' },
+              '&.Mui-disabled': {
+                background: 'linear-gradient(to right, #b0b0b0, #a0a0a0)',
+                color: '#eee',
+              }
             }}
           >
-            Save
+            {isSaving ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <CircularProgress size={20} sx={{ color: 'white' }} />
+                <span>Saving...</span>
+              </div>
+            ) : (
+              'Save'
+            )}
           </Button>
         }
 

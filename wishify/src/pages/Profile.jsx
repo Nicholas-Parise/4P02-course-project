@@ -290,6 +290,8 @@ const Profile = () => {
       })
 
       if (response.status === 200) {
+        // need to remove token from local storage
+        localStorage.removeItem("token")
         setSuccessMessage("Account deleted. Redirecting to home page...")
         setSeverity('success')
         setOpenSuccessMessage(true)

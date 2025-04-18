@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { AiFillGift, AiOutlinePlus, AiOutlineUser, AiFillQuestionCircle, AiOutlineMenu, AiOutlineClose, AiFillBell } from 'react-icons/ai';
 import { User, Wishlist, Notification, WishlistItem } from '../types/types';
 import CreateItemDialog from './CreateItemDialog';
@@ -8,6 +8,8 @@ import HelpMenu from './HelpMenu';
 import '../components/landingheader.css';
 import { toast } from "sonner"
 import { IconButton } from '@mui/material';
+import isLoggedInCheck from "../utils/isLoggedIn";
+
 
 const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLoggedIn: (val: boolean)=>void, page: string }) => {
   interface NavItem {
@@ -34,6 +36,15 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
   const [isDesktop, setIsDesktop] = useState(window.innerWidth > 900);
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [openedNotificationAlert, setOpenedNotificationAlert] = useState<boolean>(false)
+
+  const location = useLocation()
+  useEffect(() => {
+    const loggedIn = isLoggedInCheck()
+    if (!loggedIn) {
+      setNotifications([])
+      setIsLoggedIn(false)
+    }
+  }, [location.pathname])
 
   useEffect(() => {
     if (!isLoggedIn){
