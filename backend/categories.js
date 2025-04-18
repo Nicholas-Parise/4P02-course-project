@@ -55,16 +55,15 @@ router.get('/:categoryId', async (req, res, next) => {
 // create a category
 router.post('/', authenticate, async (req, res, next) => {
   const userId = req.user.userId; // Get user ID from authenticated token
-  const { name, description, password} = req.body;
+  const { name, description} = req.body;
 
-  if (!name || !description || !password) {
-    return res.status(400).json({ message: "name, description, and password are required fields" });
+  if (!name || !description) {
+    return res.status(400).json({ message: "name and description are required fields" });
   }
 
-  if(password != process.env.ADMIN_SECRET){
-   // return res.status(403).json({ message: "incorrect admin password"});
+  if(userId != 0){
+    return res.status(403).json({ message: "must be admin"});
   }
-
 
   try {
     const result = await db.query(`

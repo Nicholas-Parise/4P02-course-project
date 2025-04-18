@@ -1002,8 +1002,8 @@ async function memberAdded(to, recipient_name, sender_name, list_name, event_dat
 async function notifyAllOnBlind(wishlists_id, user_id, user_name, wishlist_name) {
   try {
     /// get all members of wishlist, and get their notificatons status
-    const members = await db.query(
-      `SELECT wm.id, wm.notifications AS member_notifications, u.notifications AS user_notifications 
+    const { rows: members } = await db.query(
+      `SELECT wm.user_id, wm.notifications AS member_notifications, u.notifications AS user_notifications 
       FROM wishlist_members wm
       JOIN users u ON wm.user_id = u.id
       WHERE wm.wishlists_id = $1;`,
@@ -1012,7 +1012,7 @@ async function notifyAllOnBlind(wishlists_id, user_id, user_name, wishlist_name)
     // get array of users ids where both notifications are true 
     const notifyMembers = members
       .filter(member => member.member_notifications && member.user_notifications && member.id != user_id)
-      .map(member => member.id);
+      .map(member => member.user_id);
 
     await createNotification(notifyMembers,
       "a user is no longer blind",
