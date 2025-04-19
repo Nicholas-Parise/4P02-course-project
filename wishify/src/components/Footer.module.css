@@ -4,8 +4,6 @@
   border-top: 1px solid #d0d7de;
   font-size: 14px;
   color: #57606a;
-  position: absolute;
-  bottom: 0;
   width: 100%;
 }
 
@@ -28,7 +26,7 @@
   gap: 1.5rem;
   flex-wrap: wrap;
   padding: 0;
-  margin: 0 0 1rem 0;
+  margin: 0 0 1.5rem 0;
   list-style: none;
 }
 
@@ -43,6 +41,29 @@
   text-decoration: underline;
 }
 
-copyright {
+.social {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.social a {
+  color: #57606a;
+  transition: color 0.2s ease;
+}
+
+.social a:hover {
+  color: #1f2328;
+}
+
+.icon {
+  font-size: 1.25rem;
+  vertical-align: middle;
+}
+
+.copyright {
   color: #8c959f;
+  margin-top: 1rem;
+  font-size: 13px;
 }

@@ -282,20 +282,6 @@ const Landing = () => {
           ))}
         </div>
       </div>
-
-      <div className="footer">
-        <div className="social">
-          <a href="https://github.com/Nicholas-Parise/4P02-course-project" target="_blank" rel="noopener noreferrer">
-            <FaGithub className="icon" />
-          </a>
-          <a href="https://nicholasparise.atlassian.net/jira/software/projects/COSC/summary" target="_blank" rel="noopener noreferrer">
-            <SiJira className="icon" />
-          </a>
-          <a href="https://drive.google.com/drive/folders/1H5uFw_031SYkvf21KdLdkOzGt67i78vZ" target="_blank" rel="noopener noreferrer">
-            <FaGoogleDrive className="icon" />
-          </a>
-        </div>
-      </div>
     </div>
   );
 };
