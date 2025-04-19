@@ -241,13 +241,12 @@ const ProfileMenu = ({ closeMenu, logOut, profile, token, notifications, deleteN
             <Button
               onClick={confirmLogOut}
               sx={{
-                flex: 1,
-                marginRight: "8px",
-                border: "1px solid red",
-                color: "red",
-                borderRadius: "8px",
-                "&:hover": {
-                  backgroundColor: "#ffe6e6",
+                width: '48%',
+                border: '2px solid red',
+                color: 'red',
+                borderRadius: '25px',
+                '&:hover': {
+                  backgroundColor: '#ffe6e6',
                 },
               }}
             >
@@ -256,14 +255,13 @@ const ProfileMenu = ({ closeMenu, logOut, profile, token, notifications, deleteN
             <Button
               onClick={cancelLogOut}
               sx={{
-                flex: 1,
-                marginLeft: "8px",
-                border: "1px solid #5651e5",
-                color: "#5651e5",
-                borderRadius: "8px",
-                "&:hover": {
-                  backgroundColor: "#f0f0ff",
-                },
+                width: '48%',
+                background: 'linear-gradient(to right, #8d8aee, #5651e5)',
+                color: 'white',
+                borderRadius: '25px',
+                '&:hover': { 
+                  background: 'linear-gradient(to right, #5651e5, #343188)',
+                }
               }}
             >
               Cancel

@@ -689,6 +689,7 @@ const Event = () => {
             key={index} 
             id={wishlist.id}
             title={wishlist.name}
+            image={wishlist.image}
             edit={handleEditOpen}
             duplicate={handleDuplicate}
             share={handleShare}

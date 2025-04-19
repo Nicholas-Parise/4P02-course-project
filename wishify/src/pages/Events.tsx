@@ -88,10 +88,20 @@ const Events = () => {
         // Process event data
         const ownedEvents = eventData.filter(
           (event: Event) => event.creator_id === userId
-        );
+        ).map((event: { image: any }) => ({
+          ...event,
+          owner: true,
+          image: event.image
+        }));
+
         const sharedEvents = eventData.filter(
           (event: Event) => event.creator_id !== userId
-        );
+        ).map((event: { image: any }) => ({
+          ...event,
+          owner: false,
+          image: event.image
+        }));
+
         setEvents(ownedEvents);
         setSharedEvents(sharedEvents);
   
@@ -320,6 +330,7 @@ const Events = () => {
       <h1>My Events</h1>
       <EventContainer>
         <CreateEvent addThumbnail={handleModalOpen}>Create an Event</CreateEvent>
+        
         {loading ? <Loading /> : 
           events.map((event, index) => (
             <EventThumbnail 
@@ -328,6 +339,7 @@ const Events = () => {
               key={index} 
               id={event.id}
               title={event.name}
+              image={event.image} // Make sure this is passed
               edit={handleEditOpen}
               share={handleShare}
               owner={"Me"}
@@ -337,14 +349,16 @@ const Events = () => {
         }
       </EventContainer>
 
-      {activeEvent  && activeEvent.share_token && (
-              <ShareEventModal
-              eventID={activeEvent.id}
-              shareToken={activeEvent.share_token} 
-              isOwner={activeEvent.owner}
-              isOpen={isShareModalOpen} 
-              setIsOpen={setIsShareModalOpen}/>
-            )}
+      {activeEvent && activeEvent.share_token && (
+        <ShareEventModal
+          eventID={activeEvent.id}
+          shareToken={activeEvent.share_token} 
+          isOwner={activeEvent.owner}
+          isOpen={isShareModalOpen} 
+          setIsOpen={setIsShareModalOpen}
+        />
+      )}
+
       <h1>Shared Events</h1>
       <EventContainer>
         {sharedEvents.map((event, index) => (
@@ -354,6 +368,7 @@ const Events = () => {
             key={index} 
             id={event.id}
             title={event.name}
+            image={event.image}
             edit={handleEditOpen}
             share={handleShare}
             owner={event.creator_displayname || "None"}
@@ -387,16 +402,23 @@ const Events = () => {
         </ModalBox>
       </Modal>
       <Modal
-          open={editOpen}
-          onClose={handleEditClose}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
+        open={editOpen}
+        onClose={handleEditClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
       >
-        <ModalBox sx={boxStyle}>
-        <Typography id="modal-modal-title" variant="h6" component="h2">
+        <ModalBox sx={{
+          ...boxStyle,
+          '& .MuiTypography-h6': {
+            color: '#5651e5',
+            fontWeight: 'bold',
+            marginBottom: '16px'
+          }
+        }}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
             Edit Event
-        </Typography>
-        <TextField
+          </Typography>
+          <TextField
             fullWidth
             value={newEventTitle}
             onChange={(e) => setNewEventTitle(e.target.value)}
@@ -405,39 +427,153 @@ const Events = () => {
             margin="normal"
             error={!!errorMessage}
             helperText={errorMessage}
-        />
-        <ModalButton onClick={handleRenameEvent}>Rename</ModalButton>
-        <ModalButton onClick={handleDelConfirmOpen}>Delete</ModalButton>
-        <Modal
-          open={delConfirmOpen}
-          onClose={handleDelConfirmClose}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
-        >
-          <ModalBox sx={boxStyle}>
-            <Typography id="modal-modal-title" variant="h6" component="h2">
-              Are you sure you want to delete {activeOverlay}?
-            </Typography>
-            <TextField
-              fullWidth
-              value={delConfirmation}
-              onChange={(e) => setDelConfirmation(e.target.value)}
-              label={"Type \"" + activeOverlay + "\" here to confirm"}
-              variant="outlined"
-              margin="normal"
-            />
-            {delConfirmation == activeOverlay ?
-              <div>
-                <ModalButton color='error' onClick={deleteEvent}>Delete</ModalButton>
-                <ModalButton style={{float: 'right'}} onClick={handleDelConfirmClose}>Go Back</ModalButton>
-              </div>
-              :
-              <ModalButton style={{float: 'right'}} onClick={handleDelConfirmClose}>Go Back</ModalButton>
-            }
-          </ModalBox>
-        </Modal>
-      </ModalBox>
-      </Modal>      
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '8px',
+                '& fieldset': {
+                  borderColor: '#5651e5',
+                },
+                '&:hover fieldset': {
+                  borderColor: '#4540d4',
+                },
+              },
+              marginBottom: '16px'
+            }}
+          />
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between',
+            width: '100%',
+            marginTop: '16px'
+          }}>
+            <ModalButton 
+              onClick={handleRenameEvent}
+              sx={{
+                background: 'linear-gradient(to right, #8d8aee, #5651e5)',
+                color: 'white',
+                borderRadius: '25px',
+                width: '48%',
+                '&:hover': { 
+                  background: 'linear-gradient(to right, #5651e5, #343188)',
+                }
+              }}
+            >
+              Rename
+            </ModalButton>
+            <ModalButton 
+              onClick={handleDelConfirmOpen}
+              sx={{
+                border: '2px solid red',
+                color: 'red',
+                borderRadius: '25px',
+                width: '48%',
+                '&:hover': {
+                  backgroundColor: '#ffe6e6',
+                }
+              }}
+            >
+              Delete
+            </ModalButton>
+          </div>
+          <Modal
+            open={delConfirmOpen}
+            onClose={handleDelConfirmClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <ModalBox sx={{
+              ...boxStyle,
+              '& .MuiTypography-h6': {
+                color: '#5651e5',
+                fontWeight: 'bold',
+                marginBottom: '16px'
+              }
+            }}>
+              <Typography id="modal-modal-title" variant="h6" component="h2">
+                Are you sure you want to delete {activeOverlay}?
+              </Typography>
+              <TextField
+                fullWidth
+                value={delConfirmation}
+                onChange={(e) => setDelConfirmation(e.target.value)}
+                label={`Type "${activeOverlay}" here to confirm`}
+                variant="outlined"
+                margin="normal"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '8px',
+                    '& fieldset': {
+                      borderColor: '#5651e5',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#4540d4',
+                    },
+                  }
+                }}
+              />
+              {delConfirmation == activeOverlay ?
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between',
+                  width: '100%',
+                  marginTop: '16px'
+                }}>
+                  <ModalButton 
+                    onClick={deleteEvent}
+                    sx={{
+                      border: '2px solid red',
+                      color: 'red',
+                      borderRadius: '25px',
+                      width: '48%',
+                      '&:hover': {
+                        backgroundColor: '#ffe6e6',
+                      }
+                    }}
+                  >
+                    Delete
+                  </ModalButton>
+                  <ModalButton 
+                    onClick={handleDelConfirmClose}
+                    sx={{
+                      background: 'linear-gradient(to right, #8d8aee, #5651e5)',
+                      color: 'white',
+                      borderRadius: '25px',
+                      width: '48%',
+                      '&:hover': { 
+                        background: 'linear-gradient(to right, #5651e5, #343188)',
+                      }
+                    }}
+                  >
+                    Cancel
+                  </ModalButton>
+                </div>
+                :
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'flex-end',
+                  width: '100%',
+                  marginTop: '16px'
+                }}>
+                  <ModalButton 
+                    onClick={handleDelConfirmClose}
+                    sx={{
+                      background: 'linear-gradient(to right, #8d8aee, #5651e5)',
+                      color: 'white',
+                      borderRadius: '25px',
+                      width: '48%',
+                      '&:hover': { 
+                        background: 'linear-gradient(to right, #5651e5, #343188)',
+                      }
+                    }}
+                  >
+                    Cancel
+                  </ModalButton>
+                </div>
+              }
+            </ModalBox>
+          </Modal>
+        </ModalBox>
+      </Modal>
       <CreateEventModal 
         open={createEventModalOpen}
         setOpen={setCreateEventModalOpen}

@@ -345,16 +345,23 @@ const Wishlists = () => {
       />
 
       <Modal
-          open={editOpen}
-          onClose={handleEditClose}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
+        open={editOpen}
+        onClose={handleEditClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
       >
-        <ModalBox sx={boxStyle}>
-        <Typography id="modal-modal-title" variant="h6" component="h2">
+        <ModalBox sx={{
+          ...boxStyle,
+          '& .MuiTypography-h6': {
+            color: '#5651e5',
+            fontWeight: 'bold',
+            marginBottom: '16px'
+          }
+        }}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
             Edit Wishlist
-        </Typography>
-        <TextField
+          </Typography>
+          <TextField
             fullWidth
             value={newWishlistTitle}
             onChange={(e) => setNewWishlistTitle(e.target.value)}
@@ -363,38 +370,152 @@ const Wishlists = () => {
             margin="normal"
             error={!!errorMessage}
             helperText={errorMessage}
-        />
-        <ModalButton onClick={handleRenameWishlist}>Rename</ModalButton>
-        <ModalButton onClick={handleDelConfirmOpen}>Delete</ModalButton>
-        <Modal
-          open={delConfirmOpen}
-          onClose={handleDelConfirmClose}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
-        >
-          <ModalBox sx={boxStyle}>
-            <Typography id="modal-modal-title" variant="h6" component="h2">
-              Are you sure you want to delete {activeOverlay}?
-            </Typography>
-            <TextField
-              fullWidth
-              value={delConfirmation}
-              onChange={(e) => setDelConfirmation(e.target.value)}
-              label={"Type \"" + activeOverlay + "\" here to confirm"}
-              variant="outlined"
-              margin="normal"
-            />
-            {delConfirmation == activeOverlay ?
-              <div>
-                <ModalButton color='error' onClick={deleteWishlist}>Delete</ModalButton>
-                <ModalButton style={{float: 'right'}} onClick={handleDelConfirmClose}>Go Back</ModalButton>
-              </div>
-              :
-              <ModalButton style={{float: 'right'}} onClick={handleDelConfirmClose}>Go Back</ModalButton>
-            }
-          </ModalBox>
-        </Modal>
-      </ModalBox>
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '8px',
+                '& fieldset': {
+                  borderColor: '#5651e5',
+                },
+                '&:hover fieldset': {
+                  borderColor: '#4540d4',
+                },
+              },
+              marginBottom: '16px'
+            }}
+          />
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between',
+            width: '100%',
+            marginTop: '16px'
+          }}>
+            <ModalButton 
+              onClick={handleRenameWishlist}
+              sx={{
+                background: 'linear-gradient(to right, #8d8aee, #5651e5)',
+                color: 'white',
+                borderRadius: '25px',
+                width: '48%',
+                '&:hover': { 
+                  background: 'linear-gradient(to right, #5651e5, #343188)',
+                }
+              }}
+            >
+              Rename
+            </ModalButton>
+            <ModalButton 
+              onClick={handleDelConfirmOpen}
+              sx={{
+                border: '2px solid red',
+                color: 'red',
+                borderRadius: '25px',
+                width: '48%',
+                '&:hover': {
+                  backgroundColor: '#ffe6e6',
+                }
+              }}
+            >
+              Delete
+            </ModalButton>
+          </div>
+          <Modal
+            open={delConfirmOpen}
+            onClose={handleDelConfirmClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <ModalBox sx={{
+              ...boxStyle,
+              '& .MuiTypography-h6': {
+                color: '#5651e5',
+                fontWeight: 'bold',
+                marginBottom: '16px'
+              }
+            }}>
+              <Typography id="modal-modal-title" variant="h6" component="h2">
+                Are you sure you want to delete {activeOverlay}?
+              </Typography>
+              <TextField
+                fullWidth
+                value={delConfirmation}
+                onChange={(e) => setDelConfirmation(e.target.value)}
+                label={`Type "${activeOverlay}" here to confirm`}
+                variant="outlined"
+                margin="normal"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '8px',
+                    '& fieldset': {
+                      borderColor: '#5651e5',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#4540d4',
+                    },
+                  }
+                }}
+              />
+              {delConfirmation == activeOverlay ?
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between',
+                  width: '100%',
+                  marginTop: '16px'
+                }}>
+                  <ModalButton 
+                    onClick={deleteWishlist}
+                    sx={{
+                      border: '2px solid red',
+                      color: 'red',
+                      borderRadius: '25px',
+                      width: '48%',
+                      '&:hover': {
+                        backgroundColor: '#ffe6e6',
+                      }
+                    }}
+                  >
+                    Delete
+                  </ModalButton>
+                  <ModalButton 
+                    onClick={handleDelConfirmClose}
+                    sx={{
+                      background: 'linear-gradient(to right, #8d8aee, #5651e5)',
+                      color: 'white',
+                      borderRadius: '25px',
+                      width: '48%',
+                      '&:hover': { 
+                        background: 'linear-gradient(to right, #5651e5, #343188)',
+                      }
+                    }}
+                  >
+                    Cancel
+                  </ModalButton>
+                </div>
+                :
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'flex-end',
+                  width: '100%',
+                  marginTop: '16px'
+                }}>
+                  <ModalButton 
+                    onClick={handleDelConfirmClose}
+                    sx={{
+                      background: 'linear-gradient(to right, #8d8aee, #5651e5)',
+                      color: 'white',
+                      borderRadius: '25px',
+                      width: '48%',
+                      '&:hover': { 
+                        background: 'linear-gradient(to right, #5651e5, #343188)',
+                      }
+                    }}
+                  >
+                    Cancel
+                  </ModalButton>
+                </div>
+              }
+            </ModalBox>
+          </Modal>
+        </ModalBox>
       </Modal>
       
     </section>
