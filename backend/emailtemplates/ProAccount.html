@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to Wishify Pro!</title>
+    <style type="text/css">
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        
+        body { 
+            margin: 0 !important; 
+            padding: 0 !important; 
+            width: 100% !important;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #444444;
+            background-color: #f7f7f7;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        .content {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid #5651E5;
+        }
+        
+        h1 {
+            color: #5651E5;
+            font-size: 24px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        h2 {
+            color: #5651E5;
+            font-size: 20px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        
+        p {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        
+        .button {
+            background: linear-gradient(90deg, #8d8aee, #5651E5);
+            border-radius: 8px;
+            color: #ffffff !important;
+            display: inline-block;
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 1.5;
+            padding: 12px 24px;
+            text-decoration: none;
+            margin: 20px 0;
+            transition: 0.3s ease;
+        }
+        
+        .button:hover {
+            background: linear-gradient(90deg, #8d8aee, #343188);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px 0;
+            font-size: 12px;
+            color: #999999;
+        }
+        
+        .feature-box {
+            background-color: #f8f9ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #5651E5;
+        }
+        
+        .pro-badge {
+            display: inline-block;
+            background-color: #5651E5;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+        
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #8d8aee, transparent);
+            margin: 25px 0;
+        }
+        
+        ul.features-list {
+            padding-left: 20px;
+        }
+        
+        ul.features-list li {
+            margin-bottom: 10px;
+        }
+        
+        @media screen and (max-width: 600px) {
+            .container {
+                width: 100% !important;
+                padding: 10px !important;
+            }
+            .content {
+                padding: 20px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="https://www.wishify.ca" style="text-decoration: none;">
+                <h1 style="display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: bold; margin: 0;">
+                    <span style="display: flex; align-items: center; color: #5651E5;">Wish</span><span style="color: #000000;">ify</span>
+                    <span class="pro-badge">PRO</span>
+                </h1>
+            </a>
+        </div>
+        
+        <div class="content">
+            <h1>Welcome to Wishify Pro!</h1>
+            
+            <p>Hello {{user_name}},</p>
+            
+            <p>Thank you for upgrading to Wishify Pro! Your subscription is now active, and we're excited for you to explore all the premium features.</p>
+            
+            <div class="feature-box">
+                <h2>Your Pro Membership Details:</h2>
+                <ul class="features-list">
+                    <li><strong>Plan:</strong> Pro Membership ($1.99/month)</li>
+                    <li><strong>Billing Date:</strong> {{next_billing_date}}</li>
+                    <li><strong>Subscription ID:</strong> {{subscription_id}}</li>
+                </ul>
+            </div>
+            
+            <h2>Unlocked Pro Features:</h2>
+            
+            <div class="feature-box">
+                <h3>Unlimited Wishlists</h3>
+                <p>Create as many wishlists as you need for every occasion, interest, or recipient.</p>
+            </div>
+            
+            <div class="feature-box">
+                <h3>Exclusive Pro Badge</h3>
+                <p>Your profile now displays the prestigious Pro badge, showing your commitment to great gifting.</p>
+            </div>
+            
+            <div class="feature-box">
+                <h3>Priority Support</h3>
+                <p>Get faster responses with our dedicated Pro support team available 24/7.</p>
+            </div>
+            
+            <div class="feature-box">
+                <h3>Duplicate Wishlists</h3>
+                <p>Simply Duplicate Wishlist with a simple click of a button</p>
+            </div>
+            
+            <p align="center">
+                <a href="https://www.wishify.ca/home" class="button">Start Using Pro Features</a>
+            </p>
+            
+            <div class="divider"></div>
+            
+            <h2>Need Help?</h2>    
+            <p>If you have any questions about your Pro membership, please contact our support team at <a href="mailto:pro-support@wishify.ca">pro-support@wishify.ca</a>.</p>
+            
+            <p>Happy wishing!<br>The Wishify Team</p>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; {{current_year}} Wishify. All rights reserved.</p>
+            <p>
+                Wishify<br />
+                1812 Sir Issac Brock Way,<br />
+                St. Catharines, ON, Canada<br />
+            </p>
+            <p>
+                <a href="https://www.wishify.ca/account">Manage Subscription</a> | 
+                <a href="https://www.wishify.ca/privacy">Privacy Policy</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
