@@ -1,12 +1,15 @@
 const express = require('express');
+require("dotenv").config();
 const router = express.Router();
 const db = require('./db');
 const bodyParser = require('body-parser');
+const fs = require('fs/promises');
+const path = require('path');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
 const authenticate = require('./middleware/authenticate');
 const createNotification = require("./middleware/createNotification");
 const sendEmail = require("./middleware/sendEmail");
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-require("dotenv").config();
 
 router.post('/create-subscription-session', express.json(), authenticate, async (req, res) => {
     try {
