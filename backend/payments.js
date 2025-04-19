@@ -300,7 +300,6 @@ async function proEmail(to, first_name, next_billing_date){
 
     htmlTemplate = htmlTemplate
     .replace(/{{first_name}}/g, first_name)
-    .replace(/{{email}}/g, to)
     .replace(/{{next_billing_date}}/g, next_billing_date) //new Date().toISOString().split('T')[0]
     .replace(/{{current_year}}/g, new Date().getFullYear());    
 
