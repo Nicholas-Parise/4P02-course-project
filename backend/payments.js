@@ -147,7 +147,7 @@ router.post('/webhook', bodyParser.raw({ type: 'application/json' }), async (req
                     "Welcome to Wishify Pro! You can now view and manage your subscription.", 
                     "/manage-subscription");
 
-                await proEmail(email, first_name, subscription.items.data[0].current_period_end);
+                await proEmail(email, user.rows[0].name, subscription.items.data[0].current_period_end);
 
                 console.log(`Subscription completed and updated for email: ${email}`);
             } catch (err) {
