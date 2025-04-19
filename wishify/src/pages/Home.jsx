@@ -5,6 +5,7 @@ import { NavLink } from 'react-router-dom';
 import {WishlistThumbnail} from '../components/Thumbnail'
 import {EventThumbnail} from '../components/Thumbnail'
 import FirstSetupModal from '../components/ProfileSettingModals/FirstSetupModal';
+import { useNavigate } from 'react-router-dom';
 
 const WishlistContainer = styled.div`
   display: grid;
@@ -185,8 +186,17 @@ const EmptyNote = styled.span`
 `
 
 const ItemDisplay = ({ item }) => {
+  const navigate = useNavigate();
+
+  const handleCardClick = () => {
+    navigate(`/wishlists/${item.wishlists_id}#${item.item_id}`);
+  };
+
   return (
-    <ContributionCard>
+    <ContributionCard 
+      onClick={handleCardClick}
+      style={{ cursor: 'pointer' }}
+    >
       <ContributionHeader title={item.wishlist_name}>
         {item.wishlist_name}
       </ContributionHeader>
@@ -194,9 +204,7 @@ const ItemDisplay = ({ item }) => {
       <ContributionDetail>
         <DetailLabel>Item:</DetailLabel>
         <DetailValue>
-          <ContributionLink href={`/wishlists/${item.wishlists_id}#${item.item_id}`}>
-            {item.name}
-          </ContributionLink>
+          {item.name}
         </DetailValue>
       </ContributionDetail>
       
