@@ -5,7 +5,7 @@ import AddIcon from '@mui/icons-material/Add';
 import "./PopularItems.css";
 import Loading from "./Loading";
 
-const PopularItems = ({ loading, items, bgColor="#e8e8e8", title="", subtitle="", maxItems=0, tagsEnabled, wishlistCountEnabled, addButtonsEnabled, onAdd = () => {} }) => {
+const PopularItems = ({ loading, items, bgColor="#FFFFFF", title="", subtitle="", maxItems=0, tagsEnabled, wishlistCountEnabled, addButtonsEnabled, onAdd = () => {} }) => {
   // If maxItems is specified, slice the array
   const displayedItems = maxItems ? items.slice(0, maxItems) : items;
 
