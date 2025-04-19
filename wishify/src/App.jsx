@@ -24,7 +24,7 @@ import Status from "./pages/Status";
 import Share from"./pages/Share";
 import Ideas from "./pages/Ideas";
 import UpgradePage from "./pages/UpgradePage";
-import UpgradeRedirect from "./components/UpgradeRedirect"; // Add this import
+import UpgradeRedirect from "./components/UpgradeRedirect";
 
 import ManageSubscription from './pages/ManageSubscription';
 import Success from './pages/Success';

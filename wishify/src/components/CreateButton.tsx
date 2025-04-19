@@ -33,6 +33,11 @@ const CreateWishlistButton = styled.button<{isDisabled?: boolean}>`
         font-size: 1.6rem;
         padding: 12px;
     }
+
+    @media (max-width: 900px) and (orientation: landscape) {
+        font-size: 1.2rem;
+        padding: 10px;
+    }
 `
 
 const CreateEventButton = styled.button`
@@ -63,6 +68,11 @@ const CreateEventButton = styled.button`
     @media (max-width: 480px) {
         font-size: 1.6rem;
         padding: 12px;
+    }
+    
+    @media (max-width: 900px) and (orientation: landscape) {
+        font-size: 1.2rem;
+        padding: 10px;
     }
 `
 
