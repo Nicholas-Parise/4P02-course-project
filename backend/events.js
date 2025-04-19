@@ -234,15 +234,16 @@ router.delete('/:eventId', authenticate, async (req, res, next) => {
 router.get('/:eventId/wishlists', authenticate, async (req, res, next) => {
 
   const eventId = parseInt(req.params.eventId);
-  const page = parseInt(req.query.page) || 1;
-  const pageSize = parseInt(req.query.pageSize) || 10;
+  const userId = req.user.userId; // Get user ID from the authenticated token
 
   try {
     const result = await db.query(`
-      SELECT w.id, w.name, w.description, w.dateCreated
+      SELECT w.*, u.displayname AS creator_displayName, u.id AS creator_id, wm.owner
       FROM wishlists w
       JOIN events e ON w.event_id = e.id
-      WHERE e.id = $1;`, [eventId]);
+      LEFT JOIN users u ON w.creator_id = u.id
+      LEFT JOIN wishlist_members wm ON w.id = wm.wishlists_id AND wm.user_id = $2
+      WHERE e.id = $1;`, [eventId, userId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "No wishlists found for this event" });
@@ -264,12 +265,13 @@ router.get('/:id/members', authenticate, async (req, res) => {
   const eventId = parseInt(req.params.id);
 
   try {
-    const result = await db.query(`
-          SELECT u.id, u.displayName, u.email, u.picture
-          FROM users u
-          JOIN event_members em ON u.id = em.user_id
-          WHERE em.event_id = $1;
+      const result = await db.query(`
+        SELECT u.id, u.displayName, u.email, u.picture, u.pro, em.owner
+        FROM users u
+        JOIN event_members em ON u.id = em.user_id
+        WHERE em.event_id = $1;
       `, [eventId]);
+
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "No members found for this event" });
@@ -431,10 +433,10 @@ router.put('/:id/members', authenticate, async (req, res) => {
       return res.status(404).json({ message: "User is not a member of this event" });
     }
 
-     // if owner isn't null, and owner is false
-     if (typeof owner !== 'undefined' && owner !== null && !owner) {
+    // if owner isn't null, and owner is false
+    if (typeof owner !== 'undefined' && owner !== null && !owner) {
       // we must make sure we don't take away owner if only one owner left
-      if(ownershipCheck.rows[0].owner_count <= 1){
+      if (ownershipCheck.rows[0].owner_count <= 1) {
         return res.status(403).json({ error: "Cannot remove owner when there is only one." });
       }
     }
@@ -536,17 +538,17 @@ router.post('/share', authenticate, async (req, res) => {
     const list_description = eventCheck.rows[0].description;
 
     // Check if the user exists
-        const userCheck = await db.query(`
+    const userCheck = await db.query(`
           SELECT id,displayName,notifications FROM users WHERE email = $1;
         `, [email]);
-    
-        // get name of person doing inviting:
-        const fromUserResult = await db.query(`
+
+    // get name of person doing inviting:
+    const fromUserResult = await db.query(`
             SELECT displayName FROM users WHERE id = $1;
           `, [userId]);
-    
-        const fromUser = fromUserResult.rows[0].displayname;
-       
+
+    const fromUser = fromUserResult.rows[0].displayname;
+
     // if the user has an account add them as a member
     if (userCheck.rows.length > 0) {
       // User exists, add them to the event

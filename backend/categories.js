@@ -61,7 +61,7 @@ router.post('/', authenticate, async (req, res, next) => {
     return res.status(400).json({ message: "name and description are required fields" });
   }
 
-  if(userId != 0){
+  if(userId !== 1){
     return res.status(403).json({ message: "must be admin"});
   }
 

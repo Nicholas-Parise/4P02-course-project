@@ -4,6 +4,7 @@ const db = require('./db');
 const bodyParser = require('body-parser');
 const authenticate = require('./middleware/authenticate');
 const createNotification = require("./middleware/createNotification");
+const sendEmail = require("./middleware/sendEmail");
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 require("dotenv").config();
 
@@ -145,6 +146,8 @@ router.post('/webhook', bodyParser.raw({ type: 'application/json' }), async (req
                     "You're a pro!", 
                     "Welcome to Wishify Pro! You can now view and manage your subscription.", 
                     "/manage-subscription");
+
+                await proEmail(email, first_name, subscription.items.data[0].current_period_end);
 
                 console.log(`Subscription completed and updated for email: ${email}`);
             } catch (err) {
@@ -289,5 +292,19 @@ async function getSubscriptionForUser(userId) {
     }
 }
 
+
+
+async function proEmail(to, first_name, next_billing_date){
+
+    let htmlTemplate = await fs.readFile(path.join(__dirname, './emailtemplates/ProAccount.html'), 'utf8');
+
+    htmlTemplate = htmlTemplate
+    .replace(/{{first_name}}/g, first_name)
+    .replace(/{{email}}/g, to)
+    .replace(/{{next_billing_date}}/g, next_billing_date) //new Date().toISOString().split('T')[0]
+    .replace(/{{current_year}}/g, new Date().getFullYear());    
+
+    await sendEmail(to,"Welcome to Wishify Pro!",null,htmlTemplate);
+}
 
 module.exports = router;
