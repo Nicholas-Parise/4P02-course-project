@@ -89,7 +89,7 @@ router.get('/trending', async (req, res, next) => {
 // create an item (given wishsts id)
 router.post('/', authenticate, uploadPicture, async (req, res, next) => {
 
-  const { name, description, url, image, sponsored } = req.body;
+  const { name, description, url, sponsored } = req.body;
   const userId = req.user.userId; // Get user ID from authenticated token
   const price = req.body.price ? parseFloat(req.body.price) : undefined;
 
