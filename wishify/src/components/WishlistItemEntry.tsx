@@ -109,7 +109,7 @@ const WishlistItemEntry = ({ item, editWishlistItem, sortBy, reservations, onRes
               </button>
               <button 
                 onClick={(e) => { e.stopPropagation(); setIsDeleteModalOpen(true); }}
-                className="p-2 text-[#fb2c36] hover:bg-gray-100 rounded-full cursor-pointer"
+                className="p-2 text-[#5651e5] hover:bg-gray-100 rounded-full cursor-pointer"
               >
                 <FaTrashCan className='text-sm'/>
               </button>
