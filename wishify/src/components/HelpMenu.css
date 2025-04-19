@@ -12,7 +12,7 @@
   position: fixed;
   top: 0;
   right: 0;
-  width: 600px;
+  width: 400px;
   height: 100%;
   background: #D5D4F0;
   box-shadow: -10px 0 10px rgba(0, 0, 0, 0.1);
@@ -147,4 +147,112 @@
   font-size: 22px;
   font-weight: bold;
   margin: 0;
+}
+
+.help-context-banner {
+  width: 100%;
+  padding: 12px;
+  background-color: #f0f0ff;
+  border-left: 4px solid #5651e5;
+  margin: 15px 0;
+  font-size: 15px;
+  border-radius: 4px;
+}
+
+.help-context-banner span {
+  font-weight: bold;
+  color: #5651e5;
+}
+
+.help-related-topics {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.help-related-topics h4 {
+  color: #5651e5;
+  margin-bottom: 15px;
+}
+
+.help-topic-button {
+  display: block;
+  width: 100%;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.help-topic-button:hover {
+  background: #f8f8ff;
+  border-color: #5651e5;
+  color: #5651e5;
+}
+
+/* Make the first accordion stand out */
+.help-text-container .MuiAccordion-root:first-child {
+  border-top: 2px solid #5651e5;
+}
+
+.help-text-container .MuiAccordion-root:first-child .help-topic-summary {
+  color: #5651e5;
+  font-size: 19px;
+}
+
+.pro-features-help {
+  padding: 10px;
+}
+
+.pro-features-help h4 {
+  color: #5651e5;
+  margin-bottom: 15px;
+}
+
+.pro-features-help ul {
+  padding-left: 20px;
+  margin-bottom: 20px;
+}
+
+.pro-features-help li {
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.pro-features-help strong {
+  color: #5651e5;
+}
+
+.pro-cta {
+  background: #f8f8ff;
+  padding: 15px;
+  border-radius: 10px;
+  border-left: 4px solid #5651e5;
+  margin-top: 20px;
+}
+
+.pro-cta p {
+  margin-bottom: 15px;
+  font-size: 15px;
+}
+
+.upgrade-button {
+  background: linear-gradient(to right, #8d8aee, #5651e5);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.upgrade-button:hover {
+  background: linear-gradient(to right, #5651e5, #343188);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(86, 81, 229, 0.2);
 }

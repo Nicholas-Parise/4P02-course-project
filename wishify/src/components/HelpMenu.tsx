@@ -1,12 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { AiOutlineUser, AiOutlineLogout, AiFillGift, AiOutlineCloseCircle, AiOutlineBell, AiFillBell } from "react-icons/ai";
-import { NavLink, useNavigate } from "react-router-dom";
+import { AiFillGift, AiOutlineCloseCircle } from "react-icons/ai";
+import { NavLink, useLocation } from "react-router-dom";
+import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
+import { FaChevronDown } from "react-icons/fa";
 import "./HelpMenu.css";
-import HelpAccordion from "./HelpAccordion.jsx";
-import { Card, CardContent, CardHeader, CircularProgress } from "@mui/material"
-import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material"
-import { FaChevronDown } from "react-icons/fa"
-import React from "react";
 
 interface Props {
   closeMenu: () => void,
@@ -15,6 +12,23 @@ interface Props {
 const HelpMenu = ({ closeMenu }: Props) => {
   const [isClosing, setIsClosing] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const location = useLocation();
+  type HelpSectionKey = keyof typeof helpContent;
+  const [activeSection, setActiveSection] = useState<HelpSectionKey | "">("");
+
+  useEffect(() => {
+    // Determine which help section to show based on current route
+    const path = location.pathname;
+    if (path.includes("/wishlists")) {
+      setActiveSection("wishlist");
+    } else if (path.includes("/events")) {
+      setActiveSection("event");
+    } else if (path.includes("/ideas")) {
+      setActiveSection("ideas");
+    } else {
+      setActiveSection("");
+    }
+  }, [location]);
 
   const handleClose = () => {
     setIsClosing(true);
@@ -22,6 +36,134 @@ const HelpMenu = ({ closeMenu }: Props) => {
       closeMenu();
     }, 250);
   };
+
+  const helpContent = {
+    wishlist: {
+      title: "Wishlist Management Help",
+      sections: [
+        {
+          title: "Creating and Organizing Wishlists",
+          content: "Create wishlists for different occasions or purposes. Each wishlist can have a title, detailed description, cover image, and optional due date. Use the drag-and-drop feature to reorder items based on your priority."
+        },
+        {
+          title: "Adding and Managing Items",
+          content: "Add items with comprehensive details including image, purchase links, and quantity needed."
+        },
+        {
+          title: "Advanced Sharing Options",
+          content: "Share wishlists via unique links or direct email invitations. Control permissions at two levels: Contributor (can reserve items), and Owner (can modify the wishlist)."
+        },
+        {
+          title: "Collaboration Features",
+          content: "Enable comments on your wishlist item to get feedback from friends. The item comment log shows all changes made by collaborators."
+        }
+      ]
+    },
+    event: {
+      title: "Event Coordination Help",
+      sections: [
+        {
+          title: "Creating and Customizing Events",
+          content: "Events bring together multiple wishlists for occasions like birthdays or holidays. Add event details including dates, locations, and custom cover images."
+        },
+        {
+          title: "Managing Participant Wishlists",
+          content: "Add existing wishlists from your collection or invite others to contribute theirs. Set visibility preferences for each wishlist. The unified view shows all items across wishlists, with filters to narrow down options."
+        },
+        {
+          title: "RSVP and Gift Tracking",
+          content: "Invite participants to the event. Track their responses and see who has reserved or purchased gifts."
+        },
+        {
+          title: "Event Analytics",
+          content: "Track RSVPs and gift progress through the event dashboard. See which items have been reserved or purchased. Generate thank-you lists to acknowledge contributors. Pro users get detailed analytics on participation rates and gift trends."
+        },
+        {
+          title: "Post-Event Features",
+          content: "After the event, convert it to 'Archived' status to preserve all information. Send thank-you messages to participants directly through Wishify. Export a complete gift report for your records. Reactivate archived events for recurring occasions."
+        }
+      ]
+    },
+    ideas: {
+      title: "Gift Ideas Discovery Help",
+      sections: [
+        {
+          title: "Trending and Popular Items",
+          content: "Discover what's currently popular across Wishify's community. See real-time trending data with most-wished and most-purchased items."
+        },
+        {
+          title: "Personalized Recommendations",
+          content: "Our Algorithm analyzes your past wishlists, and preferences to suggest perfect gift ideas."
+        },
+        {
+          title: "Idea to Wishlists",
+          content: "With one click, add discovered items directly to any of your wishlists. The system automatically populates available details like images and descriptions."
+        }
+      ]
+    },
+    general: {
+      title: "General Help & Support",
+      sections: [
+        {
+          title: "Dashboard Overview",
+          content: "Your Home dashboard provides a comprehensive snapshot of your Wishify activity. The top section shows your most recently accessed wishlists and events, while the bottom section displays your recent contributions to others' wishlists. Each card shows key information at a glance, including item counts, upcoming dates, and contribution statuses."
+        },
+        {
+          title: "Quick Navigation",
+          content: "Click any wishlist or event card to jump directly to it. The 'View All' buttons take you to complete lists of your wishlists or events. Use the quick action buttons (+ Add Wish) to create new items without leaving the home page. The Navigation bar provides instant access to all major sections of the application."
+        },
+        {
+          title: "Activity Tracking",
+          content: "The Contributions section meticulously tracks all items you've pledged to purchase from shared wishlists. Each entry shows the item name, purchase status (reserved/purchased), quantity, price, and any notes you've added. Click on any contribution to see more details about the wishlist and the item within the wishlist."
+        },
+        {
+          title: "Account Management",
+          content: "Update your profile picture, display name, and personal details in Account Settings. Configure notification preferences for wishlist or events within the specific wishlist and events. The master switch for notication is within the sidebar when you click your profile icon in the Navigation bar."
+        },
+        {
+          title: "Navigation Tips",
+          content: "Use the persistent Navigation bar to quickly switch between app sections."
+        },
+        {
+          title: "Troubleshooting Common Issues",
+          content: "If links aren't working, check your browser's pop-up settings. For syncing problems, try refreshing the page or logging out and back in. Clear your browser cache if you see outdated information. Image upload issues can often be resolved by checking file size and format requirements."
+        },
+        {
+          title: "Pro Features Explained",
+          content: (
+            <div className="pro-features-help">
+              <ul>
+                <li>
+                  <strong>Unlimited Wishlists</strong> - Create as many as you need (vs. 3 in Free)
+                </li>
+                <li>
+                  <strong>Exclusive Pro Badge</strong> - Verified profile marker that increases gifting credibility
+                </li>
+                <li>
+                  <strong>Priority Support</strong> - 24-hour response guarantee and live chat
+                </li>
+                <li>
+                  <strong>Early Feature Access</strong> - Try new tools weeks before public release
+                </li>
+              </ul>
+                <button 
+                  className="upgrade-button"
+                  onClick={() => window.location.href = '/upgrade'}
+                >
+                  Upgrade to Pro
+                </button>
+            </div>
+          )
+        },
+        {
+          title: "Getting Additional Support",
+          content: "Our 24/7 support team can be reached at support@wishify.com or through the in-app chat (bottom right corner). Include screenshots for technical issues. For feature requests, visit our feedback portal at feedback.wishify.com. Check our YouTube channel for video tutorials on advanced features."
+        }
+      ]
+    }
+  };
+
+  const currentHelp = activeSection && activeSection in helpContent ? helpContent[activeSection] : helpContent.general;
 
   return (
     <>
@@ -35,124 +177,30 @@ const HelpMenu = ({ closeMenu }: Props) => {
                 <AiFillGift />
                 Wish
               </span>
-              ify
+              ify Help Center
             </h1>
           </NavLink>
           <button className="close-btn" onClick={handleClose}>
             <AiOutlineCloseCircle />
           </button>
         </div>
+        
+        <div className="help-context-banner">
+          Showing help for: <span>{currentHelp.title}</span>
+        </div>
+
         <div className="help-text-container-outter">
           <div ref={menuRef} className="help-text-container">
-            <p className="help-title">Help Menu</p>
-            <Accordion>
-              <AccordionSummary expandIcon={<FaChevronDown />}>
-                <p className="help-topic-summary">Home</p>
-              </AccordionSummary>
-              <AccordionDetails>
-                <p className="help-topic-text">Your Home page holds a summary of all your account activities, from your most recently made wishlists and events to any contributions you have made.</p>
-                <Accordion>
-                  <AccordionSummary expandIcon={<FaChevronDown />}>
-                    <p className="help-topic-summary">Wishlists</p>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <p className="help-topic-text">The Wishlists section of this page contains a summary of the Wishlists you have made. Your most recently created three can be viewed here, and you can quickly jump to any one of them with a simple click. You can click the “View my Wishlists” button to jump to the Wishlist page to see all Wishlists made and those that are shared to you.</p>
-                  </AccordionDetails>
-                </Accordion>
-                <Accordion>
-                  <AccordionSummary expandIcon={<FaChevronDown />}>
-                    <p className="help-topic-summary">Events</p>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <p className="help-topic-text">The Events section of this page contains a summary of the Events you have made. Your most recently created three can be viewed here, and you can quickly jump to any one of them with a simple click. You can click the “View my Events” button to jump to the Events page to see all Events made and those that are shared to you.</p>
-                  </AccordionDetails>
-                </Accordion>
-                <Accordion>
-                  <AccordionSummary expandIcon={<FaChevronDown />}>
-                    <p className="help-topic-summary">Contributions</p>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <p className="help-topic-text">The Contributions section holds a list of any changes you have made to your wishlists. It can tell you what item you contributed to, the quantity, purchase status, and any notes you left.</p>
-                  </AccordionDetails>
-                </Accordion>
-              </AccordionDetails>
-            </Accordion>
-
-            <Accordion>
-              <AccordionSummary expandIcon={<FaChevronDown />}>
-                <p className="help-topic-summary">Wishlist</p>
-              </AccordionSummary>
-              <AccordionDetails>
-                <p className="help-topic-text">Your Wishlist page is a collection of all your Wishlists and those that have been shared with you. Here you can create, edit, share, duplicate, and delete your Wishlists.</p>
-                <Accordion>
-                  <AccordionSummary expandIcon={<FaChevronDown />}>
-                    <p className="help-topic-summary">Creation</p>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <p className="help-topic-text">You can create a Wishlist simply by clicking the “Create a Wishlist” button under the “My Wishlists” section. Now give it a name, description, due date, and a preset image. With that, your Wishlist has been made!</p>
-                  </AccordionDetails>
-                </Accordion>
-                <Accordion>
-                  <AccordionSummary expandIcon={<FaChevronDown />}>
-                    <p className="help-topic-summary">Add a Wish</p>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <p className="help-topic-text">To add an item to one of your Wishlists, click on the “Add Wish” button at the top. While there are many fields to fill out, only the Wishlist, Name, Price, and Quantity fields are required to add an item. Other options such as a Link, Image, or Description are up to you!</p>
-                  </AccordionDetails>
-                </Accordion>
-                <Accordion>
-                  <AccordionSummary expandIcon={<FaChevronDown />}>
-                    <p className="help-topic-summary">Removing a Wish</p>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <p className="help-topic-text">To remove an item from a Wishlist, first open the Wishlist with the item to be removed. Then, click on the trash can icon next to the item you would like to remove. After confirming this was done on purpose, it will be gone from the Wishlist.</p>
-                  </AccordionDetails>
-                </Accordion>
-              </AccordionDetails>
-            </Accordion>
-
-            <Accordion>
-              <AccordionSummary expandIcon={<FaChevronDown />}>
-                <p className="help-topic-summary">Event</p>
-              </AccordionSummary>
-              <AccordionDetails>
-                <p className="help-topic-text">An Event is a collection of Wishlists that you can share with people. Your Event page stores all Events you have created as well as those that are shared to you. You can create, edit, share, and delete Events from here.</p>
-                <Accordion>
-                  <AccordionSummary expandIcon={<FaChevronDown />}>
-                    <p className="help-topic-summary">Creation</p>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <p className="help-topic-text">Click on the “Create an Event” button, put in a title, and you're all done. You can edit the Events details, such as the date or address of the event, from inside the Event itself.</p>
-                  </AccordionDetails>
-                </Accordion>
-                <Accordion>
-                  <AccordionSummary expandIcon={<FaChevronDown />}>
-                    <p className="help-topic-summary">Adding a Wishlist</p>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <p className="help-topic-text">To add a Wishlist to an Event, click into that event, and select the “Add a Wishlist” button.</p>
-                  </AccordionDetails>
-                </Accordion>
-                <Accordion>
-                  <AccordionSummary expandIcon={<FaChevronDown />}>
-                    <p className="help-topic-summary">Removing a Wishlist</p>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <p className="help-topic-text">To remove a particular Wishlist from an Event, first click into the Event. Now from the list of Wishlists attached to this Event, find the Wishlist to remove, click edit, and select the “REMOVE FROM EVENT” option.</p>
-                  </AccordionDetails>
-                </Accordion>
-              </AccordionDetails>
-            </Accordion>
-
-            <Accordion>
-              <AccordionSummary expandIcon={<FaChevronDown />}>
-                <p className="help-topic-summary">Ideas</p>
-              </AccordionSummary>
-              <AccordionDetails>
-                <p className="help-topic-text">Wishify's Ideas page is here to give you Wish suggestions, based on your likes and dislikes selected in your profile.</p>
-                <p className="help-topic-text">This page offers a trending section, listing all the recently most Wished items. Our AI Recommendations sections boasts a collection of Wish ideas, based around any likes and dislikes you have, as well as a selection of different items to browse.</p>
-              </AccordionDetails>
-            </Accordion>
+            {currentHelp.sections.map((section, index) => (
+              <Accordion key={index} defaultExpanded={index === 0}>
+                <AccordionSummary expandIcon={<FaChevronDown />}>
+                  <p className="help-topic-summary">{section.title}</p>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <p className="help-topic-text">{section.content}</p>
+                </AccordionDetails>
+              </Accordion>
+            ))}
           </div>
         </div>
       </div>
