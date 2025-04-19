@@ -157,8 +157,8 @@ router.get('/:wishlistId', authenticate, async (req, res, next) => {
     const result = await db.query(`
       SELECT w.*, 
             u.displayname AS creator_displayName,
-            wm.blind AS is_blind,
-            wm.owner AS is_owner,
+            wm.blind AS blind,
+            wm.owner AS owner,
             wm.notifications,
             (wm.user_id IS NOT NULL) AS is_wishlist_member,
             (em.user_id IS NOT NULL) AS is_event_member
