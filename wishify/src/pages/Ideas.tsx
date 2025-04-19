@@ -124,7 +124,7 @@ const Ideas = () => {
     }
 
     return (
-        <section className="bg-white rounded-[25px] shadow-lg max-w-7xl border-2 border-[#5651e5]">
+        <section className="bg-white rounded-[25px] shadow-lg max-w-7xl border-2 border-[#5651e5]" style={{ marginTop: "30px" }}>
 
             {/* Trending Section */}
             <div className="mb-10">

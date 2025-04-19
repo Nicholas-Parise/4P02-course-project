@@ -103,12 +103,8 @@ const Landing = () => {
 
   const faqs = [
     {
-      question: "I want to create a wishlist, how do I do that for my son christmas?",
-      answer: "Click on Create New Wishlist and then click on 'On behalf of' to create a wishlist for your son. You can then add items and share the wishlist with family and friends."
-    },
-    {
       question: "How can I add my dad into my wishlist?",
-      answer: "Go to the wishlist settings and click on 'Add Collaborator'. Enter your dad's email address, and he will receive an invitation to join your wishlist."
+      answer: "Go to the wishlist settings and click on 'Share'. Enter your dad's email address, and he will receive an invitation to join your wishlist."
     },
     {
       question: "How do I delete a wishlist?",
@@ -119,8 +115,16 @@ const Landing = () => {
       answer: "You can share your wishlist by clicking on the 'Share' button on the wishlist page. You can copy the link or send it directly via email or social media."
     },
     {
+      question: "How does the Pro plan work?",
+      answer: "Simply upgrade to the Pro plan through your Profile Menu and follow the given prompt and it will redirect you to payment methods. The Pro plan offers additional features like unlimited wishlists, priority support, and duplicate Wishlist with a click of a button."
+    },
+    {
       question: "Is there a mobile app available?",
-      answer: "Currently we only have a web application, but a mobile app is in development and will be released soon."
+      answer: "Currently we only have a web application, but the web app is fully responsive and works well on mobile devices."
+    },
+    {
+      question: "I don't know how to use the app, can you help me?",
+      answer: "Of course! We have a comprehensive help section in the app that guides you through all the features. You can also reach out to our support team for personalized assistance."
     }
   ];
 
@@ -154,7 +158,7 @@ const Landing = () => {
   ];
 
   return (
-    <div className="landing-page">
+    <div className="landing-page" style={{backgroundColor: "#E8E8E8"}}>
       <div className="hero">
         <div className="hero-content">
           <div className="hero-text">
@@ -207,7 +211,7 @@ const Landing = () => {
         />
       )}
 
-      <div className="use-cases">
+      <div className="use-cases" style={{backgroundColor: "#E8E8E8"}}>
         <h2>Perfect For Any Occasion</h2>
         <div className="case-studies">
           <div className="case-study">
@@ -225,7 +229,7 @@ const Landing = () => {
         </div>
       </div>
 
-      <div className="faq-section">
+      <div className="faq-section" style={{backgroundColor: "#E8E8E8"}}>
         <h2 className="faq-title">Frequently Asked Questions</h2>
         <div className="faq-container">
           {faqs.map((faq, index) => (
@@ -249,7 +253,7 @@ const Landing = () => {
         </div>
       </div>
 
-      <div className="pricing-section">
+      <div className="pricing-section" style={{backgroundColor: "#E8E8E8"}}>
         <h2 className="pricing-title">Simple, Transparent Pricing</h2>
         <p className="pricing-subtitle">Choose the plan that's right for you</p>
         

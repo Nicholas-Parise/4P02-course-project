@@ -188,9 +188,35 @@ const Login = ({setIsLoggedIn}) => {
         </div>
         <br></br>
         <hr></hr>
-        <button onClick={handleGoogleLogin}>
-        <img src={google} align="left" alt="G" />
-          Login with Google</button>
+        <button onClick={handleGoogleLogin}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          width: '100%',
+          padding: '12px',
+          cursor: 'pointer',
+          position: 'relative'
+        }}>
+        <img src={google} 
+        align="left" alt="G" 
+        style={{
+          width: '30px',
+          height: '30px',
+          backgroundColor: 'white',
+          padding: '5px',
+          borderRadius: '25px',
+          marginRight: '10px'
+          }}
+          />
+          <span style={{
+            position: 'absolute',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 'calc(100% - 50px)'
+          }}>
+            Login with Google
+            </span>
+        </button>
       </section>
       
     </>
