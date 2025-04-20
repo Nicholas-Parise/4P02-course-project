@@ -116,10 +116,7 @@ router.post('/', authenticate, uploadPicture, async (req, res, next) => {
       deleteUploadedFile(req);
 
       const ideaResult = await db.query(`
-      SELECT name, description, url, image, price 
-      FROM ideas 
-      WHERE id = $1;
-      `, [idea_id]);
+      SELECT name, description, url, image, price FROM ideas WHERE id = $1;`, [idea_id]);
 
       if (ideaResult.rows.length === 0) {
         return res.status(404).json({ error: "The provided idea_id does not exist" });
@@ -128,11 +125,8 @@ router.post('/', authenticate, uploadPicture, async (req, res, next) => {
       ideaData = ideaResult.rows[0];
 
       await db.query(`
-      UPDATE ideas 
-      SET uses = uses + 1 
-      WHERE id = $1;
+      UPDATE ideas SET uses = uses + 1 WHERE id = $1;
       `, [idea_id]);
-
 
       // insert the item
       const result = await db.query(`
@@ -524,7 +518,7 @@ try{
 
     await createNotification(notifyMembers, 
       "Item added to wishlist", 
-      `Hello, an item ${item_name} has been added to a wishlist.`, 
+      `Hello, a ${item_name} has been added to a wishlist.`, 
       `/wishlists/${wishlists_id}`);
     }catch(error){
       console.error("Error sending item notifications:", error);
