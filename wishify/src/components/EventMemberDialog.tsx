@@ -111,7 +111,7 @@ const MemberDialog = ({ open, setOpen, members, userID, isOwner, setOwner, editM
                                     <TableCell className="text-center">
                                         <span 
                                             onClick={() => (setActiveMember(member), setIsOwnerModalOpen(true))}
-                                            className="fa-layers fa-fw cursor-pointer"
+                                            className={`fa-layers fa-fw ${isOwner ? 'cursor-pointer' : ''}`}
                                         >
                                             <FontAwesomeIcon icon={faCrown} fontSize={18} className="text-[#5651e5]"/>
                                             {!member.owner && <FontAwesomeIcon icon={faSlash} fontSize={24} />}
@@ -163,7 +163,7 @@ const MemberDialog = ({ open, setOpen, members, userID, isOwner, setOwner, editM
                 <div className="flex">
                     <img 
                         src={activeMember.picture} 
-                        className={`w-6 h-6 mr-3 overflow-hidden rounded-full ${activeMember.pro && "ring-amber-400 ring-2 "}`}
+                        className={`w-6 h-6 mr-3 overflow-hidden rounded-full ${activeMember.pro && "ring-[#5651e5] ring-2 "}`}
                     />
                 </div>
                 <div>

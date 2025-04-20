@@ -62,7 +62,8 @@ function App() {
                 <Route path="forgot" element={<ResetPassword />} />
                 <Route path="status" element={<Status />} />
                 <Route path="profile/:userId" element={<PublicProfile />} />
-                <Route path="wishlists/share/:share_token" element={<Share isLoggedIn={isLoggedIn} />} />
+                <Route path="wishlists/share/:share_token" element={<Share isLoggedIn={isLoggedIn} type={"wishlist"} />} />
+                <Route path="events/share/:share_token" element={<Share isLoggedIn={isLoggedIn} type={"event"} />} />
 
                 <Route path="privacy-policy" element={<Privacy />} />
                 <Route path="terms-of-service" element={<TOS />} />
