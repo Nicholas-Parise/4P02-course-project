@@ -707,8 +707,14 @@ export const WishlistThumbnail = (props: any) => {
 
     let navigate = useNavigate(); 
     const openWishlist = () => {
-        let path = "/wishlists/" + props.id;
-        navigate(path);
+        if (props.shareToken){
+            let path = "/wishlists/share/" + props.shareToken;
+            navigate(path);
+        }
+        else{
+            let path = "/wishlists/" + props.id;
+            navigate(path);
+        }
     }
 
     if(props.isOwner){
