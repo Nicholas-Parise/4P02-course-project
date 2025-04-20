@@ -140,7 +140,7 @@ const MemberDialog = ({ open, setOpen, members, userID, isOwner, setBlind, setOw
                                 <TableRow key={member.id}>
                                     <Link to={`/profile/${member.id}`}>
                                     <TableCell className="!flex">
-                                            <div className="flex justify-center">
+                                            <div className="flex justify-center object-cover">
                                                 <img 
                                                     src={member.picture} 
                                                     className={`w-5 h-5 mr-3 overflow-hidden rounded-full ${member.pro && "ring-[#5651e5] ring-2 "}`}
