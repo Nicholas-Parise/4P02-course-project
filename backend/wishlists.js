@@ -309,6 +309,8 @@ router.put('/:wishlistId', authenticate, async (req, res, next) => {
               dateUpdated = NOW()
           WHERE id = $1;
         `, [wishlistId]);
+      }else{
+        return res.status(400).json({ error: "You must send \"null\" if you want to remove a deadline." });
       }
     }
 
@@ -324,6 +326,8 @@ router.put('/:wishlistId', authenticate, async (req, res, next) => {
               dateUpdated = NOW()
           WHERE id = $1;
         `, [wishlistId]);
+      }else{
+        return res.status(400).json({ error: "You must send \"null\" if you want to remove an event_id." });
       }
     }
 
