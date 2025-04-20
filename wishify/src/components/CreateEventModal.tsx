@@ -1,6 +1,6 @@
 import { useState, FormEvent } from "react"
 import { Dialog, DialogTitle, Box, DialogContent, DialogContentText, Typography, FormControl, Button, TextField } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Event } from "../types/types";
@@ -119,7 +119,7 @@ const CreateEventModal = ({ open, setOpen, events, setEvents, token }: Props) =>
               </div>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <div className="grid gap-2">
-                  <DatePicker
+                  <DateTimePicker
                     label="Due Date"
                     value={date}
                     onChange={(newValue: any) => setDate(newValue)}

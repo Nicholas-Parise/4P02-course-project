@@ -83,7 +83,7 @@ function App() {
                      <Route path="upgrade" element={<UpgradePage/>} />
                   <Route path="ideas" element={<Ideas />} />
 
-                  <Route path="profile" element={<Profile />} />
+                  <Route path="profile" element={<Profile setIsLoggedIn={setIsLoggedIn} />} />
                   
                 </Route>
                 <Route path="*" element={<NoPage />} />

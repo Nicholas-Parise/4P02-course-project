@@ -13,10 +13,11 @@ interface Props {
   profile: User,
   token: string,
   notifications: Notification[],
+  readNotification: (id: number) => void,
   deleteNotification: (id: number) => void
 }
 
-const ProfileMenu = ({ closeMenu, logOut, profile, token, notifications, deleteNotification }: Props) => {
+const ProfileMenu = ({ closeMenu, logOut, profile, token, notifications, readNotification, deleteNotification }: Props) => {
   const [isClosing, setIsClosing] = useState(false);
   const [showLogOutModal, setShowLogOutModal] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(profile.notifications);
@@ -45,7 +46,22 @@ const ProfileMenu = ({ closeMenu, logOut, profile, token, notifications, deleteN
     handleClose();
   };
 
-  const handleRedirect = (url: string) => {
+  const handleNotificationRedirect = (id: number, url: string) => {
+    fetch(`https://api.wishify.ca/notifications/${id}`, {
+      method: 'put',
+      headers: new Headers({
+        'Authorization': "Bearer "+token,
+        'Content-Type': 'application/json'
+      }),
+      body: JSON.stringify({
+        "is_read": true,
+      })
+      })
+      .catch((error) => {
+        console.log("Failed to set notification as read\n" + error)
+      })
+
+    readNotification(id)
     navigate(url);
     handleClose();
   }
@@ -170,7 +186,7 @@ const ProfileMenu = ({ closeMenu, logOut, profile, token, notifications, deleteN
                   <NotificationEntry
                     key={notification.id} 
                     notification={notification}
-                    handleRedirect={handleRedirect}
+                    handleRedirect={handleNotificationRedirect}
                     deleteNotification={deleteNotification}
                   />
                 ))}

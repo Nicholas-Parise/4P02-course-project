@@ -56,19 +56,18 @@ export default function WishlistHeader({ wishlist, setWishlist, event, setEventI
     <div className="items-center justify-center flex">
       { wishlist ? (
         <div className="bg-white shadow-md rounded-[25px] p-6 border-2 border-[#5651e5] w-full">
-          <div className="hidden md:flex items-center mb-2">
-            <h1 className="text-3xl font-bold items-center">{wishlist.name}</h1>
-            <div className="items-center flex justify-between w-full ml-2">
+          <div className="hidden md:block items-center mb-2">
+          <div className="items-center flex justify-between w-full">
               <div className="flex items-center">
-                <div className="w-12">
+                <div className="w-10 mr-3">
                   <span className="fa-layers fa-fw">
-                    <FontAwesomeIcon icon={faCrown} fontSize={20} className="opacity-[54%]"/>
+                    <FontAwesomeIcon icon={faCrown} fontSize={24} className="opacity-[54%]"/>
                     {!owner && <FontAwesomeIcon icon={faSlash} fontSize={24} />}
                   </span>
                 </div>
-                <div className="w-12">
+                <div className="w-10">
                   <span className="fa-layers fa-fw">
-                    <FontAwesomeIcon icon={faEye} fontSize={20} className="opacity-[54%]"/>
+                    <FontAwesomeIcon icon={faEye} fontSize={24} className="opacity-[54%]"/>
                     {blind && <FontAwesomeIcon icon={faSlash} fontSize={24} />}
                   </span>
                 </div>
@@ -90,25 +89,27 @@ export default function WishlistHeader({ wishlist, setWishlist, event, setEventI
                 </IconButton>
               </div>
             </div>
+            <h1 className="text-3xl font-bold items-center w-full">
+              {wishlist.name}
+            </h1>
           </div>
 
           <div className="md:hidden">
-            <div className="flex items-center gap-2 mb-2" style={{width: '50px'}}>
-              <span className="fa-layers fa-fw">
-                <FontAwesomeIcon icon={faCrown} className="text-lg opacity-[54%]"/>
-                {!owner && <FontAwesomeIcon icon={faSlash} />}
-              </span>
-              <span className="fa-layers fa-fw">
-                <FontAwesomeIcon icon={faEye} className="text-lg opacity-[54%]"/>
-                {blind && <FontAwesomeIcon icon={faSlash} />}
-              </span>
-            </div>
-
-            {/* Title and Action Buttons */}
-            <div className="flex justify-between items-center mb-2">
-              <h1 className="text-2xl font-bold break-words">
-                {wishlist.name}
-              </h1>
+            <div className="flex items-center gap-2 justify-between">
+              <div className="text-center flex">
+                <div className="w-8 mr-2">
+                  <span className="fa-layers fa-fw">
+                    <FontAwesomeIcon fontSize={24} icon={faCrown} className="text-lg opacity-[54%]"/>
+                    {!owner && <FontAwesomeIcon fontSize={18} icon={faSlash} />}
+                  </span>
+                </div>
+                <div className="w-8">
+                  <span className="fa-layers fa-fw text-center">
+                    <FontAwesomeIcon fontSize={24} icon={faEye} className="text-lg opacity-[54%]"/>
+                    {blind && <FontAwesomeIcon fontSize={18} icon={faSlash} />}
+                  </span>
+                </div>
+              </div>
               <div className="flex items-center gap-1">
                 <IconButton 
                   sx={{":hover": {color: '#5651e5'}, padding: '8px'}} 
@@ -128,19 +129,28 @@ export default function WishlistHeader({ wishlist, setWishlist, event, setEventI
                 </IconButton>
               </div>
             </div>
+            
+            {/* Title and Action Buttons */}
+            <div className="flex justify-between items-center mb-2">
+              <h1 className="text-2xl font-bold break-words w-fit">
+                {wishlist.name}
+              </h1>
+            </div>
           </div>
           
           {/* Content - Mobile and Desktop versions */}
           {wishlist.deadline && (
             <>
               {/* Desktop version */}
-              <p className="hidden md:block text-gray-800">
-                Deadline: {new Date(wishlist.deadline).toLocaleString()}
-              </p>
+              <div className="items-center hidden md:flex text-gray-800">
+                <SlCalender className="w-5 h-5 mr-2" />
+                <span>{new Date(wishlist.deadline).toLocaleString()}</span>
+              </div>
               {/* Mobile version */}
-              <p className="md:hidden text-gray-800 text-sm">
-                Deadline: {new Date(wishlist.deadline).toLocaleString()}
-              </p>
+              <div className="flex items-center md:hidden text-gray-800 text-sm">
+                <SlCalender className="w-5 h-5 mr-2" />
+                <span>{new Date(wishlist.deadline).toLocaleString()}</span>
+              </div>
             </>
           )}
           

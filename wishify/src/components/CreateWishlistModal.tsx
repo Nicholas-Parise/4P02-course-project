@@ -1,6 +1,6 @@
 import { useState, FormEvent } from "react"
 import { Dialog, DialogTitle, Box, DialogContent, DialogContentText, Typography, FormControl, Button, TextField } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Wishlist } from "../types/types";
@@ -71,12 +71,7 @@ const CreateWishlistModal = ({ open, setOpen, wishlists, setWishlists, token }: 
       })
       .then((response) => response.json())
       .then((data) => {
-          let newWishlist: Wishlist = 
-          {id: data.wishlist.id,
-            event_id: 0, // TODO add event support
-            name: uniqueTitle,
-            description: "",
-            image: ""} // TODO add descriptions
+          let newWishlist: Wishlist = data.wishlist
           setWishlists([...wishlists, newWishlist])
           setNewWishlist({})
       })
@@ -98,6 +93,7 @@ const CreateWishlistModal = ({ open, setOpen, wishlists, setWishlists, token }: 
           maxWidth: '600px',
           width: '100%',
           boxShadow: '0 4px 20px rgba(86, 81, 229, 0.15)',
+          border: '2px solid #5651e5',
       }}}
     >
       <DialogTitle 
@@ -118,7 +114,8 @@ const CreateWishlistModal = ({ open, setOpen, wishlists, setWishlists, token }: 
           sx={{ 
             color: '#666',
             textAlign: 'center',
-            marginBottom: '24px'
+            marginBottom: '24px',
+            marginTop: '12px'
           }}
         >
           Enter the details for your new wishlist
@@ -154,7 +151,7 @@ const CreateWishlistModal = ({ open, setOpen, wishlists, setWishlists, token }: 
               />
               
               <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
+                <DateTimePicker
                   label="Due Date (Optional)"
                   value={date}
                   onChange={(newValue: any) => setDate(newValue)}

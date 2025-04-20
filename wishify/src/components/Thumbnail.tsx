@@ -695,7 +695,7 @@ export const WishlistThumbnail = (props: any) => {
                 } : {}}
                 onMouseLeave={props.toggleActive}
             >
-                <MenuOwnerText>Creator: {props.owner}</MenuOwnerText>
+                <MenuOwnerText>Created by: {props.owner}</MenuOwnerText>
                 <WishlistTitle inMenu title={props.title}>{props.title}</WishlistTitle>
                 <WishlistMenuButton onClick={openWishlist}>Open</WishlistMenuButton>
                 <WishlistMenuButton onClick={props.edit}>Edit</WishlistMenuButton>
@@ -771,7 +771,7 @@ export const WishlistThumbnail = (props: any) => {
                     textShadow: '0 0 4px rgba(255, 255, 255, 0.8)'
                 } : {}}
             >
-                <OwnerText>Creator: {props.owner}</OwnerText>
+                <OwnerText>Created by: {props.owner}</OwnerText>
                 <TextContainer>{props.title}</TextContainer>
             </WishlistButton>
         )
@@ -801,7 +801,7 @@ export const EventThumbnail = (props: any) => {
                 } : {}}
                 onMouseLeave={props.toggleActive}
             >
-                <MenuOwnerText>Creator: {props.owner}</MenuOwnerText>
+                <MenuOwnerText>Created by: {props.owner}</MenuOwnerText>
                 <EventTitle inMenu title={props.title}>{props.title}</EventTitle>
                 <EventMenuButton onClick={openEvent}>Open</EventMenuButton>
                 <EventMenuButton onClick={props.edit}>Edit</EventMenuButton>
@@ -876,7 +876,7 @@ export const EventThumbnail = (props: any) => {
                     textShadow: '0 0 4px rgba(255, 255, 255, 0.8)'
                 } : {}}
             >
-                <OwnerText>Creator: {props.owner}</OwnerText>
+                <OwnerText>Created by: {props.owner}</OwnerText>
                 <TextContainer>{props.title}</TextContainer>
             </EventButton>
         )

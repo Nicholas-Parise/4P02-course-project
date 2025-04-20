@@ -23,7 +23,7 @@ import {
   Divider
 } from '@mui/material'
 
-const Profile = () => {
+const Profile = ({setIsLoggedIn}) => {
   const navigate = useNavigate()
 
   const [user, setUser] = React.useState({
@@ -297,6 +297,7 @@ const Profile = () => {
         setOpenSuccessMessage(true)
         setTimeout(() => {
           localStorage.removeItem("token")
+          setIsLoggedIn(false)
           navigate('/')
         }, 3000)
       } else if (response.status === 400) { // password not provided (handled on frontend)

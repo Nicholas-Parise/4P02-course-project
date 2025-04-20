@@ -4,14 +4,14 @@ import { IconButton } from "@mui/material";
 
 interface Props {
   notification: Notification, 
-  handleRedirect: (url: string) => void,
+  handleRedirect: (id: number, url: string) => void,
   deleteNotification: (id: number) => void
 }
 
 const NotificationEntry = ({notification, handleRedirect, deleteNotification} : Props) => {
   return (
     <div 
-      onClick={() => handleRedirect(notification.url)} 
+      onClick={() => handleRedirect(notification.id, notification.url)} 
       
       className={`notifications-entry ${notification.is_read ? 'bg-[#ffffff]' : 'bg-[#e8e7ff]'}`}
     >
