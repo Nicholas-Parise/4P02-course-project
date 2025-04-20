@@ -1011,7 +1011,7 @@ async function notifyAllOnBlind(wishlists_id, user_id, user_name, wishlist_name)
 
     // get array of users ids where both notifications are true 
     const notifyMembers = members
-      .filter(member => member.member_notifications && member.user_notifications && member.id != user_id)
+      .filter(member => member.member_notifications && member.user_notifications && member.user_id != user_id)
       .map(member => member.user_id);
 
     await createNotification(notifyMembers,
