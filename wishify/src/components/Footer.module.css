@@ -5,6 +5,9 @@
   font-size: 14px;
   color: #57606a;
   width: 100%;
+  position: absolute;
+  bottom: 0;
+  transform: translateY(304px);
 }
 
 .inner {

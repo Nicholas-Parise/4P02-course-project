@@ -45,6 +45,13 @@ section {
   box-sizing: border-box;
 }
 
+@media only screen and (max-width: 768px) {
+  section {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}
+
 .container {
   max-width: 1240px;
   margin: auto;
