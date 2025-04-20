@@ -159,6 +159,21 @@ router.put('/:eventId', authenticate, async (req, res, next) => {
       return res.status(403).json({ error: "Only the owner can edit this event." });
     }
 
+ let tempDeadline = deadline;
+
+    if (deadline && typeof deadline === "string") {
+      if (deadline.toLowerCase() === "null") {
+        tempDeadline = null;
+        await db.query(`
+          UPDATE events
+          SET 
+              deadline = NULL,
+              dateUpdated = NOW()
+          WHERE id = $1;
+        `, [eventId]);
+      }
+    }
+
     // Update the event with provided values (only update fields that are passed)
     const result = await db.query(`
     UPDATE events
@@ -173,7 +188,7 @@ router.put('/:eventId', authenticate, async (req, res, next) => {
         dateUpdated = NOW()
     WHERE id = $8
     RETURNING *;
-  `, [name, description, url, addr, city, image, deadline, eventId]);
+  `, [name, description, url, addr, city, image, tempDeadline, eventId]);
 
 
     if (result.rows.length === 0) {
