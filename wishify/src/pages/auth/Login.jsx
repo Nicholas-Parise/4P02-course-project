@@ -76,8 +76,34 @@ const Login = ({setIsLoggedIn}) => {
         }
         
         // Then check for share token (existing functionality)
-        const share_token = sessionStorage.getItem("share_token")
-        if(share_token) {
+        const event_share_token = sessionStorage.getItem("event_share_token")
+        if(event_share_token) {
+          fetch(`https://api.wishify.ca/events/members`, {
+            method: 'post',
+            headers: new Headers({
+              'Authorization': "Bearer "+data.token,
+              'Content-Type': 'application/json'
+            }),
+            body: JSON.stringify({
+                share_token: event_share_token,
+                owner: false
+            })
+            })
+            .then((response) => {
+                return response.json();
+            })
+            .then((data) => {
+                sessionStorage.removeItem("event_share_token")
+            })
+            .catch((error) => {
+              console.log("Failed to share event\n" + error)
+              alert("Failed to share event\n" + error)
+            }
+          )
+        }
+
+        const wishlist_share_token = sessionStorage.getItem("wishlist_share_token")
+        if(wishlist_share_token) {
           fetch(`https://api.wishify.ca/wishlists/members`, {
             method: 'post',
             headers: new Headers({
@@ -85,7 +111,7 @@ const Login = ({setIsLoggedIn}) => {
               'Content-Type': 'application/json'
             }),
             body: JSON.stringify({
-                share_token: share_token,
+                share_token: wishlist_share_token,
                 owner: false,
                 blind: false
             })
@@ -94,7 +120,7 @@ const Login = ({setIsLoggedIn}) => {
                 return response.json();
             })
             .then((data) => {
-                sessionStorage.removeItem("share_token")
+                sessionStorage.removeItem("wishlist_share_token")
                 navigate(`/wishlists/${data.id}`)
             })
             .catch((error) => {

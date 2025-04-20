@@ -128,6 +128,7 @@ const boxStyle = {
   borderRadius: "25px",
   boxShadow: 24,
   p: 4,
+  
 };
 
 const Event = () => {
@@ -265,6 +266,7 @@ const Event = () => {
     if (JSON.stringify(event) !== JSON.stringify(originalEvent)) {
       setSaving(true);
       setTimeout(() => setSaving(false), 1000)
+
       try {
         await fetch(eventUrl, {
           method: 'PUT',
@@ -724,7 +726,7 @@ const Event = () => {
             <Typography id="modal-modal-title" variant="h6" component="h2">
               Choose a Wishlist
             </Typography>
-            <FormControl sx={{ width: '25ch' }}>
+            <FormControl sx={{ width: '100%' }}>
               <InputLabel sx={{mt: 3}} id="wishlist-select" required>Wishlist</InputLabel>
               <Select 
                 sx={{mt: 3}}
@@ -747,7 +749,7 @@ const Event = () => {
             <Typography id="modal-modal-title" variant="h6" component="h2">
               Create a new Wishlist
             </Typography>
-            <FormControl sx={{ width: '25ch' }}>
+            <FormControl sx={{ width: '100%' }}>
               <TextField
                 fullWidth
                 value={newWishlistTitle}

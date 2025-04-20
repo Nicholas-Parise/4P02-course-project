@@ -177,8 +177,8 @@ const WishlistItemEntry = ({ item, editWishlistItem, sortBy, reservations, onRes
         },
       }}
     >
-      <DialogTitle id="item-dialog-title" className="text-[#5651e5] relative">
-        <div className="text-center font-bold">{item.name}</div>
+      <DialogTitle id="item-dialog-title" className="text-[#5651e5] relative sm:max-w-[425px]">
+        <div className="text-center font-bold break-normal w-full">{item.name}</div>
         <IconButton
           aria-label="close"
           onClick={() => setIsModalOpen(false)}

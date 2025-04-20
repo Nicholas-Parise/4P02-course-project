@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react"
-import { Modal, Button, TextField, Typography, Box, Divider } from '@mui/material'
+import { Modal, Button, TextField, Typography, Box, Divider, Tooltip } from '@mui/material'
 
 interface Props{
     eventID: number,
@@ -12,6 +12,8 @@ interface Props{
 const ShareEventModal = ({ eventID, shareToken, isOpen, isOwner, setIsOpen }: Props) => {
     const [inputEmail, setInputEmail] = useState("")
     const token = localStorage.getItem('token') || ''
+
+    const [isTooltipOpen, setIsToolTipOpen] = useState<boolean>(false)
   
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault()
@@ -64,18 +66,26 @@ const ShareEventModal = ({ eventID, shareToken, isOpen, isOwner, setIsOpen }: Pr
           </Typography>
 
           <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
-            <Button
-                onClick={() => navigator.clipboard.writeText(`https://wishify.ca/events/share/${shareToken}`)}
-                variant="contained"
-                type="submit"
-                sx={{
-                    background: 'linear-gradient(to right, #8d8aee, #5651e5)',
-                    color: 'white',
-                    borderRadius: '25px',
-                    '&:hover': { background: 'linear-gradient(to right, #5651e5, #343188)' }}
-                }>
-                Copy Link
-            </Button>
+            <Tooltip
+              title="Copied!"
+              onClose={() => setIsToolTipOpen(false)}
+              open={isTooltipOpen}
+              arrow
+              placement="left"
+            >
+              <Button
+                  onClick={() => (setIsToolTipOpen(true), navigator.clipboard.writeText(`https://wishify.ca/events/share/${shareToken}`))}
+                  variant="contained"
+                  type="submit"
+                  sx={{
+                      background: 'linear-gradient(to right, #8d8aee, #5651e5)',
+                      color: 'white',
+                      borderRadius: '25px',
+                      '&:hover': { background: 'linear-gradient(to right, #5651e5, #343188)' }}
+                  }>
+                  Copy Link
+              </Button>
+            </Tooltip>
           </Box>
           { isOwner && 
             <>
