@@ -36,6 +36,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
   const [isDesktop, setIsDesktop] = useState(window.innerWidth > 900);
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [openedNotificationAlert, setOpenedNotificationAlert] = useState<boolean>(false)
+  const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(true)
 
   const location = useLocation()
   useEffect(() => {
@@ -209,15 +210,13 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
         .then((response) => response.json())
         .then((data) => {
           setProfile(data.user)
-          console.log(data)
+          setNotificationsEnabled(data.user.notifications)
         })
         .catch((error) => {
           console.log(error)
         })
   }, [token, isLoggedIn]);
-
   
-
   const openModal = () => {
     setNewItem({});
     setImagePreview(null);
@@ -276,6 +275,8 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
                       profile={profile}
                       token={token}
                       notifications={notifications}
+                      notificationsEnabled={notificationsEnabled}
+                      setNotificationsEnabled={setNotificationsEnabled}
                       readNotification={readNotification}
                       deleteNotification={deleteNotification}
                       />}
@@ -325,6 +326,8 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
                       closeMenu={() => setIsProfileMenuOpen(false)} 
                       profile={profile}
                       token={token}
+                      notificationsEnabled={notificationsEnabled}
+                      setNotificationsEnabled={setNotificationsEnabled}
                       notifications={notifications}
                       readNotification={readNotification}
                       deleteNotification={deleteNotification}
