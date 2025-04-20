@@ -208,12 +208,14 @@ const ItemDisplay = ({ item }) => {
         </DetailValue>
       </ContributionDetail>
       
-      <ContributionDetail>
-        <DetailLabel>Note:</DetailLabel>
-        <DetailValue>
-          {item.note ? item.note : <EmptyNote>None</EmptyNote>}
-        </DetailValue>
-      </ContributionDetail>
+      {item.note &&  
+        <ContributionDetail>
+          <DetailLabel>Note:</DetailLabel>
+          <DetailValue>
+            {item.note}
+          </DetailValue>
+        </ContributionDetail>
+      }
       
       <ContributionDetail>
         <DetailLabel>Quantity:</DetailLabel>
@@ -430,7 +432,7 @@ const [contributions, setContributions] = useState([])
         <div className="home-user-info">
           <div className="home-user-picture">
               <img
-                  src={user.picture || "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg"}
+                  src={user.picture || "/assets/placeholder-avatar.png"}
                   alt='User profile picture'
                   className="w-[150px] h-[150px] rounded-full object-cover"
               />
@@ -475,7 +477,7 @@ const [contributions, setContributions] = useState([])
           </NavLink>
         </EventContainer>
           
-        <h1>Contributions</h1>
+        <h1>Reservations</h1>
         <div className="home-wishlist-top">
           <ContributionContainer>
             {contributions.map((contribution) => (

@@ -13,14 +13,15 @@ interface Props {
   profile: User,
   token: string,
   notifications: Notification[],
+  notificationsEnabled: boolean,
+  setNotificationsEnabled: (enabled :boolean) => void,
   readNotification: (id: number) => void,
   deleteNotification: (id: number) => void
 }
 
-const ProfileMenu = ({ closeMenu, logOut, profile, token, notifications, readNotification, deleteNotification }: Props) => {
+const ProfileMenu = ({ closeMenu, logOut, profile, token, notifications, notificationsEnabled, setNotificationsEnabled, readNotification, deleteNotification }: Props) => {
   const [isClosing, setIsClosing] = useState(false);
   const [showLogOutModal, setShowLogOutModal] = useState(false);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(profile.notifications);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
 
@@ -99,7 +100,7 @@ const ProfileMenu = ({ closeMenu, logOut, profile, token, notifications, readNot
         if(status_code != 200 && status_code != 201){
           return
         }
-        setNotificationsEnabled(!notificationsEnabled);
+        setNotificationsEnabled(!notificationsEnabled)
     })
     .catch((error) => {
         console.log(error)
