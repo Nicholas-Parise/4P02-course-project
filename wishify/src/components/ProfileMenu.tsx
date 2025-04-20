@@ -126,7 +126,7 @@ const ProfileMenu = ({ closeMenu, logOut, profile, token, notifications, deleteN
         </div>
 
         <div className="user-info cursor-pointer" onClick={handleAccountSettings}>
-          <div className="profile-image">
+          <div className="profile-image object-cover">
           <img 
               src={profile.picture} 
               className={`w-[75px] h-[75px] overflow-hidden rounded-full ${profile.pro && "ring-[#5651e5] ring-3 "}`}
