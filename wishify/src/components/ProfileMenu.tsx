@@ -129,7 +129,7 @@ const ProfileMenu = ({ closeMenu, logOut, profile, token, notifications, deleteN
           <div className="profile-image">
           <img 
               src={profile.picture} 
-              className={`w-[75px] h-[75px] overflow-hidden rounded-full ${profile.pro && "ring-[#5651e5] ring-3 "}`}
+              className={`w-[75px] h-[75px] object-cover overflow-hidden rounded-full ${profile.pro && "ring-[#5651e5] ring-3 "}`}
             />
           </div>
           <div className="profile-text">

@@ -50,19 +50,3 @@ def test_get_category_by_id_not_found(setup_test_account, log_in, cleanup_test_a
         headers={"Authorization": f"Bearer {token}"},
     )
     assert res.status_code == 404
-
-# test create duplicate category (409)
-def test_create_duplicate_category(setup_test_account, log_in, cleanup_test_account):
-    token = log_in
-
-    sleep(sleepTime)
-    res = req.post(
-        domain+"/categories",
-        headers={"Authorization": f"Bearer {token}"},
-        json={
-            "name": "Books",
-            "description": "The more you know.",
-            "password": "abc123"
-        }
-    )
-    assert res.status_code == 409

@@ -158,7 +158,7 @@ const Landing = () => {
   ];
 
   return (
-    <div className="landing-page" style={{backgroundColor: "#E8E8E8"}}>
+    <div className="landing-page" style={{backgroundColor: "#f2f2ff"}}>
       <div className="hero">
         <div className="hero-content">
           <div className="hero-text">
@@ -211,7 +211,7 @@ const Landing = () => {
         />
       )}
 
-      <div className="use-cases" style={{backgroundColor: "#E8E8E8"}}>
+      <div className="use-cases" style={{backgroundColor: "#f2f2ff"}}>
         <h2>Perfect For Any Occasion</h2>
         <div className="case-studies">
           <div className="case-study">
@@ -229,7 +229,7 @@ const Landing = () => {
         </div>
       </div>
 
-      <div className="faq-section" style={{backgroundColor: "#E8E8E8"}}>
+      <div className="faq-section" style={{backgroundColor: "#FFFFFF"}}>
         <h2 className="faq-title">Frequently Asked Questions</h2>
         <div className="faq-container">
           {faqs.map((faq, index) => (
@@ -253,7 +253,7 @@ const Landing = () => {
         </div>
       </div>
 
-      <div className="pricing-section" style={{backgroundColor: "#E8E8E8"}}>
+      <div className="pricing-section" style={{backgroundColor: "#f2f2ff"}}>
         <h2 className="pricing-title">Simple, Transparent Pricing</h2>
         <p className="pricing-subtitle">Choose the plan that's right for you</p>
         

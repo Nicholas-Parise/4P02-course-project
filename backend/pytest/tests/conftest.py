@@ -322,7 +322,7 @@ def cleanup_test_item_full(request):
 # create both a wishlist and multiple items
 @pytest.fixture
 def setup_test_item_full_multi(request):
-    sleep(sleepTime)
+    sleep(sleepTime+1)
     res = req.post(
         domain+"/auth/login",
         json={
@@ -332,7 +332,7 @@ def setup_test_item_full_multi(request):
     )
     token = res.json()["token"] 
 
-    sleep(sleepTime)
+    sleep(sleepTime+1)
     res = req.post(
         domain+"/wishlists",
         headers={"Authorization": f"Bearer {token}"},
@@ -347,7 +347,7 @@ def setup_test_item_full_multi(request):
     item_ids = []
 
     for i in range(5):
-        sleep(sleepTime)
+        sleep(sleepTime+1)
         res = req.post(
             domain+f"/items/",
             headers={"Authorization": f"Bearer {token}"},
@@ -385,14 +385,14 @@ def cleanup_test_item_full_multi(request):
     assert item_ids is not None # item_id must not be none!
 
     for item_id in item_ids:
-        sleep(sleepTime)
+        sleep(sleepTime+1)
         res = req.delete(
             domain+f"/items/{item_id}",
             headers={"Authorization": f"Bearer {token}"},
         )
 
         # check that the item no longer exists
-        sleep(sleepTime)
+        sleep(sleepTime+1)
         res = req.get(
             domain+f"/items/{item_id}",
             headers={"Authorization": f"Bearer {token}"},
@@ -401,14 +401,14 @@ def cleanup_test_item_full_multi(request):
         assert res.status_code == 404
 
     # delete wishlist
-    sleep(sleepTime)
+    sleep(sleepTime+1)
     res = req.delete(
         domain+f"/wishlists/{wishlist_id}",
         headers={"Authorization": f"Bearer {token}"},
     )
 
     # check that the wishlist no longer exists
-    sleep(sleepTime)
+    sleep(sleepTime+1)
     res = req.get(
         domain+f"/wishlists/{wishlist_id}",
         headers={"Authorization": f"Bearer {token}"},
