@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { NavLink, useLocation } from "react-router-dom";
-import { AiFillGift, AiOutlinePlus, AiOutlineUser, AiFillQuestionCircle, AiOutlineMenu, AiOutlineClose, AiFillBell } from 'react-icons/ai';
+import { AiFillGift, AiOutlinePlus, AiOutlineUser, AiOutlineQuestionCircle, AiOutlineMenu, AiOutlineClose, AiFillBell } from 'react-icons/ai';
 import { User, Wishlist, Notification, WishlistItem } from '../types/types';
 import CreateItemDialog from './CreateItemDialog';
 import ProfileMenu from './ProfileMenu';
@@ -109,6 +109,16 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
       .catch((error) => {
         console.log("Failed to delete notification\n" + error)
       })
+  }
+
+  const readNotification = (id: number) => {
+    setNotifications(notifications.map(n => n.id == id ? {...n, is_read: true} : n))
+
+    const unreadNotifications = notifications.filter(n => !n.is_read)
+    if(unreadNotifications.length == 1){
+      setOpenedNotificationAlert(false)
+      toast.dismiss()
+    }
   }
 
   useEffect(() => {
@@ -243,7 +253,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
 
               {/* Mobile menu button and persistent icons */}
               <div className="mobile-header-icons">
-                <AiFillQuestionCircle className="text-2xl cursor-pointer" onClick={() => setIsHelpMenuOpen(!isHelpMenuOpen)} />
+                <AiOutlineQuestionCircle size={28} className="text-2xl cursor-pointer text-[#5651e5]" onClick={() => setIsHelpMenuOpen(!isHelpMenuOpen)} />
                   
                 {isHelpMenuOpen && <HelpMenu closeMenu={() => setIsHelpMenuOpen(false)} />}
                 
@@ -266,6 +276,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
                       profile={profile}
                       token={token}
                       notifications={notifications}
+                      readNotification={readNotification}
                       deleteNotification={deleteNotification}
                       />}
 
@@ -289,7 +300,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
                   
                   {/* Help Button */}
                   <div className="relative desktop-help-icon">
-                    <AiFillQuestionCircle className="text-2xl cursor-pointer" onClick={() => setIsHelpMenuOpen(!isHelpMenuOpen)} />
+                    <AiOutlineQuestionCircle size={28} className="text-2xl cursor-pointer text-[#5651e5]" onClick={() => setIsHelpMenuOpen(!isHelpMenuOpen)} />
                     {isHelpMenuOpen && <HelpMenu closeMenu={() => setIsHelpMenuOpen(false)} />}
                   </div>
 
@@ -315,6 +326,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
                       profile={profile}
                       token={token}
                       notifications={notifications}
+                      readNotification={readNotification}
                       deleteNotification={deleteNotification}
                       />}
                   </div>

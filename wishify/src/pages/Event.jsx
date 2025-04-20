@@ -693,7 +693,8 @@ const Event = () => {
             edit={handleEditOpen}
             duplicate={handleDuplicate}
             share={handleShare}
-            owner={"Me"}
+            owner={wishlist.creator_displayname}
+            shareToken={wishlist.share_token}
           />
         ))}
       </WishlistContainer>
