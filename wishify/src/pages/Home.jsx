@@ -251,6 +251,7 @@ const ItemDisplay = ({ item }) => {
 };
 
 const Home = () => {
+  const navigate = useNavigate();
 
   const [wishlists, setWishlists] = useState([])
 
@@ -422,7 +423,8 @@ const [contributions, setContributions] = useState([])
 
   const handleCloseFirstSetupModal = () => {
     setOpenFirstSetupModal(false)
-    userLoading()
+    navigate("/profile")
+    window.location.reload()
   }
   // END CODE FOR FIRST SETUP MODAL
 
