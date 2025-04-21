@@ -15,10 +15,6 @@ router.get('/', authenticate, async (req, res, next) => {
 
     const result = await db.query(`SELECT id, title, body, url, is_read, created FROM notifications WHERE user_id = $1 ORDER BY created DESC;`, [userId]);
     
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "notifications not found." });
-    }
-
     return res.status(200).json(result.rows);
 
   } catch (error) {
