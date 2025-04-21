@@ -302,7 +302,7 @@ const Register = () => {
             transform: 'translateX(-50%)',
             width: 'calc(100% - 50px)'
           }}>
-            Login with Google
+            Continue with Google
             </span>
         </button>
       </section>
