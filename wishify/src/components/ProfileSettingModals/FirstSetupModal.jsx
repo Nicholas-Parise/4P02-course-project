@@ -264,6 +264,9 @@ const FirstSetupModal = ({ open, onSavePicture, onClose, bioValue, likesValues }
         throw new Error('Failed to change first setup')
       }
       const data = await response.json()
+      onClose()
+      navigate("/profile")
+      window.location.reload()
     } catch (err) {
       console.error(err)
       return true
@@ -295,11 +298,6 @@ const FirstSetupModal = ({ open, onSavePicture, onClose, bioValue, likesValues }
   const handleRemoveDislike = (item) => {
     setDislikesToAdd((prev) => prev.filter((i) => i !== item))
     setDislikesLeft((prev) => prev + 1)
-  }
-
-  const handleClose = () => {
-    changeFirstSetup(false)
-    onClose()
   }
 
   return (
