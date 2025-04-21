@@ -1076,7 +1076,7 @@ const Event = () => {
           isOwner={owner}
           setOwner={setOwner}
           editMember={editMember}
-          eventID={event?.id || -1}
+          eventID={parseInt(id)}
           token={token}
         />
         { event.share_token && (
