@@ -165,8 +165,9 @@ const Event = () => {
   const [event, setEvent] = useState({
     name: '',
     description: '',
-    addr: '',
-    city: '',
+    addr: null,
+    city: null,
+    deadline: "null"
   });
   const [wishlists, setWishlists] = useState([]);
   const [ownedWishlists, setOwnedWishlists] = useState([]);
@@ -214,7 +215,6 @@ const Event = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const wishlistUrl = `https://api.wishify.ca/wishlists/`;
 
-  // Fetch event data on component mount
   useEffect(() => {
     const fetchEvent = async () => {
       try {
@@ -231,8 +231,8 @@ const Event = () => {
           name: eventData.name || '',
           description: eventData.description || '',
           deadline: eventData.deadline || 'null',
-          addr: eventData.addr || '',
-          city: eventData.city || '',
+          addr: eventData.addr || null,
+          city: eventData.city || null,
           share_token: eventData.share_token || '',
           owner: eventData.owner || false,
           image: eventData.image || '/assets/generic.jpg',
@@ -252,7 +252,6 @@ const Event = () => {
     fetchEvent();
   }, [eventUrl, token]);
 
-  // Fetch wishlists on component mount
   useEffect(() => {
     const fetchEvent = async () => {
       try {
@@ -275,7 +274,6 @@ const Event = () => {
     fetchEvent();
   }, [wishlistUrl, token]);
 
-  // Fetch user data on component mount
   const [userID, setUserID] = useState()
 
   useEffect(() => {
@@ -295,23 +293,37 @@ const Event = () => {
         })
     }, [])
 
-  // Save event data to the backend
   const saveEvent = async () => {
     if (JSON.stringify(event) !== JSON.stringify(originalEvent)) {
       setSaving(true);
       setTimeout(() => setSaving(false), 1000)
 
+      const dataToSend = {
+        ...event,
+        addr: event.addr || null, 
+        city: event.city || null,
+        deadline: event.deadline === "" ? "null" : event.deadline 
+      };
+
       try {
-        await fetch(eventUrl, {
+        const response = await fetch(eventUrl, {
           method: 'PUT',
           headers: new Headers({
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           }),
-          body: JSON.stringify(event),
+          body: JSON.stringify(dataToSend),
         });
-        console.log('Event saved:', event);
-        setOriginalEvent(event);
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Error response:', errorData);
+          throw new Error(errorData.message || 'Failed to save event');
+        }
+
+        const updatedEvent = await response.json();
+        console.log('Event saved:', updatedEvent);
+        setOriginalEvent(updatedEvent.event || event);
       } catch (error) {
         console.error('Error saving event:', error);
       }
@@ -338,21 +350,28 @@ const Event = () => {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [event, originalEvent]);
 
-  const handleChange = (e) => {
-    if (!e.target.value){
-      setEvent({ ...event, deadline: "null" });
-      return;
-    }
-    const localDate = new Date(e.target.value);
-    setEvent({ ...event, deadline: localDate.toISOString() });
+  const handleDateChange = (e) => {
+    const value = e.target.value;
+    const deadlineValue = value ? new Date(value).toISOString() : "null";
+    setEvent({ ...event, deadline: deadlineValue });
   };
 
   const formatDateForInput = (date) => {
-    if (!date) return "";
+    if (!date || date === "null") return "";
     const localDateTime = new Date(date);
-    if (isNaN(localDateTime)) return "";
+    if (isNaN(localDateTime.getTime())) return "";
     const offset = localDateTime.getTimezoneOffset() * 60000;
-    return new Date(localDateTime - offset).toISOString().slice(0, 16);
+    return new Date(localDateTime.getTime() - offset).toISOString().slice(0, 16);
+  };
+
+  const handleAddressChange = (e) => {
+    const value = e.target.value;
+    setEvent({ ...event, addr: value || null });
+  };
+
+  const handleCityChange = (e) => {
+    const value = e.target.value;
+    setEvent({ ...event, city: value || null });
   };
 
   const handleCreateWishlist = async (e) => {
@@ -372,7 +391,6 @@ const Event = () => {
       }
     }
 
-    // Create wishlist
     try {
       const response = await fetch(wishlistUrl, {
         method: 'POST',
@@ -617,7 +635,7 @@ const Event = () => {
                 <input
                   type="datetime-local"
                   value={formatDateForInput(event.deadline)}
-                  onChange={handleChange}
+                  onChange={handleDateChange}
                   onBlur={saveEvent}
                   style={{
                     width: '100%',
@@ -648,8 +666,8 @@ const Event = () => {
                 <label style={{ fontWeight: 'bold', color: '#5651e5' }}>Address</label>
                 <EditText
                   name="address"
-                  value={event.addr}
-                  onChange={(e) => setEvent({ ...event, addr: e.target.value })}
+                  value={event.addr || ''}
+                  onChange={handleAddressChange}
                   onBlur={saveEvent}
                   label="Enter Address"
                   style={{ 
@@ -681,8 +699,8 @@ const Event = () => {
               <label style={{ fontWeight: 'bold', color: '#5651e5' }}>City</label>
               <EditText
                 name="city"
-                value={event.city}
-                onChange={(e) => setEvent({ ...event, city: e.target.value })}
+                value={event.city || ''}
+                onChange={handleCityChange}
                 onBlur={saveEvent}
                 label="Enter City"
                 style={{ 
