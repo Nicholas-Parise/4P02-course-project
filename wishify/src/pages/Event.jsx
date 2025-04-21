@@ -85,6 +85,8 @@ const WishlistContainer = styled.div`
 const DescriptionTextarea = styled(EditTextarea)`
   resize: none;
   height: 100px !important;
+  border: 2px solid #5651e5;
+  padding: 10px;
   border-radius: 8px;
   font-size: 20px;
   width: 100%;
@@ -595,7 +597,7 @@ const Event = () => {
           {event.owner ? 
             (
             <DetailItem>
-              <label style={{ fontWeight: 'bold', color: '#5651e5' }}>Date</label>
+              <label style={{ fontWeight: 'bold', color: '#5651e5', marginBottom: '3px'}}>Date</label>
               <input
                 type="datetime-local"
                 value={formatDateForInput(event.deadline)}
@@ -603,8 +605,10 @@ const Event = () => {
                 onBlur={saveEvent}
                 style={{
                   width: '100%',
+                  height: '60px',
                   padding: '8px',
-                  borderRadius: '8px'
+                  borderRadius: '8px',
+                  border: '2px solid #5651e5'
                 }}
               />
             </DetailItem>
@@ -632,7 +636,13 @@ const Event = () => {
                 onChange={(e) => setEvent({ ...event, addr: e.target.value })}
                 onBlur={saveEvent}
                 label="Enter Address"
-                style={{ width: '100%', height: '100%' }}
+                style={{ 
+                  width: '100%', 
+                  height: '60px',
+                  padding: '8px',
+                  borderRadius: '8px',
+                  border: '2px solid #5651e5'
+                }}
               />
             </DetailItem>
             ) : ( event.addr && (
@@ -659,7 +669,13 @@ const Event = () => {
               onChange={(e) => setEvent({ ...event, city: e.target.value })}
               onBlur={saveEvent}
               label="Enter City"
-              style={{ width: '100%', height: '100%' }}
+              style={{ 
+                width: '100%', 
+                height: '60px',
+                padding: '8px',
+                borderRadius: '8px',
+                border: '2px solid #5651e5'
+              }}
             />
           </DetailItem>
           ) : ( event.city && (

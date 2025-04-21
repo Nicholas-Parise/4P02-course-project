@@ -14,6 +14,27 @@ import Modal from '@mui/material/Modal';
 import FormControl from "@mui/material/FormControl";
 import CreateWishlistModal from '../components/CreateWishlistModal'
 
+import pictureGift from '/assets/gift.jpg';
+import pictureSports from '/assets/sports.jpg';
+import pictureTech from '/assets/tech.jpg';
+import pictureWedding from '/assets/wedding.jpeg';
+import pictureHome from '/assets/kitchen.jpg';
+import pictureBooks from '/assets/books.jpg';
+import pictureTravel from '/assets/travel.jpg';
+import pictureHobby from '/assets/hobby.jpg';
+
+// Predefined gallery of images for wishlists
+const galleryImages = [
+  { id: 1, src: pictureGift, alt: "Holiday Gift Theme" },
+  { id: 2, src: pictureWedding, alt: "Wedding Registry Theme" },
+  { id: 3, src: pictureSports, alt: "Sports Theme" },
+  { id: 4, src: pictureHome, alt: "Home & Kitchen Theme" },
+  { id: 5, src: pictureTech, alt: "Tech & Gadgets Theme" },
+  { id: 6, src: pictureBooks, alt: "Book Lovers Theme" },
+  { id: 7, src: pictureTravel, alt: "Travel & Adventure Theme" },
+  { id: 8, src: pictureHobby, alt: "Hobby & Crafts Theme" },
+];
+
 const boxStyle = {
   position: 'absolute',
   top: '50%',
@@ -365,7 +386,7 @@ const Wishlists = () => {
             fullWidth
             value={newWishlistTitle}
             onChange={(e) => setNewWishlistTitle(e.target.value)}
-            label="New Wishlist Title"
+            label="Wishlist Title"
             variant="outlined"
             margin="normal"
             error={!!errorMessage}
@@ -383,6 +404,60 @@ const Wishlists = () => {
               marginBottom: '16px'
             }}
           />
+          
+          {/* Image Gallery Section */}
+          <div>
+            <Typography 
+              sx={{ 
+                color: '#5651e5',
+                fontWeight: '500',
+                marginBottom: '12px'
+              }}
+            >
+              Cover image
+            </Typography>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: '12px',
+              marginBottom: '16px'
+            }}>
+              {galleryImages.map((image) => (
+                <div
+                  key={image.id}
+                  style={{
+                    position: 'relative',
+                    cursor: 'pointer',
+                    border: activeWishlist?.image === image.src ? '2px solid #5651e5' : '2px solid transparent',
+                    borderRadius: '8px',
+                    overflow: 'hidden',
+                    transition: 'all 0.3s ease',
+                    boxShadow: activeWishlist?.image === image.src ? '0 0 0 2px rgba(86, 81, 229, 0.5)' : 'none',
+                    aspectRatio: '1/1'
+                  }}
+                  onClick={() => {
+                    if (!activeWishlist) return;
+                    // Update the local state immediately for better UX
+                    const updatedWishlists = wishlists.map(wishlist =>
+                      wishlist.id === activeWishlist.id ? {...wishlist, image: image.src} : wishlist
+                    );
+                    setWishlists(updatedWishlists);
+                  }}
+                >
+                  <img
+                    src={image.src}
+                    alt={image.alt}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover'
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div style={{ 
             display: 'flex', 
             justifyContent: 'space-between',
@@ -390,7 +465,50 @@ const Wishlists = () => {
             marginTop: '16px'
           }}>
             <ModalButton 
-              onClick={handleRenameWishlist}
+              onClick={() => {
+                // Validate title first
+                const wishlistNames = wishlists.map(wishlist => wishlist.name);
+                
+                if (newWishlistTitle.trim() === '') {
+                  setErrorMessage('Title cannot be empty');
+                  return;
+                } else if (newWishlistTitle !== activeOverlay && wishlistNames.includes(newWishlistTitle)) {
+                  setErrorMessage('Title already exists');
+                  return;
+                }
+
+                // Find the wishlist to update
+                const wishlistToUpdate = wishlists.find(wishlist => wishlist.name === activeOverlay);
+                if (!wishlistToUpdate) {
+                  console.log("Wishlist not found");
+                  return;
+                }
+
+                // Send update to backend
+                fetch(wishlistUrl + wishlistToUpdate.id, {
+                  method: 'put',
+                  headers: new Headers({
+                    'Authorization': "Bearer "+token,
+                    'Content-Type': 'application/json'
+                  }),
+                  body: JSON.stringify({
+                    name: newWishlistTitle,
+                    image: wishlistToUpdate.image // This will be the updated image from state
+                  })
+                })
+                .then((response) => response.json())
+                .then((data) => {
+                    const updatedWishlists = wishlists.map(wishlist =>
+                      wishlist.id === wishlistToUpdate.id ? data.wishlist : wishlist
+                    );
+                    setWishlists(updatedWishlists);
+                    setNewWishlistTitle('');
+                    handleEditClose();
+                })
+                .catch((error) => {
+                    console.log(error)
+                });
+              }}
               sx={{
                 background: 'linear-gradient(to right, #8d8aee, #5651e5)',
                 color: 'white',
@@ -401,7 +519,7 @@ const Wishlists = () => {
                 }
               }}
             >
-              Rename
+              Save Changes
             </ModalButton>
             <ModalButton 
               onClick={handleDelConfirmOpen}
@@ -418,6 +536,8 @@ const Wishlists = () => {
               Delete
             </ModalButton>
           </div>
+          
+          {/* Delete confirmation modal remains the same */}
           <Modal
             open={delConfirmOpen}
             onClose={handleDelConfirmClose}

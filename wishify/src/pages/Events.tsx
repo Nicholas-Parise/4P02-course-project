@@ -14,6 +14,21 @@ import Modal from '@mui/material/Modal';
 import FormControl from "@mui/material/FormControl";
 import ShareEventModal from '../components/ShareEventModal'
 
+import pictureBirthday from '/assets/bday-banner.jpg';
+import pictureWedding from '/assets/wedding.png';
+import pictureCamping from '/assets/camping.jpg';
+import pictureChristmas from '/assets/christmas.jpg';
+import pictureGeneric from '/assets/generic.jpg';
+
+// Predefined gallery of images for events
+const galleryImages = [
+  { id: 1, src: pictureBirthday, alt: "Birthday theme" },
+  { id: 2, src: pictureWedding, alt: "Wedding theme" },
+  { id: 3, src: pictureCamping, alt: "Camping theme" },
+  { id: 4, src: pictureChristmas, alt: "Holiday theme" },
+  { id: 5, src: pictureGeneric, alt: "Generic theme" }
+]
+
 
 const boxStyle = {
   position: 'absolute',
@@ -440,6 +455,59 @@ const Events = () => {
               marginBottom: '16px'
             }}
           />
+          
+          {/* Image Gallery Section */}
+          <div>
+            <Typography 
+              sx={{ 
+                color: '#5651e5',
+                fontWeight: '500',
+                marginBottom: '12px'
+              }}
+            >
+              Cover image
+            </Typography>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: '12px',
+              marginBottom: '16px'
+            }}>
+              {galleryImages.map((image) => (
+                <div
+                  key={image.id}
+                  style={{
+                    position: 'relative',
+                    cursor: 'pointer',
+                    border: activeEvent?.image === image.src ? '2px solid #5651e5' : '2px solid transparent',
+                    borderRadius: '8px',
+                    overflow: 'hidden',
+                    transition: 'all 0.3s ease',
+                    boxShadow: activeEvent?.image === image.src ? '0 0 0 2px rgba(86, 81, 229, 0.5)' : 'none',
+                    aspectRatio: '1/1'
+                  }}
+                  onClick={() => {
+                    if (!activeEvent) return;
+                    const updatedEvents = events.map(event =>
+                      event.id === activeEvent.id ? {...event, image: image.src} : event
+                    );
+                    setEvents(updatedEvents);
+                  }}
+                >
+                  <img
+                    src={image.src}
+                    alt={image.alt}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover'
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div style={{ 
             display: 'flex', 
             justifyContent: 'space-between',
@@ -458,7 +526,7 @@ const Events = () => {
                 }
               }}
             >
-              Rename
+              Save Changes
             </ModalButton>
             <ModalButton 
               onClick={handleDelConfirmOpen}
