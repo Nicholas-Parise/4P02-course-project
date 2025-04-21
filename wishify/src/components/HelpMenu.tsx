@@ -56,6 +56,22 @@ const HelpMenu = ({ closeMenu }: Props) => {
         {
           title: "Collaboration Features",
           content: "Enable comments on your wishlist item to get feedback from friends. The item comment log shows all changes made by collaborators."
+        },
+        {
+          title: "Wishlist Analytics",
+          content: "Track the status of items in your wishlist. See which items have been reserved or purchased, and by whom."
+        },
+        {
+          title: "Wishlist Reminders",
+          content: "Set reminders for important dates related to your wishlist. Notifications can be sent via email or in-app."
+        },
+        {
+          title: "Wishlist Customization",
+          content: "Customize the look and feel of your wishlist with themes and layouts. Use tags to categorize items for easier navigation."
+        },
+        {
+          title: "Wishlist Privacy Settings",
+          content: "Control who can view your wishlist. Set it to public, private, or shared with specific users."
         }
       ]
     },
@@ -71,16 +87,24 @@ const HelpMenu = ({ closeMenu }: Props) => {
           content: "Add existing wishlists from your collection or invite others to contribute theirs. Set visibility preferences for each wishlist. The unified view shows all items across wishlists, with filters to narrow down options."
         },
         {
-          title: "RSVP and Gift Tracking",
+          title: "Member and Gift Tracking",
           content: "Invite participants to the event. Track their responses and see who has reserved or purchased gifts."
         },
         {
           title: "Event Analytics",
-          content: "Track RSVPs and gift progress through the event dashboard. See which items have been reserved or purchased. Generate thank-you lists to acknowledge contributors. Pro users get detailed analytics on participation rates and gift trends."
+          content: "Track Members and gift progress through the event dashboard. See which items have been reserved or purchased."
         },
         {
-          title: "Post-Event Features",
-          content: "After the event, convert it to 'Archived' status to preserve all information. Send thank-you messages to participants directly through Wishify. Export a complete gift report for your records. Reactivate archived events for recurring occasions."
+          title: "Event Reminders",
+          content: "Set reminders for important dates related to the event. Notifications can be sent via email or in-app."
+        },
+        {
+          title: "Event Sharing",
+          content: "Share event details with participants through unique links or direct email invitations. Control permissions for each participant."
+        },
+        {
+          title: "Event Collaboration",
+          content: "Enable comments on event items to get feedback from participants. The item comment log shows all changes made by collaborators."
         }
       ]
     },
@@ -98,6 +122,22 @@ const HelpMenu = ({ closeMenu }: Props) => {
         {
           title: "Idea to Wishlists",
           content: "With one click, add discovered items directly to any of your wishlists. The system automatically populates available details like images and descriptions."
+        },
+        {
+          title: "Idea Sharing",
+          content: "Share your favorite gift ideas with friends and family. Use unique links or direct email invitations to share."
+        },
+        {
+          title: "Idea Collaboration",
+          content: "Enable comments on gift ideas to get feedback from friends. The item comment log shows all changes made by collaborators."
+        },
+        {
+          title: "Idea Analytics",
+          content: "Track the popularity of items you discover. See which items have been reserved or purchased by others."
+        },
+        {
+          title: "Idea Customization",
+          content: "Customize the look and feel of your gift ideas with themes and layouts. Use tags in your profile page to categorize items for easier navigation."
         }
       ]
     },
