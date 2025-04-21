@@ -10,8 +10,7 @@ import ShareWishlistModal from '../components/ShareWishlistModal';
 import ShareEventModal from '../components/ShareEventModal';
 import EventMemberDialog from '../components/EventMemberDialog';
 
-import ModalBox from '@mui/material/Box';
-import ModalButton from '@mui/material/Button';
+import { Box, Button, DialogContentText } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Modal from '@mui/material/Modal';
@@ -21,6 +20,30 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Divider from '@mui/material/Divider';
 import Alert from '@mui/material/Alert';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+
+import pictureGift from '/assets/gift.jpg';
+import pictureSports from '/assets/sports.jpg';
+import pictureTech from '/assets/tech.jpg';
+import pictureWedding from '/assets/wedding.jpeg';
+import pictureHome from '/assets/kitchen.jpg';
+import pictureBooks from '/assets/books.jpg';
+import pictureTravel from '/assets/travel.jpg';
+import pictureHobby from '/assets/hobby.jpg';
+
+// Predefined gallery of images for wishlists
+const galleryImages = [
+  { id: 1, src: pictureGift, alt: "Holiday Gift Theme" },
+  { id: 2, src: pictureWedding, alt: "Wedding Registry Theme" },
+  { id: 3, src: pictureSports, alt: "Sports Theme" },
+  { id: 4, src: pictureHome, alt: "Home & Kitchen Theme" },
+  { id: 5, src: pictureTech, alt: "Tech & Gadgets Theme" },
+  { id: 6, src: pictureBooks, alt: "Book Lovers Theme" },
+  { id: 7, src: pictureTravel, alt: "Travel & Adventure Theme" },
+  { id: 8, src: pictureHobby, alt: "Hobby & Crafts Theme" },
+];
 
 const EventSection = styled.section`
   margin-top: 20px;
@@ -124,13 +147,13 @@ const boxStyle = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'white',
+  bgcolor: 'background.paper',
+  borderRadius: '25px',
+  boxShadow: '0 4px 20px rgba(86, 81, 229, 0.15)',
   border: '2px solid #5651e5',
-  borderRadius: "25px",
-  boxShadow: 24,
   p: 4,
-  
+  width: '90%',
+  maxWidth: '600px'
 };
 
 const Event = () => {
@@ -157,6 +180,10 @@ const Event = () => {
   const handleModalClose = () => {
     setModalOpen(false);
     setErrorMessage('');
+    setNewWishlistTitle('');
+    setNewWishlistDescription('');
+    setNewWishlistDeadline(null);
+    setSelectedImage(null);
   }
   const [editOpen, setEditOpen] = React.useState(false);
   const handleEditOpen = () => {
@@ -180,6 +207,9 @@ const Event = () => {
 
   const [errorMessage, setErrorMessage] = useState('');
   const [newWishlistTitle, setNewWishlistTitle] = useState('');
+  const [newWishlistDescription, setNewWishlistDescription] = useState('');
+  const [newWishlistDeadline, setNewWishlistDeadline] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
   const wishlistUrl = `https://api.wishify.ca/wishlists/`;
 
   // Fetch event data on component mount
@@ -323,55 +353,55 @@ const Event = () => {
     return new Date(localDateTime - offset).toISOString().slice(0, 16);
   };
 
-  const handleCreateWishlist = (e) => {
-      e.preventDefault();
-      if (newWishlistTitle.trim() === '') {
-        setErrorMessage('Title cannot be empty');
-        return;
-      } 
-      
-      let uniqueTitle = newWishlistTitle;
-      let counter = 1;
-      if (wishlists != undefined){
-        const wishlistNames = wishlists.map(wishlist => wishlist.name);
-        while (wishlistNames.includes(uniqueTitle)) {
-          uniqueTitle = `${newWishlistTitle} (${counter})`;
-          counter++;
-        }
+  const handleCreateWishlist = async (e) => {
+    e.preventDefault();
+    if (newWishlistTitle.trim() === '') {
+      setErrorMessage('Title cannot be empty');
+      return;
+    } 
+    
+    let uniqueTitle = newWishlistTitle;
+    let counter = 1;
+    if (wishlists != undefined){
+      const wishlistNames = wishlists.map(wishlist => wishlist.name);
+      while (wishlistNames.includes(uniqueTitle)) {
+        uniqueTitle = `${newWishlistTitle} (${counter})`;
+        counter++;
       }
-      console.log(id)
-  
-      // create wishlist in the backend
-      fetch(wishlistUrl, {
-        method: 'post',
-        headers: new Headers({
-            'Authorization': "Bearer "+token,
-            'Content-Type': 'application/json'
-        }),
-        body: JSON.stringify({
-            name: uniqueTitle,
-            event_id: id,
-            description: "",
-            image: "", 
-        })
-        })
-        .then((response) => response.json())
-        .then((data) => {
-            console.log(data)
-            let newWishlist = 
-            {id: data.wishlist.id,
-              event_id: id,
-              name: uniqueTitle,
-              description: "",
-              image: ""} // TODO add descriptions
-            setWishlists([...wishlists, newWishlist])
-        })
-        .catch((error) => {
-            console.log(error)
-        })
-  
-      handleModalClose();
     }
+
+    // Create wishlist
+    try {
+      const response = await fetch(wishlistUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: uniqueTitle,
+          event_id: id,
+          description: newWishlistDescription,
+          deadline: newWishlistDeadline ? newWishlistDeadline.toISOString() : null,
+          image: selectedImage,
+        }),
+      });
+      const data = await response.json();
+      const newWishlist = {
+        id: data.wishlist.id,
+        event_id: id,
+        name: uniqueTitle,
+        description: newWishlistDescription,
+        deadline: newWishlistDeadline,
+        image: selectedImage,
+      };
+      setWishlists([...wishlists, newWishlist]);
+      handleModalClose();
+    } catch (error) {
+      console.error('Error creating wishlist:', error);
+    }
+  };
+
   const changeActiveOverlay = (title) => {
     if(activeOverlay == title){
       setActiveOverlay("")
@@ -379,6 +409,7 @@ const Event = () => {
       setActiveOverlay(title)
     }
   }
+
   function handleRenameWishlist(){
     const wishlistNames = wishlists.map(wishlist => wishlist.name);
 
@@ -391,16 +422,12 @@ const Event = () => {
     }
 
     const wishlistToRename = wishlists.find(wishlist => wishlist.name === activeOverlay);
-    // this condition should never happen but I've left it here just in case
     if (!wishlistToRename) {
       console.log("Wishlist not found");
       return;
     }
     const wishlistId = wishlistToRename.id;
 
-    console.log("id " + wishlistId)
-    console.log("token " + token)
-    console.log("name " + newWishlistTitle)
     fetch(wishlistUrl + wishlistId, {
       method: 'put',
       headers: new Headers({
@@ -410,26 +437,25 @@ const Event = () => {
       body: JSON.stringify({
         name: newWishlistTitle
       })
-      })
-      .then((response) => response.json())
-      .then((data) => {
-          console.log(data)
-          // update the wishlists state with the new data
-          const updatedWishlists = wishlists.map(wishlist =>
-            wishlist.id === wishlistId ? data.wishlist : wishlist
-          );
-          setWishlists(updatedWishlists);
-      })
-      .catch((error) => {
-          console.log(error)
-      })
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        console.log(data)
+        const updatedWishlists = wishlists.map(wishlist =>
+          wishlist.id === wishlistId ? data.wishlist : wishlist
+        );
+        setWishlists(updatedWishlists);
+    })
+    .catch((error) => {
+        console.log(error)
+    })
     
     setNewWishlistTitle('');
     handleEditClose();
   }
+
   function handleRemoveWishlist(){
     const wishlistToRemove = wishlists.find(wishlist => wishlist.name === activeOverlay);
-    // this condition should never happen but I've left it here just in case
     if (!wishlistToRemove) {
       console.log("Wishlist not found");
       return;
@@ -457,15 +483,12 @@ const Event = () => {
   }
 
   const handleDuplicate = () => {
-    // find the wishlist to duplicate
     const wishlistToDuplicate = wishlists.find(wishlist => wishlist.name === activeOverlay);
-    // this condition should never happen but I've left it here just in case
     if (!wishlistToDuplicate) {
       console.log("Wishlist not found");
       return;
     }
     const wishlistId = wishlistToDuplicate.id;
-    console.log(wishlistToDuplicate)
 
     const url = `https://api.wishify.ca/wishlists/${wishlistId}/duplicate`
     fetch(url, {
@@ -474,20 +497,19 @@ const Event = () => {
         'Authorization': "Bearer "+token,
         'Content-Type': 'application/json'
       }),
-      })
-      .then((response) => response.json())
-      .then((data) => {
-          console.log(data)
-          // update the wishlists state with the new data
-          let duplicatedWishlist = structuredClone(wishlistToDuplicate);
-          duplicatedWishlist.id = data.wishlist.id;
-          duplicatedWishlist.name = data.wishlist.name;
-          const updatedWishlists = [...wishlists, duplicatedWishlist];
-          setWishlists(updatedWishlists);
-      })
-      .catch((error) => {
-          console.log(error)
-      })
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        console.log(data)
+        let duplicatedWishlist = structuredClone(wishlistToDuplicate);
+        duplicatedWishlist.id = data.wishlist.id;
+        duplicatedWishlist.name = data.wishlist.name;
+        const updatedWishlists = [...wishlists, duplicatedWishlist];
+        setWishlists(updatedWishlists);
+    })
+    .catch((error) => {
+        console.log(error)
+    })
   }
 
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -522,120 +544,145 @@ const Event = () => {
     setSelectedWishlist('');
     handleModalClose();
   }
-
-  const handleRSVP = () => {
-    // just alert user for now
-    setRsvpAlert(true);
-    setTimeout(() => setRsvpAlert(false), 3000)
-  }
     
-
   const activeWishlist = wishlists.find((wishlist) => wishlist.name === activeOverlay);
   const [selectedWishlist, setSelectedWishlist] = useState('')
 
   return (
-  <>
-    <EventSection>
-      <EventImage src={event.image} alt="Event banner" />
-      
-      <FloatingActions>
-        <ActionButton onClick={() => setIsMemberDialogOpen(true)}>
-          <FaPeopleGroup size={18} />
-          <span>View Members</span>
-        </ActionButton>
-        <ActionButton onClick={handleShare}>
-          <FaShare size={18} />
-          <span>Share Event</span>
-        </ActionButton>
-      </FloatingActions>
-      
-      <Content>
-        {event.owner ? (
-          <EditText
-            name="name"
-            style={{ 
+    <>
+      <EventSection>
+        <EventImage src={event.image} alt="Event banner" />
+        
+        <FloatingActions>
+          <ActionButton onClick={() => setIsMemberDialogOpen(true)}>
+            <FaPeopleGroup size={18} />
+            <span>View Members</span>
+          </ActionButton>
+          <ActionButton onClick={handleShare}>
+            <FaShare size={18} />
+            <span>Share Event</span>
+          </ActionButton>
+        </FloatingActions>
+        
+        <Content>
+          {event.owner ? (
+            <EditText
+              name="name"
+              style={{ 
+                fontSize: '30px',
+                fontWeight: 'bold',
+                color: '#5651e5',
+                padding: '8px 0',
+                justifyContent: 'center',
+                textAlign: 'center',
+              }}
+              value={event.name}
+              onChange={(e) => setEvent({ ...event, name: e.target.value })}
+              onBlur={saveEvent}
+            />
+          ) : (
+            <h1 style={{
               fontSize: '30px',
               fontWeight: 'bold',
               color: '#5651e5',
               padding: '8px 0',
               justifyContent: 'center',
               textAlign: 'center',
-
-            }}
-            value={event.name}
-            onChange={(e) => setEvent({ ...event, name: e.target.value })}
-            onBlur={saveEvent}
-          />
-        ) : (
-          <h1 style={{
-            fontSize: '30px',
-            fontWeight: 'bold',
-            color: '#5651e5',
-            padding: '8px 0',
-            justifyContent: 'center',
-            textAlign: 'center',
-          }}>{event.name}</h1>
-        )}
-        {event.owner ? (        
-          <DescriptionTextarea
-            value={event.description}
-            onChange={(e) => setEvent({ ...event, description: e.target.value })}
-            onBlur={saveEvent}
-            rows={4}
-          />) : (event.description && (
-          <p style={{
-            resize: "none",
-            marginBottom: "10px",
-            height: "100px !important",
-            borderRadius: "8px",
-            fontSize: "20px",
-            width: "100%"
-          }}>{event.description}</p>)
-        )}
-        
-        <DetailsContainer>
-          {event.owner ? 
-            (
-            <DetailItem>
-              <label style={{ fontWeight: 'bold', color: '#5651e5', marginBottom: '3px'}}>Date</label>
-              <input
-                type="datetime-local"
-                value={formatDateForInput(event.deadline)}
-                onChange={handleChange}
-                onBlur={saveEvent}
-                style={{
-                  width: '100%',
-                  height: '60px',
-                  padding: '8px',
-                  borderRadius: '8px',
-                  border: '2px solid #5651e5'
-                }}
-              />
-            </DetailItem>
-            ) : ( event.deadline !== "null" && (
+            }}>{event.name}</h1>
+          )}
+          {event.owner ? (        
+            <DescriptionTextarea
+              value={event.description}
+              onChange={(e) => setEvent({ ...event, description: e.target.value })}
+              onBlur={saveEvent}
+              rows={4}
+            />) : (event.description && (
+            <p style={{
+              resize: "none",
+              marginBottom: "10px",
+              height: "100px !important",
+              borderRadius: "8px",
+              fontSize: "20px",
+              width: "100%"
+            }}>{event.description}</p>)
+          )}
+          
+          <DetailsContainer>
+            {event.owner ? 
+              (
               <DetailItem>
-              <label style={{ fontWeight: 'bold', color: '#5651e5' }}>Date</label>
-              <p style={{
-                resize: "none",
-                marginBottom: "10px",
-                height: "100px !important",
-                borderRadius: "8px",
-                fontSize: "20px",
-                width: "100%"
-              }}>{new Date(event.deadline).toLocaleString()}</p>
-            </DetailItem>
-            ))
-          }
-          {event.owner ?
+                <label style={{ fontWeight: 'bold', color: '#5651e5', marginBottom: '3px'}}>Date</label>
+                <input
+                  type="datetime-local"
+                  value={formatDateForInput(event.deadline)}
+                  onChange={handleChange}
+                  onBlur={saveEvent}
+                  style={{
+                    width: '100%',
+                    height: '60px',
+                    padding: '8px',
+                    borderRadius: '8px',
+                    border: '2px solid #5651e5'
+                  }}
+                />
+              </DetailItem>
+              ) : ( event.deadline !== "null" && (
+                <DetailItem>
+                <label style={{ fontWeight: 'bold', color: '#5651e5' }}>Date</label>
+                <p style={{
+                  resize: "none",
+                  marginBottom: "10px",
+                  height: "100px !important",
+                  borderRadius: "8px",
+                  fontSize: "20px",
+                  width: "100%"
+                }}>{new Date(event.deadline).toLocaleString()}</p>
+              </DetailItem>
+              ))
+            }
+            {event.owner ?
+              (
+              <DetailItem>
+                <label style={{ fontWeight: 'bold', color: '#5651e5' }}>Address</label>
+                <EditText
+                  name="address"
+                  value={event.addr}
+                  onChange={(e) => setEvent({ ...event, addr: e.target.value })}
+                  onBlur={saveEvent}
+                  label="Enter Address"
+                  style={{ 
+                    width: '100%', 
+                    height: '60px',
+                    padding: '8px',
+                    borderRadius: '8px',
+                    border: '2px solid #5651e5'
+                  }}
+                />
+              </DetailItem>
+              ) : ( event.addr && (
+                <DetailItem>
+                <label style={{ fontWeight: 'bold', color: '#5651e5' }}>Address</label>
+                <p style={{
+                  resize: "none",
+                  marginBottom: "10px",
+                  height: "100px !important",
+                  borderRadius: "8px",
+                  fontSize: "20px",
+                  width: "100%"
+                }}>{event.addr}</p>
+              </DetailItem>
+              ))
+            }      
+            {event.owner ?
             (
             <DetailItem>
-              <label style={{ fontWeight: 'bold', color: '#5651e5' }}>Address</label>
+              <label style={{ fontWeight: 'bold', color: '#5651e5' }}>City</label>
               <EditText
-                name="address"
-                value={event.addr}
-                onChange={(e) => setEvent({ ...event, addr: e.target.value })}
+                name="city"
+                value={event.city}
+                onChange={(e) => setEvent({ ...event, city: e.target.value })}
                 onBlur={saveEvent}
-                label="Enter Address"
+                label="Enter City"
                 style={{ 
                   width: '100%', 
                   height: '60px',
@@ -645,9 +692,9 @@ const Event = () => {
                 }}
               />
             </DetailItem>
-            ) : ( event.addr && (
+            ) : ( event.city && (
               <DetailItem>
-              <label style={{ fontWeight: 'bold', color: '#5651e5' }}>Address</label>
+              <label style={{ fontWeight: 'bold', color: '#5651e5' }}>City</label>
               <p style={{
                 resize: "none",
                 marginBottom: "10px",
@@ -655,182 +702,374 @@ const Event = () => {
                 borderRadius: "8px",
                 fontSize: "20px",
                 width: "100%"
-              }}>{event.addr}</p>
+              }}>{event.city}</p>
             </DetailItem>
             ))
-          }      
-          {event.owner ?
-          (
-          <DetailItem>
-            <label style={{ fontWeight: 'bold', color: '#5651e5' }}>City</label>
-            <EditText
-              name="city"
-              value={event.city}
-              onChange={(e) => setEvent({ ...event, city: e.target.value })}
-              onBlur={saveEvent}
-              label="Enter City"
-              style={{ 
-                width: '100%', 
-                height: '60px',
-                padding: '8px',
-                borderRadius: '8px',
-                border: '2px solid #5651e5'
-              }}
-            />
-          </DetailItem>
-          ) : ( event.city && (
-            <DetailItem>
-            <label style={{ fontWeight: 'bold', color: '#5651e5' }}>City</label>
-            <p style={{
-              resize: "none",
-              marginBottom: "10px",
-              height: "100px !important",
-              borderRadius: "8px",
-              fontSize: "20px",
-              width: "100%"
-            }}>{event.city}</p>
-          </DetailItem>
-          ))
-          }
-        </DetailsContainer>
-      </Content>
-      
-      <WishlistContainer>
-        <CreateWishlist addThumbnail={handleModalOpen}> 
-          Add a Wishlist 
-        </CreateWishlist>
+            }
+          </DetailsContainer>
+        </Content>
         
-        {wishlists.map((wishlist, index) => (
-          <WishlistThumbnail 
-            active={activeOverlay} 
-            toggleActive={() => changeActiveOverlay(wishlist.name)} 
-            key={index} 
-            id={wishlist.id}
-            title={wishlist.name}
-            image={wishlist.image}
-            edit={handleEditOpen}
-            duplicate={handleDuplicate}
-            share={handleShare}
-            owner={wishlist.creator_displayname}
-            shareToken={wishlist.share_token}
-          />
-        ))}
-      </WishlistContainer>
+        <WishlistContainer>
+          <CreateWishlist addThumbnail={handleModalOpen}> 
+            Add a Wishlist 
+          </CreateWishlist>
+          
+          {wishlists.map((wishlist, index) => (
+            <WishlistThumbnail 
+              active={activeOverlay} 
+              toggleActive={() => changeActiveOverlay(wishlist.name)} 
+              key={index} 
+              id={wishlist.id}
+              title={wishlist.name}
+              image={wishlist.image}
+              edit={handleEditOpen}
+              duplicate={handleDuplicate}
+              share={handleShare}
+              owner={wishlist.creator_displayname}
+              shareToken={wishlist.share_token}
+            />
+          ))}
+        </WishlistContainer>
 
-      {activeWishlist && activeWishlist.share_token && (
-        <ShareWishlistModal
-          wishlistID={activeWishlist.id}
-          isOwner={activeWishlist.owner} 
-          shareToken={activeWishlist.share_token} 
-          isOpen={isShareModalOpen} 
-          setIsOpen={setIsShareModalOpen}/>
+        {activeWishlist && activeWishlist.share_token && (
+          <ShareWishlistModal
+            wishlistID={activeWishlist.id}
+            isOwner={activeWishlist.owner} 
+            shareToken={activeWishlist.share_token} 
+            isOpen={isShareModalOpen} 
+            setIsOpen={setIsShareModalOpen}/>
+          )}
+        </EventSection>
+
+        {saving && (
+          <p style={{ textAlign: 'center', color: 'green' }}>Saving...</p>
         )}
-      </EventSection>
 
-      {saving && (
-        <p style={{ textAlign: 'center', color: 'green' }}>Saving...</p>
-      )}
-
-      <Modal
-        open={modalOpen}
-        onClose={handleModalClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <ModalBox sx={boxStyle}>
-          <form autoComplete="off" onSubmit={handleChooseWishlist}>
-            <Typography id="modal-modal-title" variant="h6" component="h2">
-              Choose a Wishlist
-            </Typography>
-            <FormControl sx={{ width: '100%' }}>
-              <InputLabel sx={{mt: 3}} id="wishlist-select" required>Wishlist</InputLabel>
-              <Select 
-                sx={{mt: 3}}
-                className='space-y-2'
-                labelId="wishlist-select" 
-                label="Wishlist"
-                value={selectedWishlist}
-                required
-                onChange={(event) => setSelectedWishlist(event.target.value)}
-              >
-                {ownedWishlists.length > 0 && ownedWishlists.map(wishlist => {
-                  return <MenuItem key={wishlist.id} value={wishlist.id}>{wishlist.name}</MenuItem>
-                })}
-              </Select>
-              <ModalButton type="submit">Choose</ModalButton>
-            </FormControl>
-          </form>
-          <Divider sx={{mb: 2, mt:2}}>OR</Divider>
-          <form autoComplete="off" onSubmit={handleCreateWishlist}>
-            <Typography id="modal-modal-title" variant="h6" component="h2">
-              Create a new Wishlist
-            </Typography>
-            <FormControl sx={{ width: '100%' }}>
-              <TextField
-                fullWidth
-                value={newWishlistTitle}
-                onChange={(e) => setNewWishlistTitle(e.target.value)}
-                label="Wishlist Title"
-                variant="outlined"
-                margin="normal"
-                error={!!errorMessage}
-                helperText={errorMessage}
-              />
-              <ModalButton type="submit">Create</ModalButton>
-            </FormControl>
-          </form>
-        </ModalBox>
-      </Modal>
-      <Modal
-          open={editOpen}
-          onClose={handleEditClose}
+        <Modal
+          open={modalOpen}
+          onClose={handleModalClose}
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
-      >
-        <ModalBox sx={boxStyle}>
-        <Typography id="modal-modal-title" variant="h6" component="h2">
-            Edit Wishlist
-        </Typography>
-        <TextField
-            fullWidth
-            value={newWishlistTitle}
-            onChange={(e) => setNewWishlistTitle(e.target.value)}
-            label="New Wishlist Title"
+        >
+          <Box sx={boxStyle}>
+            <form autoComplete="off" onSubmit={handleChooseWishlist}>
+              <Typography 
+                id="modal-modal-title" 
+                variant="h6" 
+                component="h2"
+                sx={{ 
+                  textAlign: 'center', 
+                  fontWeight: 'bold', 
+                  color: '#5651e5',
+                  fontSize: '1.5rem',
+                  padding: '16px 0',
+                  borderBottom: '1px solid #e0e0e0'
+                }}
+              >
+                Choose a Wishlist
+              </Typography>
+              <FormControl fullWidth sx={{ mt: 3 }}>
+                <InputLabel id="wishlist-select" required>Wishlist</InputLabel>
+                <Select
+                  labelId="wishlist-select"
+                  label="Wishlist"
+                  value={selectedWishlist}
+                  required
+                  onChange={(event) => setSelectedWishlist(event.target.value)}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '12px',
+                    }
+                  }}
+                >
+                  {ownedWishlists.length > 0 && ownedWishlists.map(wishlist => (
+                    <MenuItem key={wishlist.id} value={wishlist.id}>{wishlist.name}</MenuItem>
+                  ))}
+                </Select>
+                <Button 
+                  type="submit"
+                  variant="contained"
+                  fullWidth
+                  sx={{
+                    mt: 2,
+                    background: 'linear-gradient(to right, #8d8aee, #5651e5)',
+                    color: 'white',
+                    borderRadius: '25px',
+                    padding: '8px 24px',
+                    boxShadow: 'none',
+                    '&:hover': { 
+                      background: 'linear-gradient(to right, #5651e5, #343188)',
+                      boxShadow: 'none'
+                    }
+                  }}
+                >
+                  Choose
+                </Button>
+              </FormControl>
+            </form>
+            
+            <Divider sx={{ my: 3 }}>OR</Divider>
+            
+            <form autoComplete="off" onSubmit={handleCreateWishlist}>
+              <Typography 
+                id="modal-modal-title" 
+                variant="h6" 
+                component="h2"
+                sx={{ 
+                  textAlign: 'center', 
+                  fontWeight: 'bold', 
+                  color: '#5651e5',
+                  fontSize: '1.5rem',
+                  padding: '16px 0',
+                  borderBottom: '1px solid #e0e0e0'
+                }}
+              >
+                Create New Wishlist
+              </Typography>
+              
+              <DialogContentText 
+                sx={{ 
+                  color: '#666',
+                  textAlign: 'center',
+                  marginBottom: '24px',
+                  marginTop: '12px'
+                }}
+              >
+                Enter the details for your new wishlist
+              </DialogContentText>
+              
+              <FormControl fullWidth>
+                <TextField
+                  fullWidth
+                  value={newWishlistTitle}
+                  onChange={(e) => setNewWishlistTitle(e.target.value)}
+                  label="Wishlist Title"
+                  variant="outlined"
+                  margin="normal"
+                  error={!!errorMessage}
+                  helperText={errorMessage}
+                  required
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '12px',
+                    }
+                  }}
+                />
+                
+                <TextField
+                  fullWidth
+                  value={newWishlistDescription}
+                  onChange={(e) => setNewWishlistDescription(e.target.value)}
+                  label="Description (Optional)"
+                  variant="outlined"
+                  margin="normal"
+                  multiline
+                  rows={3}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '12px',
+                    }
+                  }}
+                />
+                
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DateTimePicker
+                    label="Due Date (Optional)"
+                    value={newWishlistDeadline}
+                    onChange={(newValue) => setNewWishlistDeadline(newValue)}
+                    slotProps={{
+                      textField: {
+                        sx: {
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: '12px',
+                          },
+                          width: '100%',
+                          mt: 2
+                        }
+                      }
+                    }}
+                  />
+                </LocalizationProvider>
+
+                <Typography 
+                  sx={{ 
+                    color: '#5651e5',
+                    fontWeight: '500',
+                    marginBottom: '12px',
+                    mt: 2
+                  }}
+                >
+                  Choose a cover image
+                </Typography>
+                
+                <Box sx={{ 
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(4, 1fr)',
+                  gap: '12px',
+                  mb: 3
+                }}>
+                  {galleryImages.map((image) => (
+                    <Box
+                      key={image.id}
+                      sx={{
+                        position: 'relative',
+                        cursor: 'pointer',
+                        border: selectedImage === image.src ? '2px solid #5651e5' : '2px solid transparent',
+                        borderRadius: '8px',
+                        overflow: 'hidden',
+                        transition: 'all 0.3s',
+                        '&:hover': {
+                          borderColor: '#5651e5'
+                        }
+                      }}
+                      onClick={() => setSelectedImage(image.src)}
+                    >
+                      <img
+                        src={image.src}
+                        alt={image.alt}
+                        style={{ width: '100%', height: 'auto', aspectRatio: '1/1', objectFit: 'cover' }}
+                      />
+                      {selectedImage === image.src && (
+                        <Box sx={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          boxShadow: 'inset 0 0 0 2px #5651e5'
+                        }} />
+                      )}
+                    </Box>
+                  ))}
+                </Box>
+
+                <Box sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  gap: '16px',
+                  marginTop: '24px'
+                }}>
+                  <Button
+                    variant="outlined"
+                    onClick={handleModalClose}
+                    sx={{ 
+                      borderRadius: '25px', 
+                      borderColor: '#5651e5', 
+                      color: '#5651e5',
+                      padding: '8px 24px',
+                      '&:hover': {
+                        backgroundColor: '#f0f0ff',
+                        borderColor: '#5651e5'
+                      }
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    variant="contained"
+                    sx={{
+                      background: 'linear-gradient(to right, #8d8aee, #5651e5)',
+                      color: 'white',
+                      borderRadius: '25px',
+                      padding: '8px 24px',
+                      boxShadow: 'none',
+                      '&:hover': { 
+                        background: 'linear-gradient(to right, #5651e5, #343188)',
+                        boxShadow: 'none'
+                      }
+                    }}
+                  >
+                    Create Wishlist
+                  </Button>
+                </Box>
+              </FormControl>
+            </form>
+          </Box>
+        </Modal>
+        <Modal
+            open={editOpen}
+            onClose={handleEditClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+        >
+          <Box sx={boxStyle}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+              Edit Wishlist
+          </Typography>
+          <TextField
+              fullWidth
+              value={newWishlistTitle}
+              onChange={(e) => setNewWishlistTitle(e.target.value)}
+              label="New Wishlist Title"
+              variant="outlined"
+              margin="normal"
+              error={!!errorMessage}
+              helperText={errorMessage}
+          />
+          <Button 
+            onClick={handleRenameWishlist}
+            variant="contained"
+            sx={{
+              background: 'linear-gradient(to right, #8d8aee, #5651e5)',
+              color: 'white',
+              borderRadius: '12px',
+              padding: '8px 24px',
+              boxShadow: 'none',
+              mt: 2,
+              '&:hover': { 
+                background: 'linear-gradient(to right, #5651e5, #343188)',
+                boxShadow: 'none'
+              }
+            }}
+          >
+            Rename
+          </Button>
+          <Button 
+            onClick={handleRemoveWishlist}
             variant="outlined"
-            margin="normal"
-            error={!!errorMessage}
-            helperText={errorMessage}
+            sx={{ 
+              borderRadius: '12px', 
+              borderColor: '#5651e5', 
+              color: '#5651e5',
+              padding: '8px 24px',
+              mt: 2,
+              ml: 2,
+              '&:hover': {
+                backgroundColor: '#f0f0ff',
+                borderColor: '#5651e5'
+              }
+            }}
+          >
+            Remove From Event
+          </Button>
+        </Box>
+        </Modal>
+        <Alert severity="success" sx={{ position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)', zIndex: 900, opacity: rsvpAlert ? 1 : 0, transition: rsvpAlert ? "none" : "opacity 1s ease-out"}}>
+          RSVP successfully added.
+        </Alert>
+        <EventMemberDialog 
+          open={isMemberDialogOpen}
+          setOpen={setIsMemberDialogOpen}
+          members={eventMembers}
+          userID={userID || -1}
+          isOwner={owner}
+          setOwner={setOwner}
+          editMember={editMember}
+          eventID={event?.id || -1}
+          token={token}
         />
-        <ModalButton onClick={handleRenameWishlist}>Rename</ModalButton>
-        <ModalButton onClick={handleRemoveWishlist}>Remove From Event</ModalButton>
-      </ModalBox>
-      </Modal>
-      <Alert severity="success" sx={{ position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)', zIndex: 900, opacity: rsvpAlert ? 1 : 0, transition: rsvpAlert ? "none" : "opacity 1s ease-out"}}>
-        RSVP successfully added.
-      </Alert>
-      <EventMemberDialog 
-        open={isMemberDialogOpen}
-        setOpen={setIsMemberDialogOpen}
-        members={eventMembers}
-        userID={userID || -1}
-        isOwner={owner}
-        setOwner={setOwner}
-        editMember={editMember}
-        eventID={event?.id || -1}
-        token={token}
-      />
-      { event.share_token && (
-          <ShareEventModal
-          eventID={id}
-          shareToken={event.share_token} 
-          isOpen={isShareModalOpen}
-          isOwner={event.owner}
-          setIsOpen={setIsShareModalOpen}/>
-        )
-      }
-    </>
-  );
-;
-}
+        { event.share_token && (
+            <ShareEventModal
+            eventID={id}
+            shareToken={event.share_token} 
+            isOpen={isShareModalOpen}
+            isOwner={event.owner}
+            setIsOpen={setIsShareModalOpen}/>
+          )
+        }
+      </>
+    );
+  };
 
 export default Event;
