@@ -22,6 +22,7 @@ import {
 import { Close } from "@mui/icons-material"
 import CloudUploadIcon from "@mui/icons-material/CloudUpload"
 import PersonIcon from "@mui/icons-material/Person"
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -48,6 +49,8 @@ const FirstSetupModal = ({ open, onSavePicture, onClose, bioValue, likesValues }
   const fileInputRef = useRef(null)
 
   const [search, setSearch] = useState('')
+
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     const fetchCategories = async () => {
