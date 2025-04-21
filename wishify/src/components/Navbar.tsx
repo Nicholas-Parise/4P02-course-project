@@ -123,7 +123,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
   }
 
   useEffect(() => {
-    if(openedNotificationAlert || !profile?.notifications) return // existing alert
+    if(openedNotificationAlert || !notificationsEnabled) return // existing alert
 
     const readNotifications = () => {
       notifications.filter(n => !n.is_read).forEach(n => {
