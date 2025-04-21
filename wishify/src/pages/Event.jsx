@@ -153,7 +153,9 @@ const boxStyle = {
   border: '2px solid #5651e5',
   p: 4,
   width: '90%',
-  maxWidth: '600px'
+  maxWidth: '600px',
+  maxHeight: '90vh',
+  overflowY: 'auto'
 };
 
 const Event = () => {
