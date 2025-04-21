@@ -423,8 +423,6 @@ const [contributions, setContributions] = useState([])
 
   const handleCloseFirstSetupModal = () => {
     setOpenFirstSetupModal(false)
-    navigate("/profile")
-    window.location.reload()
   }
   // END CODE FOR FIRST SETUP MODAL
 
