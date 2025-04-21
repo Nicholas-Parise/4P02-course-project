@@ -4,7 +4,6 @@ import { CheckoutProvider } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import '../Landing.css';
 
-
 const UpgradePage = () => {
 
   // this is the public key, so it doesn't have to be in the .env file
@@ -12,16 +11,7 @@ const UpgradePage = () => {
   const [token] = useState(localStorage.getItem('token') || '');
 
   const [activeFaqIndex, setActiveFaqIndex] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState(null);
-  const [cardDetails, setCardDetails] = useState({
-    number: '',
-    expiry: '',
-    cvc: '',
-    name: ''
-  });
-  const [processing, setProcessing] = useState(false);
-
+ 
   const handleSubscribe = async () => {
     console.log(token);
     const res = await fetch('https://api.wishify.ca/payments/create-subscription-session', {
@@ -41,44 +31,8 @@ const UpgradePage = () => {
   };
 
 
-
   const toggleFAQ = (index) => {
     setActiveFaqIndex(activeFaqIndex === index ? null : index);
-  };
-
-  const handleUpgrade = (plan) => {
-    setSelectedPlan(plan);
-    setShowModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setCardDetails({
-      number: '',
-      expiry: '',
-      cvc: '',
-      name: ''
-    });
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setCardDetails(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setProcessing(true);
-
-    // Simulate payment processing
-    setTimeout(() => {
-      setProcessing(false);
-      alert(`Payment successful! You've subscribed to the ${selectedPlan} plan.`);
-      handleCloseModal();
-    }, 2000);
   };
 
   const faqs = [
@@ -282,32 +236,6 @@ const UpgradePage = () => {
         </div>
       </div>
 
-      {/* FAQ Section */}
-      {/*      <div className="faq-section">
-        <h2 className="faq-title">Frequently Asked Questions</h2>
-        <div className="faq-container">
-          {faqs.map((faq, index) => (
-            <div key={index} className="faq-item">
-              <div 
-                className="faq-question" 
-                onClick={() => toggleFAQ(index)}
-              >
-                <h3>{faq.question}</h3>
-                <span className="faq-toggle">
-                  {activeFaqIndex === index ? '−' : '+'}
-                </span>
-              </div>
-              <div 
-                className={`faq-answer ${activeFaqIndex === index ? 'active' : ''}`}
-              >
-                <p>{faq.answer}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-*/}
-
       {/* Final CTA Section */}
       <div className="pricing-section" style={{ paddingBottom: '6rem' }}>
         <h2 className="pricing-title">Ready to Upgrade?</h2>
@@ -320,7 +248,7 @@ const UpgradePage = () => {
         }}>
           <button
             className="plan-button featured-button"
-            onClick={() => handleUpgrade('monthly')}
+            onClick={() => handleSubscribe()}
             style={{
               padding: '1rem 2rem',
               fontSize: '1.2rem',
@@ -338,89 +266,7 @@ const UpgradePage = () => {
         </div>
       </div>
 
-      {/* Payment Modal */}
-      {showModal && (
-        <div className="payment-modal-overlay">
-          <div className="payment-modal">
-            <div className="payment-modal-header">
-              <h3>
-                <FaCreditCard /> Upgrade to Pro {selectedPlan === 'monthly' ? '($1.99/month)' : '($9.99/year)'}
-              </h3>
-              <button onClick={handleCloseModal} className="payment-modal-close">
-                <FaTimes />
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="payment-form">
-              <div className="form-group">
-                <label>Card Number</label>
-                <input
-                  type="text"
-                  name="number"
-                  value={cardDetails.number}
-                  onChange={handleInputChange}
-                  placeholder="1234 5678 9012 3456"
-                  maxLength="16"
-                />
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Expiry Date</label>
-                  <input
-                    type="text"
-                    name="expiry"
-                    value={cardDetails.expiry}
-                    onChange={handleInputChange}
-                    placeholder="MM/YY"
-                    maxLength="5"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>CVC</label>
-                  <input
-                    type="text"
-                    name="cvc"
-                    value={cardDetails.cvc}
-                    onChange={handleInputChange}
-                    placeholder="123"
-                    maxLength="3"
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Cardholder Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={cardDetails.name}
-                  onChange={handleInputChange}
-                  placeholder="Name on card"
-                />
-              </div>
-
-              <div className="payment-actions">
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="payment-cancel"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={processing}
-                  className="payment-submit"
-                >
-                  {processing ? 'Processing...' : 'Confirm Payment'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+     
     </div>
   );
 };
