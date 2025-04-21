@@ -295,6 +295,10 @@ const FirstSetupModal = ({ open, onSavePicture, onClose, bioValue, likesValues }
     setLikesLeft((prev) => prev + 1)
   }
 
+  const handleClose = () => {
+    changeFirstSetup(false)
+  }
+
   const handleRemoveDislike = (item) => {
     setDislikesToAdd((prev) => prev.filter((i) => i !== item))
     setDislikesLeft((prev) => prev + 1)
