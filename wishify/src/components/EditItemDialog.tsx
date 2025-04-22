@@ -27,32 +27,34 @@ const EditItemDialog = ({ open, setOpen, item, editWishlistItem, }: Props) => {
         }
       }
 
-    const editItem = (e: FormEvent) => {
+    const editItem = async (e: FormEvent) => {
         e.preventDefault();
 
         const editUrl = `https://api.wishify.ca/items/${newItem.id}`
         const imageUrl = `https://api.wishify.ca/items/upload/${newItem.id}`
         let newImage = ""
 
-        let data = new FormData()
-        data.append("picture", newItem.picture || "");
-        // Update Image
-        fetch(imageUrl, {
-          method: 'post',
-          headers: new Headers({
-              'Authorization': "Bearer "+token,
-              'Accept': 'application/json'
-          }),
-          body: data
-          })
-          .then((response) => response.json())
-          .then((data) => {
-              setOpen(false)
-              newImage = data.imageUrl
-          })
-          .catch((error) => {
-              console.log(error)
-          })
+        if(newItem.picture) {
+            let data = new FormData()
+            data.append("picture", newItem.picture || "");
+            // Update Image
+            await fetch(imageUrl, {
+            method: 'post',
+            headers: new Headers({
+                'Authorization': "Bearer "+token,
+                'Accept': 'application/json'
+            }),
+            body: data
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                setOpen(false)
+                newImage = data.imageUrl
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        }
 
         // Update Item Data
         fetch(editUrl, {
@@ -72,7 +74,13 @@ const EditItemDialog = ({ open, setOpen, item, editWishlistItem, }: Props) => {
         .then((response) => response.json())
         .then((data) => {
             console.log(newImage)
-            editWishlistItem({...data.item, image: newImage})
+            if (newItem.picture){
+                editWishlistItem({...data.item, image: newImage})
+            }
+            else{
+                editWishlistItem({...data.item})
+            }
+
             setOpen(false)
         })
         .catch((error) => {
