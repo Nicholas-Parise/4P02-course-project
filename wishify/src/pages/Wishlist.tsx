@@ -497,7 +497,11 @@ const Wishlist = () => {
               </div>
             </div>
           </div>
-          { sortedItems.length === 0 ? <section><p className="text-center text-gray-500">No items in your wishlist.</p><p className="text-center text-gray-500">Start adding them by clicking the Add Wish button!</p></section> :
+          { sortedItems.length === 0 ? <section>
+            <p className="text-center text-gray-500">No items in your wishlist.</p>
+            <p className="text-center text-gray-500">Start adding them by clicking the Add Wish button!</p>
+            <p className="text-center text-gray-500">Or add recommended/trending items from the <a href={"/ideas"} className='text-gray-500'>Ideas page!</a></p>
+          </section> :
           <DndContext onDragEnd={handleDragEnd}>
               <SortableContext items={sortedItems.map((item) => item.id)}>
                   <ul className="space-y-4">

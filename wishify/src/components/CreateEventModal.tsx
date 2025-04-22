@@ -65,7 +65,10 @@ const CreateEventModal = ({ open, setOpen, events, setEvents, token }: Props) =>
       })
       .then((response) => response.json())
       .then((data) => {
-          let newEvent: Event =  data.event // TODO add descriptions
+          let newEvent: Event =  {
+            ...data.event,
+            owner: true
+          }
           setEvents([...events, newEvent])
           setNewEvent({})
       })
@@ -111,7 +114,7 @@ const CreateEventModal = ({ open, setOpen, events, setEvents, token }: Props) =>
               </div>
               <div className="grid gap-2">
                 <TextField
-                  label="Event Description" 
+                  label="Event Description (Optional)" 
                   value={newEvent.description || ""} 
                   onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
                   multiline
@@ -120,7 +123,7 @@ const CreateEventModal = ({ open, setOpen, events, setEvents, token }: Props) =>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <div className="grid gap-2">
                   <DateTimePicker
-                    label="Due Date"
+                    label="Date (Optional)"
                     value={date}
                     onChange={(newValue: any) => setDate(newValue)}
                   />

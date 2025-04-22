@@ -23,7 +23,7 @@ ul {
   list-style-type: none;
 }
 
-a:not(.text-blue-600) {
+a:not(.text-blue-600, .text-gray-500) {
   text-decoration: none;
   color: #333;
 }

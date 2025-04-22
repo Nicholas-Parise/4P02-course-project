@@ -164,50 +164,6 @@ const Events = () => {
 
   const [delConfirmation, setDelConfirmation] = useState('');
 
-  const handleCreateEvent = (e: FormEvent) => {
-    e.preventDefault();
-    if (newEventTitle.trim() === '') {
-      setErrorMessage('Title cannot be empty');
-      return;
-    } 
-    
-    let uniqueTitle = newEventTitle;
-    let counter = 1;
-    if (events != undefined){
-      const eventNames = events.map(event => event.name);
-      while (eventNames.includes(uniqueTitle)) {
-        uniqueTitle = `${newEventTitle} (${counter})`;
-        counter++;
-      }
-    }
-
-    // create event in the backend
-    fetch(eventUrl, {
-      method: 'post',
-      headers: new Headers({
-          'Authorization': "Bearer "+token,
-          'Content-Type': 'application/json'
-      }),
-      body: JSON.stringify({
-          name: uniqueTitle,
-          description: "Type your description here",
-          image: "", 
-          addr: "Type your address here",
-          city: "Type your city here",
-      })
-      })
-      .then((response) => response.json())
-      .then((data) => {
-          let newEvent: Event = data.event
-          setEvents([...events, newEvent])
-      })
-      .catch((error) => {
-          console.log(error)
-      })
-
-    handleModalClose();
-  }
-
   const changeActiveOverlay = (title: string) => {
     if(activeOverlay == title){
       setActiveOverlay("")
@@ -357,7 +313,7 @@ const Events = () => {
               image={event.image} // Make sure this is passed
               edit={handleEditOpen}
               share={handleShare}
-              owner={"Me"}
+              owner={event.creator_displayname || "None"}
               isOwner={event.owner}
             />
           ))
@@ -391,31 +347,7 @@ const Events = () => {
           />
         ))}
       </EventContainer>
-      {/* Modal for Creating Events */}
-      <Modal
-        open={modalOpen}
-        onClose={handleModalClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <ModalBox sx={boxStyle}>
-          <form autoComplete="off" onSubmit={handleCreateEvent}>
-            <FormControl sx={{ width: '25ch' }}>
-              <TextField
-                fullWidth
-                value={newEventTitle}
-                onChange={(e) => setNewEventTitle(e.target.value)}
-                label="Event Title"
-                variant="outlined"
-                margin="normal"
-                error={!!errorMessage}
-                helperText={errorMessage}
-              />
-              <ModalButton type="submit">Create</ModalButton>
-            </FormControl>
-          </form>
-        </ModalBox>
-      </Modal>
+      {/* Modal for Editing Events */}
       <Modal
         open={editOpen}
         onClose={handleEditClose}
