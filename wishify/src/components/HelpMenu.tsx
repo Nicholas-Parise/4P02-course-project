@@ -2,7 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { AiFillGift, AiOutlineCloseCircle } from "react-icons/ai";
 import { NavLink, useLocation } from "react-router-dom";
 import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
-import { FaChevronDown } from "react-icons/fa";
+import { FaChevronDown, FaShare } from "react-icons/fa";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSlash, faEye, faCrown } from "@fortawesome/free-solid-svg-icons";
 import "./HelpMenu.css";
 
 interface Props {
@@ -43,35 +45,70 @@ const HelpMenu = ({ closeMenu }: Props) => {
       sections: [
         {
           title: "Creating and Organizing Wishlists",
-          content: "Create wishlists for different occasions or purposes. Each wishlist can have a title, detailed description, cover image, and optional due date. Use the drag-and-drop feature to reorder items based on your priority."
+          content: "Simply click the 'create a wishlist' button. You can create wishlists for different occasions or purposes."
         },
         {
           title: "Adding and Managing Items",
-          content: "Add items with comprehensive details including image, purchase links, and quantity needed."
+          content: "Simply click the 'Add wish' button to add an item. Use the drag-and-drop feature to reorder items based on your priority."
         },
         {
-          title: "Advanced Sharing Options",
-          content: "Share wishlists via unique links or direct email invitations. Control permissions at two levels: Contributor (can reserve items), and Owner (can modify the wishlist)."
+          title: "Sharing",
+          content:(
+          <>
+          Share wishlists via unique links or direct email invitations. Simply click:
+          <FaShare style={{ marginLeft:"2px", display:"inline-block", color: "#5651e5" }} className='transition-[1]'/>
+          </>
+          )
+        },
+        {
+          title: "Permissions",
+          content:(
+            <>
+             permission levels: 
+             <br></br>
+             <FontAwesomeIcon icon={faCrown} fontSize={12} className="opacity-[54%]"/>
+             Owner (can modify the wishlist)
+             <br></br>
+             <span style={{ display: "inline-block", verticalAlign: "middle", marginRight: 14 }}>
+                <span className="fa-layers fa-fw">
+                <FontAwesomeIcon icon={faCrown} fontSize={12} className="opacity-[54%]"/>
+                {<FontAwesomeIcon icon={faSlash} fontSize={12} />}
+              </span>
+              </span>
+              <span style={{ display:"inline-block"}}>
+              Contributor (can reserve items)
+              </span>
+             
+              <br></br>
+             <FontAwesomeIcon icon={faEye} fontSize={12} className="opacity-[54%]"/>
+             Viewer (can see contributions)
+             <br></br>
+             <span style={{ display: "inline-block", verticalAlign: "middle", marginRight: 14 }}>
+                <span className="fa-layers fa-fw">
+                <FontAwesomeIcon icon={faEye} fontSize={12} className="opacity-[54%]"/>
+                {<FontAwesomeIcon icon={faSlash} fontSize={12} />}
+              </span>
+              </span>
+              <span style={{ display:"inline-block"}}>
+              Blind (cannot see contributions)
+              </span>
+        
+             <span style={{ visibility:"hidden" }}>s p a c e</span>
+
+            </>
+          ) 
         },
         {
           title: "Collaboration Features",
-          content: "Enable comments on your wishlist item to get feedback from friends. The item comment log shows all changes made by collaborators."
+          content: "Click the item to leave a contribution, you can mark it as purchased or reserved."
         },
         {
           title: "Wishlist Analytics",
           content: "Track the status of items in your wishlist. See which items have been reserved or purchased, and by whom."
         },
         {
-          title: "Wishlist Reminders",
-          content: "Set reminders for important dates related to your wishlist. Notifications can be sent via email or in-app."
-        },
-        {
           title: "Wishlist Customization",
-          content: "Customize the look and feel of your wishlist with themes and layouts. Use tags to categorize items for easier navigation."
-        },
-        {
-          title: "Wishlist Privacy Settings",
-          content: "Control who can view your wishlist. Set it to public, private, or shared with specific users."
+          content: "Customize the look and feel of your wishlist with themes and layouts."
         }
       ]
     },
@@ -83,8 +120,8 @@ const HelpMenu = ({ closeMenu }: Props) => {
           content: "Events bring together multiple wishlists for occasions like birthdays or holidays. Add event details including dates, locations, and custom cover images."
         },
         {
-          title: "Managing Participant Wishlists",
-          content: "Add existing wishlists from your collection or invite others to contribute theirs. Set visibility preferences for each wishlist. The unified view shows all items across wishlists, with filters to narrow down options."
+          title: "Managing Wishlists",
+          content: "Add existing wishlists from your collection or create a new one. invite others to contribute theirs."
         },
         {
           title: "Member and Gift Tracking",
@@ -95,16 +132,17 @@ const HelpMenu = ({ closeMenu }: Props) => {
           content: "Track Members and gift progress through the event dashboard. See which items have been reserved or purchased."
         },
         {
-          title: "Event Reminders",
-          content: "Set reminders for important dates related to the event. Notifications can be sent via email or in-app."
-        },
-        {
           title: "Event Sharing",
-          content: "Share event details with participants through unique links or direct email invitations. Control permissions for each participant."
+          content:(
+            <>
+            Share wishlists via unique links or direct email invitations. Simply click:
+            <FaShare style={{ marginLeft:"2px", display:"inline-block", color: "#5651e5" }} className='transition-[1]'/>
+            </>
+            )
         },
         {
           title: "Event Collaboration",
-          content: "Enable comments on event items to get feedback from participants. The item comment log shows all changes made by collaborators."
+          content: "The item comment log shows all changes made by collaborators."
         }
       ]
     },
@@ -117,27 +155,15 @@ const HelpMenu = ({ closeMenu }: Props) => {
         },
         {
           title: "Personalized Recommendations",
-          content: "Our Algorithm analyzes your past wishlists, and preferences to suggest perfect gift ideas."
+          content: "Our Algorithm analyzes your likes and dislikes to suggest perfect gift ideas."
         },
         {
           title: "Idea to Wishlists",
-          content: "With one click, add discovered items directly to any of your wishlists. The system automatically populates available details like images and descriptions."
-        },
-        {
-          title: "Idea Sharing",
-          content: "Share your favorite gift ideas with friends and family. Use unique links or direct email invitations to share."
-        },
-        {
-          title: "Idea Collaboration",
-          content: "Enable comments on gift ideas to get feedback from friends. The item comment log shows all changes made by collaborators."
+          content: "With one click, add discovered items directly to any of your wishlists!"
         },
         {
           title: "Idea Analytics",
-          content: "Track the popularity of items you discover. See which items have been reserved or purchased by others."
-        },
-        {
-          title: "Idea Customization",
-          content: "Customize the look and feel of your gift ideas with themes and layouts. Use tags in your profile page to categorize items for easier navigation."
+          content: "See the popularity of items you discover. See which items have been the most wishlisted."
         }
       ]
     },
@@ -146,27 +172,27 @@ const HelpMenu = ({ closeMenu }: Props) => {
       sections: [
         {
           title: "Dashboard Overview",
-          content: "Your Home dashboard provides a comprehensive snapshot of your Wishify activity. The top section shows your most recently accessed wishlists and events, while the bottom section displays your recent contributions to others' wishlists. Each card shows key information at a glance, including item counts, upcoming dates, and contribution statuses."
+          content: "Your Home dashboard provides a comprehensive snapshot of your Wishify activity. See your recently accessed wishlists, events and your recent contributions to others' wishlists."
         },
         {
           title: "Quick Navigation",
-          content: "Click any wishlist or event card to jump directly to it. The 'View All' buttons take you to complete lists of your wishlists or events. Use the quick action buttons (+ Add Wish) to create new items without leaving the home page. The Navigation bar provides instant access to all major sections of the application."
+          content: "Click any wishlist or event card to jump directly to it. The Navigation bar and profile menu provide instant access to all major sections of the application."
         },
         {
           title: "Activity Tracking",
-          content: "The Contributions section meticulously tracks all items you've pledged to purchase from shared wishlists. Each entry shows the item name, purchase status (reserved/purchased), quantity, price, and any notes you've added. Click on any contribution to see more details about the wishlist and the item within the wishlist."
+          content: "The Contributions section meticulously tracks all items you've pledged to purchase. Click on any contribution to see more details."
         },
         {
           title: "Account Management",
-          content: "Update your profile picture, display name, and personal details in Account Settings. Configure notification preferences for wishlist or events within the specific wishlist and events. The master switch for notication is within the sidebar when you click your profile icon in the Navigation bar."
+          content: "Mange your account settings by navigating to your profile and editing the fields."
         },
         {
-          title: "Navigation Tips",
-          content: "Use the persistent Navigation bar to quickly switch between app sections."
+          title: "Notifications",
+          content: "Configure notification preferences for wishlist or events within the specific wishlist and events. The master switch for notication is within the sidebar."
         },
         {
           title: "Troubleshooting Common Issues",
-          content: "If links aren't working, check your browser's pop-up settings. For syncing problems, try refreshing the page or logging out and back in. Clear your browser cache if you see outdated information. Image upload issues can often be resolved by checking file size and format requirements."
+          content: "If links aren't working, check your browser's pop-up settings. For syncing problems, try refreshing the page or logging out and back in. Clear your browser cache if you see outdated information."
         },
         {
           title: "Pro Features Explained",
@@ -180,7 +206,7 @@ const HelpMenu = ({ closeMenu }: Props) => {
                   <strong>Exclusive Pro Badge</strong> - Verified profile marker that increases gifting credibility
                 </li>
                 <li>
-                  <strong>Priority Support</strong> - 24-hour response guarantee and live chat
+                  <strong>Priority Support</strong> - 24-hour response guarantee
                 </li>
                 <li>
                   <strong>Early Feature Access</strong> - Try new tools weeks before public release
@@ -197,7 +223,7 @@ const HelpMenu = ({ closeMenu }: Props) => {
         },
         {
           title: "Getting Additional Support",
-          content: "Our 24/7 support team can be reached at support@wishify.com or through the in-app chat (bottom right corner). Include screenshots for technical issues. For feature requests, visit our feedback portal at feedback.wishify.com. Check our YouTube channel for video tutorials on advanced features."
+          content: "Our 24/7 support team can be reached at support@wishify.com. Include screenshots for technical issues."
         }
       ]
     }
