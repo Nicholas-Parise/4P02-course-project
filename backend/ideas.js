@@ -30,7 +30,9 @@ router.get('/', authenticate, async (req, res, next) => {
     // ---- 
     // note if we only want ideas where score is above 0 we have to use a sub query instead: 
     // SELECT * FROM (....)sub WHERE sub.score > -1 ORDER BY sub.score DESC, sub.created DESC;
+    // ORDER BY score DESC, i.uses DESC;
     const result = await db.query(`
+      SELECT * FROM (
       SELECT i.*, 
           json_agg(json_build_object('id', c.id, 'name', c.name, 'love', uc.love)) AS categories,
           SUM(CASE 
@@ -43,9 +45,8 @@ router.get('/', authenticate, async (req, res, next) => {
       LEFT JOIN categories c ON ic.category_id = c.id
       LEFT JOIN user_categories uc ON uc.category_id = c.id AND uc.user_id = $1
       GROUP BY i.id
-      ORDER BY score DESC, i.uses DESC;
+      )sub WHERE sub.score > -1 ORDER BY sub.score DESC, sub.uses DESC;
   `, [userId]);
-
 
 
     res.status(200).json({ ideas: result.rows });
