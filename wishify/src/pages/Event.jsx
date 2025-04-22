@@ -264,7 +264,8 @@ const Event = () => {
         });
         const data = await response.json();
         const filteredWishlists = data.filter(wishlist => wishlist.event_id != id);
-        setOwnedWishlists(filteredWishlists);
+        const ownedWishlists = filteredWishlists.filter(wishlist => wishlist.owner);
+        setOwnedWishlists(ownedWishlists);
         console.log(ownedWishlists)
       } catch (error) {
         console.error('Error fetching event:', error);
@@ -746,6 +747,7 @@ const Event = () => {
               duplicate={handleDuplicate}
               share={handleShare}
               owner={wishlist.creator_displayname}
+              isOwner={wishlist.owner}
               shareToken={wishlist.share_token}
             />
           ))}
