@@ -121,7 +121,6 @@ const Ideas = () => {
     }
     const handleCloseModal = () => {
         setModalOpen(false);
-        setDefaultQuantity(1);
     }
 
     return (
