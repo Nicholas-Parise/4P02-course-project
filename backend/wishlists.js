@@ -170,12 +170,16 @@ router.get('/:wishlistId', authenticate, async (req, res, next) => {
       LIMIT 1;
       `, [userId, wishlistId]);
 
-
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "wishlist not found." });
     }
 
     const wishlist = result.rows[0];
+
+    // if the user doesn't have a membership to either the event or the wishlist
+    if (!wishlist.is_wishlist_member && !wishlist.is_event_member) {
+      return res.status(403).json({ error: "You are not a member of this wishlist." });
+    }
 
     // Get all items
     const itemsResult = await db.query(`
