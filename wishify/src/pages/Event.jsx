@@ -487,6 +487,7 @@ const Event = () => {
       method: 'put',
       headers: new Headers({
         'Authorization': "Bearer "+token,
+        'Content-Type': 'application/json'
       }),
       body: JSON.stringify({
         event_id: "null"
