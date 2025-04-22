@@ -50,7 +50,7 @@ router.post('/register', async (req, res, next) => {
 
         // send notification if allowed 
         if (result.rows[0].notifications) {
-            await createNotification([result.rows[0].id], "Welcome to Wishify!", "Hello from the wishify team! we are so excited to welcome you to this platform, if you need any assistance checkout the help page.", "/home");
+            await createNotification([result.rows[0].id], "Welcome to Wishify!", "Hello from the wishify team! we are so excited to welcome you to this platform.", "/home");
             await welcomeEmail(email, displayName);
         }
 
