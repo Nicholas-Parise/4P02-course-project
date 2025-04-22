@@ -157,7 +157,7 @@ const Ideas = () => {
                     addButtonsEnabled={true} 
                     bgColor={"#fff"} 
                     loading={loading} 
-                    title="Recommended for You - Powered by AI" 
+                    title="Recommended for You" 
                     subtitle="Personalized suggestions based on your preferences"
                     items={ideas} 
                     tagsEnabled={true} 
