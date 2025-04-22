@@ -65,7 +65,10 @@ const CreateEventModal = ({ open, setOpen, events, setEvents, token }: Props) =>
       })
       .then((response) => response.json())
       .then((data) => {
-          let newEvent: Event =  data.event // TODO add descriptions
+          let newEvent: Event =  {
+            ...data.event,
+            owner: true
+          }
           setEvents([...events, newEvent])
           setNewEvent({})
       })

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Modal,
     Box,
@@ -37,6 +37,11 @@ const AddIdeaModal: React.FC<AddIdeaModalProps> = ({
     wishlists,
     onAdd,
 }) => {
+    useEffect(() => {
+        if (open) {
+          setQuantity("1"); // Reset quantity when the modal opens
+        }
+      }, [open]);
     const [selectedWishlist, setSelectedWishlist] = useState('');
     const [selectedWishlistId, setSelectedWishlistId] = useState(0);
     const [quantity, setQuantity] = useState("1");
