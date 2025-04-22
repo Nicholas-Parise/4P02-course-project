@@ -24,7 +24,6 @@ export default function ManageSubscription() {
 
 
   const handleSubscribe = async () => {
-    console.log(token);
     const res = await fetch('https://api.wishify.ca/payments/create-subscription-session', {
       method: 'POST',
       headers: {
@@ -71,7 +70,6 @@ export default function ManageSubscription() {
 
   const ChangePayment = async () => {
 
-    console.log(token);
     const res = await fetch('https://api.wishify.ca/payments/create-portal-session', {
       method: 'POST',
       headers: {
@@ -82,8 +80,6 @@ export default function ManageSubscription() {
 
     const data = await res.json();
 
-    console.log(data);
-
     //const stripe = await stripePromise;
     //stripe?.redirectToCheckout(data.url);
     window.location.href = data.url;
@@ -92,7 +88,6 @@ export default function ManageSubscription() {
 
 
   const reactivateSub = async () => {
-    console.log(token);
     const res = await fetch('https://api.wishify.ca/payments/reactivate-subscription', {
       method: 'POST',
       headers: {
@@ -104,7 +99,6 @@ export default function ManageSubscription() {
 
     const data = await res.json();
 
-    console.log(data);
     //window.location.href = data.url;
     fetchStatus();
   };

@@ -260,7 +260,7 @@ const Home = () => {
 
     useEffect(() => {
       let token = localStorage.getItem('token') || ''
-      console.log(token)
+      //console.log(token)
       fetch(wishlistUrl, {
         method: 'get',
         headers: new Headers({
@@ -373,7 +373,7 @@ const [contributions, setContributions] = useState([])
 
     useEffect(() => {
       let token = localStorage.getItem('token') || ''
-      console.log(token)
+      //console.log(token)
       fetch(userURL, {
         method: 'get',
         headers: new Headers({

@@ -13,7 +13,7 @@ const UpgradePage = () => {
   const [activeFaqIndex, setActiveFaqIndex] = useState(null);
  
   const handleSubscribe = async () => {
-    console.log(token);
+    //console.log(token);
     const res = await fetch('https://api.wishify.ca/payments/create-subscription-session', {
       method: 'POST',
       headers: {

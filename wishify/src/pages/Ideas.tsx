@@ -77,7 +77,7 @@ const Ideas = () => {
     function addItemToWishlist(wishlistId: number, quantity: number = 1) {
         // Add item to wishlist API call
         setToken(localStorage.getItem('token') || '')
-        console.log(token)
+        //console.log(token)
         fetch("https://api.wishify.ca/items/", {
             method: 'post',
             headers: new Headers({

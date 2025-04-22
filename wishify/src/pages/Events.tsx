@@ -191,7 +191,7 @@ const Events = () => {
     const eventId = eventToRename.id;
 
     console.log("id " + eventId)
-    console.log("token " + token)
+    //console.log("token " + token)
     console.log("name " + newEventTitle)
     fetch(eventUrl + eventId, {
       method: 'put',

@@ -81,7 +81,7 @@ const Wishlists = () => {
   useEffect(() => {
     const fetchData = async () => {
       setToken(localStorage.getItem('token') || '');
-      console.log(token);
+      //console.log(token);
   
       try {
         // Fetch user data and wishlists concurrently
@@ -190,7 +190,7 @@ const Wishlists = () => {
     const wishlistId = wishlistToRename.id;
 
     console.log("id " + wishlistId)
-    console.log("token " + token)
+    //console.log("token " + token)
     console.log("name " + newWishlistTitle)
     fetch(wishlistUrl + wishlistId, {
       method: 'put',

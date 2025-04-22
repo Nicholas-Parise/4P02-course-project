@@ -56,11 +56,11 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
 
     setNotifications([])
     const token = localStorage.getItem('token') || ''
-    console.log(token)
+    //console.log(token)
     setToken(token)
 
     const getNotifications = () => {
-      console.log(token)
+      //console.log(token)
       let status_code = -1
       const notificationsURL = `https://api.wishify.ca/notifications`
       fetch(notificationsURL, {
