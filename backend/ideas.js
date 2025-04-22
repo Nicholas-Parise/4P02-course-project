@@ -20,7 +20,6 @@ router.get('/', authenticate, async (req, res, next) => {
     // false = -5 points (user dislikes the category)
     // null = 0 points (user has no opinion)
 
-    
     // query explanation:
     // for each idea we want to calculate the score by:
     // getting each category associated with the idea
