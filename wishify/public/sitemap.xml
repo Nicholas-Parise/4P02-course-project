@@ -4,47 +4,65 @@
   <!-- Homepage -->
   <url>
     <loc>https://wishify.ca/</loc>
-    <lastmod>2025-04-05</lastmod>
+    <lastmod>2025-04-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
 
     <url>
     <loc>https://wishify.ca/landing</loc>
-    <lastmod>2025-04-05</lastmod>
+    <lastmod>2025-04-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <!-- Public Pages -->
 
+  <!-- Auth -->
+
   <url>
     <loc>https://wishify.ca/login</loc>
-    <lastmod>2025-04-05</lastmod>
+    <lastmod>2025-04-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://wishify.ca/register</loc>
-    <lastmod>2025-04-05</lastmod>
+    <lastmod>2025-04-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
+
+  <url>
+    <loc>https://www.wishify.ca/forgot-password</loc>
+    <lastmod>2025-04-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <!-- Other  -->
+
   <url>
     <loc>https://wishify.ca/status</loc>
     <lastmod>2025-04-05</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.4</priority>
+    <priority>0.5</priority>
   </url>
   <url>
     <loc>https://wishify.ca/privacy-policy</loc>
-    <lastmod>2025-04-05</lastmod>
+    <lastmod>2025-04-25</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://wishify.ca/terms-of-service</loc>
-    <lastmod>2025-04-05</lastmod>
+    <lastmod>2025-04-0255</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://wishify.ca/about</loc>
+    <lastmod>2025-04-25</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
