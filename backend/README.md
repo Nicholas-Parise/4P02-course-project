@@ -1,6 +1,4 @@
-# Backend code
-
-The following is all about the backend of this web app. From the database, to specifics about the API.
+# Backend
 
 # Endpoints
 An end point in **BOLD** specifies it's implemented.
@@ -109,8 +107,11 @@ GET /wishlists/:id/items → Get all items in a wishlist (and contributions)
 GET /wishlists/share/:token → get the shared wishlist  
 POST /wishlists/share → share the wishlist to email, if user exists membership added. Else send email**
 
+# Server Architecture
+![Screenshot of Server Architecture.](server-architecture.png)
+
 
 # Database
-
 ![Screenshot of database UML.](database/4P02-Database-UML.png)
+
 
