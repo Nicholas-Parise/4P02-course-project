@@ -1,4 +1,5 @@
-# 4P02-course-project group 12
+# Wishify
+## 4P02-course-project group 12
 
 ![Wishify.](wishify/public/assets/wishify.png)
 
